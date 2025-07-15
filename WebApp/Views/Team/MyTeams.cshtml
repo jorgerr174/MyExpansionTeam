@@ -1,0 +1,16 @@
+﻿@model IEnumerable<METCore.DTOs.Team.TeamInfoDto>?
+
+@{
+    ViewData.Add("myTeams", true);
+}
+
+<div class="text-center">
+    <div id="teams">
+        @await Html.PartialAsync("~/Views/Shared/_TeamList.cshtml", Model, ViewData)
+    </div>
+</div>
+
+<div class="col-sm-6">
+    <a asp-action="Create">New Team</a>
+</div>
+

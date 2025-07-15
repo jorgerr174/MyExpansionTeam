@@ -1,0 +1,29 @@
+﻿@model METCore.DTOs.Team.TeamBasicInfoDto
+
+<form asp-action="Create" method="post">
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.UserUsername)
+    @Html.HiddenFor(m => m.Date)
+    @Html.HiddenFor(m => m.Complete)
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Location, htmlAttributes: new { @class = "control-label" })
+        @Html.TextBoxFor(m => m.Location, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Location, "", new { @class = "text-danger" })
+	</div>
+
+	<div class="form-group">
+		@Html.LabelFor(m => m.Mascot, new { @class = "control-label" })
+		@Html.TextBoxFor(m => m.Mascot, new { @class = "form-control" })
+		@Html.ValidationMessageFor(m => m.Mascot, "", new { @class = "text-danger" })
+	</div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Abb, htmlAttributes: new { @class = "control-label" })
+        @Html.TextBoxFor(m => m.Abb, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Abb, "", new { @class = "text-danger" })
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Team</button>
+</form>

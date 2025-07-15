@@ -1,0 +1,11 @@
+﻿@model IEnumerable<METCore.DTOs.Team.TeamInfoDto>?
+
+@{
+    ViewData.Add("myTeam", false);
+}
+
+<div class="text-center">
+    <div id="teams">
+        @await Html.PartialAsync("~/Views/Shared/_TeamList.cshtml", Model, ViewData)
+    </div>
+</div>

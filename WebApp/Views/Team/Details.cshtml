@@ -1,0 +1,48 @@
+﻿@model METCore.DTOs.Team.TeamInfoDto
+
+<div>
+    <h1>@Model.Location @Model.Mascot</h1>
+    <h4>@User?.Identity?.Name</h4>
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.Complete)
+    @Html.HiddenFor(m => m.RosterSettingsProtectedPlayersIds)
+
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Date)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.Date)</dd>
+    </dl>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Location)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.Location)</dd>
+    </dl>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Abb)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.Abb)</dd>
+    </dl>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Mascot)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.Mascot)</dd>
+    </dl>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.RosterSettingsCap)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.RosterSettingsCap)</dd>
+    </dl>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.RosterSettingsMaxPerTeam)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.RosterSettingsMaxPerTeam)</dd>
+    </dl>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.RosterSettingsProtectedPerTeam)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.RosterSettingsProtectedPerTeam)</dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-area="" asp-controller="Home" asp-action="Index">Go Back</a>
+</div>

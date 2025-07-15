@@ -1,0 +1,82 @@
+﻿@using static METCore.Enums.Types
+@model METCore.DTOs.Admin.ImportDto
+
+@{
+    string errorFileName = ViewBag.errorFile as string ?? "";
+    int thisYear = ViewBag.thisYear as int? ?? 0;
+}
+
+<h2>Import @Enum.GetName(typeof(ImportEnum), @Model.Type)</h2>
+
+
+<form asp-action="Import" enctype="multipart/form-data" method="post">
+    @if (!String.IsNullOrWhiteSpace(errorFileName))
+	{
+		<div class="form-group">
+			<div class="col-md-offset-2 col-md-10">
+                <p class="text-danger">No todos los registros de @Model.File.FileName se importaron con éxito.</p>
+                <p class="text-danger">Pulse a continuación para descargar aquellos no importados.</p>
+                <a asp-action="DownloadErrorFile" asp-route-FileName="@errorFileName" class="btn btn-warning">
+					<i class="fa fa-download"></i> Download Error Report
+				</a>
+			</div>
+		</div>
+	}
+	
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+	<br /><br />
+
+    <div class="form-group">
+		<hr />
+        <div class="form-group">
+            @Html.ValidationMessageFor(m => m.Type, "", new { @class = "text-danger" })
+            <br />
+            @Html.LabelFor(m => m.Type, htmlAttributes: new { @class = "control-label" })
+            @Html.DropDownListFor(m => m.Type, Html.GetEnumSelectList<ImportEnum>())
+        </div>
+        <div class="form-group" id="year-group" hidden>
+			<br />
+			@Html.ValidationMessageFor(m => m.Year, "", new { @class = "text-danger" })
+            <br />
+            @Html.LabelFor(m => m.Year, htmlAttributes: new { @class = "control-label" })
+            @Html.DropDownListFor(m => m.Year, new SelectList(new int[] { DateTime.Now.Year-1, DateTime.Now.Year-2, DateTime.Now.Year-3 }))
+        </div>
+        <div class="form-group" id="typestats-group" hidden>
+			<br />
+			@Html.ValidationMessageFor(m => m.StatsType, "", new { @class = "text-danger" })
+            <br />
+            @Html.LabelFor(m => m.StatsType, htmlAttributes: new { @class = "control-label" })
+            @Html.DropDownListFor(m => m.StatsType, Html.GetEnumSelectList<StatsEnum>())
+        </div>
+        <br />
+        <div class="form-group">
+            @Html.ValidationMessageFor(m => m.File, "", new { @class = "text-danger" })
+            <br />
+            @Html.LabelFor(m => m.File, htmlAttributes: new { @class = "control-label" })
+            <input type="file" name="File" id="File" class="form-control" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Upload CSV</button>
+</form>
+
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        const typeDropdown = document.getElementById('Type');
+        const yearGroup = document.getElementById('year-group');
+        const statsTypeGroup = document.getElementById('typestats-group');
+
+        function updateFormVisibility() {
+            if (typeDropdown.options[typeDropdown.selectedIndex].text === 'Stats') {
+                yearGroup.hidden = false;
+                statsTypeGroup.hidden = false;
+            } else {
+                yearGroup.hidden = true;
+                statsTypeGroup.hidden = true;
+            }
+        }
+
+        typeDropdown.addEventListener('change', updateFormVisibility);
+    });
+</script>
