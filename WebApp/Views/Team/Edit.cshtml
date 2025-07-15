@@ -1,0 +1,42 @@
+﻿@model METCore.DTOs.Team.TeamBasicInfoDto
+
+<form asp-action="UpdateCredentials" method="post">
+    <h1>@Model.Location @Model.Mascot</h1>
+    <h4>@User?.Identity?.Name</h4>
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.Complete)
+    @Html.HiddenFor(m => m.UserUsername)
+    @Html.HiddenFor(m => m.Date)
+
+	@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="form-group">
+        <dt class="col-sm-2">@Html.DisplayNameFor(m => m.Date)</dt>
+        <dd class="col-sm-10">@Model.Date.ToString("dd/MM/yyyy")</dd>
+    </div>
+    <hr />
+
+    <div class="form-group">
+		@Html.ValidationMessageFor(m => m.Location, "", new { @class = "text-danger" })
+		@Html.LabelFor(m => m.Location, htmlAttributes: new { @class = "control-label" })
+        @Html.TextBoxFor(m => m.Location, new { @class = "form-control" })
+	</div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Abb, htmlAttributes: new { @class = "control-label" })
+        @Html.TextBoxFor(m => m.Abb, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Abb, "", new { @class = "text-danger" })
+    </div>
+	
+    <div class="form-group">
+		@Html.ValidationMessageFor(m => m.Mascot, "", new { @class = "text-danger" })
+		@Html.LabelFor(m => m.Mascot, new { @class = "control-label" })
+        @Html.TextBoxFor(m => m.Mascot, new { @class = "form-control" })
+    </div>
+
+    <div class="row">
+		<button type="submit" class="btn btn-primary col-sm">Update Team</button>
+        <a class="col-sm" href="@Url.RouteUrl("EditSettings", new { Id = Model.Id } )">Editar ajustes</a>
+        <a class="col-sm" href="@Url.RouteUrl("EditRoster", new { Id = Model.Id } )">Editar plantilla</a>
+	</div>
+</form>

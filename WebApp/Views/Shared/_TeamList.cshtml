@@ -1,0 +1,68 @@
+﻿@using METCore.DTOs.Shared
+@using METCore.DTOs.Team
+@model IEnumerable<TeamInfoDto>
+
+@{
+    bool myTeams = ViewData["myTeams"] as bool? ?? false; // Default to true if missing
+}
+
+<div>
+    <br />
+    <div>
+        <a asp-controller="Team" asp-action="NewTeam">New Team</a>
+    </div>
+
+    <br />
+    <hr />
+    <table>
+        @if (myTeams)
+        {
+            <tr>
+                <td class="col-sm-3">Date</td>
+                <td class="col-sm-2">Abb</td>
+                <td class="col-sm-5">Noun As</td>
+                <td class="col-sm-3">Editar</td>
+            </tr>
+            <tbody>
+                @foreach (TeamInfoDto team in Model)
+                {
+                    <tr>
+                        <td class="col-sm-3">@team.Date.ToString("dd/MM/yyyy")</td>
+                        <td class="col-sm-2">@team.Abb</td>
+                        <td class="col-sm-5">@team.Location @team.Mascot</td>
+                        <td class="col-sm-3"><a href="@Url.RouteUrl("EditTeam", new { Id = team.Id } )">Editar</a></td>
+                    </tr>
+	            }
+            </tbody>
+            <tfoot>
+            </tfoot>
+        }
+        else
+        {
+            <tr>
+                <td class="col-sm-3">Date</td>
+                <td class="col-sm-2">Abb</td>
+                <td class="col-sm-5">User</td>
+                <td class="col-sm-3">See</td>
+            </tr>
+            <tbody>
+                @foreach (TeamInfoDto team in Model)
+                {
+                    <tr>
+                        <td class="col-sm-3">@team.Date.ToString("dd/MM/yyyy")</td>
+                        <td class="col-sm-2">@team.Abb</td>
+                        <td class="col-sm-5"><a href="@Url.RouteUrl("UserDetails", new { username = team.UserUsername } )">@team.UserUsername</a></td>
+                        <td class="col-sm-3"><a href="@Url.RouteUrl("TeamDetails", new { Id = team.Id } )">@team.Location @team.Mascot</a></td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+            </tfoot>
+        }
+    </table>
+    
+    <br />
+	<div>
+		<a asp-controller="Home" asp-action="Index">Go Back</a>
+    </div>
+</div>

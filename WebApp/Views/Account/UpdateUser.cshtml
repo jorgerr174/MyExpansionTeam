@@ -1,0 +1,55 @@
+﻿@model WebApp.Models.Account.UserViewModel
+
+<form asp-action="UpdateUser" method="post">
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <dl class="row">
+        @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "text-danger" })
+        <dt class="col-sm-1">
+            @Html.DisplayNameFor(m => m.FirstName)
+        </dt>
+        <dd class="col-sm-3">
+            @Html.DisplayFor(m => m.FirstName)
+        </dd>
+        <dd class="col-sm-8">
+            @Html.TextBox("FirstName", "", new { @class = "form-control", placeholder = "New First Name" })
+        </dd>
+    </dl>
+    <dl class="row">
+		@Html.ValidationMessageFor(m => m.LastName, "", new { @class = "text-danger" })
+        <dt class="col-sm-1">
+            @Html.DisplayNameFor(m => m.LastName)
+        </dt>
+        <dd class="col-sm-3">
+            @Html.DisplayFor(m => m.LastName)
+        </dd>
+        <dd class="col-sm-8">
+            @Html.TextBox("LastName", "", new { @class = "form-control", placeholder = "Nuevo apellido" })
+        </dd>
+    </dl>
+    <dl class="row">
+		@Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+        <dt class="col-sm-1">
+            @Html.DisplayNameFor(m => m.Email)
+        </dt>
+        <dd class="col-sm-3">
+            @Html.DisplayFor(m => m.Email)
+        </dd>
+        <dd class="col-sm-8">
+            @Html.TextBox("Email", "", new { @class = "form-control", placeholder = "Nuevo email" })
+        </dd>
+    </dl>
+    <dl class="row">
+		@Html.ValidationMessageFor(m => m.Tlf, "", new { @class = "text-danger" })
+        <dt class="col-sm-1">
+            @Html.DisplayNameFor(m => m.Tlf)
+        </dt>
+        <dd class="col-sm-3">
+            @Html.DisplayFor(m => m.Tlf)
+        </dd>
+        <dd class="col-sm-8">
+            @Html.TextBox("Tlf", "", new { @class = "form-control", placeholder = "Nuevo teléfono" })
+        </dd>
+    </dl>
+
+    <button type="submit" class="btn btn-primary">Update Information</button>
+</form>

@@ -1,0 +1,1179 @@
+﻿@model METCore.DTOs.Team.TeamDto
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2>Build Team Roster - @Model.Location @Model.Mascot</h2>
+
+            <!-- Phase Navigation -->
+            <ul class="nav nav-pills mb-4" id="phaseNavigation" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="roster-tab" data-bs-toggle="pill" data-bs-target="#roster-phase" type="button" role="tab">
+                        <i class="fas fa-users me-2"></i>Build Roster
+                        <span class="badge bg-secondary ms-2" id="roster-count">0</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="review-tab" data-bs-toggle="pill" data-bs-target="#review-phase" type="button" role="tab">
+                        <i class="fas fa-clipboard-list me-2"></i>Review Roster
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="formation-tab" data-bs-toggle="pill" data-bs-target="#formation-phase" type="button" role="tab">
+                        <i class="fas fa-chess-board me-2"></i>Formation & Starters
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Salary Cap Indicator -->
+            <div class="alert alert-info mb-4" id="salaryCapIndicator">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h6><i class="fas fa-dollar-sign me-2"></i>Salary Cap Status</h6>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar" id="capProgressBar" style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted">
+                            $<span id="currentCapUsed">0</span>M of $<span id="maxCapAvailable">0</span>M used
+                            (<span id="capPercentage">0</span>%)
+                        </small>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="text-success">
+                            <strong>Remaining: $<span id="capRemaining">0</span>M</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="SaveRoster" method="post" id="teamRosterForm">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.HiddenFor(m => m.Id)
+                @Html.HiddenFor(m => m.Location)
+                @Html.HiddenFor(m => m.Mascot)
+                @Html.HiddenFor(m => m.Abb)
+                @Html.HiddenFor(m => m.UserUsername)
+                @Html.HiddenFor(m => m.Date)
+                @Html.HiddenFor(m => m.Complete)
+                @Html.HiddenFor(m => m.RosterSettingsCap)
+                @Html.HiddenFor(m => m.RosterSettingsMaxPerTeam)
+                @Html.HiddenFor(m => m.RosterSettingsProtectedPerTeam)
+                <input type="hidden" id="TeamsCap" name="TeamsCap" value="0" />
+
+                <!-- Hidden fields for protected players -->
+                @if (Model.RosterSettingsProtectedPlayersIds != null)
+                {
+                    @for (int i = 0; i < Model.RosterSettingsProtectedPlayersIds.Count; i++)
+                    {
+                        <input type="hidden" name="RosterSettingsProtectedPlayersIds[@i]" value="@Model.RosterSettingsProtectedPlayersIds[i]" />
+                    }
+                }
+
+                <!-- Container for dynamic player hidden fields -->
+                <div id="rosterPlayersContainer">
+                    @if (Model.PlayersIds != null)
+                    {
+                        @for (int i = 0; i < Model.PlayersIds.Count; i++)
+                        {
+                            <input type="hidden" name="PlayersIds[@i]" value="@Model.PlayersIds[i]" />
+                        }
+                    }
+                </div>
+
+                <!-- Hidden fields for starters configuration -->
+                <div id="startersContainer"></div>
+
+                <div class="tab-content">
+                    <!-- Phase 1: Build Roster -->
+                    <div class="tab-pane fade show active" id="roster-phase" role="tabpanel">
+                        <div class="row">
+                            <!-- Franchise Selection Sidebar -->
+                            <div class="col-md-3">
+                                <div class="card sticky-top" style="top: 20px;">
+                                    <div class="card-header">
+                                        <h5>NFL Franchises</h5>
+                                        <div class="progress mt-2" style="height: 6px;">
+                                            <div class="progress-bar" id="selectionProgress" style="width: 0%"></div>
+                                        </div>
+                                        <small class="text-muted">
+                                            <span id="franchisesWithSelections">0</span> of 32 franchises selected from
+                                        </small>
+                                    </div>
+                                    <div class="card-body p-0" style="max-height: 600px; overflow-y: auto;">
+                                        <div class="list-group list-group-flush" id="franchisesList">
+                                            <!-- Franchises will be populated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Player Selection Area -->
+                            <div class="col-md-9">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 id="currentFranchiseName">Select a franchise</h5>
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge bg-primary me-2" id="franchiseSelectedCount">0</span>
+                                                <span class="text-muted">of <span id="maxPerFranchise">0</span> max from this franchise</span>
+                                            </div>
+                                        </div>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button" class="btn btn-outline-secondary" id="showAllPlayers">
+                                                <i class="fas fa-users me-1"></i>All
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary" id="showAvailableOnly">
+                                                <i class="fas fa-user-check me-1"></i>Available
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                                        <div id="playerSelectionArea">
+                                            <div class="text-center text-muted p-5">
+                                                <i class="fas fa-hand-point-left fa-2x mb-3"></i>
+                                                <p>Select a franchise from the sidebar to view available players</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 2: Review Roster -->
+                    <div class="tab-pane fade" id="review-phase" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5>Current Team Roster</h5>
+                                        <div>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" id="clearAllRoster">
+                                                <i class="fas fa-trash me-1"></i>Clear All
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Position filters -->
+                                        <div class="mb-3">
+                                            <div class="btn-group" role="group" id="positionFilters">
+                                                <button type="button" class="btn btn-outline-primary btn-sm active" data-position="all">All</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="QB">QB</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="RB">RB</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="WR">WR</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="TE">TE</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="OL">OL</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="DL">DL</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="LB">LB</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="DB">DB</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="K">K</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="P">P</button>
+                                            </div>
+                                        </div>
+
+                                        <div id="currentRosterDisplay">
+                                            <div class="text-center text-muted p-5">
+                                                <i class="fas fa-users fa-2x mb-3"></i>
+                                                <p>No players selected yet. Start by selecting players in the Build Roster tab.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3: Formation & Starters -->
+                    <div class="tab-pane fade" id="formation-phase" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Starting Formation</h5>
+                                        <div class="btn-group btn-group-sm" role="group" id="formationSelector">
+                                            <button type="button" class="btn btn-outline-primary active" data-formation="offense">Offense</button>
+                                            <button type="button" class="btn btn-outline-primary" data-formation="defense">Defense</button>
+                                            <button type="button" class="btn btn-outline-primary" data-formation="special">Special Teams</button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="formationDisplay">
+                                            <!-- Formation positions will be displayed here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6>Available Players</h6>
+                                        <select class="form-select form-select-sm" id="formationPositionFilter">
+                                            <option value="all">All Positions</option>
+                                            <option value="QB">Quarterbacks</option>
+                                            <option value="RB">Running Backs</option>
+                                            <option value="WR">Wide Receivers</option>
+                                            <option value="TE">Tight Ends</option>
+                                            <option value="OL">Offensive Line</option>
+                                            <option value="DL">Defensive Line</option>
+                                            <option value="LB">Linebackers</option>
+                                            <option value="DB">Defensive Backs</option>
+                                            <option value="K">Kickers</option>
+                                            <option value="P">Punters</option>
+                                        </select>
+                                    </div>
+                                    <div class="card-body p-0" style="max-height: 500px; overflow-y: auto;">
+                                        <div id="availablePlayersForFormation">
+                                            <!-- Available players for formation will be listed here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="/Team/MyTeams" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to My Teams
+                                </a>
+                            </div>
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-primary" name="saveAction" value="save">
+                                    <i class="fas fa-save me-2"></i>Save Progress
+                                </button>
+                                <button type="submit" class="btn btn-success" name="saveAction" value="draft">
+                                    <i class="fas fa-play me-2"></i>Save & Continue to Draft
+                                </button>
+                                <button type="submit" class="btn btn-outline-success" name="saveAction" value="complete">
+                                    <i class="fas fa-check me-2"></i>Save & Return to Teams
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        // State variables
+        let rosterPlayersArray = [];
+        let protectedPlayersArray = @Html.Raw(Json.Serialize(Model.RosterSettingsProtectedPlayersIds ?? new List<int>()));
+        let currentFranchiseId = null;
+        let maxPerFranchise = @Model.RosterSettingsMaxPerTeam;
+        let salaryCapPercentage = @Model.RosterSettingsCap;
+        let viewMode = 'all'; // 'all' or 'available'
+        let startersConfiguration = {};
+        let totalCapUsed = 0; // Common variable for total cap used
+
+        // Calculate max available cap
+        const baseSalaryCap = 224; // NFL salary cap in millions
+        const maxCapAvailable = Math.round(baseSalaryCap * salaryCapPercentage / 100);
+
+        // Franchise data cache
+        const franchisePlayersCache = {};
+        const allRosterPlayersCache = {}; // Cache for all selected players
+        let currentFormation = 'offense';
+        let currentPositionFilter = 'all';
+
+        // Franchise names mapping
+        const franchiseNames = {
+            1: { name: "Arizona Cardinals", abbreviation: "ARI" },
+            2: { name: "Atlanta Falcons", abbreviation: "ATL" },
+            3: { name: "Baltimore Ravens", abbreviation: "BAL" },
+            4: { name: "Buffalo Bills", abbreviation: "BUF" },
+            5: { name: "Carolina Panthers", abbreviation: "CAR" },
+            6: { name: "Chicago Bears", abbreviation: "CHI" },
+            7: { name: "Cincinnati Bengals", abbreviation: "CIN" },
+            8: { name: "Cleveland Browns", abbreviation: "CLE" },
+            9: { name: "Dallas Cowboys", abbreviation: "DAL" },
+            10: { name: "Denver Broncos", abbreviation: "DEN" },
+            11: { name: "Detroit Lions", abbreviation: "DET" },
+            12: { name: "Green Bay Packers", abbreviation: "GB" },
+            13: { name: "Houston Texans", abbreviation: "HOU" },
+            14: { name: "Indianapolis Colts", abbreviation: "IND" },
+            15: { name: "Jacksonville Jaguars", abbreviation: "JAX" },
+            16: { name: "Kansas City Chiefs", abbreviation: "KC" },
+            17: { name: "Las Vegas Raiders", abbreviation: "LV" },
+            18: { name: "Los Angeles Chargers", abbreviation: "LAC" },
+            19: { name: "Los Angeles Rams", abbreviation: "LAR" },
+            20: { name: "Miami Dolphins", abbreviation: "MIA" },
+            21: { name: "Minnesota Vikings", abbreviation: "MIN" },
+            22: { name: "New England Patriots", abbreviation: "NE" },
+            23: { name: "New Orleans Saints", abbreviation: "NO" },
+            24: { name: "New York Giants", abbreviation: "NYG" },
+            25: { name: "New York Jets", abbreviation: "NYJ" },
+            26: { name: "Philadelphia Eagles", abbreviation: "PHI" },
+            27: { name: "Pittsburgh Steelers", abbreviation: "PIT" },
+            28: { name: "San Francisco 49ers", abbreviation: "SF" },
+            29: { name: "Seattle Seahawks", abbreviation: "SEA" },
+            30: { name: "Tampa Bay Buccaneers", abbreviation: "TB" },
+            31: { name: "Tennessee Titans", abbreviation: "TEN" },
+            32: { name: "Washington Commanders", abbreviation: "WAS" }
+        };
+
+        // Formation templates
+        const formations = {
+            offense: {
+                name: "Offensive Formation",
+                positions: [
+                    { id: "QB1", name: "QB", position: "QB", required: true },
+                    { id: "RB1", name: "RB", position: "RB", required: true },
+                    { id: "FB1", name: "FB", position: "FB", required: false },
+                    { id: "WR1", name: "WR1", position: "WR", required: true },
+                    { id: "WR2", name: "WR2", position: "WR", required: true },
+                    { id: "WR3", name: "WR3", position: "WR", required: false },
+                    { id: "TE1", name: "TE", position: "TE", required: true },
+                    { id: "LT", name: "LT", position: "OL", required: true },
+                    { id: "LG", name: "LG", position: "OL", required: true },
+                    { id: "C", name: "C", position: "OL", required: true },
+                    { id: "RG", name: "RG", position: "OL", required: true },
+                    { id: "RT", name: "RT", position: "OL", required: true }
+                ]
+            },
+            defense: {
+                name: "Defensive Formation (3-4)",
+                positions: [
+                    { id: "DE1", name: "DE1", position: "DL", required: true },
+                    { id: "NT", name: "NT", position: "DL", required: true },
+                    { id: "DE2", name: "DE2", position: "DL", required: true },
+                    { id: "OLB1", name: "OLB1", position: "LB", required: true },
+                    { id: "ILB1", name: "ILB1", position: "LB", required: true },
+                    { id: "ILB2", name: "ILB2", position: "LB", required: true },
+                    { id: "OLB2", name: "OLB2", position: "LB", required: true },
+                    { id: "CB1", name: "CB1", position: "DB", required: true },
+                    { id: "CB2", name: "CB2", position: "DB", required: true },
+                    { id: "FS", name: "FS", position: "DB", required: true },
+                    { id: "SS", name: "SS", position: "DB", required: true }
+                ]
+            },
+            special: {
+                name: "Special Teams",
+                positions: [
+                    { id: "K", name: "K", position: "K", required: true },
+                    { id: "P", name: "P", position: "P", required: true },
+                    { id: "LS", name: "LS", position: "LS", required: false },
+                    { id: "KR", name: "KR", position: "RB", required: false },
+                    { id: "PR", name: "PR", position: "WR", required: false }
+                ]
+            }
+        };
+
+        // Initialize
+        function initializeRosterPlayers() {
+            const container = document.getElementById('rosterPlayersContainer');
+            const existingInputs = container.querySelectorAll('input[name*="PlayersIds"]');
+            rosterPlayersArray = [];
+            totalCapUsed = 0; // Reset cap
+
+            existingInputs.forEach(input => {
+                const value = parseInt(input.value);
+                if (!isNaN(value)) {
+                    rosterPlayersArray.push(value);
+                    // Add cap value if player is cached
+                    const player = allRosterPlayersCache[value];
+                    if (player && player.capValue) {
+                        totalCapUsed += player.capValue;
+                    }
+                }
+            });
+
+            updateRosterCount();
+        }
+
+        function updateRosterCount() {
+            document.getElementById('roster-count').textContent = rosterPlayersArray.length;
+        }
+
+        function updateSalaryCapDisplay() {
+            document.getElementById('currentCapUsed').textContent = totalCapUsed.toFixed(1);
+            document.getElementById('maxCapAvailable').textContent = maxCapAvailable;
+            document.getElementById('capRemaining').textContent = (maxCapAvailable - totalCapUsed).toFixed(1);
+
+            const percentage = (totalCapUsed / maxCapAvailable) * 100;
+            document.getElementById('capPercentage').textContent = percentage.toFixed(1);
+            document.getElementById('capProgressBar').style.width = `${Math.min(percentage, 100)}%`;
+
+            // Change color based on usage
+            const progressBar = document.getElementById('capProgressBar');
+            progressBar.className = 'progress-bar';
+            if (percentage > 90) {
+                progressBar.classList.add('bg-danger');
+            } else if (percentage > 75) {
+                progressBar.classList.add('bg-warning');
+            } else {
+                progressBar.classList.add('bg-success');
+            }
+
+            // Update TeamsCap hidden field with calculated value
+            document.getElementById('TeamsCap').value = totalCapUsed.toFixed(2);
+        }
+
+        function updateRosterPlayersHiddenFields() {
+            const container = document.getElementById('rosterPlayersContainer');
+            container.innerHTML = '';
+
+            rosterPlayersArray.forEach((playerId, index) => {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = `PlayersIds[${index}]`;
+                hiddenInput.value = playerId;
+                container.appendChild(hiddenInput);
+            });
+
+            updateRosterCount();
+        }
+
+        function getFranchiseSelectedCount(franchiseId) {
+            const franchise = franchisePlayersCache[franchiseId];
+            if (!franchise) return 0;
+
+            return rosterPlayersArray.filter(playerId =>
+                franchise.players.some(p => p.id === playerId)
+            ).length;
+        }
+
+        function updateFranchiseSelectedCount() {
+            if (currentFranchiseId) {
+                const count = getFranchiseSelectedCount(currentFranchiseId);
+                document.getElementById('franchiseSelectedCount').textContent = count;
+            }
+        }
+
+        function updateSelectionProgress() {
+            const franchisesWithSelections = Array.from({ length: 32 }, (_, i) => i + 1).filter(franchiseId => {
+                return getFranchiseSelectedCount(franchiseId) > 0;
+            }).length;
+
+            document.getElementById('franchisesWithSelections').textContent = franchisesWithSelections;
+            const percentage = (franchisesWithSelections / 32) * 100;
+            document.getElementById('selectionProgress').style.width = `${percentage}%`;
+        }
+
+        function populateFranchisesList() {
+            const franchisesList = document.getElementById('franchisesList');
+            franchisesList.innerHTML = '';
+
+            for (let franchiseId = 1; franchiseId <= 32; franchiseId++) {
+                const selectedCount = getFranchiseSelectedCount(franchiseId);
+                const hasSelections = selectedCount > 0;
+                const isMaxed = selectedCount >= maxPerFranchise;
+                const statusClass = isMaxed ? 'list-group-item-danger' : hasSelections ? 'list-group-item-success' : '';
+
+                const franchiseInfo = franchiseNames[franchiseId] || { name: `Franchise ${franchiseId}`, abbreviation: `F${franchiseId}` };
+
+                const franchiseItem = document.createElement('a');
+                franchiseItem.href = '#';
+                franchiseItem.className = `list-group-item list-group-item-action franchise-item ${statusClass}`;
+                franchiseItem.setAttribute('data-franchise-id', franchiseId);
+                franchiseItem.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${franchiseInfo.name}</strong>
+                            <br><small class="text-muted">${franchiseInfo.abbreviation}</small>
+                        </div>
+                        <span class="badge ${isMaxed ? 'bg-danger' : hasSelections ? 'bg-success' : 'bg-secondary'}">${selectedCount}/${maxPerFranchise}</span>
+                    </div>
+                `;
+
+                franchiseItem.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const franchiseId = parseInt(this.getAttribute('data-franchise-id'));
+                    selectFranchise(franchiseId);
+                });
+
+                franchisesList.appendChild(franchiseItem);
+            }
+
+            updateSelectionProgress();
+        }
+
+        function selectFranchise(franchiseId) {
+            currentFranchiseId = franchiseId;
+            document.querySelectorAll('.franchise-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`.franchise-item[data-franchise-id="${franchiseId}"]`).classList.add('active');
+
+            const franchiseInfo = franchiseNames[franchiseId] || { name: `Franchise ${franchiseId}`, abbreviation: `F${franchiseId}` };
+
+            document.getElementById('currentFranchiseName').textContent = `Loading ${franchiseInfo.name}...`;
+            document.getElementById('maxPerFranchise').textContent = maxPerFranchise;
+
+            const container = document.getElementById('playerSelectionArea');
+            container.innerHTML = `
+                <div class="text-center p-5">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-muted">Loading available players...</p>
+                </div>
+            `;
+
+            if (franchisePlayersCache[franchiseId]) {
+                displayPlayersForSelection(franchisePlayersCache[franchiseId]);
+                document.getElementById('currentFranchiseName').textContent = franchisePlayersCache[franchiseId].name;
+                updateFranchiseSelectedCount();
+                return;
+            }
+
+            // Use GetSelectablePlayers endpoint which shows all players
+            fetch(`/Team/GetSelectablePlayers?FranchiseId=${franchiseId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error || !Array.isArray(data)) {
+                        throw new Error('Invalid response format');
+                    }
+
+                    const franchiseData = createFranchiseDataFromJson(data, franchiseId);
+                    franchisePlayersCache[franchiseId] = franchiseData;
+
+                    document.getElementById('currentFranchiseName').textContent = franchiseData.name;
+
+                    displayPlayersForSelection(franchiseData);
+                    updateFranchiseSelectedCount();
+                })
+                .catch(error => {
+                    console.error('Error loading franchise data:', error);
+                    container.innerHTML = `
+                        <div class="text-center text-danger p-5">
+                            <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                            <p>Error loading franchise data. Please try again.</p>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="selectFranchise(${franchiseId})">
+                                <i class="fas fa-redo me-1"></i>Retry
+                            </button>
+                        </div>
+                    `;
+                });
+        }
+
+        function createFranchiseDataFromJson(playersData, franchiseId) {
+            const franchiseInfo = franchiseNames[franchiseId] || { name: `Franchise ${franchiseId}`, abbreviation: `F${franchiseId}` };
+            return {
+                id: franchiseId,
+                name: franchiseInfo.name,
+                abbreviation: franchiseInfo.abbreviation,
+                players: playersData
+            };
+        }
+
+        function displayPlayersForSelection(franchise) {
+            const container = document.getElementById('playerSelectionArea');
+            container.innerHTML = '';
+
+            // Group players by position
+            const playersByPosition = {};
+            franchise.players.forEach(player => {
+                // Cache player data
+                allRosterPlayersCache[player.id] = player;
+
+                if (!playersByPosition[player.position]) {
+                    playersByPosition[player.position] = [];
+                }
+                playersByPosition[player.position].push(player);
+            });
+
+            if (Object.keys(playersByPosition).length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted p-5">
+                        <i class="fas fa-users-slash fa-2x mb-3"></i>
+                        <p>${viewMode === 'available' ? 'No available players from this franchise' : 'No players to display'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            Object.keys(playersByPosition).forEach(position => {
+                const positionSection = document.createElement('div');
+                positionSection.className = 'mb-4';
+                positionSection.innerHTML = `
+                    <h6 class="text-muted mb-3">${position}</h6>
+                    <div class="row" id="position-${position}">
+                    </div>
+                `;
+
+                const positionContainer = positionSection.querySelector(`#position-${position}`);
+
+                playersByPosition[position].forEach(player => {
+                    const isChosen = rosterPlayersArray.includes(player.id) ? true
+                        : protectedPlayersArray.includes(player.id) ? false
+                        : undefined;
+
+                    const playerDiv = document.createElement('div');
+                    playerDiv.className = 'col-md-6 col-lg-4 mb-2';
+
+                    playerDiv.innerHTML = `
+                        <div class="card player-card ${isChosen == true ? 'selected' : isChosen == false ? 'protected' : ''}"
+                            data-player-id="${player.id}" data-player-cap="${player.pureAPY || 0}">
+                            <div class="card-body">
+                                <div class="player-header">
+                                    <div class="player-info">
+                                        <h6 class="player-title">${player.name}</h6>
+                                        <small class="player-details">${player.position} | Age: ${player.age}</small>
+                                        <br>
+                                        <small class="player-details">${player.height} | ${player.weight}</small>
+                                    </div>
+                                    <div class="player-stats">
+                                        <small class="player-salary">${player.apy}</small><br>
+                                        <small class="player-cap">Cap: ${player.apy}</small>
+                                    </div>
+                                </div>
+                                ${isChosen ? '<div class="selected-overlay"><i class="fas fa-check-circle"></i></div>' : ''}
+                            </div>
+                        </div>
+                    `;
+
+                    const playerCard = playerDiv.querySelector('.player-card');
+                    playerCard.addEventListener('click', function () {
+                        if (!this.classList.contains('protected')) {
+                            const playerId = parseInt(this.getAttribute('data-player-id'));
+                            const playerCapValue = parseFloat(this.getAttribute('data-player-cap')) || 0;
+
+                            if (this.classList.contains('selected')) {
+                                // Remove from roster
+                                rosterPlayersArray = rosterPlayersArray.filter(id => id !== playerId);
+                                this.classList.remove('selected');
+
+                                // Remove selected overlay
+                                const overlay = this.querySelector('.selected-overlay');
+                                if (overlay) overlay.remove();
+
+                                totalCapUsed -= playerCapValue;
+                            } else {
+                                // Check constraints
+                                const currentFranchiseSelected = getFranchiseSelectedCount(currentFranchiseId);
+                                if (currentFranchiseSelected >= maxPerFranchise) {
+                                    alert(`You can only select ${maxPerFranchise} players from each franchise.`);
+                                    return;
+                                }
+
+                                totalCapUsed += playerCapValue;
+
+                                // Add to roster
+                                rosterPlayersArray.push(playerId);
+                                this.classList.add('selected');
+
+                                // Add selected overlay
+                                this.innerHTML += '<div class="selected-overlay"><i class="fas fa-check-circle"></i></div>';
+                            }
+
+                            updateRosterPlayersHiddenFields();
+                            updateSalaryCapDisplay();
+                            updateFranchiseSelectedCount();
+                            populateFranchisesList(); // Refresh franchise status
+                            refreshRosterDisplay(); // Update roster tab if visible
+                        }
+                    });
+
+                    positionContainer.appendChild(playerDiv);
+                });
+
+                container.appendChild(positionSection);
+            });
+        }
+
+        // View mode toggles
+        document.getElementById('showAllPlayers').addEventListener('click', function () {
+            viewMode = 'all';
+            document.getElementById('showAllPlayers').classList.add('active');
+            document.getElementById('showAvailableOnly').classList.remove('active');
+
+            if (currentFranchiseId && franchisePlayersCache[currentFranchiseId]) {
+                displayPlayersForSelection(franchisePlayersCache[currentFranchiseId]);
+            }
+        });
+
+        document.getElementById('showAvailableOnly').addEventListener('click', function () {
+            viewMode = 'available';
+            document.getElementById('showAvailableOnly').classList.add('active');
+            document.getElementById('showAllPlayers').classList.remove('active');
+
+            if (currentFranchiseId && franchisePlayersCache[currentFranchiseId]) {
+                displayPlayersForSelection(franchisePlayersCache[currentFranchiseId]);
+            }
+        });
+
+        // Roster Review Functions
+        function refreshRosterDisplay() {
+            const container = document.getElementById('currentRosterDisplay');
+
+            if (rosterPlayersArray.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted p-5">
+                        <i class="fas fa-users fa-2x mb-3"></i>
+                        <p>No players selected yet. Start by selecting players in the Build Roster tab.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group selected players by position
+            const playersByPosition = {};
+            rosterPlayersArray.forEach(playerId => {
+                const player = allRosterPlayersCache[playerId];
+                if (player) {
+                    if (!playersByPosition[player.position]) {
+                        playersByPosition[player.position] = [];
+                    }
+                    playersByPosition[player.position].push(player);
+                }
+            });
+
+            container.innerHTML = '';
+
+            // Create position summary
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'alert alert-secondary mb-4';
+            summaryDiv.innerHTML = `
+                <h6 class="mb-2">Roster Summary</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Total Players:</strong> ${rosterPlayersArray.length}<br>
+                        <strong>Total Cap Used:</strong> $${totalCapUsed}M
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Positions:</strong> ${Object.keys(playersByPosition).map(pos => `${pos} (${playersByPosition[pos].length})`).join(', ')}
+                    </div>
+                </div>
+            `;
+            container.appendChild(summaryDiv);
+
+            // Display players by position
+            Object.keys(playersByPosition).forEach(position => {
+                const positionSection = document.createElement('div');
+                positionSection.className = 'mb-4 position-group';
+                positionSection.setAttribute('data-position', position);
+
+                positionSection.innerHTML = `
+                    <h6 class="text-muted mb-3">${position} (${playersByPosition[position].length})</h6>
+                    <div class="row">
+                    </div>
+                `;
+
+                const rowContainer = positionSection.querySelector('.row');
+
+                playersByPosition[position].forEach(player => {
+                    const playerDiv = document.createElement('div');
+                    playerDiv.className = 'col-md-4 col-lg-3 mb-3';
+
+                    // Find which franchise this player belongs to
+                    let franchiseName = '';
+                    for (let franchiseId = 1; franchiseId <= 32; franchiseId++) {
+                        const franchise = franchisePlayersCache[franchiseId];
+                        if (franchise && franchise.players.some(p => p.id === player.id)) {
+                            franchiseName = franchiseNames[franchiseId].abbreviation;
+                            break;
+                        }
+                    }
+
+                    playerDiv.innerHTML = `
+                        <div class="card roster-player-card" data-player-id="${player.id}">
+                            <div class="card-body">
+                                <h6 class="card-title">${player.name}</h6>
+                                <p class="card-text">
+                                    <small class="text-muted">${player.position} | ${franchiseName}</small><br>
+                                    <small class="text-muted">Age: ${player.age} | ${player.height} | ${player.weight}</small><br>
+                                    <small class="text-success">${player.apy}</small><br>
+                                    <small class="text-info">Cap: ${(player.capValue || 0).toFixed(1)}M</small>
+                                </p>
+                                <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeFromRoster(${player.id})">
+                                    <i class="fas fa-times me-1"></i>Remove
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                    rowContainer.appendChild(playerDiv);
+                });
+
+                container.appendChild(positionSection);
+            });
+        }
+
+        // Position filter functionality
+        document.querySelectorAll('#positionFilters button').forEach(button => {
+            button.addEventListener('click', function () {
+                document.querySelectorAll('#positionFilters button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                const filterPosition = this.getAttribute('data-position');
+                const positionGroups = document.querySelectorAll('.position-group');
+
+                positionGroups.forEach(group => {
+                    if (filterPosition === 'all' || group.getAttribute('data-position') === filterPosition) {
+                        group.style.display = 'block';
+                    } else {
+                        group.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Clear all roster
+        document.getElementById('clearAllRoster').addEventListener('click', function () {
+            if (confirm('Are you sure you want to clear all selected players? This action cannot be undone.')) {
+                rosterPlayersArray = [];
+                totalCapUsed = 0; // Reset cap to 0
+                updateRosterPlayersHiddenFields();
+                updateSalaryCapDisplay();
+                populateFranchisesList();
+                refreshRosterDisplay();
+                refreshFormationDisplay();
+            }
+        });
+
+        // Remove single player from roster
+        window.removeFromRoster = function(playerId) {
+            const player = allRosterPlayersCache[playerId];
+            if (player && player.capValue) {
+                totalCapUsed -= player.capValue; // Subtract player's cap
+            }
+
+            rosterPlayersArray = rosterPlayersArray.filter(id => id !== playerId);
+            updateRosterPlayersHiddenFields();
+            updateSalaryCapDisplay();
+            populateFranchisesList();
+            refreshRosterDisplay();
+            refreshFormationDisplay();
+
+            // Update selection display if on same franchise
+            if (currentFranchiseId && franchisePlayersCache[currentFranchiseId]) {
+                displayPlayersForSelection(franchisePlayersCache[currentFranchiseId]);
+                updateFranchiseSelectedCount();
+            }
+        };
+
+        // Formation & Starters Functions
+        function refreshFormationDisplay() {
+            const container = document.getElementById('formationDisplay');
+            const formation = formations[currentFormation];
+
+            container.innerHTML = `
+                <h6 class="mb-3">${formation.name}</h6>
+                <div class="row">
+            `;
+
+            formation.positions.forEach(pos => {
+                const assignedPlayerId = startersConfiguration[`${currentFormation}_${pos.id}`];
+                const assignedPlayer = assignedPlayerId ? allRosterPlayersCache[assignedPlayerId] : null;
+
+                const posDiv = document.createElement('div');
+                posDiv.className = 'col-md-6 col-lg-4 mb-3';
+
+                posDiv.innerHTML = `
+                    <div class="card formation-position ${pos.required ? 'required' : ''}"
+                         data-position-id="${pos.id}"
+                         data-position-type="${pos.position}"
+                         ondrop="dropPlayer(event, '${currentFormation}_${pos.id}')"
+                         ondragover="allowDrop(event)">
+                        <div class="card-body">
+                            <h6 class="position-label">${pos.name}</h6>
+                            <div class="position-slot">
+                                ${assignedPlayer ? `
+                                    <div class="assigned-player" draggable="true" ondragstart="dragPlayer(event, ${assignedPlayer.id})">
+                                        <strong>${assignedPlayer.name}</strong><br>
+                                        <small>${assignedPlayer.position} | ${assignedPlayer.apy}</small>
+                                        <button type="button" class="btn btn-sm btn-link text-danger p-0 float-end"
+                                                onclick="removeFromPosition('${currentFormation}_${pos.id}')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                ` : `
+                                    <div class="empty-slot">
+                                        <i class="fas fa-plus-circle text-muted"></i>
+                                        <br><small class="text-muted">Drag player here</small>
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                container.querySelector('.row').appendChild(posDiv);
+            });
+
+            refreshAvailablePlayersForFormation();
+        }
+
+        function refreshAvailablePlayersForFormation() {
+            const container = document.getElementById('availablePlayersForFormation');
+            container.innerHTML = '';
+
+            // Get all assigned player IDs
+            const assignedPlayerIds = Object.values(startersConfiguration);
+
+            // Filter roster players
+            const availablePlayers = rosterPlayersArray
+                .map(id => allRosterPlayersCache[id])
+                .filter(player => player && !assignedPlayerIds.includes(player.id))
+                .filter(player => currentPositionFilter === 'all' || player.position === currentPositionFilter);
+
+            if (availablePlayers.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted p-4">
+                        <i class="fas fa-users-slash fa-2x mb-2"></i>
+                        <p>No available players for this position</p>
+                    </div>
+                `;
+                return;
+            }
+
+            availablePlayers.forEach(player => {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'available-player p-2 border-bottom';
+                playerDiv.draggable = true;
+                playerDiv.setAttribute('ondragstart', `dragPlayer(event, ${player.id})`);
+
+                playerDiv.innerHTML = `
+                    <strong>${player.name}</strong><br>
+                    <small class="text-muted">${player.position} | ${player.age} | ${player.apy}</small>
+                `;
+
+                container.appendChild(playerDiv);
+            });
+        }
+
+        // Drag and drop functions
+        window.dragPlayer = function(event, playerId) {
+            event.dataTransfer.setData('playerId', playerId);
+        };
+
+        window.allowDrop = function(event) {
+            event.preventDefault();
+        };
+
+        window.dropPlayer = function(event, positionKey) {
+            event.preventDefault();
+            const playerId = parseInt(event.dataTransfer.getData('playerId'));
+            const player = allRosterPlayersCache[playerId];
+
+            if (player) {
+                // Remove player from any existing position
+                Object.keys(startersConfiguration).forEach(key => {
+                    if (startersConfiguration[key] === playerId) {
+                        delete startersConfiguration[key];
+                    }
+                });
+
+                // Assign to new position
+                startersConfiguration[positionKey] = playerId;
+                updateStartersHiddenFields();
+                refreshFormationDisplay();
+            }
+        };
+
+        window.removeFromPosition = function(positionKey) {
+            delete startersConfiguration[positionKey];
+            updateStartersHiddenFields();
+            refreshFormationDisplay();
+        };
+
+        function updateStartersHiddenFields() {
+            const container = document.getElementById('startersContainer');
+            container.innerHTML = '';
+
+            Object.keys(startersConfiguration).forEach((key, index) => {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = `Starters[${index}].PositionKey`;
+                hiddenInput.value = key;
+                container.appendChild(hiddenInput);
+
+                const valueInput = document.createElement('input');
+                valueInput.type = 'hidden';
+                valueInput.name = `Starters[${index}].PlayerId`;
+                valueInput.value = startersConfiguration[key];
+                container.appendChild(valueInput);
+            });
+        }
+
+        // Formation selector
+        document.querySelectorAll('#formationSelector button').forEach(button => {
+            button.addEventListener('click', function () {
+                document.querySelectorAll('#formationSelector button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFormation = this.getAttribute('data-formation');
+                refreshFormationDisplay();
+            });
+        });
+
+        // Position filter for formation
+        document.getElementById('formationPositionFilter').addEventListener('change', function () {
+            currentPositionFilter = this.value;
+            refreshAvailablePlayersForFormation();
+        });
+
+        // Tab change event handlers
+        document.getElementById('review-tab').addEventListener('shown.bs.tab', function () {
+            refreshRosterDisplay();
+        });
+
+        document.getElementById('formation-tab').addEventListener('shown.bs.tab', function () {
+            refreshFormationDisplay();
+        });
+
+        // Initialize everything
+        initializeRosterPlayers();
+        populateFranchisesList();
+        document.getElementById('showAllPlayers').classList.add('active');
+
+        // Auto-select first franchise
+        if (document.querySelectorAll('.franchise-item').length > 0) {
+            selectFranchise(1);
+        }
+
+        // Initial cap display update
+        updateSalaryCapDisplay();
+    });
+</script>
+
+<style>
+    .player-card {
+        transition: all 0.2s ease;
+        cursor: pointer;
+        position: relative;
+    }
+
+        .player-card:hover:not(.protected) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .player-card.selected {
+            border-color: var(--bs-success) !important;
+            background-color: rgba(25, 135, 84, 0.1);
+        }
+
+        .player-card.protected {
+            opacity: 0.7;
+            cursor: not-allowed;
+            background-color: rgba(220, 53, 69, 0.05);
+        }
+
+            .player-card.protected:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+    .players-list {
+        max-width: 100%;
+    }
+
+    .player-title {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .player-salary {
+        color: var(--bs-success);
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    .sticky-top {
+        z-index: 1000;
+    }
+
+    .franchise-item.active {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+        .franchise-item.active .badge {
+            background-color: rgba(255,255,255,0.2) !important;
+        }
+
+    .roster-player-card {
+        transition: all 0.2s ease;
+    }
+
+        .roster-player-card:hover {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+    .formation-position {
+        min-height: 120px;
+        border: 2px dashed #dee2e6;
+        transition: all 0.2s ease;
+    }
+
+        .formation-position.required {
+            border-color: #ffc107;
+        }
+
+        .formation-position:hover {
+            border-color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.05);
+        }
+
+    .position-slot {
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .empty-slot {
+        text-align: center;
+        width: 100%;
+    }
+
+    .assigned-player {
+        background-color: #e9ecef;
+        padding: 8px;
+        border-radius: 4px;
+        width: 100%;
+        cursor: move;
+    }
+
+    .available-player {
+        cursor: move;
+        transition: background-color 0.2s;
+    }
+
+        .available-player:hover {
+            background-color: #f8f9fa;
+        }
+
+        .available-player:active {
+            opacity: 0.5;
+        }
+
+    .btn-group button.active {
+        background-color: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+
+    .progress-bar {
+        transition: width 0.3s ease;
+    }
+
+    .list-group-item-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+    }
+
+    media (max-width: 768px) {
+
+        .player-card {
+            min-height: 100px;
+        }
+
+        .formation-position {
+            margin-bottom: 1rem;
+        }
+
+    }
+</style>

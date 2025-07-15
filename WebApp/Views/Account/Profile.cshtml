@@ -1,0 +1,75 @@
+﻿@model WebApp.Models.Account.UserViewModel
+
+
+<h1>User.Identity.Name</h1>
+
+@if(User.Identities.First().RoleClaimType == "Admin")
+{
+<hr />
+
+<div class="col-sm-4">
+    <a asp-controller="Admin" asp-action="Index">Admin Control Center</a>
+</div>
+<hr />
+<hr />
+}
+
+<div>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(m => m.FirstName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(m => m.FirstName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(m => m.LastName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(m => m.LastName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(m => m.Email)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(m => m.Email)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(m => m.Tlf)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(m => m.Tlf)
+        </dd>
+    </dl>
+</div>
+<div>
+    <br><br />
+    <br><br />
+    <dl class="row">
+        <dt class="col-sm-6">
+            <a asp-action="EditProfile">Editar</a>
+        </dt>
+        <dt class="col-sm-6">
+            <a href="#" onclick="confirmDelete(event)" class="btn btn-primary">Borrar usuario</a>
+        </dt>
+    </dl>
+    <dl class="row">
+        <dt class="col-sm-6">
+            <a asp-controller="Team" asp-action="MyTeams">Equipos</a>
+        </dt>
+        <dd class="col-sm-6">
+            <a asp-controller="Home" asp-action="Index">Volver</a>
+        </dd>
+    </dl>
+</div>
+
+<script>
+    function confirmDelete(event) 
+    {
+        event.preventDefault();
+        if (confirm('¿Está seguro de que desea eliminar su cuenta?'))
+            window.location.href = '@Url.Action("DeleteUser", "Account")';
+    }
+</script>

@@ -1,0 +1,7 @@
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\obj\Debug\net9.0\MyExpansionTeam.csproj.AssemblyReference.cache
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\obj\Debug\net9.0\MyExpansionTeam.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\obj\Debug\net9.0\MyExpansionTeam.AssemblyInfoInputs.cache
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\obj\Debug\net9.0\MyExpansionTeam.AssemblyInfo.cs
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\obj\Debug\net9.0\MyExpansionTeam.csproj.CoreCompileInputs.cache
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\obj\Debug\net9.0\MyExpansionTeam.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\obj\Debug\net9.0\MyExpansionTeam.MvcApplicationPartsAssemblyInfo.cache

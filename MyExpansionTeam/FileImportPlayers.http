@@ -1,0 +1,13 @@
+@MyExpansionTeam_HostAddress = http://localhost:5088
+@token = <your-jwt-token>
+
+POST {{MyExpansionTeam_HostAddress}}/api/Players/ImportPlayers
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data
+
+--boundary
+Content-Disposition: form-data; name="File"; filename="players.csv"
+Content-Type: text/csv
+
+< ./TestFiles/players.csv
+--boundary--

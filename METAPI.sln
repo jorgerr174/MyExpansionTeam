@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "METAPI", "MyExpansionTeam\METAPI.csproj", "{B0C849AF-226D-42A4-B07E-04D999797715}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp", "WebApp\WebApp.csproj", "{93827734-C76D-4D65-BFCA-39B6D533683C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "METCore", "METCore\METCore.csproj", "{C587D878-C8E2-4E3D-9737-A3B73249313B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "METDAL", "METDAL\METDAL.csproj", "{2E34C3E2-D884-4B27-B8E2-2053C18E36CA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B0C849AF-226D-42A4-B07E-04D999797715}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0C849AF-226D-42A4-B07E-04D999797715}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0C849AF-226D-42A4-B07E-04D999797715}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0C849AF-226D-42A4-B07E-04D999797715}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93827734-C76D-4D65-BFCA-39B6D533683C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93827734-C76D-4D65-BFCA-39B6D533683C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93827734-C76D-4D65-BFCA-39B6D533683C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93827734-C76D-4D65-BFCA-39B6D533683C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C587D878-C8E2-4E3D-9737-A3B73249313B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C587D878-C8E2-4E3D-9737-A3B73249313B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C587D878-C8E2-4E3D-9737-A3B73249313B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C587D878-C8E2-4E3D-9737-A3B73249313B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E34C3E2-D884-4B27-B8E2-2053C18E36CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E34C3E2-D884-4B27-B8E2-2053C18E36CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E34C3E2-D884-4B27-B8E2-2053C18E36CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E34C3E2-D884-4B27-B8E2-2053C18E36CA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
