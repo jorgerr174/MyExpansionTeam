@@ -1,5 +1,4 @@
-﻿using METCore.DTOs.Player;
-using METCore.Models.Players;
+﻿using METCore.Models.Players;
 using static METCore.Enums.Types;
 
 namespace METCore.Interfaces

@@ -1,5 +1,4 @@
-﻿using METCore.DTOs.Player;
-using METCore.Interfaces;
+﻿using METCore.Interfaces;
 using METCore.Models.Players;
 using METDAL.Data;
 using Microsoft.EntityFrameworkCore;
@@ -70,7 +69,8 @@ namespace METDAL.Repositories
         {
             int count = -1;
             try { count = await _context.Players.CountAsync(p => p.Name == name); }
-            catch { };
+            catch { }
+            ;
             return count;
         }
 

@@ -46,7 +46,7 @@ namespace METCore.Services
 
             foreach (Player newProspect in list)
             {
-                if (newProspect.Prospect is null)errorList.Add([.. newProspect.ImportProspectAttrs, "Problem during import. try again"]);
+                if (newProspect.Prospect is null) errorList.Add([.. newProspect.ImportProspectAttrs, "Problem during import. try again"]);
                 else if (await _playerRepository.GetProspect(newProspect) is Player prospect)
                 {
                     newProspect.Prospect.Year = DateTime.Now.Year;

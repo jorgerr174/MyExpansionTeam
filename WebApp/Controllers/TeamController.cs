@@ -193,7 +193,7 @@ namespace WebApp.Controllers
         [Authorize]
         public async Task<IActionResult> EditRoster(int Id, bool? unsuccessfulDraft = false)
         {
-            if(Id < 0) return RedirectToAction("MyTeams");
+            if (Id < 0) return RedirectToAction("MyTeams");
 
             TeamDto? dto = await this.GetTeam(Id);
             if (dto is null) return RedirectToAction("MyTeams");
@@ -239,16 +239,16 @@ namespace WebApp.Controllers
                 return View(dto);
 
             var response = await SendRequest(HttpMethod.Post, "Teams", "SaveDraft", dto);
-            return RedirectToAction("Roster", new { dto.Id, response.IsSuccessStatusCode} );
+            return RedirectToAction("Roster", new { dto.Id, response.IsSuccessStatusCode });
         }
 
         [HttpGet]
-        public async Task<Object> GetUserControlledPicks(UserPicksDto dto)
+        public async Task<Object> GetUserControlledPicks(PicksDto dto)
         {
             var response = await SendRequest(HttpMethod.Get, "Teams", "GetUserControlledPicks", dto);
-            return response.IsSuccessStatusCode ? await GetResult<UserPicksDto>(response) : await GetResult<MessageDto>(response);
+            return response.IsSuccessStatusCode ? await GetResult<PicksDto>(response) : await GetResult<MessageDto>(response);
         }
-        
+
         [HttpGet]
         public async Task<Object> GetDraftProspects()
         {
@@ -256,5 +256,21 @@ namespace WebApp.Controllers
             return response.IsSuccessStatusCode ? await GetResult<IList<ProspectDto>>(response) : await GetResult<MessageDto>(response);
         }
         #endregion Draft
+
+
+        #region Trade
+        [HttpGet]
+        public async Task<Object> GetTradePartial(TradeDto dto)
+        {
+            var response = await SendRequest(HttpMethod.Get, "Teams", "GetTradeDto", dto);
+            return response.IsSuccessStatusCode ? PartialView("Trade", await GetResult<TradeDto>(response)) : await GetResult<MessageDto>(response);
+        }
+
+        [HttpPost]
+        public async Task<MessageDto> RequestTrade(TradeDto dto)
+        {
+            return await GetResult<MessageDto>(await SendRequest(HttpMethod.Get, "Teams", "SaveTrade", dto));
+        }
+        #endregion Trade
     }
 }
