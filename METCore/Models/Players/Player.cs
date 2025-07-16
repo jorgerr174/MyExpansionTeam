@@ -52,7 +52,7 @@ namespace METCore.Models.Players
         public bool? IsRookie => Prospect is not null && Prospect.Year == DateTime.Now.Year;
 
         [NotMapped]
-        public string[] ImportProspectAttrs => 
+        public string[] ImportProspectAttrs =>
             Prospect is null ? [] : [Name, Position.ToString(), College, Height.ToString(), Weight.ToString(), .. Prospect.ImportAttributes];
 
         //        [NotMapped]

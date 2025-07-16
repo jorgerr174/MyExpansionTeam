@@ -102,6 +102,7 @@ namespace METAPI
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IFranchiseRepository, FranchiseRepository>();
             services.AddScoped<ITeamRepository, TeamRepository>();
+            services.AddScoped<ITradeRepository, TradeRepository>();
             services.AddScoped<IPlayerRepository, PlayerRepository>();
             services.AddScoped<IContractRepository, ContractRepository>();
             services.AddScoped<ISeasonStatsRepository, SeasonStatsRepository>();

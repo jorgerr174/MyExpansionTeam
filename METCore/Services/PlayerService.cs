@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using METCore.DTOs.Player;
 using METCore.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 
@@ -10,7 +9,7 @@ namespace METCore.Services
     public class PlayerService(IConfiguration configuration, IPlayerRepository playerRepository, IMapper mapper)
     {
         private readonly IConfiguration _configuration = configuration;
-        private readonly IPlayerRepository _playerRepository = playerRepository; 
+        private readonly IPlayerRepository _playerRepository = playerRepository;
         private readonly IMapper _mapper = mapper;
 
 

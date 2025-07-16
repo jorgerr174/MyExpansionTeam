@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using METCore.Models.Teams;
 
 namespace METCore.DTOs.Team
 {

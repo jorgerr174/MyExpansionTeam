@@ -794,12 +794,24 @@
                 `;
 
                 // Add click handler for manual picks
-                cardDiv.addEventListener('click', function() {
+                cardDiv.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
                     if (isUserControlled) {
                         const playerId = parseInt(this.getAttribute('data-player-id'));
+                        console.log('Player clicked:', playerId, 'User controlled:', isUserControlled);
                         makeDraftPick(playerId);
+                    } else {
+                        console.log('Click ignored - not user controlled pick');
                     }
                 });
+
+                // Add visual feedback for selectable cards
+                if (isUserControlled) {
+                    cardDiv.style.cursor = 'pointer';
+                    cardDiv.title = 'Click to draft this player';
+                }
 
                 playerDiv.appendChild(cardDiv);
                 container.appendChild(playerDiv);
@@ -840,29 +852,86 @@
             }
         });
 
-        // Trading button - opens external trade view
+        // Trading button - opens trade modal
         document.getElementById('tradingButton').addEventListener('click', function() {
             if (enableTrading && isUserControlled) {
-                openTradeView();
+                openTradeModal();
             }
         });
 
-        function openTradeView() {
+        function openTradeModal() {
             const currentPick = draftOrder[currentPickIndex];
             
-            // Open trade view in a popup/frame
-            const tradeUrl = `/Team/TradeView?currentTeam=${currentPick.teamId}&currentPick=${currentPick.overallPick}`;
+            // Create modal backdrop
+            const modalBackdrop = document.createElement('div');
+            modalBackdrop.className = 'modal-backdrop fade show';
+            modalBackdrop.style.zIndex = '1040';
+            document.body.appendChild(modalBackdrop);
             
-            // Create popup window or iframe
-            const tradeWindow = window.open(tradeUrl, 'tradeWindow', 'width=800,height=600,resizable=yes,scrollbars=yes');
+            // Create modal container
+            const modalContainer = document.createElement('div');
+            modalContainer.className = 'modal fade show';
+            modalContainer.style.display = 'block';
+            modalContainer.style.zIndex = '1050';
+            modalContainer.innerHTML = `
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Propose Trade - Pick ${currentPick.overallPick}</h5>
+                            <button type="button" class="btn-close" onclick="closeTradeModal()"></button>
+                        </div>
+                        <div class="modal-body" id="tradeModalBody">
+                            <div class="text-center p-4">
+                                <div class="spinner-border text-primary mb-3" role="status"></div>
+                                <p>Loading trade interface...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            modalContainer.id = 'tradeModal';
+            document.body.appendChild(modalContainer);
             
-            // Listen for trade result
-            window.addEventListener('message', function(event) {
-                if (event.data && event.data.type === 'tradeResult') {
-                    handleTradeResult(event.data);
-                }
-            });
+            // Load trade partial view from WebApp controller
+            fetch(`/Team/GetTradePartial?currentTeam=${currentPick.teamId}&currentPick=${currentPick.overallPick}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('tradeModalBody').innerHTML = html;
+                    
+                    // Initialize any trade-specific JavaScript if needed
+                    if (window.initializeTradeView) {
+                        window.initializeTradeView();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading trade partial:', error);
+                    document.getElementById('tradeModalBody').innerHTML = `
+                        <div class="alert alert-danger">
+                            <h6>Error Loading Trade View</h6>
+                            <p>Unable to load the trade interface. Please try again.</p>
+                            <button type="button" class="btn btn-secondary" onclick="closeTradeModal()">Close</button>
+                        </div>
+                    `;
+                });
         }
+
+        // Global function to close trade modal
+        window.closeTradeModal = function() {
+            const modal = document.getElementById('tradeModal');
+            const backdrop = document.querySelector('.modal-backdrop');
+            
+            if (modal) modal.remove();
+            if (backdrop) backdrop.remove();
+        };
+
+        // Global function to handle trade completion
+        window.onTradeCompleted = function(tradeResult) {
+            closeTradeModal();
+            
+            if (tradeResult && tradeResult.success) {
+                handleTradeResult(tradeResult);
+            }
+        };
 
         function handleTradeResult(tradeData) {
             if (tradeData.success) {
@@ -912,15 +981,15 @@
         cursor: pointer;
     }
 
-        .player-card:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+    .player-card:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 
-        .player-card.selectable:hover {
-            border-color: var(--bs-primary);
-            background-color: rgba(13, 110, 253, 0.05);
-        }
+    .player-card.selectable:hover {
+        border-color: var(--bs-primary);
+        background-color: rgba(13, 110, 253, 0.05);
+    }
 
     .sticky-top {
         z-index: 1000;
