@@ -37,7 +37,7 @@ namespace METCore.Models
 
 
         #region Constructors
-        public Franchise() : base() 
+        public Franchise() : base()
         {
             this.Players = [];
         }

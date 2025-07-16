@@ -127,14 +127,14 @@ namespace METAPI.Controllers
         /// IEnumerable<TeamDto>? (Con los valores de los Teams encontrados).
         /// </returns>
         [HttpGet("GetUserControlledPicks")]
-        public async Task<IActionResult> GetUserControlledPicks(UserPicksDto dto)
+        public async Task<IActionResult> GetUserControlledPicks(IdDto dto)
         {
             if (User?.Identity?.Name == null) return BadRequest(new MessageDto("Username"));
-            if (dto.TeamId == 0) return BadRequest(new MessageDto("TeamId"));
+            if (dto.Id < 1) return BadRequest(new MessageDto("TeamId"));
 
-            string? result = await _teamService.GetUserControlledPicks(dto, User.Identity.Name);
+            string? result = await _teamService.GetUserControlledPicks(new PicksDto(dto.Id), User.Identity.Name);
 
-            return result is null 
+            return result is null
                 ? Ok(dto)
                 : BadRequest(new MessageDto("result"));
         }
@@ -194,5 +194,41 @@ namespace METAPI.Controllers
                 : Ok(dto);
         }
         #endregion Update
+
+
+        #region Trade
+        /// <summary>Actualizar un Team a partir de los valores de TeamDto. </summary>
+        /// <param name="dto">Clase con los nuevos valores.</param>
+        /// <returns>Opciones:
+        /// Username (No existe ningún User con Username igual a parámetro).
+        /// Error (No se guardaron los cambios en la BBDD).
+        /// Nada (Todo bien).
+        /// </returns>
+        [HttpPut("GetTradeDto")]
+        [Authorize]
+        public async Task<IActionResult> GetTradeDto([FromBody] TradeDto dto)
+        {
+            string? username = User?.Identity?.Name;
+            if (String.IsNullOrWhiteSpace(username)) return BadRequest(new MessageDto("Username"));
+
+            string? result = await _teamService.GetTradeDto(User?.Identity?.Name, dto);
+
+            return String.IsNullOrWhiteSpace(result)
+                ? BadRequest(new MessageDto(result))
+                : Ok(dto);
+        }
+
+        [HttpPost("SaveTrade")]
+        [Authorize]
+        public async Task<IActionResult> SaveTrade([FromBody] TradeDto dto)
+        {
+            string? username = User?.Identity?.Name;
+            if (String.IsNullOrWhiteSpace(username)) return BadRequest(new MessageDto("Username"));
+
+            string result = await _teamService.SaveTrade(User?.Identity?.Name, dto);
+
+            return Ok(new ResultDto<TradeDto>(result, dto));
+        }
+        #endregion Trade
     }
 }

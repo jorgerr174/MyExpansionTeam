@@ -14,10 +14,12 @@ namespace METDAL.Data
         public DbSet<SeasonStats> SeasonStats { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Trade> Trades { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
 
             #region Player
             modelBuilder.Entity<Player>().Ignore(p => p.FranchiseId);
@@ -74,11 +76,13 @@ namespace METDAL.Data
                 });
             #endregion Player
 
+
             #region SeasonStats
             modelBuilder.Entity<SeasonStats>()
                 .HasIndex(["PlayerId", "Season"])
                 .IsUnique();
             #endregion SeasonStats
+
 
             #region Franchise
             modelBuilder.Entity<Franchise>().ToTable(f => f.HasCheckConstraint("NoNewFranchises", "Id < 33"));
@@ -110,27 +114,28 @@ namespace METDAL.Data
             modelBuilder.Entity<Franchise>().Navigation(f => f.Protected3);
             #endregion Franchise
 
+
             #region Team
-/*            modelBuilder.Entity<Team>()
-                .HasMany(t => t.Players)
-                .WithMany()
-                .UsingEntity<Dictionary<string, object>>(
-                    "TeamPlayer",
-                    tp => tp
-                        .HasOne<Player>()
-                        .WithMany()
-                        .HasForeignKey("PlayerId"),
-                    tp => tp
-                        .HasOne<Team>()
-                        .WithMany()
-                        .HasForeignKey("TeamId"),
-                    tp =>
-                    {
-                        tp.ToTable("TeamPlayer");
-                        tp.HasKey("TeamId", "PlayerId");
-                        tp.HasIndex("TeamId");
-                    }
-                );*/
+            /*            modelBuilder.Entity<Team>()
+                            .HasMany(t => t.Players)
+                            .WithMany()
+                            .UsingEntity<Dictionary<string, object>>(
+                                "TeamPlayer",
+                                tp => tp
+                                    .HasOne<Player>()
+                                    .WithMany()
+                                    .HasForeignKey("PlayerId"),
+                                tp => tp
+                                    .HasOne<Team>()
+                                    .WithMany()
+                                    .HasForeignKey("TeamId"),
+                                tp =>
+                                {
+                                    tp.ToTable("TeamPlayer");
+                                    tp.HasKey("TeamId", "PlayerId");
+                                    tp.HasIndex("TeamId");
+                                }
+                            );*/
             modelBuilder.Entity<Team>()
                 .Property(e => e.PlayersIds)
                 .HasConversion(
@@ -176,28 +181,28 @@ namespace METDAL.Data
 
             #region Trade
             modelBuilder.Entity<Trade>()
-                .Property(e => e.PlayersTaken)
+                .Property(e => e.TeamPlayers)
                 .HasConversion(
                     v => string.Join(',', v),
                     v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList()
                 );
 
             modelBuilder.Entity<Trade>()
-                .Property(e => e.PlayersSent)
+                .Property(e => e.TeamPicks)
                 .HasConversion(
                     v => string.Join(',', v),
                     v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList()
                 );
 
             modelBuilder.Entity<Trade>()
-                .Property(e => e.PicksTaken)
+                .Property(e => e.FranchisePlayers)
                 .HasConversion(
                     v => string.Join(',', v),
                     v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList()
                 );
 
             modelBuilder.Entity<Trade>()
-                .Property(e => e.PicksSent)
+                .Property(e => e.FranchisePicks)
                 .HasConversion(
                     v => string.Join(',', v),
                     v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList()

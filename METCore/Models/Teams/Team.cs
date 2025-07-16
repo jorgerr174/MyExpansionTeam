@@ -32,6 +32,9 @@ namespace METCore.Models.Teams
         #region Not Mapped
         [NotMapped]
         public virtual IList<Player> Players { get; set; }
+
+        [NotMapped]
+        public virtual double CurrentCap => this.Players.Sum(p => p.ActiveContract.APY);
         #endregion Not Mapped
         #endregion Attributes
 

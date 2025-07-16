@@ -1,7 +1,5 @@
 ﻿using METCore.DTOs.Shared;
-using METCore.DTOs.Team;
 using METCore.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace METAPI.Controllers

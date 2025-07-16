@@ -193,11 +193,10 @@
                                                 <button type="button" class="btn btn-outline-primary" data-position="WR">WR</button>
                                                 <button type="button" class="btn btn-outline-primary" data-position="TE">TE</button>
                                                 <button type="button" class="btn btn-outline-primary" data-position="OL">OL</button>
-                                                <button type="button" class="btn btn-outline-primary" data-position="DT">DT</button>
-                                                <button type="button" class="btn btn-outline-primary" data-position="MLB">MLB</button>
+                                                <button type="button" class="btn btn-outline-primary" data-position="DL">DL</button>
+                                                <button type="button" class="btn btn-outline-primary" data-position="LB">LB</button>
                                                 <button type="button" class="btn btn-outline-primary" data-position="DB">DB</button>
-                                                <button type="button" class="btn btn-outline-primary" data-position="K">K</button>
-                                                <button type="button" class="btn btn-outline-primary" data-position="P">P</button>
+                                                <button type="button" class="btn btn-outline-primary" data-position="P/K">P/K</button>
                                             </div>
                                         </div>
                                         <div class="btn-group btn-group-sm" role="group">
@@ -466,11 +465,21 @@
 
         function initializeDraftData() {
             // API Call 1: Get user-controlled picks
+            const pickData = {
+                teamId: parseInt('@Model.Id'), // Use actual model ID
+                franchiseIds: draftMethod === 'multiple' ? selectedFranchises : (draftMethod === 'myteam' ? [parseInt('@Model.Id')] : []),
+                rounds: manualRounds
+            };
+
+            // Build query parameters for GET request
             const queryParams = new URLSearchParams({
-                TeamId: parseInt('@Model.Id'),
-                Rounds: manualRounds
+                teamId: parseInt('@Model.Id'),
+                rounds: manualRounds
             });
-            (draftMethod === 'multiple' ? selectedFranchises : []).forEach(id => queryParams.append('OthersPicks', id));
+            
+            // Add franchise IDs as separate parameters
+            const franchiseIds = draftMethod === 'multiple' ? selectedFranchises : (draftMethod === 'myteam' ? [parseInt('@Model.Id')] : []);
+            franchiseIds.forEach(id => queryParams.append('franchiseIds', id));
 
             fetch(`/Team/GetUserControlledPicks?${queryParams.toString()}`, {
                 method: 'GET',
@@ -484,9 +493,11 @@
                 franchiseControlledPicks = data.franchisePicks || [];
                 franchiseDraftOrder = data.franchiseDraftOrder || [];
                 
+                // Initialize draft order with franchise data
                 loadDraftOrderFromAPI();
             });
 
+            // API Call 2: Load prospects (separate call)
             fetch('/Team/GetDraftProspects')
             .then(response => response.json())
             .then(prospects => {
@@ -525,26 +536,7 @@
             }
         }
 
-        function loadDraftOrder() {
-            // Create simple draft order
-            draftOrder = [];
-            for (let round = 1; round <= 7; round++) {
-                for (let pick = 1; pick <= 33; pick++) {
-                    const overallPick = ((round - 1) * 33) + pick;
-                    const teamId = pick === 33 ? parseInt('@Model.Id') : pick; // Team gets pick 33 each round
-                    
-                    draftOrder.push({
-                        round: round,
-                        pick: pick,
-                        overallPick: overallPick,
-                        teamId: teamId,
-                        teamName: teamId === parseInt('@Model.Id') ? '@Model.Location @Model.Mascot' : nflFranchises[teamId]?.name || `Team ${teamId}`,
-                        teamAbbr: teamId === parseInt('@Model.Id') ? '@Model.Abb' : nflFranchises[teamId]?.abbreviation || `T${teamId}`,
-                        neededPositions: [] // Default empty, will be filled by API data
-                    });
-                }
-            }
-        }
+
 
 
 
@@ -704,10 +696,26 @@
         function displayAvailablePlayers() {
             const container = document.getElementById('availablePlayers');
 
+            // Position group mappings
+            const positionGroups = {
+                'QB': ['QB'],
+                'RB': ['RB', 'FB'],
+                'WR': ['WR'],
+                'TE': ['TE'],
+                'OL': ['OT', 'CG', 'C'],
+                'DL': ['NT', 'DT', 'ED'],
+                'LB': ['MLB', 'OLB'],
+                'DB': ['DB'],
+                'P/K': ['P', 'K']
+            };
+
             // Filter by position
-            const filteredPlayers = availablePlayersData.filter(player =>
-                currentPositionFilter === 'all' || player.position === currentPositionFilter
-            );
+            const filteredPlayers = availablePlayersData.filter(player => {
+                if (currentPositionFilter === 'all') return true;
+                
+                const allowedPositions = positionGroups[currentPositionFilter] || [currentPositionFilter];
+                return allowedPositions.includes(player.position);
+            });
 
             container.innerHTML = '';
 
@@ -740,30 +748,70 @@
 
                 cardDiv.innerHTML = `
                     <div class="card-body">
-                        <div class="player-header">
-                            <div class="player-info">
-                                <h6 class="player-title">${player.name || 'Unknown'}</h6>
-                                <small class="player-details">${player.position || 'N/A'} | ${player.college || 'Unknown College'}</small>
-                                <br>
-                                <small class="player-details">${heightDisplay} | ${player.weight || 0} lbs | ${player.year || 'N/A'} Year</small>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="player-header">
+                                    <h6 class="player-title mb-1">${player.name || 'Unknown'}</h6>
+                                    <div class="player-basic-info mb-2">
+                                        <span class="badge bg-primary me-2">${player.position || 'N/A'}</span>
+                                        <span class="text-muted">${player.college || 'Unknown College'}</span>
+                                        <span class="text-muted mx-2">|</span>
+                                        <span class="text-muted">${player.year || 'N/A'} Year</span>
+                                    </div>
+                                    <div class="player-physical mb-2">
+                                        <small class="text-muted">
+                                            <strong>Physical:</strong> ${heightDisplay} | ${player.weight || 0} lbs
+                                            ${player.handSize ? ` | Hands: ${player.handSize}` : ''}
+                                            ${player.armLength ? ` | Arms: ${player.armLength}` : ''}
+                                            ${player.wingspan ? ` | Wingspan: ${player.wingspan}` : ''}
+                                        </small>
+                                    </div>
+                                    <div class="player-combine">
+                                        <small class="text-info">
+                                            <strong>Combine:</strong>
+                                            ${player.fortyYardDash ? ` 40yd: ${player.fortyYardDash}` : ''}
+                                            ${player.vertJump ? ` | Vert: ${player.vertJump}"` : ''}
+                                            ${player.broadJump ? ` | Broad: ${player.broadJump}"` : ''}
+                                            ${player.benchPress ? ` | Bench: ${player.benchPress}` : ''}
+                                            ${player.threeConeDrill ? ` | 3-Cone: ${player.threeConeDrill}` : ''}
+                                            ${player.twentyYardShuttle ? ` | 20yd: ${player.twentyYardShuttle}` : ''}
+                                        </small>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="player-stats">
-                                <small class="player-ath-score">Ath: ${player.athScore || 0}</small><br>
-                                ${player.fortyYardDash ? `<small class="text-muted">40: ${player.fortyYardDash}</small><br>` : ''}
-                                ${player.vertJump ? `<small class="text-muted">Vert: ${player.vertJump}</small><br>` : ''}
-                                ${player.benchPress ? `<small class="text-muted">Bench: ${player.benchPress}</small>` : ''}
+                            <div class="col-md-4 text-end">
+                                <div class="player-scores">
+                                    <div class="mb-2">
+                                        <span class="badge bg-success fs-6">Ath: ${player.athScore || 0}</span>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-warning text-dark">Consensus: ${player.consensus || 0}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 `;
 
                 // Add click handler for manual picks
-                cardDiv.addEventListener('click', function() {
+                cardDiv.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
                     if (isUserControlled) {
                         const playerId = parseInt(this.getAttribute('data-player-id'));
+                        console.log('Player clicked:', playerId, 'User controlled:', isUserControlled);
                         makeDraftPick(playerId);
+                    } else {
+                        console.log('Click ignored - not user controlled pick');
                     }
                 });
+
+                // Add visual feedback for selectable cards
+                if (isUserControlled) {
+                    cardDiv.style.cursor = 'pointer';
+                    cardDiv.title = 'Click to draft this player';
+                }
 
                 playerDiv.appendChild(cardDiv);
                 container.appendChild(playerDiv);
@@ -804,29 +852,86 @@
             }
         });
 
-        // Trading button - opens external trade view
+        // Trading button - opens trade modal
         document.getElementById('tradingButton').addEventListener('click', function() {
             if (enableTrading && isUserControlled) {
-                openTradeView();
+                openTradeModal();
             }
         });
 
-        function openTradeView() {
+        function openTradeModal() {
             const currentPick = draftOrder[currentPickIndex];
             
-            // Open trade view in a popup/frame
-            const tradeUrl = `/Team/TradeView?currentTeam=${currentPick.teamId}&currentPick=${currentPick.overallPick}`;
+            // Create modal backdrop
+            const modalBackdrop = document.createElement('div');
+            modalBackdrop.className = 'modal-backdrop fade show';
+            modalBackdrop.style.zIndex = '1040';
+            document.body.appendChild(modalBackdrop);
             
-            // Create popup window or iframe
-            const tradeWindow = window.open(tradeUrl, 'tradeWindow', 'width=800,height=600,resizable=yes,scrollbars=yes');
+            // Create modal container
+            const modalContainer = document.createElement('div');
+            modalContainer.className = 'modal fade show';
+            modalContainer.style.display = 'block';
+            modalContainer.style.zIndex = '1050';
+            modalContainer.innerHTML = `
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Propose Trade - Pick ${currentPick.overallPick}</h5>
+                            <button type="button" class="btn-close" onclick="closeTradeModal()"></button>
+                        </div>
+                        <div class="modal-body" id="tradeModalBody">
+                            <div class="text-center p-4">
+                                <div class="spinner-border text-primary mb-3" role="status"></div>
+                                <p>Loading trade interface...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            modalContainer.id = 'tradeModal';
+            document.body.appendChild(modalContainer);
             
-            // Listen for trade result
-            window.addEventListener('message', function(event) {
-                if (event.data && event.data.type === 'tradeResult') {
-                    handleTradeResult(event.data);
-                }
-            });
+            // Load trade partial view
+            fetch(`/Team/GetTradePartial?currentTeam=${currentPick.teamId}&currentPick=${currentPick.overallPick}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('tradeModalBody').innerHTML = html;
+                    
+                    // Initialize any trade-specific JavaScript here
+                    if (window.initializeTradeView) {
+                        window.initializeTradeView();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading trade view:', error);
+                    document.getElementById('tradeModalBody').innerHTML = `
+                        <div class="alert alert-danger">
+                            <h6>Error Loading Trade View</h6>
+                            <p>Unable to load the trade interface. Please try again.</p>
+                            <button type="button" class="btn btn-secondary" onclick="closeTradeModal()">Close</button>
+                        </div>
+                    `;
+                });
         }
+
+        // Global function to close trade modal
+        window.closeTradeModal = function() {
+            const modal = document.getElementById('tradeModal');
+            const backdrop = document.querySelector('.modal-backdrop');
+            
+            if (modal) modal.remove();
+            if (backdrop) backdrop.remove();
+        };
+
+        // Global function to handle trade completion
+        window.onTradeCompleted = function(tradeResult) {
+            closeTradeModal();
+            
+            if (tradeResult && tradeResult.success) {
+                handleTradeResult(tradeResult);
+            }
+        };
 
         function handleTradeResult(tradeData) {
             if (tradeData.success) {

@@ -9,6 +9,7 @@ C:\Users\jorge\workspaces\repos\MyExpansionTeam\METDAL\obj\Debug\net9.0\METDAL.G
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METDAL\obj\Debug\net9.0\METDAL.AssemblyInfoInputs.cache
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METDAL\obj\Debug\net9.0\METDAL.AssemblyInfo.cs
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METDAL\obj\Debug\net9.0\METDAL.csproj.CoreCompileInputs.cache
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\METDAL\obj\Debug\net9.0\METDAL.sourcelink.json
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METDAL\obj\Debug\net9.0\METDAL.csproj.Up2Date
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METDAL\obj\Debug\net9.0\METDAL.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METDAL\obj\Debug\net9.0\refint\METDAL.dll

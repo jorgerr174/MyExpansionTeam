@@ -24,7 +24,8 @@ namespace METDAL.Repositories
                 }
 
             }
-            catch { list = []; };
+            catch { list = []; }
+            ;
 
             return list;
         }
