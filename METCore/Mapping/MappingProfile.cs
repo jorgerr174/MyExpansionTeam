@@ -8,7 +8,6 @@ using METCore.Models;
 using METCore.Models.Players;
 using METCore.Models.Stats;
 using METCore.Models.Teams;
-using static METCore.Enums.Types;
 
 namespace METCore.Mapping
 {
@@ -35,7 +34,7 @@ namespace METCore.Mapping
                 .IncludeBase<Team, TeamBasicInfoDto>()
             .ReverseMap()
                 .IncludeBase<TeamBasicInfoDto, Team>();
-            
+
             CreateMap<Team, TeamInfoDto>()
                 .IncludeBase<Team, TeamBasicInfoDto>()
                 .ForMember(dest => dest.RosterSettingsCap, opt => opt.MapFrom(x => x.RosterSettings != null ? x.RosterSettings.Cap * 100 : 80))
@@ -180,6 +179,16 @@ namespace METCore.Mapping
             CreateMap<ImportRushStatsDto, RushStats>();
             CreateMap<ImportTackleStatsDto, TackleStats>();
             #endregion Stats
+
+
+            #region Trade
+            CreateMap<Trade, TradeDto>()
+                .ForMember(dest => dest.TeamPlayers, opt => opt.Ignore())
+                .ForMember(dest => dest.FranchisePlayers, opt => opt.Ignore())
+            .ReverseMap()
+                .ForMember(dest => dest.TeamPlayers, opt => opt.MapFrom(src => src.TeamPlayers.Select(tpl => tpl.Id)))
+                .ForMember(dest => dest.FranchisePlayers, opt => opt.MapFrom(src => src.FranchisePlayers.Select(fpl => fpl.Id)));
+            #endregion Trade
         }
     }
 }

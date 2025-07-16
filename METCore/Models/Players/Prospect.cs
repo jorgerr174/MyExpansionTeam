@@ -36,8 +36,8 @@ namespace METCore.Models.Players
 
 
         [NotMapped]
-        public string[] ImportAttributes => 
-            new string?[] { HandSize, ArmLength, Wingspan, FortyYardDash, BenchPress, VertJump, BroadJump, 
+        public string[] ImportAttributes =>
+            new string?[] { HandSize, ArmLength, Wingspan, FortyYardDash, BenchPress, VertJump, BroadJump,
                 ThreeConeDrill, TwentyYardShuttle, AthScore.ToString()}
                 .Select(s => s ?? string.Empty).ToArray();
         #endregion Attributes

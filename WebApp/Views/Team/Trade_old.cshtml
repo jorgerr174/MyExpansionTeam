@@ -1,0 +1,668 @@
+﻿<!-- Trade Modal Content -->
+<div class="container-fluid">
+    <!-- Step 1: Franchise Selection -->
+    <div id="franchiseSelectionStep" class="trade-step">
+        <h6 class="mb-3">Select Franchise to Trade With</h6>
+        <div class="row" id="franchiseGrid">
+            <!-- Franchises will be populated here -->
+        </div>
+    </div>
+
+    <!-- Step 2: Trade Builder -->
+    <div id="tradeBuilderStep" class="trade-step" style="display: none;">
+        <!-- Trade Equality Bar -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6 class="mb-2">Trade Equality</h6>
+                <div class="progress" style="height: 20px;">
+                    <div class="progress-bar bg-danger" id="userSideBar" style="width: 50%;">
+                        <span id="userSideValue">50</span>
+                    </div>
+                    <div class="progress-bar bg-success" id="franchiseSideBar" style="width: 50%;">
+                        <span id="franchiseSideValue">50</span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between mt-1">
+                    <small class="text-muted">Your Side: <span id="userTotalValue">0</span> pts</small>
+                    <small class="text-muted">Their Side: <span id="franchiseTotalValue">0</span> pts</small>
+                </div>
+                <div class="text-center mt-2">
+                    <span class="badge" id="equalityBadge">Equal Trade</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trade Items -->
+        <div class="row">
+            <!-- Your Side -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0">Your Offer</h6>
+                    </div>
+                    <div class="card-body">
+                        <!-- Your Selected Items -->
+                        <div class="mb-3">
+                            <h6>Selected Items</h6>
+                            <div id="userSelectedItems" class="selected-items-container">
+                                <div class="text-muted text-center p-3">
+                                    <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                                    <p>Select picks or players to trade</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Your Available Items -->
+                        <div class="available-items">
+                            <ul class="nav nav-tabs" id="userItemTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="user-picks-tab" data-bs-toggle="tab" data-bs-target="#user-picks" type="button" role="tab">
+                                        Draft Picks
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="user-players-tab" data-bs-toggle="tab" data-bs-target="#user-players" type="button" role="tab">
+                                        Players
+                                    </button>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="userItemTabContent">
+                                <div class="tab-pane fade show active" id="user-picks" role="tabpanel">
+                                    <div id="userPicksList" class="items-list">
+                                        <!-- User's available picks will be loaded here -->
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="user-players" role="tabpanel">
+                                    <div id="userPlayersList" class="items-list">
+                                        <!-- User's available players will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Their Side -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0">Request From <span id="selectedFranchiseName">Franchise</span></h6>
+                    </div>
+                    <div class="card-body">
+                        <!-- Their Selected Items -->
+                        <div class="mb-3">
+                            <h6>Requested Items</h6>
+                            <div id="franchiseSelectedItems" class="selected-items-container">
+                                <div class="text-muted text-center p-3">
+                                    <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                                    <p>Select picks or players to request</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Their Available Items -->
+                        <div class="available-items">
+                            <ul class="nav nav-tabs" id="franchiseItemTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="franchise-picks-tab" data-bs-toggle="tab" data-bs-target="#franchise-picks" type="button" role="tab">
+                                        Draft Picks
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="franchise-players-tab" data-bs-toggle="tab" data-bs-target="#franchise-players" type="button" role="tab">
+                                        Players
+                                    </button>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="franchiseItemTabContent">
+                                <div class="tab-pane fade show active" id="franchise-picks" role="tabpanel">
+                                    <div id="franchisePicksList" class="items-list">
+                                        <!-- Franchise's available picks will be loaded here -->
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="franchise-players" role="tabpanel">
+                                    <div id="franchisePlayersList" class="items-list">
+                                        <!-- Franchise's available players will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-between mt-3">
+            <button type="button" class="btn btn-secondary" onclick="goBackToFranchiseSelection()">
+                <i class="fas fa-arrow-left me-2"></i>Change Franchise
+            </button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary" id="requestTradeBtn" onclick="requestTrade()">
+                    <i class="fas fa-handshake me-2"></i>Request Trade
+                </button>
+                <button type="button" class="btn btn-warning" id="forceTradeBtn" onclick="forceTrade()">
+                    <i class="fas fa-bolt me-2"></i>Force Trade
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        // Trade state variables
+        let selectedFranchiseId = null;
+        let selectedFranchiseName = '';
+        let tradeData = null;
+        let userSelectedPicks = [];
+        let userSelectedPlayers = [];
+        let franchiseSelectedPicks = [];
+        let franchiseSelectedPlayers = [];
+        let userTotalValue = 0;
+        let franchiseTotalValue = 0;
+
+        // NFL Franchises (same as draft view)
+        const nflFranchises = {
+            1: { name: "Arizona Cardinals", abbreviation: "ARIZ" },
+            2: { name: "Atlanta Falcons", abbreviation: "ATL" },
+            3: { name: "Baltimore Ravens", abbreviation: "BAL" },
+            4: { name: "Buffalo Bills", abbreviation: "BUF" },
+            5: { name: "Carolina Panthers", abbreviation: "CAR" },
+            6: { name: "Chicago Bears", abbreviation: "CHI" },
+            7: { name: "Cincinnati Bengals", abbreviation: "CIN" },
+            8: { name: "Cleveland Browns", abbreviation: "CLE" },
+            9: { name: "Dallas Cowboys", abbreviation: "DAL" },
+            10: { name: "Denver Broncos", abbreviation: "DEN" },
+            11: { name: "Detroit Lions", abbreviation: "DET" },
+            12: { name: "Green Bay Packers", abbreviation: "GB" },
+            13: { name: "Houston Texans", abbreviation: "HOU" },
+            14: { name: "Indianapolis Colts", abbreviation: "IND" },
+            15: { name: "Jacksonville Jaguars", abbreviation: "JAX" },
+            16: { name: "Kansas City Chiefs", abbreviation: "KC" },
+            17: { name: "Las Vegas Raiders", abbreviation: "LV" },
+            18: { name: "Los Angeles Chargers", abbreviation: "LAC" },
+            19: { name: "Los Angeles Rams", abbreviation: "LAR" },
+            20: { name: "Miami Dolphins", abbreviation: "MIA" },
+            21: { name: "Minnesota Vikings", abbreviation: "MIN" },
+            22: { name: "New England Patriots", abbreviation: "NE" },
+            23: { name: "New Orleans Saints", abbreviation: "NO" },
+            24: { name: "New York Giants", abbreviation: "NYG" },
+            25: { name: "New York Jets", abbreviation: "NYJ" },
+            26: { name: "Philadelphia Eagles", abbreviation: "PHI" },
+            27: { name: "Pittsburgh Steelers", abbreviation: "PIT" },
+            28: { name: "San Francisco 49ers", abbreviation: "SF" },
+            29: { name: "Seattle Seahawks", abbreviation: "SEA" },
+            30: { name: "Tampa Bay Buccaneers", abbreviation: "TB" },
+            31: { name: "Tennessee Titans", abbreviation: "TEN" },
+            32: { name: "Washington Commanders", abbreviation: "WAS" }
+        };
+
+        // Initialize franchise selection
+        function initializeFranchiseSelection() {
+            const container = document.getElementById('franchiseGrid');
+            container.innerHTML = '';
+
+            Object.entries(nflFranchises).forEach(([id, franchise]) => {
+                const franchiseId = parseInt(id);
+                const col = document.createElement('div');
+                col.className = 'col-md-3 col-sm-4 col-6 mb-2';
+
+                col.innerHTML = `
+                    <div class="card franchise-card" data-franchise-id="${franchiseId}" onclick="selectFranchise(${franchiseId}, '${franchise.name}')">
+                        <div class="card-body text-center p-2">
+                            <h6 class="mb-1">${franchise.name}</h6>
+                            <small class="text-muted">${franchise.abbreviation}</small>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(col);
+            });
+        }
+
+        // Select franchise and load trade data
+        window.selectFranchise = function(franchiseId, franchiseName) {
+            selectedFranchiseId = franchiseId;
+            selectedFranchiseName = franchiseName;
+
+            // Get current pick info from parent window
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentTeam = urlParams.get('currentTeam');
+            const currentPick = urlParams.get('currentPick');
+
+            // Load trade data from API
+            fetch('/Team/GetTradeData', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userTeamId: parseInt(currentTeam),
+                    franchiseId: franchiseId,
+                    currentPick: parseInt(currentPick)
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                tradeData = data;
+                showTradeBuilder();
+            })
+            .catch(error => {
+                console.error('Error loading trade data:', error);
+                alert('Error loading trade data. Please try again.');
+            });
+        };
+
+        // Show trade builder step
+        function showTradeBuilder() {
+            document.getElementById('franchiseSelectionStep').style.display = 'none';
+            document.getElementById('tradeBuilderStep').style.display = 'block';
+            document.getElementById('selectedFranchiseName').textContent = selectedFranchiseName;
+
+            populateTradeItems();
+        }
+
+        // Populate trade items from API data
+        function populateTradeItems() {
+            // Populate user's picks
+            const userPicksContainer = document.getElementById('userPicksList');
+            userPicksContainer.innerHTML = '';
+
+            if (tradeData.userPicks && tradeData.userPicks.length > 0) {
+                tradeData.userPicks.forEach(pick => {
+                    const pickDiv = createPickElement(pick, 'user');
+                    userPicksContainer.appendChild(pickDiv);
+                });
+            } else {
+                userPicksContainer.innerHTML = '<div class="text-muted text-center p-3">No picks available</div>';
+            }
+
+            // Populate user's players
+            const userPlayersContainer = document.getElementById('userPlayersList');
+            userPlayersContainer.innerHTML = '';
+
+            if (tradeData.userPlayers && tradeData.userPlayers.length > 0) {
+                tradeData.userPlayers.forEach(player => {
+                    const playerDiv = createPlayerElement(player, 'user');
+                    userPlayersContainer.appendChild(playerDiv);
+                });
+            } else {
+                userPlayersContainer.innerHTML = '<div class="text-muted text-center p-3">No players available</div>';
+            }
+
+            // Populate franchise's picks
+            const franchisePicksContainer = document.getElementById('franchisePicksList');
+            franchisePicksContainer.innerHTML = '';
+
+            if (tradeData.franchisePicks && tradeData.franchisePicks.length > 0) {
+                tradeData.franchisePicks.forEach(pick => {
+                    const pickDiv = createPickElement(pick, 'franchise');
+                    franchisePicksContainer.appendChild(pickDiv);
+                });
+            } else {
+                franchisePicksContainer.innerHTML = '<div class="text-muted text-center p-3">No picks available</div>';
+            }
+
+            // Populate franchise's players
+            const franchisePlayersContainer = document.getElementById('franchisePlayersList');
+            franchisePlayersContainer.innerHTML = '';
+
+            if (tradeData.franchisePlayers && tradeData.franchisePlayers.length > 0) {
+                tradeData.franchisePlayers.forEach(player => {
+                    const playerDiv = createPlayerElement(player, 'franchise');
+                    franchisePlayersContainer.appendChild(playerDiv);
+                });
+            } else {
+                franchisePlayersContainer.innerHTML = '<div class="text-muted text-center p-3">No players available</div>';
+            }
+        }
+
+        // Create pick element
+        function createPickElement(pick, side) {
+            const pickDiv = document.createElement('div');
+            pickDiv.className = 'trade-item mb-2';
+            pickDiv.innerHTML = `
+                <div class="card trade-item-card" data-type="pick" data-id="${pick.id}" data-value="${pick.value}" data-side="${side}">
+                    <div class="card-body p-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Round ${pick.round}, Pick ${pick.pick}</strong>
+                                <br><small class="text-muted">Overall: ${pick.overallPick}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-info">${pick.value} pts</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Add click handler
+            pickDiv.querySelector('.trade-item-card').addEventListener('click', function() {
+                toggleItemSelection(this);
+            });
+
+            return pickDiv;
+        }
+
+        // Create player element
+        function createPlayerElement(player, side) {
+            const playerDiv = document.createElement('div');
+            playerDiv.className = 'trade-item mb-2';
+            playerDiv.innerHTML = `
+                <div class="card trade-item-card" data-type="player" data-id="${player.id}" data-value="${player.value}" data-side="${side}">
+                    <div class="card-body p-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>${player.name}</strong>
+                                <br><small class="text-muted">${player.position} | ${player.age} years</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-success">${player.value} pts</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Add click handler
+            playerDiv.querySelector('.trade-item-card').addEventListener('click', function() {
+                toggleItemSelection(this);
+            });
+
+            return playerDiv;
+        }
+
+        // Toggle item selection
+        function toggleItemSelection(element) {
+            const isSelected = element.classList.contains('selected');
+            const type = element.getAttribute('data-type');
+            const id = parseInt(element.getAttribute('data-id'));
+            const value = parseInt(element.getAttribute('data-value'));
+            const side = element.getAttribute('data-side');
+
+            if (isSelected) {
+                // Remove selection
+                element.classList.remove('selected');
+                removeFromSelection(type, id, side, value);
+            } else {
+                // Add selection
+                element.classList.add('selected');
+                addToSelection(type, id, side, value);
+            }
+
+            updateSelectedItemsDisplay();
+            updateTradeEquality();
+        }
+
+        // Add item to selection
+        function addToSelection(type, id, side, value) {
+            if (side === 'user') {
+                if (type === 'pick') {
+                    userSelectedPicks.push(id);
+                } else {
+                    userSelectedPlayers.push(id);
+                }
+                userTotalValue += value;
+            } else {
+                if (type === 'pick') {
+                    franchiseSelectedPicks.push(id);
+                } else {
+                    franchiseSelectedPlayers.push(id);
+                }
+                franchiseTotalValue += value;
+            }
+        }
+
+        // Remove item from selection
+        function removeFromSelection(type, id, side, value) {
+            if (side === 'user') {
+                if (type === 'pick') {
+                    userSelectedPicks = userSelectedPicks.filter(pickId => pickId !== id);
+                } else {
+                    userSelectedPlayers = userSelectedPlayers.filter(playerId => playerId !== id);
+                }
+                userTotalValue -= value;
+            } else {
+                if (type === 'pick') {
+                    franchiseSelectedPicks = franchiseSelectedPicks.filter(pickId => pickId !== id);
+                } else {
+                    franchiseSelectedPlayers = franchiseSelectedPlayers.filter(playerId => playerId !== id);
+                }
+                franchiseTotalValue -= value;
+            }
+        }
+
+        // Update selected items display
+        function updateSelectedItemsDisplay() {
+            const userContainer = document.getElementById('userSelectedItems');
+            const franchiseContainer = document.getElementById('franchiseSelectedItems');
+
+            // Update user's selected items
+            if (userSelectedPicks.length === 0 && userSelectedPlayers.length === 0) {
+                userContainer.innerHTML = `
+                    <div class="text-muted text-center p-3">
+                        <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                        <p>Select picks or players to trade</p>
+                    </div>
+                `;
+            } else {
+                userContainer.innerHTML = '<div class="selected-items-list"></div>';
+                // Add selected items display logic here
+            }
+
+            // Update franchise's selected items
+            if (franchiseSelectedPicks.length === 0 && franchiseSelectedPlayers.length === 0) {
+                franchiseContainer.innerHTML = `
+                    <div class="text-muted text-center p-3">
+                        <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                        <p>Select picks or players to request</p>
+                    </div>
+                `;
+            } else {
+                franchiseContainer.innerHTML = '<div class="selected-items-list"></div>';
+                // Add selected items display logic here
+            }
+        }
+
+        // Update trade equality bar
+        function updateTradeEquality() {
+            const totalValue = userTotalValue + franchiseTotalValue;
+
+            if (totalValue === 0) {
+                // Reset to 50/50 when no items selected
+                document.getElementById('userSideBar').style.width = '50%';
+                document.getElementById('franchiseSideBar').style.width = '50%';
+                document.getElementById('equalityBadge').textContent = 'Equal Trade';
+                document.getElementById('equalityBadge').className = 'badge bg-secondary';
+            } else {
+                const userPercentage = (userTotalValue / totalValue) * 100;
+                const franchisePercentage = (franchiseTotalValue / totalValue) * 100;
+
+                document.getElementById('userSideBar').style.width = userPercentage + '%';
+                document.getElementById('franchiseSideBar').style.width = franchisePercentage + '%';
+
+                // Update equality badge
+                const difference = Math.abs(userTotalValue - franchiseTotalValue);
+                const equalityBadge = document.getElementById('equalityBadge');
+
+                if (difference <= 10) {
+                    equalityBadge.textContent = 'Fair Trade';
+                    equalityBadge.className = 'badge bg-success';
+                } else if (difference <= 25) {
+                    equalityBadge.textContent = 'Uneven Trade';
+                    equalityBadge.className = 'badge bg-warning';
+                } else {
+                    equalityBadge.textContent = 'Unfair Trade';
+                    equalityBadge.className = 'badge bg-danger';
+                }
+            }
+
+            document.getElementById('userTotalValue').textContent = userTotalValue;
+            document.getElementById('franchiseTotalValue').textContent = franchiseTotalValue;
+            document.getElementById('userSideValue').textContent = userTotalValue;
+            document.getElementById('franchiseSideValue').textContent = franchiseTotalValue;
+        }
+
+        // Go back to franchise selection
+        window.goBackToFranchiseSelection = function() {
+            document.getElementById('tradeBuilderStep').style.display = 'none';
+            document.getElementById('franchiseSelectionStep').style.display = 'block';
+
+            // Reset selection
+            userSelectedPicks = [];
+            userSelectedPlayers = [];
+            franchiseSelectedPicks = [];
+            franchiseSelectedPlayers = [];
+            userTotalValue = 0;
+            franchiseTotalValue = 0;
+            updateTradeEquality();
+        };
+
+        // Request trade
+        window.requestTrade = function() {
+            if (userSelectedPicks.length === 0 && userSelectedPlayers.length === 0) {
+                alert('Please select items to trade');
+                return;
+            }
+
+            if (franchiseSelectedPicks.length === 0 && franchiseSelectedPlayers.length === 0) {
+                alert('Please select items to request');
+                return;
+            }
+
+            const tradeRequest = {
+                franchiseId: selectedFranchiseId,
+                userPicks: userSelectedPicks,
+                userPlayers: userSelectedPlayers,
+                franchisePicks: franchiseSelectedPicks,
+                franchisePlayers: franchiseSelectedPlayers
+            };
+
+            fetch('/Team/RequestTrade', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(tradeRequest)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Trade request sent successfully!');
+                    // Update parent window and close modal
+                    if (window.parent && window.parent.onTradeCompleted) {
+                        window.parent.onTradeCompleted(result);
+                    }
+                } else {
+                    alert('Trade request was rejected: ' + (result.message || 'Unknown reason'));
+                }
+            })
+            .catch(error => {
+                console.error('Error requesting trade:', error);
+                alert('Error sending trade request. Please try again.');
+            });
+        };
+
+        // Force trade
+        window.forceTrade = function() {
+            if (userSelectedPicks.length === 0 && userSelectedPlayers.length === 0) {
+                alert('Please select items to trade');
+                return;
+            }
+
+            if (franchiseSelectedPicks.length === 0 && franchiseSelectedPlayers.length === 0) {
+                alert('Please select items to request');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to force this trade? This cannot be undone.')) {
+                return;
+            }
+
+            const tradeRequest = {
+                franchiseId: selectedFranchiseId,
+                userPicks: userSelectedPicks,
+                userPlayers: userSelectedPlayers,
+                franchisePicks: franchiseSelectedPicks,
+                franchisePlayers: franchiseSelectedPlayers
+            };
+
+            fetch('/Team/ForceTrade', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(tradeRequest)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Trade completed successfully!');
+                    // Update parent window and close modal
+                    if (window.parent && window.parent.onTradeCompleted) {
+                        window.parent.onTradeCompleted(result);
+                    }
+                } else {
+                    alert('Error completing trade: ' + (result.message || 'Unknown reason'));
+                }
+            })
+            .catch(error => {
+                console.error('Error forcing trade:', error);
+                alert('Error completing trade. Please try again.');
+            });
+        };
+
+        // Initialize the view
+        initializeFranchiseSelection();
+    });
+</script>
+
+<style>
+    .franchise-card {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .franchise-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-color: #007bff;
+        }
+
+    .trade-item-card {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .trade-item-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .trade-item-card.selected {
+            border-color: #28a745 !important;
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+
+    .selected-items-container {
+        min-height: 100px;
+        border: 2px dashed #dee2e6;
+        border-radius: 0.375rem;
+    }
+
+    .items-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .progress-bar {
+        transition: width 0.3s ease;
+    }
+
+    .trade-step {
+        min-height: 400px;
+    }
+</style>

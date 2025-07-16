@@ -1,6 +1,4 @@
-﻿using static METCore.Enums.Types;
-
-namespace METCore.DTOs.Player
+﻿namespace METCore.DTOs.Player
 {
     public class AthleteDto
     {

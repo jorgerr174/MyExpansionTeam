@@ -430,17 +430,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserPicksDto"
+                "$ref": "#/components/schemas/IdDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserPicksDto"
+                "$ref": "#/components/schemas/IdDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserPicksDto"
+                "$ref": "#/components/schemas/IdDto"
               }
             }
           }
@@ -545,6 +545,68 @@
         }
       }
     },
+    "/api/Teams/GetTradeDto": {
+      "put": {
+        "tags": [
+          "Teams"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TradeDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TradeDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TradeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Teams/SaveTrade": {
+      "post": {
+        "tags": [
+          "Teams"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TradeDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TradeDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TradeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Users/Profile": {
       "get": {
         "tags": [
@@ -634,6 +696,47 @@
         ],
         "type": "integer",
         "format": "int32"
+      },
+      "SelectableDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "height": {
+            "type": "string",
+            "nullable": true
+          },
+          "weight": {
+            "type": "string",
+            "nullable": true
+          },
+          "age": {
+            "type": "string",
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
+          "apy": {
+            "type": "string",
+            "nullable": true
+          },
+          "defaultProtected": {
+            "type": "boolean"
+          },
+          "pureAPY": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "StatsEnum": {
         "enum": [
@@ -831,6 +934,61 @@
         },
         "additionalProperties": false
       },
+      "TradeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "teamId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "franchiseId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "force": {
+            "type": "boolean"
+          },
+          "teamCurrentCap": {
+            "type": "number",
+            "format": "double"
+          },
+          "teamPlayers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SelectableDto"
+            },
+            "nullable": true
+          },
+          "teamPicks": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "franchisePlayers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SelectableDto"
+            },
+            "nullable": true
+          },
+          "franchisePicks": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "UpdateCredentialsDto": {
         "type": "object",
         "properties": {
@@ -886,36 +1044,6 @@
           },
           "role": {
             "$ref": "#/components/schemas/RoleEnum"
-          }
-        },
-        "additionalProperties": false
-      },
-      "UserPicksDto": {
-        "type": "object",
-        "properties": {
-          "teamId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "teamPicks": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "nullable": true
-          },
-          "othersPicks": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "nullable": true
-          },
-          "rounds": {
-            "type": "integer",
-            "format": "int32"
           }
         },
         "additionalProperties": false

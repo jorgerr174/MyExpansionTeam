@@ -1,6 +1,4 @@
-﻿using METCore.Models.Teams;
-
-namespace METCore.DTOs.Team
+﻿namespace METCore.DTOs.Team
 {
     public class TeamDto : TeamInfoDto
     {
