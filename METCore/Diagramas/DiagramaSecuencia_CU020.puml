@@ -1,0 +1,72 @@
+@startuml DiagramaSecuencia_CU020
+!theme plain
+title CU020: Alteración de Roles de Usuarios
+
+actor "Administrador" as admin
+participant "Admin Controller" as controller
+participant "User Service" as userService
+participant "User Repository" as userRepo
+participant "Database" as db
+
+admin -> controller : GET /Admin/UserManagement\nSolicitar gestión roles
+activate controller
+
+controller -> controller : ValidateUserRole()\nValidar rol administrador
+
+alt Usuario es administrador
+    controller --> admin : Formulario gestión roles usuarios
+    deactivate controller
+    
+    admin -> controller : POST /Admin/SearchUsers\n(cadena búsqueda)
+    activate controller
+    
+    controller -> userService : SearchUsers(searchString)
+    activate userService
+    userService -> userRepo : GetUsersByUsername(searchString)
+    activate userRepo
+    userRepo -> db : SELECT FROM Users WHERE Username LIKE ?
+    activate db
+    db --> userRepo : usuarios coincidentes
+    deactivate db
+    userRepo --> userService : lista usuarios encontrados
+    deactivate userRepo
+    userService --> controller : usuarios cuyo nombre coincide
+    deactivate userService
+    
+    controller --> admin : Lista usuarios encontrados con roles actuales
+    deactivate controller
+    
+    admin -> controller : POST /Admin/ChangeUserRole\n(userId, nuevoRol)
+    activate controller
+    
+    controller -> userService : ChangeUserRole(userId, newRole)
+    activate userService
+    
+    userService -> userService : ValidateNewRole()\nValidar rol válido
+    
+    alt Rol válido
+        userService -> userRepo : UpdateUserRole(userId, newRole)
+        activate userRepo
+        userRepo -> db : UPDATE Users SET Role = ? WHERE Id = ?
+        activate db
+        db --> userRepo : rol actualizado
+        deactivate db
+        userRepo --> userService : cambio rol exitoso
+        deactivate userRepo
+        
+        userService --> controller : Success("Rol modificado")
+        deactivate userService
+        controller --> admin : Mensaje confirmación cambio rol
+    else Rol inválido
+        userService --> controller : Error("Rol no válido")
+        deactivate userService
+        controller --> admin : Mensaje error + Formulario gestión
+    end
+    
+else Usuario no es administrador
+    controller --> admin : Redirect /Home/Index\nRetornar pantalla inicial
+end
+
+deactivate controller
+
+@enduml

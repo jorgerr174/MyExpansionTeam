@@ -598,9 +598,6 @@ namespace METDAL.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Draft")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -617,6 +614,9 @@ namespace METDAL.Migrations
 
                     b.Property<string>("ProtectedPlayersIds")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Selections")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
@@ -640,36 +640,30 @@ namespace METDAL.Migrations
                     b.Property<int>("FranchiseId")
                         .HasColumnType("int");
 
-                    b.Property<string>("PicksSent")
+                    b.Property<string>("FranchisePicks")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PicksTaken")
+                    b.Property<string>("FranchisePlayers")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PlayersSent")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PlayersTaken")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("TeamId")
+                    b.Property<int>("TeamId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TotalCapSent")
-                        .HasColumnType("int");
+                    b.Property<string>("TeamPicks")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TotalCapTaken")
-                        .HasColumnType("int");
+                    b.Property<string>("TeamPlayers")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("Trade");
+                    b.ToTable("Trades");
                 });
 
             modelBuilder.Entity("METCore.Models.User", b =>
@@ -973,7 +967,9 @@ namespace METDAL.Migrations
                 {
                     b.HasOne("METCore.Models.Teams.Team", null)
                         .WithMany("Trades")
-                        .HasForeignKey("TeamId");
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("METCore.Models.Players.Player", b =>

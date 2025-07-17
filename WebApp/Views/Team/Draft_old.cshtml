@@ -34,7 +34,7 @@
                 <input type="hidden" id="selectedFranchises" name="SelectedFranchises" value="" />
                 
                 <!-- Hidden field for team's draft picks only -->
-                <input type="hidden" id="draftPicks" name="Draft" value="@Model.Draft" />
+                <input type="hidden" id="draftPicks" name="Draft" value="@Model.Selections" />
 
                 <div class="tab-content">
                     <!-- Phase 1: Draft Settings Configuration -->
@@ -56,7 +56,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group mb-3">
-                                            @Html.LabelFor(m => m.Speed, "Simulation Speed", new { @class = "form-label" })
+@*                                             @Html.LabelFor(m => m.Speed, "Simulation Speed", new { @class = "form-label" })
                                             @Html.DropDownListFor(m => m.Speed, new SelectList(new[] {
                                             new { Value = "instant", Text = "Instant" },
                                             new { Value = "fast", Text = "Fast (0.5s per pick)" },
@@ -64,7 +64,7 @@
                                             new { Value = "slow", Text = "Slow (2s per pick)" }
                                             }, "Value", "Text"), new { @class = "form-select"})
                                             @Html.ValidationMessageFor(m => m.Speed, "", new { @class = "text-danger" })
-                                            <div class="form-text">Speed of automated picks during simulation</div>
+ *@                                            <div class="form-text">Speed of automated picks during simulation</div>
                                         </div>
                                     </div>
                                 </div>
@@ -892,19 +892,19 @@
             modalContainer.id = 'tradeModal';
             document.body.appendChild(modalContainer);
             
-            // Load trade partial view
+            // Load trade partial view from WebApp controller
             fetch(`/Team/GetTradePartial?currentTeam=${currentPick.teamId}&currentPick=${currentPick.overallPick}`)
                 .then(response => response.text())
                 .then(html => {
                     document.getElementById('tradeModalBody').innerHTML = html;
                     
-                    // Initialize any trade-specific JavaScript here
+                    // Initialize any trade-specific JavaScript if needed
                     if (window.initializeTradeView) {
                         window.initializeTradeView();
                     }
                 })
                 .catch(error => {
-                    console.error('Error loading trade view:', error);
+                    console.error('Error loading trade partial:', error);
                     document.getElementById('tradeModalBody').innerHTML = `
                         <div class="alert alert-danger">
                             <h6>Error Loading Trade View</h6>

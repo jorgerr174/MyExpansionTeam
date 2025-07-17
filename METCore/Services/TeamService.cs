@@ -97,7 +97,24 @@ namespace METCore.Services
         public async Task<DraftDto?> GetTeamDraftDtoById(int id)
         {
             Team? team = await _teamRepository.GetTById(id);
-            return team == null ? null : _mapper.Map<DraftDto>(team);
+            if (team is null) return null;
+            DraftDto dto = _mapper.Map<DraftDto>(team);
+
+            if (team.Trades is not null && team.Trades.Count > 0)
+                foreach (Trade trade in team.Trades.OrderBy(t => t.Id))
+                {
+                    foreach (int tp in trade.FranchisePicks)
+                    {
+                        dto.Picks[0].Remove(tp);
+                        dto.Picks[trade.FranchiseId].Add(tp);
+                    }
+                    foreach (int fp in trade.FranchisePlayers)
+                    {
+                        dto.Picks[0].Remove(fp);
+                        dto.Picks[trade.FranchiseId].Add(fp);
+                    }
+                }
+            return _mapper.Map<DraftDto>(team);
         }
 
         /// <summary>
@@ -135,43 +152,9 @@ namespace METCore.Services
             return (await _playerRepository.GetManyTByIds(Ids)).Select(p => p.Id).ToList();
         }
 
-        private IList<int> GetDefaultProtectedPlayers(int numPerFranchise)
+        private List<int> GetDefaultProtectedPlayers(int numPerFranchise)
         {
             return _franchiseRepository.GetDefaultProtected(numPerFranchise).Select(p => p.Id).ToList();
-        }
-
-        public async Task<string?> GetUserControlledPicks(PicksDto dto, string username)
-        {
-            User? user = await _userRepository.GetUserByUsername(username);
-            if (user is null) return "Username";
-
-            Team? team = await _teamRepository.GetTById(dto.TeamId);
-            if (team is null) return "TeamId";
-            else if (team.User.Id != user.Id) return "User";
-
-            try
-            {
-                if (team.Trades is not null && team.Trades.Count > 0)
-                    foreach (Trade trade in team.Trades.OrderBy(t => t.Id))
-                    {
-                        foreach (int tp in trade.FranchisePicks)
-                        {
-                            dto.Picks[0].Remove(tp);
-                            dto.Picks[trade.FranchiseId].Add(tp);
-                        }
-                        foreach (int fp in trade.FranchisePlayers)
-                        {
-                            dto.Picks[0].Remove(fp);
-                            dto.Picks[trade.FranchiseId].Add(fp);
-                        }
-                    }
-            }
-            catch (Exception ex)
-            {
-                return "Error";
-            }
-
-            return null;
         }
         #endregion Get
 

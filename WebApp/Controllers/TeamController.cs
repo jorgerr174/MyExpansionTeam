@@ -242,12 +242,6 @@ namespace WebApp.Controllers
             return RedirectToAction("Roster", new { dto.Id, response.IsSuccessStatusCode });
         }
 
-        [HttpGet]
-        public async Task<Object> GetUserControlledPicks(PicksDto dto)
-        {
-            var response = await SendRequest(HttpMethod.Get, "Teams", "GetUserControlledPicks", dto);
-            return response.IsSuccessStatusCode ? await GetResult<PicksDto>(response) : await GetResult<MessageDto>(response);
-        }
 
         [HttpGet]
         public async Task<Object> GetDraftProspects()
@@ -259,6 +253,20 @@ namespace WebApp.Controllers
 
 
         #region Trade
+        [HttpGet]
+        public async Task<IList<TradeDto>> GetTeamTrades(int TeamId)
+        {
+            var response = await SendRequest(HttpMethod.Get, "Teams", "GetTeamTrades", new IdDto(TeamId));
+            return !response.IsSuccessStatusCode ? [] : await GetResult<IList<TradeDto>>(response);
+        }
+
+        [HttpGet]
+        public async Task<DraftDto> GetTeamDraft(int TeamId)
+        {
+            var response = await SendRequest(HttpMethod.Get, "Teams", "GetTeamDraft", new IdDto(TeamId));
+            return !response.IsSuccessStatusCode ? new DraftDto() : await GetResult<DraftDto>(response);
+        }
+
         [HttpGet]
         public async Task<Object> GetTradePartial(TradeDto dto)
         {
