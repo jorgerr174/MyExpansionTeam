@@ -1,0 +1,74 @@
+@startuml DiagramaSecuencia_CU014
+!theme plain
+title CU014: Realización del Draft
+
+actor "Actor Usuario" as usuario
+participant "Draft Controller" as controller
+participant "Draft Service" as draftService
+participant "Player Service" as playerService
+participant "Team Service" as teamService
+participant "Database" as db
+
+usuario -> controller : POST /api/Draft/Execute\nSolicitar draft manual
+activate controller
+
+controller -> controller : CompletesCU016()\nModificación ajustes draft
+
+controller -> draftService : InitializeDraft(draftConfig)
+activate draftService
+
+draftService -> playerService : GetAvailablePlayers()
+activate playerService
+playerService -> db : SELECT FROM Players WHERE Available = true
+activate db
+db --> playerService : jugadores disponibles
+deactivate db
+playerService --> draftService : pool jugadores
+deactivate playerService
+
+draftService -> teamService : GetParticipatingTeams()
+activate teamService
+teamService -> db : SELECT FROM Teams WHERE Participating = true
+activate db
+db --> teamService : equipos participantes
+deactivate db
+teamService --> draftService : lista equipos
+deactivate teamService
+
+draftService -> draftService : CreateDraftOrder()\nCrear orden draft
+
+loop Para cada ronda hasta rondas seleccionadas
+    loop Para cada equipo en orden
+        alt Turno del usuario
+            draftService --> controller : PlayerSelectionTurn(availablePlayers)
+            deactivate draftService
+            controller --> usuario : Seleccionar jugador a draftear
+            
+            usuario -> controller : SelectPlayer(playerId)
+            controller -> draftService : UserPlayerSelection(playerId)
+            activate draftService
+        else Turno automático
+            draftService -> draftService : AutoSelectBestPlayer(team, available)
+        end
+        
+        draftService -> playerService : AssignPlayerToTeam(playerId, teamId)
+        activate playerService
+        playerService -> db : UPDATE Players SET TeamId = ?
+        activate db
+        db --> playerService : jugador asignado
+        deactivate db
+        playerService --> draftService : jugador drafteado
+        deactivate playerService
+    end
+end
+
+draftService -> draftService : ContinueWithCU015()\nSimulación rondas restantes
+
+draftService --> controller : DraftCompleted(results)
+deactivate draftService
+
+controller --> usuario : Resultados draft completado
+
+deactivate controller
+
+@enduml

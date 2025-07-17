@@ -1,12 +1,12 @@
-C:\Users\jorge\workspaces\repos\MyExpansionTeam\METCore\bin\Debug\net9.0\METCore.deps.json
-C:\Users\jorge\workspaces\repos\MyExpansionTeam\METCore\bin\Debug\net9.0\METCore.dll
-C:\Users\jorge\workspaces\repos\MyExpansionTeam\METCore\bin\Debug\net9.0\METCore.pdb
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METCore\obj\Debug\net9.0\METCore.csproj.AssemblyReference.cache
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METCore\obj\Debug\net9.0\METCore.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METCore\obj\Debug\net9.0\METCore.AssemblyInfoInputs.cache
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METCore\obj\Debug\net9.0\METCore.AssemblyInfo.cs
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METCore\obj\Debug\net9.0\METCore.csproj.CoreCompileInputs.cache
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METCore\obj\Debug\net9.0\METCore.sourcelink.json
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\METCore\bin\Debug\net9.0\METCore.deps.json
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\METCore\bin\Debug\net9.0\METCore.dll
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\METCore\bin\Debug\net9.0\METCore.pdb
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METCore\obj\Debug\net9.0\METCore.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METCore\obj\Debug\net9.0\refint\METCore.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METCore\obj\Debug\net9.0\METCore.pdb

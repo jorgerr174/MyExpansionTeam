@@ -27,7 +27,7 @@ namespace METCore.Models.Teams
 
         public virtual IList<Trade>? Trades { get; set; }
 
-        public string? Draft { get; set; }
+        public IDictionary<int, int>? Selections { get; set; }
 
         #region Not Mapped
         [NotMapped]
@@ -63,14 +63,14 @@ namespace METCore.Models.Teams
         }
 
         public Team(string Location, string Mascot, List<Player> Players, User User, DateTime Date, string Abb,
-            bool? Complete, decimal? Cap, int? MaxPerTeam, int? ProtectedPerTeam, IList<int>? ProtectedPlayersIds, IList<Trade>? Trades, string? Draft)
+            bool? Complete, decimal? Cap, int? MaxPerTeam, int? ProtectedPerTeam, IList<int>? ProtectedPlayersIds, IList<Trade>? Trades, IDictionary<int, int>? Selections)
             : this(Location, Mascot, Players, User, Date, Abb)
         {
             this.Complete = Complete.HasValue && Complete.Value;
             this.RosterSettings = Cap.HasValue || MaxPerTeam.HasValue || ProtectedPerTeam.HasValue ? new(Cap, MaxPerTeam, ProtectedPerTeam) : null;
             this.ProtectedPlayersIds = ProtectedPlayersIds ?? [];
             this.Trades = Trades;
-            this.Draft = Draft;
+            this.Selections = Selections;
         }
         #endregion Constructors
     }

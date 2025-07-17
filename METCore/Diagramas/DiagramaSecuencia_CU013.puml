@@ -1,0 +1,87 @@
+@startuml DiagramaSecuencia_CU013
+!theme plain
+title CU013: Realización de Trueques
+
+actor "Actor Usuario" as usuario
+participant "Trade Controller" as controller
+participant "Trade Service" as tradeService
+participant "Player Service" as playerService
+participant "Team Service" as teamService
+participant "Trade Repository" as tradeRepo
+participant "Database" as db
+
+usuario -> controller : GET /Trade/Index\nSolicitar realizar trueque
+activate controller
+
+controller -> teamService : GetUserTeams(userId)
+activate teamService
+teamService --> controller : equipos del usuario
+deactivate teamService
+
+controller -> teamService : GetOtherTeams(userId)
+activate teamService
+teamService --> controller : otros equipos disponibles
+deactivate teamService
+
+controller --> usuario : Vista selección equipos para trueque
+deactivate controller
+
+usuario -> controller : POST /Trade/Create\n(equipos origen/destino, jugadores)
+activate controller
+
+controller -> controller : ValidateTradeRequest()\nValidar solicitud trueque
+
+controller -> tradeService : CreateTrade(fromTeamId, toTeamId, playerIds)
+activate tradeService
+
+tradeService -> playerService : ValidatePlayerAvailability(playerIds)
+activate playerService
+playerService --> tradeService : jugadores disponibles
+deactivate playerService
+
+tradeService -> tradeService : ValidateTradeRules()\nValidar reglas de trueque
+
+alt Trueque válido
+    tradeService -> tradeRepo : CreateTradeRecord(tradeData)
+    activate tradeRepo
+    tradeRepo -> db : INSERT INTO Trades
+    activate db
+    db --> tradeRepo : trueque registrado
+    deactivate db
+    tradeRepo --> tradeService : trade ID
+    deactivate tradeRepo
+    
+    tradeService -> playerService : ExecuteTrade(fromTeam, toTeam, players)
+    activate playerService
+    
+    loop Para cada jugador en el trueque
+        playerService -> db : UPDATE Players SET TeamId = ? WHERE Id = ?
+        activate db
+        db --> playerService : jugador transferido
+        deactivate db
+    end
+    
+    playerService --> tradeService : trueque ejecutado
+    deactivate playerService
+    
+    tradeService -> tradeRepo : MarkTradeCompleted(tradeId)
+    activate tradeRepo
+    tradeRepo -> db : UPDATE Trades SET IsCompleted = true
+    activate db
+    db --> tradeRepo : trueque completado
+    deactivate db
+    tradeRepo --> tradeService : estado actualizado
+    deactivate tradeRepo
+    
+    tradeService --> controller : Success("Trueque realizado")
+    deactivate tradeService
+    controller --> usuario : Mensaje confirmación + Detalles trueque
+else Trueque inválido
+    tradeService --> controller : Error("Trueque no válido")
+    deactivate tradeService
+    controller --> usuario : Mensaje error + Formulario trueque
+end
+
+deactivate controller
+
+@enduml

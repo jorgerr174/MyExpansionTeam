@@ -1,0 +1,63 @@
+@startuml DiagramaSecuencia_CU002
+!theme plain
+title CU002: Inicio de Sesión
+
+actor "Actor Anónimo" as anonimo
+participant "Account Controller" as controller
+participant "User Service" as userService
+participant "User Repository" as userRepo
+participant "Password Hasher" as hasher
+participant "Auth Service" as authService
+participant "Database" as db
+
+anonimo -> controller : GET /Account/Login\nSolicitar formulario login
+activate controller
+controller --> anonimo : Vista formulario login
+deactivate controller
+
+anonimo -> controller : POST /Account/Login\n(usuario, contraseña)
+activate controller
+
+controller -> controller : ValidateModel()\nValidar credenciales
+
+controller -> userService : AuthenticateUser(credentials)
+activate userService
+
+userService -> userRepo : GetUserByUsername(username)
+activate userRepo
+userRepo -> db : SELECT FROM Users WHERE Username = ?
+activate db
+db --> userRepo : datos usuario
+deactivate db
+userRepo --> userService : usuario encontrado
+deactivate userRepo
+
+alt Usuario existe
+    userService -> hasher : VerifyPassword(password, hashedPassword)
+    activate hasher
+    hasher --> userService : contraseña válida
+    deactivate hasher
+    
+    alt Contraseña correcta
+        userService -> authService : CreateAuthToken(user)
+        activate authService
+        authService --> userService : token autenticación
+        deactivate authService
+        
+        userService --> controller : Success(user, token)
+        deactivate userService
+        controller --> anonimo : Redirigir a página principal\n(Actor Usuario)
+    else Contraseña incorrecta
+        userService --> controller : Error("Credenciales inválidas")
+        deactivate userService
+        controller --> anonimo : Mensaje error + formulario login
+    end
+else Usuario no existe
+    userService --> controller : Error("Usuario no encontrado")
+    deactivate userService
+    controller --> anonimo : Mensaje error + formulario login
+end
+
+deactivate controller
+
+@enduml

@@ -421,37 +421,6 @@
         }
       }
     },
-    "/api/Teams/GetUserControlledPicks": {
-      "get": {
-        "tags": [
-          "Teams"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/IdDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/IdDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/IdDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/Teams/UpdateTeam": {
       "put": {
         "tags": [

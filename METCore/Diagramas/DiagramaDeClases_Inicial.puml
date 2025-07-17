@@ -1,0 +1,131 @@
+@startuml DiagramaClasesInicial
+!theme plain
+title Diagrama de Clases Inicial - Mi Equipo Expansión
+
+class Player {
+    -Id : int
+    -Name : string
+    -Position : string
+    -Age : int
+    -Height : string
+    -Weight : int
+    -TeamId : int
+    -Experience : int
+    -College : string
+    -IsProtected : boolean
+}
+
+class Team {
+    -Id : int
+    -Name : string
+    -Abb : string
+    -City : string
+    -Conference : string
+    -Division : string
+    -Founded : int
+}
+
+class Contract {
+    -Id : int
+    -PlayerId : int
+    -Salary : decimal
+    -Years : int
+    -APY : decimal
+    -LastSeason : int
+    -GuaranteedMoney : decimal
+    -SigningBonus : decimal
+}
+
+class SeasonStats {
+    -Id : int
+    -PlayerId : int
+    -Season : int
+    -Games : int
+    -GamesStarted : int
+    -Position : string
+    -StatType : string
+}
+
+class SkillStats {
+    -Id : int
+    -SeasonStatsId : int
+    -Targets : int
+    -Receptions : int
+    -Yards : int
+    -Touchdowns : int
+    -YardsPerAttempt : decimal
+    -YardsPerGame : decimal
+}
+
+class TackleStats {
+    -Id : int
+    -SeasonStatsId : int
+    -Solo : int
+    -Assisted : int
+    -Total : int
+    -Sacks : decimal
+    -Tackles4Loss : int
+    -PassesDefended : int
+}
+
+class User {
+    -Id : int
+    -Username : string
+    -Email : string
+    -Password : string
+    -FirstName : string
+    -LastName : string
+    -Phone : string
+    -Address : string
+    -BirthDate : DateTime
+    -Role : string
+}
+
+class Franchise {
+    -Id : int
+    -Name : string
+    -Abb : string
+    -UserId : int
+    -CreatedDate : DateTime
+    -IsActive : boolean
+}
+
+class Squad {
+    -Id : int
+    -Name : string
+    -TeamId : int
+    -UserId : int
+    -CreatedDate : DateTime
+    -SalaryCap : decimal
+}
+
+class RosterSettings {
+    -Id : int
+    -SquadId : int
+    -MaxPlayers : int
+    -MinPlayers : int
+    -SalaryCapEnabled : boolean
+}
+
+class Trade {
+    -Id : int
+    -FromSquadId : int
+    -ToSquadId : int
+    -PlayerId : int
+    -TradeDate : DateTime
+    -IsCompleted : boolean
+}
+
+' Relaciones principales
+Player ||--o{ Contract : "tiene"
+Player ||--o{ SeasonStats : "genera"
+SeasonStats ||--o{ SkillStats : "contiene"
+SeasonStats ||--o{ TackleStats : "contiene"
+Team ||--o{ Player : "contiene"
+User ||--o{ Franchise : "posee"
+User ||--o{ Squad : "gestiona"
+Team ||--o{ Squad : "pertenece"
+Squad ||--|| RosterSettings : "tiene"
+Squad ||--o{ Trade : "participa"
+
+@enduml

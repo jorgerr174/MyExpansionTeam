@@ -1,0 +1,66 @@
+@startuml DiagramaSecuencia_CU012
+!theme plain
+title CU012: Elección de Jugadores
+
+actor "Actor Usuario" as usuario
+participant "Team Controller" as controller
+participant "Player Service" as playerService
+participant "Player Repository" as playerRepo
+participant "Contract Service" as contractService
+participant "Database" as db
+
+usuario -> controller : GET /Team/AddPlayers/{teamId}\nSolicitar añadir jugadores
+activate controller
+
+controller -> playerService : GetAvailablePlayers()
+activate playerService
+playerService -> playerRepo : GetFreeAgents()
+activate playerRepo
+playerRepo -> db : SELECT FROM Players WHERE TeamId IS NULL
+activate db
+db --> playerRepo : jugadores disponibles
+deactivate db
+playerRepo --> playerService : lista jugadores libres
+deactivate playerRepo
+playerService --> controller : jugadores disponibles para selección
+deactivate playerService
+
+controller --> usuario : Vista jugadores disponibles
+deactivate controller
+
+usuario -> controller : POST /Team/SelectPlayers\n(jugadores elegidos)
+activate controller
+
+controller -> controller : ValidateSelection()\nValidar selección
+
+controller -> playerService : AssignPlayersToTeam(teamId, selectedPlayers)
+activate playerService
+
+loop Para cada jugador seleccionado
+    playerService -> playerRepo : AssignPlayerToTeam(playerId, teamId)
+    activate playerRepo
+    playerRepo -> db : UPDATE Players SET TeamId = ? WHERE Id = ?
+    activate db
+    db --> playerRepo : jugador asignado
+    deactivate db
+    playerRepo --> playerService : asignación exitosa
+    deactivate playerRepo
+    
+    playerService -> contractService : CreateDefaultContract(playerId, teamId)
+    activate contractService
+    contractService -> db : INSERT INTO Contracts
+    activate db
+    db --> contractService : contrato creado
+    deactivate db
+    contractService --> playerService : contrato generado
+    deactivate contractService
+end
+
+playerService --> controller : Success("Jugadores añadidos al equipo")
+deactivate playerService
+
+controller --> usuario : Mensaje confirmación + Roster actualizado
+
+deactivate controller
+
+@enduml
