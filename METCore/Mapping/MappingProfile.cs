@@ -32,8 +32,11 @@ namespace METCore.Mapping
 
             CreateMap<Team, DraftDto>()
                 .IncludeBase<Team, TeamBasicInfoDto>()
+                .ForMember(dest => dest.Picks, opt => opt.Ignore())
+                .ForMember(dest => dest.Prospects, opt => opt.Ignore())
             .ReverseMap()
                 .IncludeBase<TeamBasicInfoDto, Team>();
+
 
             CreateMap<Team, TeamInfoDto>()
                 .IncludeBase<Team, TeamBasicInfoDto>()

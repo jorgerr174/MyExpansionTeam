@@ -1,0 +1,67 @@
+@startuml DiagramaSecuencia_CU017
+!theme plain
+title CU017: Seguimiento de Rendimiento de Equipos
+
+actor "Actor Usuario" as usuario
+participant "Team Controller" as controller
+participant "Team Service" as teamService
+participant "Stats Service" as statsService
+participant "Player Service" as playerService
+participant "Database" as db
+
+usuario -> controller : GET /Team/Details/{teamId}\nAcceder al equipo
+activate controller
+
+controller -> teamService : GetTeamById(teamId, userId)
+activate teamService
+teamService -> db : SELECT FROM Teams WHERE Id = ? AND UserId = ?
+activate db
+db --> teamService : datos del equipo
+deactivate db
+teamService --> controller : equipo accedido
+deactivate teamService
+
+controller -> playerService : GetTeamPlayers(teamId)
+activate playerService
+playerService -> db : SELECT FROM Players WHERE TeamId = ?
+activate db
+db --> playerService : jugadores plantilla
+deactivate db
+playerService --> controller : lista jugadores equipo
+deactivate playerService
+
+controller --> usuario : Vista equipo con jugadores
+deactivate controller
+
+usuario -> controller : GET /Team/Stats/{teamId}\nVer estadísticas totales
+activate controller
+
+controller -> statsService : GetTeamStats(teamId)
+activate statsService
+statsService -> db : SELECT SUM(...) FROM SeasonStats WHERE PlayerId IN (SELECT Id FROM Players WHERE TeamId = ?)
+activate db
+db --> statsService : estadísticas totales plantilla
+deactivate db
+statsService --> controller : estadísticas totales agregadas
+deactivate statsService
+
+controller --> usuario : Estadísticas totales de todos los jugadores
+deactivate controller
+
+usuario -> controller : GET /Player/Stats/{playerId}\nSeleccionar tipo estadística individual
+activate controller
+
+controller -> statsService : GetPlayerStats(playerId, statType)
+activate statsService
+statsService -> db : SELECT FROM SeasonStats WHERE PlayerId = ? AND StatType = ?
+activate db
+db --> statsService : estadísticas individuales jugador
+deactivate db
+statsService --> controller : estadísticas individuales específicas
+deactivate statsService
+
+controller --> usuario : Estadísticas individuales jugador seleccionado
+
+deactivate controller
+
+@enduml

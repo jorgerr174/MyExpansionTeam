@@ -16,6 +16,7 @@ namespace METDAL.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Trade> Trades { get; set; }
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -116,26 +117,6 @@ namespace METDAL.Data
 
 
             #region Team
-            /*            modelBuilder.Entity<Team>()
-                            .HasMany(t => t.Players)
-                            .WithMany()
-                            .UsingEntity<Dictionary<string, object>>(
-                                "TeamPlayer",
-                                tp => tp
-                                    .HasOne<Player>()
-                                    .WithMany()
-                                    .HasForeignKey("PlayerId"),
-                                tp => tp
-                                    .HasOne<Team>()
-                                    .WithMany()
-                                    .HasForeignKey("TeamId"),
-                                tp =>
-                                {
-                                    tp.ToTable("TeamPlayer");
-                                    tp.HasKey("TeamId", "PlayerId");
-                                    tp.HasIndex("TeamId");
-                                }
-                            );*/
             modelBuilder.Entity<Team>()
                 .Property(e => e.PlayersIds)
                 .HasConversion(
@@ -176,38 +157,80 @@ namespace METDAL.Data
                     ts.Property(s => s.MaxPerTeam).HasColumnName("MaxPerTeam");
                     ts.Property(s => s.ProtectedPerTeam).HasColumnName("ProtectedPerTeam");
                 });
+
+            modelBuilder.Entity<Team>()
+                .Property(e => e.Selections)
+                .HasConversion(
+                    v => v != null && v.Any() ? string.Join(',', v.Select(kvp => $"{kvp.Key}:{kvp.Value}")) : string.Empty,
+                    v => ConvertStringToSelections(v))
+                .Metadata.SetValueComparer(
+                    new ValueComparer<IDictionary<int, int>>(
+                        (d1, d2) => d1 != null && d2 != null && d1.Count == d2.Count && d1.All(kvp => d2.ContainsKey(kvp.Key) && d2[kvp.Key] == kvp.Value),
+                        d => d != null ? d.Aggregate(0, (hash, kvp) => HashCode.Combine(hash, kvp.Key.GetHashCode(), kvp.Value.GetHashCode())) : 0,
+                        d => d != null ? d.ToDictionary(kvp => kvp.Key, kvp => kvp.Value) : new Dictionary<int, int>()));
             #endregion Team
 
 
             #region Trade
             modelBuilder.Entity<Trade>()
                 .Property(e => e.TeamPlayers)
-                .HasConversion(
-                    v => string.Join(',', v),
-                    v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList()
-                );
+                .HasConversion(v => string.Join(',', v), v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList())
+                .Metadata.SetValueComparer(
+                    new ValueComparer<IList<int>>(
+                        (c1, c2) => c1.SequenceEqual(c2),
+                        c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                        c => c.ToList()));
 
             modelBuilder.Entity<Trade>()
                 .Property(e => e.TeamPicks)
-                .HasConversion(
-                    v => string.Join(',', v),
-                    v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList()
-                );
+                .HasConversion(v => string.Join(',', v), v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList())
+                .Metadata.SetValueComparer(
+                    new ValueComparer<IList<int>>(
+                        (c1, c2) => c1.SequenceEqual(c2),
+                        c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                        c => c.ToList()));
 
             modelBuilder.Entity<Trade>()
                 .Property(e => e.FranchisePlayers)
-                .HasConversion(
-                    v => string.Join(',', v),
-                    v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList()
-                );
+                .HasConversion(v => string.Join(',', v), v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList())
+                .Metadata.SetValueComparer(
+                    new ValueComparer<IList<int>>(
+                        (c1, c2) => c1.SequenceEqual(c2),
+                        c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                        c => c.ToList()));
 
             modelBuilder.Entity<Trade>()
                 .Property(e => e.FranchisePicks)
-                .HasConversion(
-                    v => string.Join(',', v),
-                    v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList()
-                );
+                .HasConversion(v => string.Join(',', v), v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList())
+                .Metadata.SetValueComparer(
+                    new ValueComparer<IList<int>>(
+                        (c1, c2) => c1.SequenceEqual(c2),
+                        c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                        c => c.ToList()));
             #endregion Trade        
+        }
+
+        private static IDictionary<int, int> ConvertStringToSelections(string v)
+        {
+            if (string.IsNullOrEmpty(v))
+                return new Dictionary<int, int>();
+
+            var result = new Dictionary<int, int>();
+            var pairs = v.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var pair in pairs)
+            {
+                var parts = pair.Split(':');
+                if (parts.Length == 2)
+                {
+                    if (int.TryParse(parts[0], out int key) && int.TryParse(parts[1], out int value))
+                    {
+                        result[key] = value;
+                    }
+                }
+            }
+
+            return result;
         }
     }
 }

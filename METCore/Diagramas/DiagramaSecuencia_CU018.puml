@@ -1,0 +1,73 @@
+@startuml DiagramaSecuencia_CU018
+!theme plain
+title CU018: Interacción entre Usuarios
+
+actor "Actor Usuario" as usuario
+participant "User Controller" as controller
+participant "User Service" as userService
+participant "User Repository" as userRepo
+participant "Team Service" as teamService
+participant "Database" as db
+
+usuario -> controller : GET /User/Search\nSolicitar buscar usuario
+activate controller
+controller --> usuario : Formulario búsqueda usuarios
+deactivate controller
+
+usuario -> controller : POST /User/Search\n(cadena identificativa)
+activate controller
+
+controller -> userService : SearchUsers(searchString)
+activate userService
+userService -> userRepo : GetUsersByUsername(searchString)
+activate userRepo
+userRepo -> db : SELECT FROM Users WHERE Username LIKE ?
+activate db
+db --> userRepo : usuarios coincidentes
+deactivate db
+userRepo --> userService : lista usuarios encontrados
+deactivate userRepo
+
+alt Usuarios encontrados
+    userService --> controller : usuarios cuyo nombre coincide
+    deactivate userService
+    controller --> usuario : Lista usuarios coincidentes
+    
+    usuario -> controller : GET /User/Profile/{userId}\nElegir usuario y acceder perfil
+    activate controller
+    
+    controller -> userService : GetUserProfile(userId)
+    activate userService
+    userService -> userRepo : GetUserById(userId)
+    activate userRepo
+    userRepo -> db : SELECT FROM Users WHERE Id = ?
+    activate db
+    db --> userRepo : datos usuario
+    deactivate db
+    userRepo --> userService : perfil usuario
+    deactivate userRepo
+    
+    userService -> teamService : GetUserTeams(userId)
+    activate teamService
+    teamService -> db : SELECT FROM Teams WHERE UserId = ?
+    activate db
+    db --> teamService : equipos del usuario
+    deactivate db
+    teamService --> userService : equipos públicos usuario
+    deactivate teamService
+    
+    userService --> controller : perfil completo + equipos
+    deactivate userService
+    
+    controller --> usuario : Vista perfil usuario con equipos
+    deactivate controller
+    
+else No usuarios encontrados
+    userService --> controller : Error("No existe usuario")
+    deactivate userService
+    controller --> usuario : Mensaje "No existe usuario coincidente"
+end
+
+deactivate controller
+
+@enduml

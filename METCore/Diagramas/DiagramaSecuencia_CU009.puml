@@ -1,0 +1,62 @@
+@startuml DiagramaSecuencia_CU009
+!theme plain
+title CU009: Borrado de Equipos
+
+actor "Actor Usuario" as usuario
+participant "Team Controller" as controller
+participant "Team Service" as teamService
+participant "Team Repository" as teamRepo
+participant "Player Service" as playerService
+participant "Database" as db
+
+usuario -> controller : GET /Team/Delete/{teamId}\nSolicitar borrado equipo
+activate controller
+
+controller -> teamService : GetTeamById(teamId, userId)
+activate teamService
+teamService -> teamRepo : GetTeamByIdAndUser(teamId, userId)
+activate teamRepo
+teamRepo -> db : SELECT FROM Teams WHERE Id = ? AND UserId = ?
+activate db
+db --> teamRepo : datos del equipo
+deactivate db
+teamRepo --> teamService : equipo a eliminar
+deactivate teamRepo
+teamService --> controller : confirmación equipo
+deactivate teamService
+
+controller --> usuario : Confirmación borrado equipo
+deactivate controller
+
+usuario -> controller : POST /Team/Delete/{teamId}\nConfirmar borrado
+activate controller
+
+controller -> teamService : DeleteTeam(teamId, userId)
+activate teamService
+
+teamService -> playerService : ReleaseTeamPlayers(teamId)
+activate playerService
+playerService -> db : UPDATE Players SET TeamId = NULL WHERE TeamId = ?
+activate db
+db --> playerService : jugadores liberados
+deactivate db
+playerService --> teamService : jugadores del equipo liberados
+deactivate playerService
+
+teamService -> teamRepo : DeleteTeam(teamId)
+activate teamRepo
+teamRepo -> db : DELETE FROM Teams WHERE Id = ?
+activate db
+db --> teamRepo : equipo eliminado
+deactivate db
+teamRepo --> teamService : equipo borrado
+deactivate teamRepo
+
+teamService --> controller : Success("Equipo eliminado")
+deactivate teamService
+
+controller --> usuario : Mensaje confirmación + Redirigir lista equipos
+
+deactivate controller
+
+@enduml

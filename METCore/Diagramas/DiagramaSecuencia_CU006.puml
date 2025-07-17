@@ -1,0 +1,64 @@
+@startuml DiagramaSecuencia_CU006
+!theme plain
+title CU006: Creación de Equipo
+
+actor "Actor Usuario" as usuario
+participant "Team Controller" as controller
+participant "Team Service" as teamService
+participant "Team Repository" as teamRepo
+participant "RosterSettings Service" as rosterService
+participant "Database" as db
+
+usuario -> controller : GET /Team/Create\nSolicitar creación equipo
+activate controller
+controller --> usuario : Formulario creación equipo
+deactivate controller
+
+usuario -> controller : POST /Team/Create\n(datos del equipo)
+activate controller
+
+controller -> controller : ValidateModel()\nValidar datos del equipo
+
+controller -> teamService : CreateTeam(teamData, userId)
+activate teamService
+
+teamService -> teamRepo : CheckTeamExists(teamName, userId)
+activate teamRepo
+teamRepo -> db : SELECT FROM Teams WHERE Name = ? AND UserId = ?
+activate db
+db --> teamRepo : equipo existe o null
+deactivate db
+teamRepo --> teamService : verificación existencia
+deactivate teamRepo
+
+alt Equipo no existe
+    teamService -> teamRepo : CreateTeam(teamData)
+    activate teamRepo
+    teamRepo -> db : INSERT INTO Teams
+    activate db
+    db --> teamRepo : nuevo team ID
+    deactivate db
+    teamRepo --> teamService : equipo creado
+    deactivate teamRepo
+    
+    teamService -> rosterService : CreateDefaultRosterSettings(teamId)
+    activate rosterService
+    rosterService -> db : INSERT INTO RosterSettings
+    activate db
+    db --> rosterService : configuración roster creada
+    deactivate db
+    rosterService --> teamService : roster configurado
+    deactivate rosterService
+    
+    teamService --> controller : Success(team)
+    deactivate teamService
+    controller --> usuario : Redirigir a /Team/Details/{teamId}
+else Equipo ya existe
+    teamService --> controller : Error("Equipo ya existe")
+    deactivate teamService
+    controller --> usuario : Mensaje error + formulario
+end
+
+deactivate controller
+
+@enduml

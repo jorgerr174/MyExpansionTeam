@@ -1,0 +1,61 @@
+@startuml DiagramaSecuencia_CU016
+!theme plain
+title CU016: Modificación de Ajustes del Draft
+
+actor "Actor Usuario" as usuario
+participant "Draft Controller" as controller
+participant "Draft Service" as draftService
+participant "DraftSettings Repository" as settingsRepo
+participant "Database" as db
+
+usuario -> controller : GET /Draft/Settings\nSolicitar ajustes draft
+activate controller
+
+controller -> draftService : GetDraftSettings()
+activate draftService
+draftService -> settingsRepo : GetCurrentDraftSettings()
+activate settingsRepo
+settingsRepo -> db : SELECT FROM DraftSettings
+activate db
+db --> settingsRepo : ajustes actuales
+deactivate db
+settingsRepo --> draftService : configuración predeterminada
+deactivate settingsRepo
+draftService --> controller : menú ajustes con valores predeterminados
+deactivate draftService
+
+controller --> usuario : Vista ajustes draft (equipos, rondas, modalidades)
+deactivate controller
+
+usuario -> controller : POST /Draft/Settings\n(ajustes modificados)
+activate controller
+
+controller -> controller : ValidateSettings()\nValidar nuevos ajustes
+
+controller -> draftService : UpdateDraftSettings(newSettings)
+activate draftService
+
+draftService -> draftService : ValidateSettingsValues()\nValidar valores ajustes
+
+alt Ajustes válidos
+    draftService -> settingsRepo : SaveDraftSettings(settings)
+    activate settingsRepo
+    settingsRepo -> db : UPDATE DraftSettings SET ...
+    activate db
+    db --> settingsRepo : ajustes guardados
+    deactivate db
+    settingsRepo --> draftService : configuración actualizada
+    deactivate settingsRepo
+    
+    draftService --> controller : Success("Ajustes guardados")
+    deactivate draftService
+    controller --> usuario : Mensaje confirmación + Ajustes aplicados
+else Ajustes inválidos
+    draftService --> controller : Error("Valores no válidos")
+    deactivate draftService
+    controller --> usuario : Mensaje error + Formulario ajustes
+end
+
+deactivate controller
+
+@enduml

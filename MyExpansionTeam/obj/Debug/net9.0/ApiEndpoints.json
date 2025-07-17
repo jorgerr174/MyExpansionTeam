@@ -170,22 +170,6 @@
   },
   {
     "ContainingType": "METAPI.Controllers.TeamsController",
-    "Method": "GetUserControlledPicks",
-    "RelativePath": "api/Teams/GetUserControlledPicks",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "METCore.DTOs.Shared.IdDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "METAPI.Controllers.TeamsController",
     "Method": "MyTeams",
     "RelativePath": "api/Teams/MyTeams",
     "HttpMethod": "GET",

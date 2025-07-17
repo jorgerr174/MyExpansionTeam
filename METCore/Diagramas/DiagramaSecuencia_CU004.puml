@@ -1,0 +1,53 @@
+@startuml DiagramaSecuencia_CU004
+!theme plain
+title CU004: Modificación de Credenciales
+
+actor "Actor Usuario" as usuario
+participant "Account Controller" as controller
+participant "User Service" as userService
+participant "User Repository" as userRepo
+participant "Password Hasher" as hasher
+participant "Database" as db
+
+usuario -> controller : GET /Account/Profile\nSolicitar modificación credenciales
+activate controller
+controller --> usuario : Formulario modificación credenciales
+deactivate controller
+
+usuario -> controller : POST /Account/UpdateCredentials\n(nuevo usuario, contraseña x2)
+activate controller
+
+controller -> controller : ValidateModel()\nValidar datos nuevos
+
+controller -> userService : UpdateUserCredentials(userId, newCredentials)
+activate userService
+
+userService -> userService : ValidateNewCredentials()\nComprobar credenciales adecuadas
+
+alt Credenciales válidas
+    userService -> hasher : HashPassword(newPassword)
+    activate hasher
+    hasher --> userService : nueva contraseña hasheada
+    deactivate hasher
+    
+    userService -> userRepo : UpdateUserCredentials(userId, newData)
+    activate userRepo
+    userRepo -> db : UPDATE Users SET Username = ?, Password = ?
+    activate db
+    db --> userRepo : actualización exitosa
+    deactivate db
+    userRepo --> userService : credenciales actualizadas
+    deactivate userRepo
+    
+    userService --> controller : Success("Credenciales modificadas")
+    deactivate userService
+    controller --> usuario : Mensaje éxito
+else Credenciales no adecuadas
+    userService --> controller : Error("Credenciales no válidas")
+    deactivate userService
+    controller --> usuario : Mensaje error + formulario
+end
+
+deactivate controller
+
+@enduml
