@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using METCore.DTOs.Player;
 
 namespace METCore.DTOs.Team
 {
@@ -10,11 +11,11 @@ namespace METCore.DTOs.Team
         public int Rounds { get; set; }
 
         [Required]
-        [Range(0, 1)]
-        public decimal Speed { get; set; }
+        public IDictionary<int, int>? Selections { get; set; }
 
-        [Required]
-        public string? Draft { get; set; }
+        public IList<int>[] Picks { get; set; }
+
+        public IList<SelectableDto> Prospects { get; set; }
         #region Not Mapped
         #endregion Not Mapped
 
@@ -25,15 +26,16 @@ namespace METCore.DTOs.Team
         public DraftDto() : base()
         {
             this.Rounds = 3;
-            this.Speed = (decimal)0.5;
+            this.Picks = [];
         }
 
         public DraftDto(int Id, string Location, string Abb, string Mascot, string UserUsername, DateTime Date, bool? Complete,
-            int? Rounds, decimal? Speed)
+            int? Rounds, IDictionary<int, int>? Selections)
             : base(Id, Location, Abb, Mascot, UserUsername, Date, Complete)
         {
             this.Rounds = Rounds ?? 3;
-            this.Speed = Speed ?? (decimal)0.5;
+            this.Selections = Selections;
+            this.Picks = [];
         }
         #endregion Constructors
     }

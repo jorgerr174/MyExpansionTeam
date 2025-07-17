@@ -1,0 +1,52 @@
+@startuml DiagramaSecuencia_CU010
+!theme plain
+title CU010: Modificación de Ajustes de Juego
+
+actor "Actor Usuario" as usuario
+participant "Team Controller" as controller
+participant "RosterSettings Service" as rosterService
+participant "Database" as db
+
+usuario -> controller : GET /Team/RosterSettings/{teamId}\nSolicitar ajustes
+activate controller
+
+controller -> rosterService : GetRosterSettings(teamId)
+activate rosterService
+rosterService -> db : SELECT FROM RosterSettings WHERE TeamId = ?
+activate db
+db --> rosterService : ajustes actuales
+deactivate db
+rosterService --> controller : menú ajustes con valores predeterminados
+deactivate rosterService
+
+controller --> usuario : Vista ajustes con valores actuales
+deactivate controller
+
+usuario -> controller : POST /Team/RosterSettings/{teamId}\n(ajustes modificados)
+activate controller
+
+controller -> controller : ValidateSettings()\nValidar nuevos ajustes
+
+controller -> rosterService : UpdateRosterSettings(teamId, newSettings)
+activate rosterService
+
+rosterService -> rosterService : ValidateSettingsValues()\nValidar valores ajustes
+
+alt Ajustes válidos
+    rosterService -> db : UPDATE RosterSettings SET ... WHERE TeamId = ?
+    activate db
+    db --> rosterService : ajustes actualizados
+    deactivate db
+    
+    rosterService --> controller : Success("Ajustes guardados")
+    deactivate rosterService
+    controller --> usuario : Mensaje confirmación + Ajustes guardados
+else Ajustes inválidos
+    rosterService --> controller : Error("Valores no válidos")
+    deactivate rosterService
+    controller --> usuario : Mensaje error + Formulario ajustes
+end
+
+deactivate controller
+
+@enduml

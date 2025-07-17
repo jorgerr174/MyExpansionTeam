@@ -1,0 +1,296 @@
+@startuml DiagramaClasesFinal
+!theme plain
+title Diagrama de Clases Final - Mi Equipo Expansión
+
+' ============= INTERFACES =============
+interface ITeamService {
+    +GetTeamById(id: int) : Task<Team>
+    +CreateTeam(team: Team) : Task<Team>
+    +UpdateTeam(team: Team) : Task<Team>
+    +DeleteTeam(id: int) : Task<bool>
+    +GetTeamsByUser(userId: int) : Task<List<Team>>
+}
+
+interface IPlayerService {
+    +GetPlayerById(id: int) : Task<Player>
+    +GetPlayersByTeam(teamId: int) : Task<List<Player>>
+    +GetAvailablePlayers() : Task<List<Player>>
+    +AssignPlayerToTeam(playerId: int, teamId: int) : Task<bool>
+}
+
+interface ISeasonStatsService {
+    +ImportStatsFromFile(file: IFormFile, year: int, type: string) : Task<ImportResult>
+    +GetStatsByPlayer(playerId: int) : Task<List<SeasonStats>>
+    +GetStatsByTeam(teamId: int) : Task<List<SeasonStats>>
+}
+
+interface IDraftService {
+    +ExecuteDraft(config: DraftConfiguration) : Task<DraftResult>
+    +SimulateDraft(config: DraftConfiguration) : Task<DraftResult>
+    +GetDraftSettings() : Task<DraftSettings>
+}
+
+interface IUserService {
+    +RegisterUser(user: RegisterDto) : Task<User>
+    +AuthenticateUser(credentials: LoginDto) : Task<User>
+    +UpdateUserRole(userId: int, role: string) : Task<bool>
+}
+
+' ============= CONTROLLERS =============
+class TeamController {
+    -_teamService : ITeamService
+    -_playerService : IPlayerService
+    +Index() : IActionResult
+    +Create() : IActionResult
+    +Create(model: TeamCreateDto) : Task<IActionResult>
+    +Details(id: int) : Task<IActionResult>
+    +Edit(id: int) : Task<IActionResult>
+    +Delete(id: int) : Task<IActionResult>
+    +Roster(id: int) : Task<IActionResult>
+    +RosterSettings(id: int) : Task<IActionResult>
+    +Trade() : IActionResult
+}
+
+class PlayerController {
+    -_playerService : IPlayerService
+    -_statsService : ISeasonStatsService
+    +Index() : Task<IActionResult>
+    +Details(id: int) : Task<IActionResult>
+    +Stats(id: int) : Task<IActionResult>
+    +GetPlayersByPosition(position: string) : Task<JsonResult>
+}
+
+class SeasonStatsController {
+    -_seasonStatsService : ISeasonStatsService
+    +ImportStats(dto: ImportDto) : Task<IActionResult>
+    +GetPlayerStats(playerId: int) : Task<IActionResult>
+    +GetTeamStats(teamId: int) : Task<IActionResult>
+}
+
+class DraftController {
+    -_draftService : IDraftService
+    -_teamService : ITeamService
+    +Index() : IActionResult
+    +Execute(config: DraftConfigDto) : Task<IActionResult>
+    +Simulate(config: DraftConfigDto) : Task<IActionResult>
+    +Settings() : Task<IActionResult>
+    +Results(draftId: int) : Task<IActionResult>
+}
+
+class AccountController {
+    -_userService : IUserService
+    +Register() : IActionResult
+    +Register(model: RegisterDto) : Task<IActionResult>
+    +Login() : IActionResult
+    +Login(model: LoginDto) : Task<IActionResult>
+    +Logout() : IActionResult
+    +Profile() : Task<IActionResult>
+}
+
+class AdminController {
+    -_userService : IUserService
+    -_statsService : ISeasonStatsService
+    +Index() : IActionResult
+    +Import() : IActionResult
+    +Import(model: ImportDto) : Task<IActionResult>
+    +UserManagement() : Task<IActionResult>
+    +ChangeUserRole(userId: int, role: string) : Task<IActionResult>
+}
+
+' ============= SERVICES =============
+class TeamService {
+    -_teamRepository : ITeamRepository
+    -_playerRepository : IPlayerRepository
+    +GetTeamById(id: int) : Task<Team>
+    +CreateTeam(team: Team) : Task<Team>
+    +UpdateTeam(team: Team) : Task<Team>
+    +DeleteTeam(id: int) : Task<bool>
+    +GetTeamsByUser(userId: int) : Task<List<Team>>
+}
+
+class PlayerService {
+    -_playerRepository : IPlayerRepository
+    -_contractRepository : IContractRepository
+    +GetPlayerById(id: int) : Task<Player>
+    +GetPlayersByTeam(teamId: int) : Task<List<Player>>
+    +GetAvailablePlayers() : Task<List<Player>>
+    +AssignPlayerToTeam(playerId: int, teamId: int) : Task<bool>
+}
+
+class SeasonStatsService {
+    -_statsRepository : ISeasonStatsRepository
+    -_playerRepository : IPlayerRepository
+    +ImportStatsFromFile(file: IFormFile, year: int, type: string) : Task<ImportResult>
+    +GetStatsByPlayer(playerId: int) : Task<List<SeasonStats>>
+    +GetStatsByTeam(teamId: int) : Task<List<SeasonStats>>
+}
+
+class DraftService {
+    -_draftRepository : IDraftRepository
+    -_playerService : IPlayerService
+    -_teamService : ITeamService
+    +ExecuteDraft(config: DraftConfiguration) : Task<DraftResult>
+    +SimulateDraft(config: DraftConfiguration) : Task<DraftResult>
+    +GetDraftSettings() : Task<DraftSettings>
+}
+
+class UserService {
+    -_userRepository : IUserRepository
+    -_passwordHasher : IPasswordHasher
+    +RegisterUser(user: RegisterDto) : Task<User>
+    +AuthenticateUser(credentials: LoginDto) : Task<User>
+    +UpdateUserRole(userId: int, role: string) : Task<bool>
+}
+
+' ============= DTOs =============
+class TeamCreateDto {
+    +Name : string
+    +Abbreviation : string
+    +City : string
+    +Conference : string
+    +Division : string
+}
+
+class ImportDto {
+    +File : IFormFile
+    +Type : string
+    +Year : int
+    +StatsType : string
+}
+
+class RegisterDto {
+    +Username : string
+    +Email : string
+    +Password : string
+    +FirstName : string
+    +LastName : string
+    +Phone : string
+    +Address : string
+    +BirthDate : DateTime
+}
+
+class LoginDto {
+    +Username : string
+    +Password : string
+}
+
+class DraftConfigDto {
+    +NumberOfRounds : int
+    +TeamsParticipating : List<int>
+    +DraftType : string
+    +PositionRequirements : Dictionary<string, int>
+}
+
+' ============= ENTIDADES =============
+class Player {
+    -Id : int
+    -Name : string
+    -Position : string
+    -Age : int
+    -Height : string
+    -Weight : int
+    -TeamId : int
+    -Experience : int
+    -College : string
+    -IsProtected : boolean
+}
+
+class Team {
+    -Id : int
+    -Name : string
+    -Abb : string
+    -City : string
+    -Conference : string
+    -Division : string
+    -Founded : int
+}
+
+class Contract {
+    -Id : int
+    -PlayerId : int
+    -Salary : decimal
+    -Years : int
+    -APY : decimal
+    -LastSeason : int
+    -GuaranteedMoney : decimal
+    -SigningBonus : decimal
+}
+
+class SeasonStats {
+    -Id : int
+    -PlayerId : int
+    -Season : int
+    -Games : int
+    -GamesStarted : int
+    -Position : string
+    -StatType : string
+}
+
+class User {
+    -Id : int
+    -Username : string
+    -Email : string
+    -Password : string
+    -FirstName : string
+    -LastName : string
+    -Phone : string
+    -Address : string
+    -BirthDate : DateTime
+    -Role : string
+}
+
+class Franchise {
+    -Id : int
+    -Name : string
+    -Abb : string
+    -UserId : int
+    -CreatedDate : DateTime
+    -IsActive : boolean
+}
+
+class Squad {
+    -Id : int
+    -Name : string
+    -TeamId : int
+    -UserId : int
+    -CreatedDate : DateTime
+    -SalaryCap : decimal
+}
+
+' ============= RELACIONES =============
+' Implementaciones de interfaces
+TeamService ..|> ITeamService
+PlayerService ..|> IPlayerService
+SeasonStatsService ..|> ISeasonStatsService
+DraftService ..|> IDraftService
+UserService ..|> IUserService
+
+' Controllers usan Services
+TeamController --> ITeamService
+TeamController --> IPlayerService
+PlayerController --> IPlayerService
+PlayerController --> ISeasonStatsService
+SeasonStatsController --> ISeasonStatsService
+DraftController --> IDraftService
+DraftController --> ITeamService
+AccountController --> IUserService
+AdminController --> IUserService
+AdminController --> ISeasonStatsService
+
+' Controllers usan DTOs
+TeamController --> TeamCreateDto
+SeasonStatsController --> ImportDto
+AccountController --> RegisterDto
+AccountController --> LoginDto
+DraftController --> DraftConfigDto
+AdminController --> ImportDto
+
+' Relaciones entre entidades
+Player ||--o{ Contract : "tiene"
+Player ||--o{ SeasonStats : "genera"
+Team ||--o{ Player : "contiene"
+User ||--o{ Franchise : "posee"
+User ||--o{ Squad : "gestiona"
+Team ||--o{ Squad : "pertenece"
+
+@enduml

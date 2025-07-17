@@ -120,24 +120,6 @@ namespace METAPI.Controllers
             IEnumerable<TeamInfoDto>? list = await this.ListTeams(true, User?.Identity?.Name);
             return list == null ? BadRequest(new MessageDto("Username")) : Ok(list);
         }
-
-        /// <summary> Obtener los TeamDtos con los valores de los Teams del User logeado.</summary>
-        /// <returns>Opciones:
-        /// Username (no se encontró ningún User para username).
-        /// IEnumerable<TeamDto>? (Con los valores de los Teams encontrados).
-        /// </returns>
-        [HttpGet("GetUserControlledPicks")]
-        public async Task<IActionResult> GetUserControlledPicks(IdDto dto)
-        {
-            if (User?.Identity?.Name == null) return BadRequest(new MessageDto("Username"));
-            if (dto.Id < 1) return BadRequest(new MessageDto("TeamId"));
-
-            string? result = await _teamService.GetUserControlledPicks(new PicksDto(dto.Id), User.Identity.Name);
-
-            return result is null
-                ? Ok(dto)
-                : BadRequest(new MessageDto("result"));
-        }
         #endregion Get
 
 
@@ -213,7 +195,7 @@ namespace METAPI.Controllers
 
             string? result = await _teamService.GetTradeDto(User?.Identity?.Name, dto);
 
-            return String.IsNullOrWhiteSpace(result)
+            return !String.IsNullOrWhiteSpace(result)
                 ? BadRequest(new MessageDto(result))
                 : Ok(dto);
         }
