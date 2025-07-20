@@ -16,17 +16,24 @@ namespace METCore.Mapping
         public MappingProfile()
         {
             #region User
-            CreateMap<User, UserDto>()
-                .ForMember(dest => dest.Tlf, opt => opt.NullSubstitute(string.Empty));
+            CreateMap<NewUserDto, User>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Active, opt => opt.Ignore())
+                .ForMember(dest => dest.Role, opt => opt.Ignore())
+            .ReverseMap()
+                .ForMember(dest => dest.ConfirmPassword, opt => opt.Ignore());
 
-            CreateMap<UserDto, User>()
+            CreateMap<User, UserDto>()
+                .IncludeBase<User, NewUserDto>()
+            .ReverseMap()
+                .IncludeBase<NewUserDto, User>()
                 .ForMember(dest => dest.Password, opt => opt.Ignore());
             #endregion User
 
 
             #region Team
             CreateMap<Team, TeamBasicInfoDto>()
-                .ForMember(dest => dest.UserUsername, opt => opt.MapFrom(x => x.User.Username))
+                .ForMember(dest => dest.UserUsername, opt => opt.MapFrom(x => x.User != null ? x.User.Username : null))
             .ReverseMap()
                 .ForMember(dest => dest.User, opt => opt.Ignore());
 
@@ -34,6 +41,7 @@ namespace METCore.Mapping
                 .IncludeBase<Team, TeamBasicInfoDto>()
                 .ForMember(dest => dest.Picks, opt => opt.Ignore())
                 .ForMember(dest => dest.Prospects, opt => opt.Ignore())
+                .ForMember(dest => dest.Rounds, opt => opt.Ignore())
             .ReverseMap()
                 .IncludeBase<TeamBasicInfoDto, Team>();
 
@@ -123,7 +131,16 @@ namespace METCore.Mapping
                 .ForMember(dest => dest.PureAPY, opt => opt.MapFrom(x => x.APY == 0 ? string.Empty : x.APY.ToString().Replace(',', '.')));
 
             CreateMap<ImportAthleteDto, Player>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(x => x.Player));
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(x => x.Player))
+                .ForMember(dest => dest.BirthDate, opt => opt.Ignore())
+                .ForMember(dest => dest.Position2, opt => opt.Ignore())
+                .ForMember(dest => dest.Position3, opt => opt.Ignore())
+                .ForMember(dest => dest.Contracts, opt => opt.Ignore())
+                .ForMember(dest => dest.Stats, opt => opt.Ignore())
+                .ForMember(dest => dest.Prospect, opt => opt.Ignore())
+                .ForMember(dest => dest.Retired, opt => opt.Ignore())
+                .ForMember(dest => dest.ImportProspectAttrs, opt => opt.Ignore());
 
             CreateMap<ImportPlayerDto, Player>()
                 .IncludeBase<ImportAthleteDto, Player>();
@@ -188,6 +205,8 @@ namespace METCore.Mapping
             CreateMap<Trade, TradeDto>()
                 .ForMember(dest => dest.TeamPlayers, opt => opt.Ignore())
                 .ForMember(dest => dest.FranchisePlayers, opt => opt.Ignore())
+                .ForMember(dest => dest.Force, opt => opt.Ignore())
+                .ForMember(dest => dest.TeamCurrentCap, opt => opt.Ignore())
             .ReverseMap()
                 .ForMember(dest => dest.TeamPlayers, opt => opt.MapFrom(src => src.TeamPlayers.Select(tpl => tpl.Id)))
                 .ForMember(dest => dest.FranchisePlayers, opt => opt.MapFrom(src => src.FranchisePlayers.Select(fpl => fpl.Id)));

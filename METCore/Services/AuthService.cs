@@ -113,7 +113,7 @@ namespace METCore.Services
         /// Error (no se guardaron los cambios en la BBDD).
         /// "" (Todo bien).
         /// </returns>
-        public async Task<string> SignUp(UserDto dto)
+        public async Task<string> SignUp(NewUserDto dto)
         {
             if (String.IsNullOrWhiteSpace(dto.Password))
                 return "Password";
