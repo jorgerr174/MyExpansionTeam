@@ -2,24 +2,26 @@
 
 namespace METCore.DTOs.User
 {
-    public class UserDto(int? Id, string Username, string Password, string FirstName, string LastName, string Email, string Tlf, bool? Active, RoleEnum? Role)
+    public class UserDto : NewUserDto
     {
-        public int Id { get; set; } = Id ?? 0;
+        public int Id { get; set; }
 
-        public string Username { get; set; } = Username;
+        public bool? Active { get; set; }
 
-        public string? Password { get; set; } = Password;
+        public RoleEnum? Role { get; set; }
 
-        public string FirstName { get; set; } = FirstName;
 
-        public string LastName { get; set; } = LastName;
+        public UserDto() : base()
+        {
+            this.Id = 0;
+        }
 
-        public string Email { get; set; } = Email;
-
-        public string? Tlf { get; set; } = Tlf;
-
-        public bool? Active { get; set; } = Active;
-
-        public RoleEnum? Role { get; set; } = Role;
+        public UserDto(string Username, string Password, string FirstName, string LastName, string Email, string Tlf, int? Id, bool? Active, RoleEnum? Role)
+            : base(Username, Password, string.Empty, FirstName, LastName, Email, Tlf)
+        {
+            this.Id = Id ?? 0;
+            this.Active = Active;
+            this.Role = Role;
+        }
     }
 }

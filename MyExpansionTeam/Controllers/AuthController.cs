@@ -26,7 +26,7 @@ namespace METAPI.Controllers
         /// Nada (Ejecución correcta).
         /// </returns>
         [HttpPost("SignUp")]
-        public async Task<IActionResult> SignUp([FromBody] UserDto dto)
+        public async Task<IActionResult> SignUp([FromBody] NewUserDto dto)
         {
             string result = await _authService.SignUp(dto);
             if (!String.IsNullOrWhiteSpace(result))

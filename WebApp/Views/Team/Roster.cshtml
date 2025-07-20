@@ -207,6 +207,12 @@
                                             <button type="button" class="btn btn-outline-primary" data-formation="defense">Defense</button>
                                             <button type="button" class="btn btn-outline-primary" data-formation="special">Special Teams</button>
                                         </div>
+
+                                        <div class="ms-3">
+                                            <select class="form-select form-select-sm" id="formationTypeSelector" style="min-width: 200px;">
+                                                <!-- Options will be populated dynamically -->
+                                            </select>
+                                        </div>
                                     </div>
                                     <div class="card-body">
                                         <!-- Field Display -->
@@ -985,6 +991,7 @@
 
         // Initialize formation display when tab is activated
         function initializeFormationDisplay() {
+            populateFormationTypeSelector();
             updateFormationDisplay();
             updateBenchPlayers();
         }
@@ -992,8 +999,20 @@
         // Update the football field visual with current formation and assigned players
         function updateFormationDisplay() {
             const fieldDisplay = document.getElementById('fieldDisplay');
-            const formation = formations[currentFormation];
-            
+            const formationTypes = formations[currentFormation];
+
+            if (!formationTypes) {
+                fieldDisplay.innerHTML = '<div class="text-center p-5"><p>Formation category not found</p></div>';
+                return;
+            }
+
+            // Set default formation type if none selected
+            if (!currentFormationType || !formationTypes[currentFormationType]) {
+                currentFormationType = Object.keys(formationTypes)[0];
+            }
+
+            const formation = formationTypes[currentFormationType];
+
             if (!formation) {
                 fieldDisplay.innerHTML = '<div class="text-center p-5"><p>Formation not found</p></div>';
                 return;
@@ -1008,7 +1027,7 @@
             `;
 
             const positionsContainer = fieldDisplay.querySelector('.formation-positions');
-            
+
             formation.positions.forEach(position => {
                 const positionDiv = document.createElement('div');
                 positionDiv.className = `formation-position ${position.required ? 'required' : ''}`;
@@ -1020,9 +1039,9 @@
                 positionDiv.style.transform = 'translate(-50%, -50%)';
                 positionDiv.setAttribute('data-position-id', position.id);
                 positionDiv.setAttribute('data-position-type', position.position);
-                
+
                 const assignedPlayer = startersConfiguration[position.id];
-                
+
                 if (assignedPlayer) {
                     positionDiv.innerHTML = `
                         <div class="position-slot">
@@ -1048,7 +1067,7 @@
                 // Add drop event handlers
                 positionDiv.addEventListener('dragover', handleDragOver);
                 positionDiv.addEventListener('drop', handleDrop);
-                
+
                 positionsContainer.appendChild(positionDiv);
             });
         }
@@ -1136,8 +1155,11 @@
             if (e.target.tagName === 'BUTTON') {
                 this.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
                 e.target.classList.add('active');
-                
+
                 currentFormation = e.target.getAttribute('data-formation');
+                currentFormationType = null; // Reset formation type when category changes
+
+                populateFormationTypeSelector();
                 updateFormationDisplay();
                 updateBenchPlayers();
             }

@@ -1,4 +1,5 @@
 using System.Text;
+using AutoMapper;
 using METCore.Interfaces;
 using METCore.Services;
 using METDAL.Data;
@@ -116,6 +117,10 @@ namespace METAPI
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+
+                using var scope = app.Services.CreateScope();
+                scope.ServiceProvider.GetRequiredService<IMapper>().ConfigurationProvider.AssertConfigurationIsValid();
+                Console.WriteLine("AutoMapper configuration is valid!");
             }
 
             // Security middleware
