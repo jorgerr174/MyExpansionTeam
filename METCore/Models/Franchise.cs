@@ -29,7 +29,7 @@ namespace METCore.Models
         public virtual IList<Player> PlayersToProtect => [.. this.ProtectedPlayers.Concat(this.Players).Distinct()];
 
         [NotMapped]
-        public virtual IList<Player> PlayersByProsition => [.. this.PlayersToProtect.OrderBy(p => (int)p.Position)];
+        public virtual IList<Player> PlayersByPosition => [.. this.PlayersToProtect.OrderBy(p => (int)p.Position)];
 
         [NotMapped]
         public virtual FranchiseEnum Abb { get { return (FranchiseEnum)this.Id; } }

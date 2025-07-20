@@ -35,6 +35,7 @@ C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\bootstrap\dis
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.css.map
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.css.map
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\js\Team\Roster.js
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css.map
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\bootstrap\dist\css\bootstrap.min.css
@@ -44,6 +45,7 @@ C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\jquery\LICENS
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\jquery-validation\dist\additional-methods.min.js
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\jquery\dist\jquery.min.map
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js.map
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\css\Team\Roster.css
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\jquery-validation\LICENSE.md
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\bootstrap\dist\css\bootstrap.rtl.min.css.map
@@ -62,9 +64,11 @@ C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\bootstrap\dis
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\jquery\dist\jquery.slim.min.map
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\wwwroot\lib\jquery-validation\dist\jquery.validate.min.js
 wwwroot\css\site.css
+wwwroot\css\Team\Roster.css
 wwwroot\favicon.ico
 wwwroot\js\SessionRefresh.js
 wwwroot\js\site.js
+wwwroot\js\Team\Roster.js
 wwwroot\lib\bootstrap\dist\css\bootstrap.css
 wwwroot\lib\bootstrap\dist\css\bootstrap.css.map
 wwwroot\lib\bootstrap\dist\css\bootstrap.min.css

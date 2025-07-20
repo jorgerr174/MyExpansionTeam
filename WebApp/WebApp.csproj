@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\Roster.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Views\Team\RosterSettings.js">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -53,6 +57,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\js\Team\Roster.js" />
     <None Include="wwwroot\js\SessionRefresh.js" />
   </ItemGroup>
 	
