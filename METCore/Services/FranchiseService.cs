@@ -35,7 +35,7 @@ namespace METCore.Services
         {
             Franchise? franchise = await _franchiseRepository.GetTById(FranchiseId);
 
-            return _mapper.Map<IList<SelectableDto>>(franchise.PlayersByProsition);
+            return _mapper.Map<IList<SelectableDto>>(franchise.PlayersByPosition);
         }
         #endregion Get Selectable Players
     }

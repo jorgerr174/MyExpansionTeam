@@ -207,7 +207,7 @@ namespace WebApp.Controllers
         public async Task<IActionResult> SaveRoster(TeamDto dto, bool? next) // null-> return, false-> MyTeams, true->Draft
         {
             if (!ModelState.IsValid)
-                return View(dto);
+                return View("Roster", dto);
 
             var response = await SendRequest(HttpMethod.Post, "Teams", "UpdateRoster", dto);
             if (response.IsSuccessStatusCode)
