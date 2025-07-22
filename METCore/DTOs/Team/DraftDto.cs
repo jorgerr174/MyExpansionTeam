@@ -27,6 +27,7 @@ namespace METCore.DTOs.Team
         {
             this.Rounds = 3;
             this.Picks = [];
+            this.Prospects = [];
         }
 
         public DraftDto(int Id, string Location, string Abb, string Mascot, string UserUsername, DateTime Date, bool? Complete,
@@ -36,6 +37,7 @@ namespace METCore.DTOs.Team
             this.Rounds = Rounds ?? 3;
             this.Selections = Selections;
             this.Picks = [];
+            this.Prospects = [];
         }
         #endregion Constructors
     }

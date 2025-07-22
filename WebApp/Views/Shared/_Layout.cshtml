@@ -23,7 +23,7 @@
                         <!-- Other left-aligned links here if needed -->
                     </ul>
                     <ul class="navbar-nav ms-auto">
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        @if (@User.Identity != null && @User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Profile">@User.Identity.Name</a>
