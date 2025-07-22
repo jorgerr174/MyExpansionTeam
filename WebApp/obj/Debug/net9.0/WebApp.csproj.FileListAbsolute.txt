@@ -256,9 +256,11 @@ C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\scopedcs
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\scopedcss\bundle\WebApp.styles.css
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\scopedcss\projectbundle\WebApp.bundle.scp.css
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\fspdjdrw69-b9sayid5wm.gz
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\nm8f55end7-d9a1o5x9dd.gz
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\15ykilufbm-61n19gt1b8.gz
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\25zilipajc-61p3e63ckn.gz
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\5wk3qh7byk-xtxxf3hu2r.gz
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\k7o4f5pkkh-8zx5r9tvm4.gz
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\y1iq0brb9j-bqjiyaj88i.gz
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\1w1et0ajvv-c2jlpeoesf.gz
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\2z7chssowl-erw9l3u2r3.gz

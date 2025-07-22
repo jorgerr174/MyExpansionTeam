@@ -2,6 +2,7 @@
 using METCore.Models;
 using METCore.Models.Teams;
 using METDAL.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace METDAL.Repositories
 {
@@ -12,9 +13,9 @@ namespace METDAL.Repositories
         /// <param name="mine">Parámetro de búsqueda de equipos dl User logeado.</param>
         /// <param name="user">User logeado de búsqueda del T.</param>
         /// IEnumerable<Team> (Con los Teams encontrados).
-        public Task<IEnumerable<Team>> ListTeams(bool mine, User user)
+        public async Task<IList<Team>> ListTeams(bool mine, User user)
         {
-            return Task.FromResult(_context.Teams.AsAsyncEnumerable().ToBlockingEnumerable().Where(t => !mine || t.User == user));
+            return await _context.Teams.Where(t => !mine || t.User == user).ToListAsync();
         }
         #endregion
     }

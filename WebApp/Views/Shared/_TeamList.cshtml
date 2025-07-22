@@ -15,6 +15,8 @@
     <br />
     <hr />
     <table>
+        @if (Model is not null && Model.Count() > 0)
+        {
         @if (myTeams)
         {
             <tr>
@@ -58,6 +60,7 @@
             </tbody>
             <tfoot>
             </tfoot>
+        }
         }
     </table>
     
