@@ -1,7 +1,7 @@
 ﻿@model WebApp.Models.Account.UserViewModel
 
 
-<h1>User.Identity.Name</h1>
+<h1>@User.Identity.Name</h1>
 
 @if(User.Identities.First().RoleClaimType == "Admin")
 {

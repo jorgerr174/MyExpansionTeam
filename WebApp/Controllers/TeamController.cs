@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using METCore.DTOs.Player;
 using METCore.DTOs.Shared;
 using METCore.DTOs.Team;
@@ -204,8 +205,9 @@ namespace WebApp.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> SaveRoster(TeamDto dto, bool? next) // null-> return, false-> MyTeams, true->Draft
+        public async Task<IActionResult> SaveRoster(TeamDto dto, bool? next = null) // null-> return, false-> MyTeams, true->Draft
         {
+            //if (!ModelState.Any(e => e.Key != "next" ? false : e.Value.ValidationState == Va).Any().IsValid)
             if (!ModelState.IsValid)
                 return View("Roster", dto);
 

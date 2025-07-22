@@ -1,8 +1,11 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using AutoMapper;
 using METCore.DTOs.Player;
 using METCore.DTOs.Team;
 using METCore.Interfaces;
 using METCore.Models;
+using METCore.Models.Players;
 using METCore.Models.Teams;
 using Microsoft.Extensions.Configuration;
 using static METCore.Enums.Types;
@@ -20,6 +23,7 @@ namespace METCore.Services
         private readonly IFranchiseRepository _franchiseRepository = franchiseRepository;
         private readonly ITradeRepository _tradeRepository = tradeRepository;
         private readonly IMapper _mapper = mapper;
+
 
 
         #region Create
@@ -69,7 +73,21 @@ namespace METCore.Services
         public async Task<TeamDto?> GetDtoById(int id)
         {
             Team? team = await _teamRepository.GetTById(id);
-            return team == null ? null : _mapper.Map<TeamDto>(team);
+            if (team is null) return null;
+
+            TeamDto dto = _mapper.Map<TeamDto>(team);
+            if (team.Trades is not null && team.Trades.Count > 0)
+                foreach (Trade trade in team.Trades.OrderBy(t => t.Id))
+                {
+                    foreach (int tpi in trade.TeamPicks)
+                        dto.Picks.Remove(tpi);
+                    foreach (int fpi in trade.FranchisePicks)
+                        dto.Picks.Add(fpi);
+
+                    dto.TradedPlayers = [.. dto.TradedPlayers, _mapper.Map<PlayerBasicDto>(_playerRepository.GetManyTByIds(trade.TeamPlayers))];
+                }
+            if ((team.PlayersIds?.Count ?? 0) > 0) dto.Players = [.. _mapper.Map<IList<RosteredDto>>(await _playerRepository.GetManyTByIds(team.PlayersIds))];
+            return dto;
         }
 
         /// <summary>
@@ -114,7 +132,7 @@ namespace METCore.Services
                         dto.Picks[trade.FranchiseId].Add(fp);
                     }
                 }
-            return _mapper.Map<DraftDto>(team);
+            return dto;
         }
 
         /// <summary>
@@ -214,14 +232,15 @@ namespace METCore.Services
 
             if (user.Id != team.User.Id) return "User";
 
-            int idCount = dto.PlayersIds?.Count ?? 0;
-            if (idCount != 0)
-            {
-                dto.PlayersIds = (await _playerRepository.GetManyTByIds(dto.PlayersIds)).Select(players => players.Id).ToList();
-                if (dto.PlayersIds.Count != idCount) return "PlayerIds";
-            }
+            int idCount = dto.SelectedIds?.Count ?? 0;
+            if (idCount != 0 && await _playerRepository.CountManyTByIds(dto.SelectedIds) != idCount) return "PlayerIds";
 
-            team.PlayersIds = dto.PlayersIds;
+            team.PlayersIds = dto.SelectedIds;
+
+            team.OffLineup = _mapper.Map<Lineup>(dto.OffLineup);
+            team.DefLineup = _mapper.Map<Lineup>(dto.DefLineup);
+            team.SPLineup = _mapper.Map<SPLineup>(dto.SPLineup);
+
             return await _teamRepository.UpdateT(team) < 1 ? "Error" : "";
         }
         #endregion Update

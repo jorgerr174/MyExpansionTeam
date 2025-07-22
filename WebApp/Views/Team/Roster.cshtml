@@ -73,27 +73,26 @@
                 <input type="hidden" id="TeamsCap" name="TeamsCap" value="0" />
                 
                 <!-- Hidden fields for protected players -->
-                @if (Model.RosterSettingsProtectedPlayersIds != null)
+                @for (int i = 0; i < (Model.RosterSettingsProtectedPlayersIds?.Count ?? 0); i++)
                 {
-                    @for (int i = 0; i < Model.RosterSettingsProtectedPlayersIds.Count; i++)
-                    {
-                        <input type="hidden" name="RosterSettingsProtectedPlayersIds[@i]" value="@Model.RosterSettingsProtectedPlayersIds[i]" />
-                    }
+                <input type="hidden" name="RosterSettingsProtectedPlayersIds[@i]" value="@Model.RosterSettingsProtectedPlayersIds[i]" />
                 }
                 
-                <!-- Container for dynamic player hidden fields -->
                 <div id="rosterPlayersContainer">
-                    @if (Model.PlayersIds != null)
-                    {
-                        @for (int i = 0; i < Model.PlayersIds.Count; i++)
-                        {
-                            <input type="hidden" name="PlayersIds[@i]" value="@Model.PlayersIds[i]" />
-                        }
-                    }
+                @for (int i = 0; i < (Model.SelectedIds?.Count ?? 0); i++)
+                {
+                    <input type="hidden" name="SelectedIds[@i]" value="@Model.SelectedIds[i]" />
+                }
                 </div>
 
-                <!-- Hidden fields for starters configuration -->
                 <div id="startersContainer"></div>
+
+                @for (int i = 0; i < (Model.TradedPlayers?.Count ?? 0); i++)
+                {
+                <input type="hidden" name="TradedPlayers[@i]" value="@Model.TradedPlayers[i]" />
+                }
+
+                <div id="lineupsContainer"></div>
 
                 <div class="tab-content">
                     <!-- Phase 1: Build Roster -->
@@ -317,7 +316,7 @@
                                 </a>
                             </div>
                             <div class="btn-group">
-                                <button type="submit" class="btn btn-primary" name="next" value="null">
+                                <button type="submit" class="btn btn-primary" name="next">
                                     <i class="fas fa-save me-2"></i>Save Progress
                                 </button>
                                 <button type="submit" class="btn btn-success" name="next" value="false">
@@ -366,6 +365,14 @@
         const allRosterPlayersCache = {}; // Cache for all selected players
         let currentFormation = 'offense';
         let currentPositionFilter = 'all';
+
+        let currentFormationType = '@Model.OffLineup.Formation';
+        let offenseStartersConfiguration = {};
+        let defenseStartersConfiguration = {};
+        let specialStartersConfiguration = {};
+
+        let tradedPlayersArray = @Html.Raw(Json.Serialize(Model.TradedPlayers));
+        let lineupsData = {}; // Store loaded lineups data
 
         // ===== REFERENCE DATA =====
         // Static data for franchise names and formation templates
@@ -418,11 +425,171 @@
                         { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                         { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                         { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                        { id: "LWRX", name: "X-WR", position: "WR", x: 10, y: 55},
-                        { id: "RWRX", name: "X-WR", position: "WR", x: 10, y: 55},
-                        { id: "WRZ", name: "Z-WR", position: "WR", x: 90, y: 55},
-                        { id: "WRS", name: "Slot", position: "WR", x: 90, y: 55},
-                        { id: "TE", name: "TE", position: "TE", x: 25, y: 58},
+                        { id: "LWRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                        { id: "RWRX", name: "X-WR", position: "WR", x: 90, y: 45},
+                        { id: "WRZ", name: "Z-WR", position: "WR", x: 82, y: 50},
+                        { id: "WRS", name: "Slot", position: "WR", x: 74, y: 55},
+                        { id: "TE", name: "TE", position: "TE", x: 25, y: 58}
+                    ]
+                },
+                ZeroTwo: {
+                    name: "ZeroTwo (0RB-2TE-3WR)",
+                    positions: [
+                        { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                        { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                        { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                        { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                        { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                        { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                        { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                        { id: "WRZ", name: "Z-WR", position: "WR", x: 90, y: 45},
+                        { id: "WRS", name: "Slot", position: "WR", x: 82, y: 55},
+                        { id: "LTE", name: "TE", position: "TE", x: 25, y: 58},
+                        { id: "RTE", name: "TE", position: "TE", x: 71, y: 50}
+                    ]
+                },
+                Ten: {
+                    name: "Ten (1RB-0TE-4WR)",
+                    positions: [
+                        { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                        { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                        { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                        { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                        { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                        { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                        { id: "LWRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                        { id: "RWRX", name: "X-WR", position: "WR", x: 90, y: 45},
+                        { id: "WRZ", name: "Z-WR", position: "WR", x: 20, y: 50},
+                        { id: "WRS", name: "Slot", position: "WR", x: 75, y: 50}
+                    ]
+                },
+                Eleven: {
+                    name: "Eleven (1RB-1TE-3WR)",
+                    positions: [
+                        { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                        { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                        { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                        { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                        { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                        { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                        { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                        { id: "WRZ", name: "Z-WR", position: "WR", x: 83, y: 45},
+                        { id: "WRS", name: "Slot", position: "WR", x: 73, y: 55},
+                        { id: "TE", name: "TE", position: "TE", x: 25, y: 58}
+                    ]
+                },
+                Twelve: {
+                    name: "Twelve (1RB-2TE-2WR)",
+                    positions: [
+                        { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                        { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                        { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                        { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                        { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                        { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                        { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                        { id: "WRZ", name: "Z-WR", position: "WR", x: 90, y: 45},
+                        { id: "LTE", name: "TE", position: "TE", x: 25, y: 58},
+                        { id: "RTE", name: "TE", position: "TE", x: 71, y: 50}
+                    ]
+                },
+                Thirteen: {
+                    name: "Thirteen (1RB-3TE-1WR)",
+                    positions: [
+                        { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                        { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                        { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                        { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                        { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                        { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                        { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                        { id: "LTE", name: "TE", position: "TE", x: 29, y: 50},
+                        { id: "RTE", name: "TE", position: "TE", x: 71, y: 45},
+                        { id: "YTE", name: "Y-TE", position: "TE", x: 83, y: 50}
+                    ]
+                },
+                Twenty: {
+                    name: "Twenty (2RB-0TE-3WR)",
+                    positions: [
+                        { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                        { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                        { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                        { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                        { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                        { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                        { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                        { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                        { id: "WRZ", name: "Z-WR", position: "WR", x: 85, y: 45},
+                        { id: "WRS", name: "Slot", position: "WR", x: 75, y: 50}
+                    ]
+                },
+                TwentyOne: {
+                    name: "TwentyOne (2RB-1TE-2WR)",
+                    positions: [
+                        { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                        { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                        { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                        { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                        { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                        { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                        { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                        { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                        { id: "WRZ", name: "Z-WR", position: "WR", x: 80, y: 45},
+                        { id: "TE", name: "TE", position: "TE", x: 25, y: 58}
+                    ]
+                },
+                TwentyTwo: {
+                    name: "TwentyOne (2RB-2TE-1WR)",
+                    positions: [
+                        { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                        { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                        { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                        { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                        { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                        { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                        { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                        { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                        { id: "LTE", name: "TE", position: "TE", x: 25, y: 58},
+                        { id: "RTE", name: "TE", position: "TE", x: 80, y: 45}
+                    ]
+                },
+                Jumbo: {
+                    name: "Jumbo (6OL-2RB-1TE-1WR)",
+                    positions: [
+                        { id: "EOL", name: "OL", position: "OL", x: 29, y: 45},
+                        { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                        { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                        { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                        { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                        { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                        { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                        { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                        { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                        { id: "TE", name: "TE", position: "TE", x: 71, y: 45},
+                    ]
+                },
+                TwoQB: {
+                    name: "TwoQB (2QB-1RB-1TE-2WR)",
+                    positions: [
+                        { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                        { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                        { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                        { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                        { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                        { id: "LQB", name: "QB", position: "QB", x: 46, y: 72},
+                        { id: "RQB", name: "QB", position: "QB", x: 54, y: 72},
+                        { id: "RB", name: "RB", position: "RB", x: 62, y: 78},
+                        { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                        { id: "WRZ", name: "Z-WR", position: "WR", x: 90, y: 45},
+                        { id: "TE", name: "TE", position: "TE", x: 25, y: 58}
                     ]
                 }
             },
@@ -430,39 +597,132 @@
                 Bear: {
                     name: "Bear (5-2-4)",
                     positions: [
-                        { id: "LE", name: "EDGE", position: "DL", x: 30, y: 40},
-                        { id: "LDE", name: "DE", position: "DL", x: 45, y: 40},
-                        { id: "NT", name: "NT", position: "DL", x: 55, y: 40},
-                        { id: "RDE", name: "DE", position: "DL", x: 55, y: 40},
-                        { id: "RE", name: "EDGE", position: "DL", x: 70, y: 40},
-                        { id: "LLB", name: "LB", position: "LB", x: 50, y: 30},
-                        { id: "RLB", name: "LB", position: "LB", x: 30, y: 30},
-                        { id: "LCB", name: "CB", position: "DB", x: 15, y: 25},
-                        { id: "RCB", name: "CB", position: "DB", x: 85, y: 25},
+                        { id: "LE", name: "EDGE", position: "DL", x: 34, y: 70},
+                        { id: "LDE", name: "DE", position: "DL", x: 42, y: 70},
+                        { id: "NT", name: "NT", position: "DL", x: 50, y: 70},
+                        { id: "RDE", name: "DE", position: "DL", x: 58, y: 70},
+                        { id: "RE", name: "EDGE", position: "DL", x: 66, y: 70},
+                        { id: "LLB", name: "LB", position: "LB", x: 45, y: 40},
+                        { id: "RLB", name: "LB", position: "LB", x: 55, y: 40},
+                        { id: "LCB", name: "CB", position: "DB", x: 15, y: 55},
+                        { id: "RCB", name: "CB", position: "DB", x: 85, y: 55},
                         { id: "FS", name: "FS", position: "DB", x: 35, y: 15},
                         { id: "SS", name: "SS", position: "DB", x: 65, y: 15}
                     ]
-                }            
+                },
+                FourThree: {
+                    name: "4-3 Defense (4-3-4)",
+                    positions: [
+                        { id: "LE", name: "EDGE", position: "DL", x: 35, y: 70},
+                        { id: "LDT", name: "DT", position: "DL", x: 46, y: 70},
+                        { id: "RDT", name: "DT", position: "DL", x: 54, y: 70},
+                        { id: "RE", name: "EDGE", position: "DL", x: 65, y: 70},
+                        { id: "WILL", name: "WILL", position: "LB", x: 30, y: 43},
+                        { id: "MIKE", name: "MIKE", position: "LB", x: 50, y: 40},
+                        { id: "SAM", name: "SAM", position: "LB", x: 70, y: 43},
+                        { id: "LCB", name: "CB", position: "DB", x: 15, y: 55},
+                        { id: "RCB", name: "CB", position: "DB", x: 85, y: 55},
+                        { id: "FS", name: "FS", position: "DB", x: 35, y: 15},
+                        { id: "SS", name: "SS", position: "DB", x: 65, y: 15}
+                    ]
+                },
+                ThreeFour: {
+                    name: "3-4 Defense (3-4-4)",
+                    positions: [
+                        { id: "LDE", name: "DE", position: "DL", x: 40, y: 70},
+                        { id: "DT", name: "DT", position: "DL", x: 50, y: 70},
+                        { id: "RDE", name: "DE", position: "DL", x: 60, y: 70},
+                        { id: "ROLB", name: "OLB", position: "LB", x: 30, y: 50},
+                        { id: "RMLB", name: "MLB", position: "LB", x: 70, y: 50},
+                        { id: "LMLB", name: "MLB", position: "LB", x: 45, y: 40},
+                        { id: "LOLB", name: "OLB", position: "LB", x: 55, y: 40},
+                        { id: "LCB", name: "CB", position: "DB", x: 15, y: 55},
+                        { id: "RCB", name: "CB", position: "DB", x: 85, y: 55},
+                        { id: "FS", name: "FS", position: "DB", x: 35, y: 15},
+                        { id: "SS", name: "SS", position: "DB", x: 65, y: 15}
+                    ]
+                },
+                Nickel: {
+                    name: "Nickel (4-2-5)",
+                    positions: [
+                        { id: "LE", name: "EDGE", position: "DL", x: 35, y: 70},
+                        { id: "LDT", name: "DT", position: "DL", x: 46, y: 70},
+                        { id: "RDT", name: "DT", position: "DL", x: 54, y: 70},
+                        { id: "RE", name: "EDGE", position: "DL", x: 65, y: 70},
+                        { id: "LLB", name: "LB", position: "LB", x: 45, y: 40},
+                        { id: "RLB", name: "LB", position: "LB", x: 55, y: 40},
+                        { id: "LCB", name: "CB", position: "DB", x: 15, y: 55},
+                        { id: "RCB", name: "CB", position: "DB", x: 85, y: 55},
+                        { id: "NCB", name: "NCB", position: "DB", x: 25, y: 65},
+                        { id: "FS", name: "FS", position: "DB", x: 35, y: 15},
+                        { id: "SS", name: "SS", position: "DB", x: 65, y: 15}
+                    ]
+                },
+                Dime: {
+                    name: "Dime (3-2-6)",
+                    positions: [
+                        { id: "LDE", name: "DE", position: "DL", x: 40, y: 70},
+                        { id: "DT", name: "DT", position: "DL", x: 50, y: 70},
+                        { id: "RDE", name: "DE", position: "DL", x: 60, y: 70},
+                        { id: "LLB", name: "LB", position: "LB", x: 45, y: 40},
+                        { id: "RLB", name: "LB", position: "LB", x: 55, y: 40},
+                        { id: "LCB", name: "CB", position: "DB", x: 15, y: 55},
+                        { id: "RCB", name: "CB", position: "DB", x: 85, y: 55},
+                        { id: "NCB", name: "NCB", position: "DB", x: 25, y: 65},
+                        { id: "DCB", name: "DCB", position: "DB", x: 70, y: 53},
+                        { id: "FS", name: "FS", position: "DB", x: 35, y: 15},
+                        { id: "SS", name: "SS", position: "DB", x: 65, y: 15}
+                    ]
+                }
             },
             special: {
-                name: "Special Teams - Field Goal",
-                positions: [
-                    { id: "K", name: "K", position: "K", x: 50, y: 75},
-                    { id: "P", name: "P", position: "P", x: 50, y: 80},
-                    { id: "LS", name: "LS", position: "LS", x: 50, y: 65}},
-                    { id: "KR", name: "PR", position: "ATH", x: 45, y: 70},
-                    { id: "PR", name: "KR", position: "ATH", x: 45, y: 70}
-                ]
+                SpecialTeams: {
+                    name: "Special Teams",
+                    positions: [
+                        { id: "K", name: "K", position: "K", x: 40, y: 75},
+                        { id: "P", name: "P", position: "P", x: 60, y: 75},
+                        { id: "LS", name: "LS", position: "LS", x: 50, y: 45},
+                        { id: "KR", name: "KR", position: "ATH", x: 25, y: 55},
+                        { id: "PR", name: "PR", position: "ATH", x: 75, y: 55}
+                    ]
+                }
             }
         };
 
         // ===== CORE ROSTER MANAGEMENT FUNCTIONS =====
         // Functions that handle basic roster operations and data management
 
+        // Initialize roster from server data on page load
+        function initializeRosterFromServerData() {
+            // Get the server data from the model
+            const serverPlayers = @Html.Raw(Json.Serialize(Model.Players));
+
+            // Process each rostered player
+            serverPlayers.forEach(rosteredPlayer => {
+                const playerId = rosteredPlayer.id;
+
+                // Add to roster array
+                if (!rosterPlayersArray.includes(playerId)) {
+                    rosterPlayersArray.push(playerId);
+                }
+
+                // Add to all players cache for global access
+                allRosterPlayersCache[playerId] = rosteredPlayer;
+
+                // DON'T populate franchisePlayersCache here - let API calls load complete data
+            });
+
+            // Update UI
+            updateRosterPlayersHiddenFields();
+            updateSalaryCapDisplay();
+            populateFranchisesList();
+            refreshRosterDisplay();
+        }
+
         // Initialize roster players from existing hidden form fields
         function initializeRosterPlayers() {
             const container = document.getElementById('rosterPlayersContainer');
-            const existingInputs = container.querySelectorAll('input[name*="PlayersIds"]');
+            const existingInputs = container.querySelectorAll('input[name*="SelectedIds"]');
             rosterPlayersArray = [];
             totalCapUsed = 0;
             
@@ -493,7 +753,7 @@
             rosterPlayersArray.forEach((playerId, index) => {
                 const hiddenInput = document.createElement('input');
                 hiddenInput.type = 'hidden';
-                hiddenInput.name = `PlayersIds[${index}]`;
+                hiddenInput.name = `SelectedIds[${index}]`;
                 hiddenInput.value = playerId;
                 container.appendChild(hiddenInput);
             });
@@ -649,6 +909,9 @@
 
                     displayPlayersForSelection(franchiseData);
                     updateFranchiseSelectedCount();
+
+                    // Re-apply selected state to previously selected players
+                    reapplySelectedStates();
                 })
                 .catch(error => {
                     console.error('Error loading franchise data:', error);
@@ -667,12 +930,43 @@
         // Create franchise data object from API JSON response
         function createFranchiseDataFromJson(playersData, franchiseId) {
             const franchiseInfo = franchiseNames[franchiseId] || { name: `Franchise ${franchiseId}`, abbreviation: `F${franchiseId}` };
+
+            // Merge API data with any existing cached players (from server initialization)
+            let mergedPlayers = [...playersData];
+
+            if (franchisePlayersCache[franchiseId]) {
+                // Add any cached players that aren't in the API response
+                franchisePlayersCache[franchiseId].players.forEach(cachedPlayer => {
+                    if (!mergedPlayers.some(p => p.id === cachedPlayer.id)) {
+                        mergedPlayers.push(cachedPlayer);
+                    }
+                });
+            }
+
             return {
                 id: franchiseId,
                 name: franchiseInfo.name,
                 abbreviation: franchiseInfo.abbreviation,
-                players: playersData
+                players: mergedPlayers
             };
+        }
+
+        // Re-apply selected visual state to players that are in rosterPlayersArray
+        function reapplySelectedStates() {
+            rosterPlayersArray.forEach(playerId => {
+                const playerCard = document.querySelector(`[data-player-id="${playerId}"]`);
+                if (playerCard && !playerCard.classList.contains('selected')) {
+                    playerCard.classList.add('selected');
+            
+                    // Add selected overlay if not already there
+                    if (!playerCard.querySelector('.selected-overlay')) {
+                        const selectedOverlay = document.createElement('div');
+                        selectedOverlay.className = 'selected-overlay';
+                        selectedOverlay.innerHTML = '<i class="fas fa-check-circle"></i>';
+                        playerCard.appendChild(selectedOverlay);
+                    }
+                }
+            });
         }
 
         // Display player cards for selection, handling protected and selected states
@@ -712,6 +1006,7 @@
                 const positionContainer = positionSection.querySelector(`#position-${position}`);
 
                 playersByPosition[position].forEach(player => {
+                    const isTraded = tradedPlayersArray.includes(player.id);
                     const isProtected = protectedPlayersArray.includes(player.id);
                     const isSelected = rosterPlayersArray.includes(player.id);
 
@@ -719,7 +1014,7 @@
                     playerDiv.className = 'col-md-6 col-lg-4 mb-2';
 
                     playerDiv.innerHTML = `
-                        <div class="card player-card ${isProtected ? 'protected' : isSelected ? 'selected' : ''}" 
+                        <div class="card player-card ${isTraded ? 'traded' : isProtected ? 'protected' : isSelected ? 'selected' : ''}"
                             data-player-id="${player.id}" data-player-cap="${player.pureAPY || 0}">
                             <div class="card-body">
                                 <div class="player-header">
@@ -739,14 +1034,16 @@
 
                     const playerCard = playerDiv.querySelector('.player-card');
 
-                    if (isProtected) {
+                    if (isTraded || isProtected) {
                         const protectedOverlay = document.createElement('div');
-                        protectedOverlay.className = 'protected-overlay';
+                        protectedOverlay.className = 'unlselectable-overlay';
                         protectedOverlay.innerHTML = '<i class="fas fa-lock"></i>';
                         playerCard.appendChild(protectedOverlay);
 
-                        // Add tooltip for protected players
-                        playerCard.setAttribute('title', 'This player is protected and cannot be selected');
+                        playerCard.setAttribute('title', isTraded 
+                            ? 'This player is not available since he was previously traded away'
+                            : 'This player is protected and cannot be selected'
+                        );
                     } else {
                         if (isSelected) {
                             const selectedOverlay = document.createElement('div');
@@ -761,9 +1058,53 @@
                             const isCurrentlySelected = rosterPlayersArray.includes(playerId);
 
                             if (isCurrentlySelected) {
+                                // Check if player is in any starting position across all formations
+                                const allStarterConfigs = [
+                                    { config: offenseStartersConfiguration, name: 'Offense' },
+                                    { config: defenseStartersConfiguration, name: 'Defense' },
+                                    { config: specialStartersConfiguration, name: 'Special Teams' },
+                                    { config: startersConfiguration, name: 'Current Formation' }
+                                ];
+
+                                let assignedPositions = [];
+                                let assignedFormations = [];
+
+                                allStarterConfigs.forEach(({ config, name }) => {
+                                    Object.keys(config).forEach(key => {
+                                        if (config[key] && config[key].id === playerId) {
+                                            assignedPositions.push(key);
+                                            assignedFormations.push(name);
+                                        }
+                                    });
+                                });
+
+                                if (assignedPositions.length > 0) {
+                                    const positionsList = [...new Set(assignedPositions)].join(', ');
+                                    const formationsList = [...new Set(assignedFormations)].join(', ');
+                                    const playerName = allRosterPlayersCache[playerId]?.name || 'This player';
+
+                                    if (!confirm(`${playerName} is currently assigned to positions: ${positionsList} in ${formationsList}. Remove from starting lineup and roster?`)) {
+                                        return; // Cancel deselection
+                                    }
+
+                                    // Remove from all assigned positions in all configurations
+                                    allStarterConfigs.forEach(({ config }) => {
+                                        Object.keys(config).forEach(key => {
+                                            if (config[key] && config[key].id === playerId) {
+                                                delete config[key];
+                                            }
+                                        });
+                                    });
+
+                                    updateStartersHiddenFields();
+                                    updateFormationDisplay();
+                                    updateBenchPlayers();
+                                }
+
+                                // Continue with normal deselection...
                                 rosterPlayersArray = rosterPlayersArray.filter(id => id !== playerId);
                                 this.classList.remove('selected');
-                            
+
                                 const overlay = this.querySelector('.selected-overlay');
                                 if (overlay) overlay.remove();
                             } else {
@@ -945,16 +1286,26 @@
             if (confirm('Are you sure you want to clear your entire roster? This action cannot be undone.')) {
                 rosterPlayersArray = [];
                 totalCapUsed = 0;
+
+                // Clear all starter configurations
+                startersConfiguration = {};
+                offenseStartersConfiguration = {};
+                defenseStartersConfiguration = {};
+                specialStartersConfiguration = {};
+
                 updateRosterPlayersHiddenFields();
                 updateSalaryCapDisplay();
                 refreshRosterDisplay();
                 populateFranchisesList();
-                
+                updateStartersHiddenFields();
+                updateFormationDisplay();
+                updateBenchPlayers();
+
                 // Clear visual selection in current franchise if displayed
                 if (currentFranchiseId && franchisePlayersCache[currentFranchiseId]) {
                     displayPlayersForSelection(franchisePlayersCache[currentFranchiseId]);
                 }
-                
+
                 alert('Roster cleared successfully.');
             }
         });
@@ -963,12 +1314,14 @@
         window.removeFromRoster = function(playerId) {
             if (confirm('Are you sure you want to remove this player from your roster?')) {
                 rosterPlayersArray = rosterPlayersArray.filter(id => id !== playerId);
-                
-                // Remove from starters if assigned
-                Object.keys(startersConfiguration).forEach(key => {
-                    if (startersConfiguration[key] && startersConfiguration[key].id === playerId) {
-                        delete startersConfiguration[key];
-                    }
+
+                // Remove from starters in all configurations
+                [startersConfiguration, offenseStartersConfiguration, defenseStartersConfiguration, specialStartersConfiguration].forEach(config => {
+                    Object.keys(config).forEach(key => {
+                        if (config[key] && config[key].id === playerId) {
+                            delete config[key];
+                        }
+                    });
                 });
 
                 updateRosterPlayersHiddenFields();
@@ -978,7 +1331,7 @@
                 updateFormationDisplay();
                 updateBenchPlayers();
                 updateStartersHiddenFields();
-                
+
                 // Refresh current franchise display if open
                 if (currentFranchiseId && franchisePlayersCache[currentFranchiseId]) {
                     displayPlayersForSelection(franchisePlayersCache[currentFranchiseId]);
@@ -986,8 +1339,204 @@
             }
         };
 
+
         // ===== TAB 3: FORMATION & STARTERS FUNCTIONS =====
         // Functions for managing starting lineups and formations
+        
+        // Load lineups from Model data (no API call needed)
+        function loadLineups() {
+            try {
+                lineupsData = {};
+
+                // Load Offense lineup
+                const offLineup = @Html.Raw(Json.Serialize(Model.OffLineup));
+                if (offLineup && offLineup.formation) {
+                    if (!lineupsData.offense) lineupsData.offense = {};
+
+                    const formationPositions = formations.offense[offLineup.formation]?.positions || [];
+                    const lineupPositions = {};
+
+                    for (let i = 1; i <= 11; i++) {
+                        const playerIdProp = `player${i}`;
+                        const playerId = offLineup[playerIdProp];
+                        if (playerId && formationPositions[i-1]) {
+                            lineupPositions[formationPositions[i-1].id] = playerId;
+                        }
+                    }
+
+                    lineupsData.offense[offLineup.formation] = lineupPositions;
+                }
+
+                // Load Defense lineup
+                const defLineup = @Html.Raw(Json.Serialize(Model.DefLineup));
+                if (defLineup && defLineup.formation) {
+                    if (!lineupsData.defense) lineupsData.defense = {};
+
+                    const formationPositions = formations.defense[defLineup.formation]?.positions || [];
+                    const lineupPositions = {};
+
+                    for (let i = 1; i <= 11; i++) {
+                        const playerIdProp = `player${i}`;
+                        const playerId = defLineup[playerIdProp];
+                        if (playerId && formationPositions[i-1]) {
+                            lineupPositions[formationPositions[i-1].id] = playerId;
+                        }
+                    }
+
+                    lineupsData.defense[defLineup.formation] = lineupPositions;
+                }
+
+                // Load Special Teams lineup
+                const spLineup = @Html.Raw(Json.Serialize(Model.SPLineup));
+                if (spLineup && spLineup.formation) {
+                    if (!lineupsData.special) lineupsData.special = {};
+
+                    const formationPositions = formations.special[spLineup.formation]?.positions || [];
+                    const lineupPositions = {};
+
+                    for (let i = 1; i <= 11; i++) {
+                        const playerIdProp = `player${i}`;
+                        const playerId = spLineup[playerIdProp];
+                        if (playerId && formationPositions[i-1]) {
+                            lineupPositions[formationPositions[i-1].id] = playerId;
+                        }
+                    }
+
+                    lineupsData.special[spLineup.formation] = lineupPositions;
+                }
+
+                // Load into current formation if applicable
+                loadStartersFromLineupData();
+
+            } catch (error) {
+                console.error('Error loading lineups from model:', error);
+            }
+        }
+
+        function loadStartersFromLineupData() {
+            if (lineupsData[currentFormation] && lineupsData[currentFormation][currentFormationType]) {
+                const lineupPositions = lineupsData[currentFormation][currentFormationType];
+
+                Object.keys(lineupPositions).forEach(positionId => {
+                    const playerId = lineupPositions[positionId];
+                    const player = allRosterPlayersCache[playerId];
+                    if (player) {
+                        startersConfiguration[positionId] = player;
+                    }
+                });
+            }
+        }
+
+        function updateLineupsData() {
+            if (!currentFormation || !currentFormationType) return;
+
+            if (!lineupsData[currentFormation]) {
+                lineupsData[currentFormation] = {};
+            }
+
+            const lineupPositions = {};
+            Object.keys(startersConfiguration).forEach(positionId => {
+                const player = startersConfiguration[positionId];
+                if (player) {
+                    lineupPositions[positionId] = player.id;
+                }
+            });
+
+            lineupsData[currentFormation][currentFormationType] = lineupPositions;
+            updateLineupsHiddenFields();
+        }
+
+        function updateLineupsHiddenFields() {
+            const container = document.getElementById('lineupsContainer');
+            container.innerHTML = '';
+
+            // Create hidden fields for offense lineup
+            if (offenseStartersConfiguration && Object.keys(offenseStartersConfiguration).length > 0) {
+                // Get the formation name from lineupsData or current formation
+                let offenseFormation = '';
+                if (currentFormation === 'offense' && currentFormationType) {
+                    offenseFormation = currentFormationType;
+                } else if (lineupsData.offense) {
+                    offenseFormation = Object.keys(lineupsData.offense)[0] || '';
+                }
+
+                const nameInput = document.createElement('input');
+                nameInput.type = 'hidden';
+                nameInput.name = 'OffLineup.Formation';
+                nameInput.value = offenseFormation;
+                container.appendChild(nameInput);
+
+                if (offenseFormation && formations.offense[offenseFormation]) {
+                    const positions = formations.offense[offenseFormation].positions;
+                    positions.forEach((position, index) => {
+                        const playerId = offenseStartersConfiguration[position.id]?.id || 0;
+                        const playerInput = document.createElement('input');
+                        playerInput.type = 'hidden';
+                        playerInput.name = `OffLineup.Player${index + 1}`;
+                        playerInput.value = playerId;
+                        container.appendChild(playerInput);
+                    });
+                }
+            }
+
+            // Create hidden fields for defense lineup
+            if (defenseStartersConfiguration && Object.keys(defenseStartersConfiguration).length > 0) {
+                // Get the formation name from lineupsData or current formation
+                let defenseFormation = '';
+                if (currentFormation === 'defense' && currentFormationType) {
+                    defenseFormation = currentFormationType;
+                } else if (lineupsData.defense) {
+                    defenseFormation = Object.keys(lineupsData.defense)[0] || '';
+                }
+
+                const nameInput = document.createElement('input');
+                nameInput.type = 'hidden';
+                nameInput.name = 'DefLineup.Formation';
+                nameInput.value = defenseFormation;
+                container.appendChild(nameInput);
+
+                if (defenseFormation && formations.defense[defenseFormation]) {
+                    const positions = formations.defense[defenseFormation].positions;
+                    positions.forEach((position, index) => {
+                        const playerId = defenseStartersConfiguration[position.id]?.id || 0;
+                        const playerInput = document.createElement('input');
+                        playerInput.type = 'hidden';
+                        playerInput.name = `DefLineup.Player${index + 1}`;
+                        playerInput.value = playerId;
+                        container.appendChild(playerInput);
+                    });
+                }
+            }
+
+            // Create hidden fields for special teams lineup
+            if (specialStartersConfiguration && Object.keys(specialStartersConfiguration).length > 0) {
+                // Get the formation name from lineupsData or current formation
+                let specialFormation = '';
+                if (currentFormation === 'special' && currentFormationType) {
+                    specialFormation = currentFormationType;
+                } else if (lineupsData.special) {
+                    specialFormation = Object.keys(lineupsData.special)[0] || '';
+                }
+
+                const nameInput = document.createElement('input');
+                nameInput.type = 'hidden';
+                nameInput.name = 'SPLineup.Formation';
+                nameInput.value = specialFormation;
+                container.appendChild(nameInput);
+
+                if (specialFormation && formations.special[specialFormation]) {
+                    const positions = formations.special[specialFormation].positions;
+                    positions.forEach((position, index) => {
+                        const playerId = specialStartersConfiguration[position.id]?.id || 0;
+                        const playerInput = document.createElement('input');
+                        playerInput.type = 'hidden';
+                        playerInput.name = `SPLineup.Player${index + 1}`;
+                        playerInput.value = playerId;
+                        container.appendChild(playerInput);
+                    });
+                }
+            }
+        }
 
         // Initialize formation display when tab is activated
         function initializeFormationDisplay() {
@@ -996,9 +1545,32 @@
             updateBenchPlayers();
         }
 
+        // Populate the formation type dropdown based on current formation category
+        function populateFormationTypeSelector() {
+            const selector = document.getElementById('formationTypeSelector');
+            const formationTypes = formations[currentFormation];
+    
+            selector.innerHTML = '';
+    
+            Object.keys(formationTypes).forEach(formationType => {
+                const option = document.createElement('option');
+                option.value = formationType;
+                option.textContent = formationTypes[formationType].name;
+                selector.appendChild(option);
+            });
+    
+            // Set default selection if none exists
+            if (!currentFormationType || !formationTypes[currentFormationType]) {
+                currentFormationType = Object.keys(formationTypes)[0];
+            }
+    
+            selector.value = currentFormationType;
+        }
+
         // Update the football field visual with current formation and assigned players
         function updateFormationDisplay() {
             const fieldDisplay = document.getElementById('fieldDisplay');
+            fieldDisplay.className = `football-field ${currentFormation}`;
             const formationTypes = formations[currentFormation];
 
             if (!formationTypes) {
@@ -1053,12 +1625,15 @@
                             </div>
                         </div>
                     `;
+
+                    // Add drag event listener to assigned player
+                    const assignedPlayerElement = positionDiv.querySelector('.assigned-player');
+                    assignedPlayerElement.addEventListener('dragstart', handlePlayerDragStart);
                 } else {
                     positionDiv.innerHTML = `
                         <div class="position-slot">
                             <div class="empty-slot">
                                 <small class="text-muted">${position.name}</small>
-                                <br><small class="text-muted">${position.position}</small>
                             </div>
                         </div>
                     `;
@@ -1088,13 +1663,25 @@
             }
 
             benchContainer.innerHTML = '';
-            
+            // Add drop zone properties to bench container
+            benchContainer.addEventListener('dragover', handleBenchDragOver);
+            benchContainer.addEventListener('drop', handleBenchDrop);
+            benchContainer.addEventListener('dragleave', handleBenchDragLeave);
+
+            // Create a row container for the grid layout
+            const rowContainer = document.createElement('div');
+            rowContainer.className = 'row';
+
             availablePlayers.forEach(player => {
+                // Create column wrapper for each player
+                const colDiv = document.createElement('div');
+                colDiv.className = 'col-md-6 col-lg-4 mb-2'; // 2 per row on medium screens, 3 per row on large screens
+
                 const playerDiv = document.createElement('div');
-                playerDiv.className = 'available-player mb-2 p-2 border rounded';
+                playerDiv.className = 'available-player p-2 border rounded h-100'; // Added h-100 for equal height
                 playerDiv.draggable = true;
                 playerDiv.setAttribute('data-player-id', player.id);
-                
+
                 playerDiv.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -1109,8 +1696,43 @@
                 `;
 
                 playerDiv.addEventListener('dragstart', handleDragStart);
-                benchContainer.appendChild(playerDiv);
+                colDiv.appendChild(playerDiv);
+                rowContainer.appendChild(colDiv);
             });
+
+            benchContainer.appendChild(rowContainer);
+        }
+
+        // Handle drag over bench area
+        function handleBenchDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('drag-over'); // Add visual feedback
+        }
+
+        // Handle drop on bench (remove from starting position)
+        function handleBenchDrop(e) {
+            e.preventDefault();
+    
+            const playerId = parseInt(e.dataTransfer.getData('text/plain'));
+            const sourcePosition = e.dataTransfer.getData('source-position');
+    
+            // Only handle drops from formation positions
+            if (sourcePosition) {
+                // Remove player from starting position
+                if (startersConfiguration[sourcePosition]) {
+                    delete startersConfiguration[sourcePosition];
+            
+                    updateFormationDisplay();
+                    updateBenchPlayers();
+                    updateStartersHiddenFields();
+                }
+            }
+        }
+
+        // Handle drag leave bench area (remove visual feedback)
+        function handleBenchDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
         }
 
         // Get roster players that are not currently assigned to starting positions
@@ -1153,16 +1775,86 @@
         // Handle formation selector button clicks (Offense/Defense/Special Teams)
         document.getElementById('formationSelector').addEventListener('click', function(e) {
             if (e.target.tagName === 'BUTTON') {
+                // Save current starters to category-specific configuration
+                saveCurrentStartersToCategory();
+
                 this.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
                 e.target.classList.add('active');
 
-                currentFormation = e.target.getAttribute('data-formation');
-                currentFormationType = null; // Reset formation type when category changes
+                const newFormation = e.target.getAttribute('data-formation');
+
+                // If switching within same category, clear starters
+                if (newFormation === currentFormation) {
+                    currentFormationType = null;
+                } else {
+                    // Switching to different category, load saved starters
+                    currentFormation = newFormation;
+                    loadStartersFromCategory();
+                }
 
                 populateFormationTypeSelector();
                 updateFormationDisplay();
                 updateBenchPlayers();
             }
+        });
+
+        function saveCurrentStartersToCategory() {
+            if (currentFormation === 'offense') {
+                offenseStartersConfiguration = { ...startersConfiguration };
+            } else if (currentFormation === 'defense') {
+                defenseStartersConfiguration = { ...startersConfiguration };
+            } else if (currentFormation === 'special') {
+                specialStartersConfiguration = { ...startersConfiguration };
+            }
+
+            updateLineupsData();
+        }
+
+        function loadStartersFromCategory() {
+            if (currentFormation === 'offense') {
+                startersConfiguration = { ...offenseStartersConfiguration };
+            } else if (currentFormation === 'defense') {
+                startersConfiguration = { ...defenseStartersConfiguration };
+            } else if (currentFormation === 'special') {
+                startersConfiguration = { ...specialStartersConfiguration };
+            }
+
+            loadStartersFromLineupData();
+        }
+
+        // Update formation type selector to clear starters when changing within category:
+        document.getElementById('formationTypeSelector').addEventListener('change', function(e) {
+            const previousFormationType = currentFormationType;
+            const newFormationType = e.target.value;
+
+            // If changing formation type within same category, clear starters with confirmation
+            if (previousFormationType && previousFormationType !== newFormationType) {
+                if (Object.keys(startersConfiguration).length > 0) {
+                    if (confirm('Changing formation will clear current starting lineup. Continue?')) {
+                        startersConfiguration = {};
+                        updateStartersHiddenFields();
+                        currentFormationType = newFormationType;
+                    } else {
+                        // Revert selection
+                        this.value = previousFormationType;
+                        return;
+                    }
+                } else {
+                    currentFormationType = newFormationType;
+                }
+            } else {
+                currentFormationType = newFormationType;
+            }
+
+            updateFormationDisplay();
+            updateBenchPlayers();
+        });
+
+        // Add this new event handler for the formation type dropdown
+        document.getElementById('formationTypeSelector').addEventListener('change', function(e) {
+            currentFormationType = e.target.value;
+            updateFormationDisplay();
+            updateBenchPlayers();
         });
 
         // Handle bench position filter dropdown changes
@@ -1178,6 +1870,17 @@
         function handleDragStart(e) {
             const playerId = e.target.getAttribute('data-player-id');
             e.dataTransfer.setData('text/plain', playerId);
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        // Handle drag start from assigned position back to bench
+        function handlePlayerDragStart(e) {
+            const playerId = e.target.getAttribute('data-player-id');
+            const positionDiv = e.target.closest('.formation-position');
+            const positionId = positionDiv.getAttribute('data-position-id');
+    
+            e.dataTransfer.setData('text/plain', playerId);
+            e.dataTransfer.setData('source-position', positionId);
             e.dataTransfer.effectAllowed = 'move';
         }
 
@@ -1217,6 +1920,7 @@
             updateFormationDisplay();
             updateBenchPlayers();
             updateStartersHiddenFields();
+            updateLineupsData();
         }
 
         // ===== TAB 4: TRADES FUNCTIONS =====
@@ -1522,6 +2226,9 @@
                 return false;
             }
 
+            saveCurrentStartersToCategory();
+            updateLineupsHiddenFields();
+
             // Update hidden fields one final time
             updateRosterPlayersHiddenFields();
             updateStartersHiddenFields();
@@ -1533,17 +2240,11 @@
 
         // Initialize the complete roster interface
         function initialize() {
-            initializeRosterPlayers();
-            populateFranchisesList();
+            initializeRosterFromServerData();
             updateSalaryCapDisplay();
-            
-            // Auto-select first franchise if none selected
-            if (!currentFranchiseId) {
-                selectFranchise(1);
-            }
+            loadLineups();
         }
 
-        // Start the application
         initialize();
     });
 </script>
@@ -1580,14 +2281,32 @@
                 background-color: rgba(108, 117, 125, 0.08);
             }
 
-            .player-card.protected .player-title,
-            .player-card.protected .player-details,
-            .player-card.protected .player-salary,
-            .player-card.protected .player-cap {
-                color: #6c757d;
+
+        .player-card.traded {
+            opacity: 0.7;
+            cursor: not-allowed;
+			background-color: #ffeaa7;
+			border: 1px solid #fdcb6e;
+        }
+
+            .player-card.traded:hover {
+				transform: none;
+				box-shadow: none;
+				background-color: #ffeaa7;
             }
 
-    /* Fixed overlay positioning - bottom right corner */
+		        .player-card.protected .player-title,
+		        .player-card.protected .player-details,
+		        .player-card.protected .player-salary,
+		        .player-card.protected .player-cap,
+                .player-card.traded .player-title,
+                .player-card.traded .player-details,
+                .player-card.traded .player-salary,
+                .player-card.traded .player-cap {
+			        color: #6c757d;
+		        }
+
+	/* Fixed overlay positioning - bottom right corner */
     .selected-overlay {
         position: absolute;
         bottom: 8px;
@@ -1606,7 +2325,7 @@
     }
 
     /* Protected overlay - top right corner */
-    .protected-overlay {
+    .unlselectable-overlay {
         position: absolute;
         top: 8px;
         right: 8px;
@@ -1772,5 +2491,14 @@
         height: 3px;
         background: #ffc107;
         box-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+    }
+
+    /* Field lines when showing defense formation */
+    .football-field.defense .FirstDown-YardLine {
+        top: 65%;
+    }
+
+    .football-field.defense .scrimmage-line {
+        top: 85%;
     }
 </style>

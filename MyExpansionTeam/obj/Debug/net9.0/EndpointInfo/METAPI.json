@@ -643,6 +643,60 @@
         "type": "integer",
         "format": "int32"
       },
+      "LineupDto": {
+        "type": "object",
+        "properties": {
+          "formation": {
+            "type": "string",
+            "nullable": true
+          },
+          "player1": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player2": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player3": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player4": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player5": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player6": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player7": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player8": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player9": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player10": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player11": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "LogInDto": {
         "type": "object",
         "properties": {
@@ -691,6 +745,28 @@
         },
         "additionalProperties": false
       },
+      "PlayerBasicDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
+          "apy": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "RoleEnum": {
         "enum": [
           0,
@@ -700,7 +776,7 @@
         "type": "integer",
         "format": "int32"
       },
-      "SelectableDto": {
+      "RosteredDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -708,6 +784,14 @@
             "format": "int32"
           },
           "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
+          "apy": {
             "type": "string",
             "nullable": true
           },
@@ -723,11 +807,78 @@
             "type": "string",
             "nullable": true
           },
+          "defaultProtected": {
+            "type": "boolean"
+          },
+          "pureAPY": {
+            "type": "string",
+            "nullable": true
+          },
+          "franchiseId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SPLineupDto": {
+        "type": "object",
+        "properties": {
+          "formation": {
+            "type": "string",
+            "nullable": true
+          },
+          "player1": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player2": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player3": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player4": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "player5": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SelectableDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
           "position": {
             "type": "string",
             "nullable": true
           },
           "apy": {
+            "type": "string",
+            "nullable": true
+          },
+          "height": {
+            "type": "string",
+            "nullable": true
+          },
+          "weight": {
+            "type": "string",
+            "nullable": true
+          },
+          "age": {
             "type": "string",
             "nullable": true
           },
@@ -860,11 +1011,42 @@
             },
             "nullable": true
           },
-          "playersIds": {
+          "players": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosteredDto"
+            },
+            "nullable": true
+          },
+          "offLineup": {
+            "$ref": "#/components/schemas/LineupDto"
+          },
+          "defLineup": {
+            "$ref": "#/components/schemas/LineupDto"
+          },
+          "spLineup": {
+            "$ref": "#/components/schemas/SPLineupDto"
+          },
+          "selectedIds": {
             "type": "array",
             "items": {
               "type": "integer",
               "format": "int32"
+            },
+            "nullable": true
+          },
+          "picks": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "tradedPlayers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerBasicDto"
             },
             "nullable": true
           }
