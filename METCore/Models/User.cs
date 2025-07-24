@@ -48,18 +48,6 @@ namespace METCore.Models
             this.Active = true;
             this.Role = RoleEnum.User;
         }
-
-        public User(string firstName, string lastName, string username, string password, string email, string? tlf, bool? active)
-        {
-            this.FirstName = firstName;
-            this.LastName = lastName;
-            this.Username = username;
-            this.Password = password;
-            this.Email = email;
-            this.Tlf = tlf;
-            this.Active = active ?? true;
-            this.Role = RoleEnum.User;
-        }
         #endregion
     }
 }

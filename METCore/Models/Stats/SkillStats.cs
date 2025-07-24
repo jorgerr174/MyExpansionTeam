@@ -28,16 +28,6 @@ namespace METCore.Models.Stats
 
         #region Constructors
         public PassStats() { }
-
-        public PassStats(int Yds, int Att, int TD, int Plus20, int Plus40, int Reach1st, int Lng, int Cmp, int INT, double PR, int Sck, int SckYds)
-            : base(Yds, Att, TD, Plus20, Plus40, Reach1st, Lng)
-        {
-            this.Cmp = Cmp;
-            this.INT = INT;
-            this.PR = PR;
-            this.Sck = Sck;
-            this.SckYds = SckYds;
-        }
         #endregion Constructors
     }
     #endregion PassStats
@@ -61,14 +51,6 @@ namespace METCore.Models.Stats
 
         #region Constructors
         public RecStats() { }
-
-        public RecStats(int Yds, int Att, int TD, int Plus20, int Plus40, int Reach1st, int Lng, int Rec, int Fmb, int YAC)
-            : base(Yds, Att, TD, Plus20, Plus40, Reach1st, Lng)
-        {
-            this.Rec = Rec;
-            this.Fmb = Fmb;
-            this.YAC = YAC;
-        }
         #endregion Constructors
     }
     #endregion RecStats
@@ -86,12 +68,6 @@ namespace METCore.Models.Stats
 
         #region Constructors
         public RushStats() { }
-
-        public RushStats(int Yds, int Att, int TD, int Plus20, int Plus40, int Reach1st, int Lng, int Fmb)
-            : base(Yds, Att, TD, Plus20, Plus40, Reach1st, Lng)
-        {
-            this.Fmb = Fmb;
-        }
         #endregion Constructors
     }
     #endregion RushStats
@@ -130,17 +106,6 @@ namespace METCore.Models.Stats
 
         #region Constructors
         public SkillStats() { }
-
-        public SkillStats(int Yds, int Att, int TD, int Plus20, int Plus40, int Reach1st, int Lng)
-        {
-            this.Yds = Yds;
-            this.Att = Att;
-            this.TD = TD;
-            this.Plus20 = Plus20;
-            this.Plus40 = Plus40;
-            this.Reach1st = Reach1st;
-            this.Lng = Lng;
-        }
         #endregion Constructors
     }
     #endregion SkillStats

@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using METCore.DTOs.Team;
 using METCore.Models.Players;
 
 namespace METCore.Models.Teams
@@ -24,7 +23,7 @@ namespace METCore.Models.Teams
         public RosterSettings? RosterSettings { get; set; }
 
         public virtual IList<int> PlayersIds { get; set; }
-        
+
         public virtual Lineup OffLineup { get; set; }
         public virtual Lineup DefLineup { get; set; }
         public virtual SPLineup SPLineup { get; set; }

@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using METCore.DTOs.Player;
 using METCore.DTOs.Shared;
 using METCore.DTOs.Team;
@@ -270,10 +269,12 @@ namespace WebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<Object> GetTradePartial(TradeDto dto)
+        public async Task<IActionResult> GetTradePartial(int TeamId, int FranchiseId)
         {
-            var response = await SendRequest(HttpMethod.Get, "Teams", "GetTradeDto", dto);
-            return response.IsSuccessStatusCode ? PartialView("Trade", await GetResult<TradeDto>(response)) : await GetResult<MessageDto>(response);
+            var response = await SendRequest(HttpMethod.Get, "Teams", "GetTradeDto", new TradeDto(TeamId, FranchiseId));
+            return response.IsSuccessStatusCode 
+                ? PartialView("Trade", await GetResult<TradeDto>(response)) 
+                : PartialView("TradeError", await GetResult<MessageDto>(response));
         }
 
         [HttpPost]

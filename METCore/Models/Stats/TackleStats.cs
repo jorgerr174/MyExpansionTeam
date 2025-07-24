@@ -22,14 +22,6 @@ namespace METCore.Models.Stats
 
         #region Constructors
         public TackleStats() { }
-
-        public TackleStats(int Comb, int Solo, int Asst, double Sck)
-        {
-            this.Comb = Comb;
-            this.Solo = Solo;
-            this.Asst = Asst;
-            this.Sck = Sck;
-        }
         #endregion Constructors
     }
 }

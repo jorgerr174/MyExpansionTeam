@@ -68,21 +68,6 @@ namespace METCore.Models.Players
             Stats = [];
             College = "";
         }
-
-
-        public Player(string Name, string College, PositionEnum Position, PositionEnum Position2, PositionEnum Position3,
-            IList<Contract>? Contracts, IList<SeasonStats>? Stats, Prospect? Prospect, bool? Retired)
-        {
-            this.Name = Name;
-            this.Position = Position;
-            this.Position2 = Position2;
-            this.Position3 = Position3;
-            this.Contracts = Contracts ?? [];
-            this.Stats = Stats ?? [];
-            this.Prospect = Prospect;
-            this.College = College;
-            this.Retired = Retired ?? false;
-        }
         #endregion
     }
 }
