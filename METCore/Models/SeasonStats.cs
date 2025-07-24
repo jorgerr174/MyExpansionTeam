@@ -33,26 +33,6 @@ namespace METCore.Models
         {
             this.Season = season;
         }
-
-        public SeasonStats(int Season, PassStats? PassStats, RecStats? RecStats, RushStats? RushStats,
-            TackleStats? TackleStats, IntStats? IntStats,
-            KOStats? KOStats, KRStats? KRStats, PuntStats? PuntStats, PRStats? PRStats, FGStats? FGStats)
-        {
-            this.Season = Season;
-
-            this.PassStats = PassStats;
-            this.RecStats = RecStats;
-            this.RushStats = RushStats;
-
-            this.TackleStats = TackleStats;
-            this.IntStats = IntStats;
-
-            this.KOStats = KOStats;
-            this.KRStats = KRStats;
-            this.PuntStats = PuntStats;
-            this.PRStats = PRStats;
-            this.FGStats = FGStats;
-        }
         #endregion Constructors
     }
 }

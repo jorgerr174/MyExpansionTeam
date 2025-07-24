@@ -267,7 +267,7 @@
 
         // NFL Franchises using enum values (1-32)
         const nflFranchises = {
-            1: { name: "Arizona Cardinals", abbreviation: "ARIZ" },
+            1: { name: "Arizona Cardinals", abbreviation: "ARI" },
             2: { name: "Atlanta Falcons", abbreviation: "ATL" },
             3: { name: "Baltimore Ravens", abbreviation: "BAL" },
             4: { name: "Buffalo Bills", abbreviation: "BUF" },
@@ -300,6 +300,122 @@
             31: { name: "Tennessee Titans", abbreviation: "TEN" },
             32: { name: "Washington Commanders", abbreviation: "WAS" }
         };
+
+        const ROUND_SIZES = { 1: 33, 2: 33, 3: 37, 4: 37, 5: 38, 6: 41, 7: 42 };
+
+        const ROUND_START_PICKS = { 1: 1, 2: 34, 3: 67, 4: 104, 5: 141, 6: 179, 7: 220 };
+
+        // Convert rpp format (r1p1 -> 101) to overall pick number
+        function rppToOverall(rppNumber) {
+            const round = Math.floor(rppNumber / 100);
+            const pickInRound = rppNumber % 100;
+
+            if (!ROUND_START_PICKS[round]) {
+                console.error(`Invalid round: ${round}`);
+                return 0;
+            }
+
+            return ROUND_START_PICKS[round] + pickInRound - 1;
+        }
+
+        // Convert overall pick number to round number
+        function overallToRound(overallPick) {
+            return overallPick < 1
+                ? 0 : overallPick <= 33
+                ? 1 : overallPick <= 66
+                ? 2 : overallPick <= 103
+                ? 3 : overallPick <= 140
+                ? 4 : overallPick <= 178
+                ? 5 : overallPick <= 219
+                ? 6 : overallPick <= 261
+                ? 7 : 0;
+        }
+
+        function overallToPickInRound(overallPick) {
+            const round = overallToRound(overallPick);
+            if (round === 0) return 0;
+    
+            return overallPick - ROUND_START_PICKS[round] + 1;
+        }
+
+        function parsePickToOverall(pickString) {
+            const match = pickString.match(/r(\d+)p(\d+)/);
+            if (match) {
+                const round = parseInt(match[1]);
+                const pick = parseInt(match[2]);
+                const rppNumber = (round * 100) + pick;
+                return rppToOverall(rppNumber);
+            }
+            return 0;
+        }
+
+        function displayDraftResults(prospects, selections) {
+            const draftDisplay = document.getElementById('draftResultsDisplay');
+    
+            if (!prospects || prospects.length === 0) {
+                draftDisplay.innerHTML = `
+                    <div class="text-center text-muted p-5">
+                        <i class="fas fa-trophy fa-2x mb-3"></i>
+                        <p>No draft completed yet.</p>
+                        <p><small class="text-muted">Complete the roster building process and proceed to the draft.</small></p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Create a map of player ID to pick number from selections
+            const pickMap = {};
+            if (selections && selections.length > 0) {
+                selections.forEach(selection => {
+                    if (selection.playerId && selection.pick) {
+                        pickMap[selection.playerId] = selection.pick;
+                    }
+                });
+            }
+
+            let draftHtml = '<div class="row">';
+            prospects.forEach((prospect, index) => {
+                // Get the actual pick number from selections, or use index + 1 as fallback
+                const draftPick = pickMap[prospect.id] || (index + 1);
+                const round = overallToRound(draftPick); // FIXED: Use correct round calculation
+                const pickInRound = overallToPickInRound(draftPick); // Get pick in round
+            
+                draftHtml += `
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0">Pick #${draftPick}</h6>
+                                <small>Round ${round}, Pick ${pickInRound}</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">${prospect.name || prospect.player || 'Unknown Player'}</h6>
+                                        <small class="text-muted">${prospect.position || 'N/A'} - ${prospect.college || 'N/A'}</small>
+                                    </div>
+                                </div>
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <small class="text-muted">Height</small>
+                                        <div>${prospect.height || 0}"</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted">Weight</small>
+                                        <div>${prospect.weight || 0} lbs</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted">Score</small>
+                                        <div>${prospect.athScore || 0}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            draftHtml += '</div>';
+            draftDisplay.innerHTML = draftHtml;
+        }
 
         // Initialize page
         initializeSelections();
@@ -362,7 +478,14 @@
         // Setup event handlers
         function setupEventHandlers() {
             // Settings event handlers
-            document.getElementById('Rounds').addEventListener('change', updateDraftPreview);
+            document.getElementById('Rounds').addEventListener('change', function() {
+                updateDraftPreview();
+
+                // If draft is active, refresh the display
+                if (isDraftActive) {
+                    displayDraftOrder();
+                }
+            });
             document.getElementById('Speed').addEventListener('change', updateDraftPreview);
 
             document.querySelectorAll('input[name="draftMethod"]').forEach(radio => {
@@ -394,15 +517,16 @@
 
         // Display team picks information
         function displayTeamPicksInfo() {
-            if (allPicksData.length > 0 && allPicksData[0]) {
-                const teamPicks = allPicksData[0]; // Index 0 is for the team
-                document.getElementById('teamPicksCount').textContent = `${teamPicks.length} picks`;
-                
+            const teamPicks = allPicksData[0] || []; // Team picks are at index 0
+
+            if (teamPicks && teamPicks.length > 0) {
+                document.getElementById('teamPicksCount').textContent = teamPicks.length;
+
                 if (teamPicks.length > 0) {
                     const nextPickRpp = teamPicks[0]; // rpp format
                     const round = Math.floor(nextPickRpp / 100);
                     const pickInRound = nextPickRpp % 100;
-                    const overallPick = ((round - 1) * 32) + pickInRound;
+                    const overallPick = rppToOverall(nextPickRpp); // FIXED: Use correct conversion
                     document.getElementById('nextPickInfo').textContent = `Round ${round}, Pick ${pickInRound} (Overall #${overallPick})`;
                 } else {
                     document.getElementById('nextPickInfo').textContent = 'No picks available';
@@ -476,7 +600,7 @@
         function updateDraftPreview() {
             manualRounds = parseInt(document.getElementById('Rounds').value) || 0;
             simulationSpeed = document.getElementById('Speed').value || 'normal';
-            
+
             let manualDescription = '';
             if (draftMethod === 'full') {
                 manualDescription = 'Full simulation - watch the entire draft';
@@ -490,6 +614,11 @@
 
             document.getElementById('manualDescription').textContent = manualDescription;
             document.getElementById('tradingStatus').textContent = enableTrading ? 'Enabled' : 'Disabled';
+
+            // Update the draft order display if we're already in draft mode
+            if (isDraftActive && draftOrder.length > 0) {
+                displayDraftOrder();
+            }
         }
 
         // Validate settings
@@ -549,10 +678,10 @@
         // Load draft order from picks data
         function loadDraftOrderFromPicksData() {
             draftOrder = [];
-            
+
             // Create a map of all picks to see the order
             const allPicks = [];
-            
+
             // Add all picks from all entities (team + 32 franchises)
             for (let i = 0; i < allPicksData.length; i++) {
                 if (allPicksData[i] && allPicksData[i].length > 0) {
@@ -560,8 +689,8 @@
                         // Convert rpp format to overall pick number
                         const round = Math.floor(pickNum / 100);
                         const pickInRound = pickNum % 100;
-                        const overallPick = ((round - 1) * 32) + pickInRound;
-                        
+                        const overallPick = rppToOverall(pickNum); // FIXED: Use correct conversion
+
                         allPicks.push({
                             pickNumber: overallPick,
                             rppNumber: pickNum, // Keep original rpp format
@@ -574,10 +703,10 @@
                     });
                 }
             }
-            
+
             // Sort by overall pick number
             allPicks.sort((a, b) => a.pickNumber - b.pickNumber);
-            
+
             // Create draft order
             allPicks.forEach(pick => {
                 let teamName, teamAbbr;
@@ -622,10 +751,19 @@
             const container = document.getElementById('draftOrderList');
             container.innerHTML = '';
 
-            draftOrder.forEach((pick, index) => {
+            // Filter picks to only show those in the selected number of rounds
+            const filteredPicks = draftOrder.filter(pick => {
+                const pickRound = overallToRound(pick.overall);
+                return pickRound <= manualRounds || manualRounds === 0; // Show all if manualRounds is 0
+            });
+
+            filteredPicks.forEach((pick, index) => {
+                // Find the actual index in the full draftOrder array
+                const actualIndex = draftOrder.findIndex(p => p.overall === pick.overall);
+
                 const pickDiv = document.createElement('div');
-                pickDiv.className = `draft-pick-item p-3 border-bottom ${index === currentPickIndex ? 'bg-primary text-white' : ''} ${pick.isUserControlled ? 'border-start border-warning border-3' : ''}`;
-                pickDiv.id = `pick-${index}`;
+                pickDiv.className = `draft-pick-item p-3 border-bottom ${actualIndex === currentPickIndex ? 'bg-primary text-white' : ''} ${pick.isUserControlled ? 'border-start border-warning border-3' : ''}`;
+                pickDiv.id = `pick-${actualIndex}`;
 
                 const isSelected = pick.selectedPlayer !== null;
                 const playerName = isSelected ? pick.selectedPlayer.name : '';
@@ -639,8 +777,8 @@
                             ${pick.isUserControlled ? '<br><span class="badge bg-warning text-dark">Your Control</span>' : ''}
                         </div>
                         <div class="text-end">
-                            ${isSelected ? `<strong>${playerName}</strong><br><small>${playerPosition}</small>` : 
-                              index === currentPickIndex ? '<span class="badge bg-light text-dark">On the Clock</span>' : ''}
+                            ${isSelected ? `<strong>${playerName}</strong><br><small>${playerPosition}</small>` :
+                              actualIndex === currentPickIndex ? '<span class="badge bg-light text-dark">On the Clock</span>' : ''}
                         </div>
                     </div>
                 `;
@@ -662,45 +800,120 @@
             // Filter players by position
             let filteredPlayers = availablePlayersData;
             if (currentPositionFilter !== 'all') {
-                filteredPlayers = availablePlayersData.filter(player => 
+                filteredPlayers = availablePlayersData.filter(player =>
                     player.position === currentPositionFilter
                 );
             }
 
+            if (filteredPlayers.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center p-4">
+                        <p class="text-muted">No players available for ${currentPositionFilter} position.</p>
+                    </div>
+                `;
+                return;
+            }
+
             filteredPlayers.forEach(player => {
                 const playerDiv = document.createElement('div');
-                playerDiv.className = 'player-item p-3 border-bottom cursor-pointer';
-                playerDiv.addEventListener('click', () => selectPlayer(player));
+                playerDiv.className = 'col-12 mb-2';
 
-                playerDiv.innerHTML = `
-                    <div class="row align-items-center">
-                        <div class="col-md-6">
-                            <strong>${player.name}</strong>
-                            <br><small class="text-muted">${player.college || 'N/A'}</small>
-                        </div>
-                        <div class="col-md-2 text-center">
-                            <span class="badge bg-secondary">${player.position}</span>
-                        </div>
-                        <div class="col-md-2 text-center">
-                            <small>${player.height || 'N/A'}" / ${player.weight || 'N/A'} lbs</small>
-                        </div>
-                        <div class="col-md-2 text-center">
-                            <span class="badge bg-primary">${player.athScore || 0}</span>
-                            <br><small class="text-muted">Score</small>
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'card player-card';
+                cardDiv.setAttribute('data-player-id', player.id);
+
+                // Add selectable styling if user can pick
+                if (isUserControlled) {
+                    cardDiv.classList.add('selectable');
+                    cardDiv.style.cursor = 'pointer';
+                    cardDiv.title = 'Click to draft this player';
+                } else {
+                    cardDiv.style.cursor = 'not-allowed';
+                    cardDiv.style.opacity = '0.6';
+                }
+
+                // Format height from inches to feet'inches
+                const heightFeet = Math.floor((player.height || 0) / 12);
+                const heightInches = (player.height || 0) % 12;
+                const heightDisplay = `${heightFeet}'${heightInches}"`;
+
+                cardDiv.innerHTML = `
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="player-header">
+                                    <h6 class="player-title mb-1">${player.name || 'Unknown'}</h6>
+                                    <div class="player-basic-info mb-2">
+                                        <span class="badge bg-primary me-2">${player.position || 'N/A'}</span>
+                                        <span class="text-muted">${player.college || 'Unknown College'}</span>
+                                        <span class="text-muted mx-2">|</span>
+                                        <span class="text-muted">${player.year || 'N/A'} Year</span>
+                                    </div>
+                                    <div class="player-physical mb-2">
+                                        <small class="text-muted">
+                                            <strong>Physical:</strong> ${heightDisplay} | ${player.weight || 0} lbs
+                                            ${player.handSize ? ` | Hands: ${player.handSize}"` : ''}
+                                            ${player.armLength ? ` | Arms: ${player.armLength}"` : ''}
+                                            ${player.wingspan ? ` | Wingspan: ${player.wingspan}"` : ''}
+                                        </small>
+                                    </div>
+                                    <div class="player-combine">
+                                        <small class="text-info">
+                                            <strong>Combine:</strong>
+                                            ${player.fortyYardDash ? ` 40yd: ${player.fortyYardDash}` : ''}
+                                            ${player.vertJump ? ` | Vert: ${player.vertJump}"` : ''}
+                                            ${player.broadJump ? ` | Broad: ${player.broadJump}"` : ''}
+                                            ${player.benchPress ? ` | Bench: ${player.benchPress}` : ''}
+                                            ${player.threeConeDrill ? ` | 3-Cone: ${player.threeConeDrill}` : ''}
+                                            ${player.twentyYardShuttle ? ` | 20yd: ${player.twentyYardShuttle}` : ''}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="player-scores">
+                                    <div class="mb-2">
+                                        <span class="badge bg-success fs-6">Ath: ${player.athScore || 0}</span>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-warning text-dark">Consensus: ${player.consensus || 0}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
 
+                // Add click handler for player selection
+                cardDiv.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    console.log('Player clicked:', player.id, 'User controlled:', isUserControlled);
+
+                    if (isUserControlled) {
+                        selectPlayer(player);
+                    } else {
+                        console.log('Click ignored - not user controlled pick');
+                    }
+                });
+
+                // Add hover effects for better UX
+                cardDiv.addEventListener('mouseenter', function() {
+                    if (isUserControlled) {
+                        this.classList.add('bg-light');
+                    }
+                });
+
+                cardDiv.addEventListener('mouseleave', function() {
+                    this.classList.remove('bg-light');
+                });
+
+                playerDiv.appendChild(cardDiv);
                 container.appendChild(playerDiv);
             });
-
-            // Add hover effects
-            container.querySelectorAll('.player-item').forEach(item => {
-                item.addEventListener('mouseenter', () => item.classList.add('bg-light'));
-                item.addEventListener('mouseleave', () => item.classList.remove('bg-light'));
-            });
         }
-
+    
         // Process current draft pick
         function processDraftPick() {
             if (currentPickIndex >= draftOrder.length) {
@@ -710,10 +923,11 @@
             }
 
             const currentPick = draftOrder[currentPickIndex];
-            
+            const currentPickRound = overallToRound(currentPick.overall);
+
             // Update current pick display
             document.getElementById('current-pick').textContent = `Pick ${currentPick.overall}`;
-            
+
             // Show current pick info
             const pickInfo = document.getElementById('currentPickInfo');
             pickInfo.style.display = 'block';
@@ -723,14 +937,15 @@
                 ${currentPick.isUserControlled ? '<br><span class="badge bg-warning text-dark">Your Turn!</span>' : ''}
             `;
 
-            // Scroll to current pick in draft order
+            // Scroll to current pick in draft order (only if it's visible in filtered list)
             const pickElement = document.getElementById(`pick-${currentPickIndex}`);
             if (pickElement) {
                 pickElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
 
-            if (currentPick.isUserControlled && manualRounds >= currentPick.round) {
-                // User needs to make this pick
+            // Determine if user should control this pick
+            if (currentPick.isUserControlled && currentPickRound <= manualRounds) {
+                // User needs to make this pick (within manual rounds)
                 isUserControlled = true;
                 enablePlayerSelection();
             } else {
@@ -743,19 +958,21 @@
 
         // Enable player selection for user
         function enablePlayerSelection() {
-            const playerItems = document.querySelectorAll('.player-item');
-            playerItems.forEach(item => {
-                item.style.cursor = 'pointer';
-                item.style.opacity = '1';
+            const playerCards = document.querySelectorAll('.player-card');
+            playerCards.forEach(card => {
+                card.style.cursor = 'pointer';
+                card.style.opacity = '1';
+                card.title = 'Click to draft this player';
             });
         }
 
         // Disable player selection
         function disablePlayerSelection() {
-            const playerItems = document.querySelectorAll('.player-item');
-            playerItems.forEach(item => {
-                item.style.cursor = 'not-allowed';
-                item.style.opacity = '0.6';
+            const playerCards = document.querySelectorAll('.player-card');
+            playerCards.forEach(card => {
+                card.style.cursor = 'not-allowed';
+                card.style.opacity = '0.6';
+                card.title = 'Cannot select - not your turn';
             });
         }
 
@@ -803,48 +1020,77 @@
                 </div>
             `;
 
-            const delays = { 'instant': 100, 'fast': 500, 'normal': 1000, 'slow': 2000 };
+            // Determine speed based on whether we're past the manual rounds
+            const currentPickRound = overallToRound(draftOrder[currentPickIndex].overall);
+            let actualSpeed = simulationSpeed;
+
+            // If we're past the manual rounds, use instant speed
+            if (currentPickRound > manualRounds && manualRounds > 0) {
+                actualSpeed = 'instant';
+            }
+
+            const delays = { 'instant': 10, 'fast': 500, 'normal': 1000, 'slow': 2000 };
             setTimeout(() => {
                 makeLocalAIPick();
-            }, delays[simulationSpeed] || 1000);
+            }, delays[actualSpeed] || 1000);
         }
 
         // Make AI pick locally
         function makeLocalAIPick() {
             const currentPick = draftOrder[currentPickIndex];
             const neededPositions = currentPick.neededPositions || [];
-            
+
             let selectedPlayer = null;
-            
+
             // First try to fill needed positions
             if (neededPositions.length > 0) {
+                let positionPlayers = [];
                 for (let position of neededPositions) {
-                    selectedPlayer = availablePlayersData.find(p => p.position === position);
-                    if (selectedPlayer) break;
+                    const playersAtPosition = availablePlayersData.filter(p => p.position === position);
+                    positionPlayers = positionPlayers.concat(playersAtPosition);
+                }
+
+                if (positionPlayers.length > 0) {
+                    // Among position players, pick the one with lowest consensus (best ranking)
+                    selectedPlayer = positionPlayers.reduce((prev, current) => {
+                        // Handle cases where consensus might be 0 or undefined
+                        const prevConsensus = prev.consensus || 999;
+                        const currentConsensus = current.consensus || 999;
+                        return (prevConsensus < currentConsensus) ? prev : current;
+                    });
                 }
             }
-            
-            // If no needed position player found, pick best available
+
+            // If no needed position player found, pick best available by consensus
             if (!selectedPlayer && availablePlayersData.length > 0) {
-                selectedPlayer = availablePlayersData.reduce((prev, current) =>
-                    (prev.athScore > current.athScore) ? prev : current
-                );
+                selectedPlayer = availablePlayersData.reduce((prev, current) => {
+                    // Lower consensus number = better pick (1st is better than 20th)
+                    const prevConsensus = prev.consensus || 999;
+                    const currentConsensus = current.consensus || 999;
+
+                    // If consensus is the same, fall back to athScore as tiebreaker
+                    if (prevConsensus === currentConsensus) {
+                        return (prev.athScore > current.athScore) ? prev : current;
+                    }
+
+                    return (prevConsensus < currentConsensus) ? prev : current;
+                });
             }
 
             if (selectedPlayer) {
                 // Record the selection
                 currentPick.selectedPlayer = selectedPlayer;
-                
+
                 // Remove player from available list
                 availablePlayersData = availablePlayersData.filter(p => p.id !== selectedPlayer.id);
 
                 // Move to next pick
                 currentPickIndex++;
-                
+
                 // Update displays
                 displayDraftOrder();
                 displayAvailablePlayers();
-                
+
                 // Process next pick
                 processDraftPick();
             } else {
@@ -887,30 +1133,25 @@
         transition: all 0.3s ease;
     }
     
-    .draft-pick-item:hover {
-        background-color: #f8f9fa !important;
-    }
+        .draft-pick-item:hover {
+            background-color: #f8f9fa !important;
+        }
     
     .player-item {
         transition: all 0.3s ease;
         border-left: 3px solid transparent;
     }
     
-    .player-item:hover {
-        border-left-color: #007bff;
-        cursor: pointer;
-    }
+        .player-item:hover {
+            border-left-color: #007bff;
+            cursor: pointer;
+        }
     
     .draft-order-container {
         border: 1px solid #dee2e6;
         border-radius: 0.375rem;
     }
-    
-    .players-container {
-        border: 1px solid #dee2e6;
-        border-radius: 0.375rem;
-    }
-    
+        
     .cursor-pointer {
         cursor: pointer;
     }
@@ -929,5 +1170,89 @@
         .players-container {
             max-height: 400px;
         }
+    }
+
+    /* Player card styles for draft view */
+    .player-card {
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+
+        .player-card.selectable:hover {
+            border-left-color: #007bff;
+            box-shadow: 0 4px 8px rgba(0,123,255,0.1);
+            transform: translateY(-1px);
+        }
+
+        .player-card:not(.selectable) {
+            background-color: #f8f9fa;
+        }
+
+    .player-title {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .player-basic-info .badge {
+        font-size: 0.75rem;
+    }
+
+    .player-physical,
+    .player-combine {
+        font-size: 0.85rem;
+    }
+
+    .player-scores {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+        .player-scores .badge {
+            min-width: 80px;
+            padding: 0.5rem 0.75rem;
+        }
+
+    /* Responsive adjustments */
+    media (max-width: 768px) {
+        .player-card .col-md-8, .player-card .col-md-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .player-card .col-md-4 {
+            margin-top: 1rem;
+            text-align: left !important;
+        }
+
+        .player-scores {
+            flex-direction: row;
+            justify-content: flex-start;
+        }
+    }
+
+    /* Enhanced hover states */
+    .player-card.selectable {
+        cursor: pointer;
+    }
+
+        .player-card.selectable:hover .player-title {
+            color: #007bff;
+        }
+
+    /* Loading and empty states */
+    .text-center .spinner-border {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    /* Position filter integration */
+    .players-container {
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+    }
+
+    .player-card:last-child {
+        margin-bottom: 0 !important;
     }
 </style>

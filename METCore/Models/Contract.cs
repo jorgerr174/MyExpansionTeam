@@ -36,15 +36,6 @@ namespace METCore.Models
 
         #region Constructors
         public Contract() { }
-
-        public Contract(int YearSigned, int Length, long Total, long Guaranteed, bool Active)
-        {
-            this.YearSigned = YearSigned;
-            this.Length = Length;
-            this.Total = Total;
-            this.Guaranteed = Guaranteed;
-            this.Active = Active;
-        }
         #endregion
     }
 }

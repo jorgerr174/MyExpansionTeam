@@ -2030,38 +2030,142 @@
 
         // Show trade modal for creating new trade offers
         function openTradeModal() {
+            showFranchiseSelectionModal();
+        }
+
+        function showFranchiseSelectionModal() {
             const modalContainer = document.getElementById('tradeModalContainer');
             modalContainer.innerHTML = `
-                <div class="modal fade" id="tradeModal" tabindex="-1" aria-labelledby="tradeModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
+                <div class="modal fade" id="tradeModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="tradeModalLabel">Trade Feature</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <h5 class="modal-title">Select Franchise to Trade With</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
-                                <div class="alert alert-info">
-                                    <h6><i class="fas fa-info-circle me-2"></i>Feature Coming Soon</h6>
-                                    <p>The trade functionality will be implemented to allow you to:</p>
-                                    <ul class="mb-0">
-                                        <li>Propose trades with other teams</li>
-                                        <li>Exchange players and draft picks</li>
-                                        <li>View trade value calculations</li>
-                                        <li>Review trade history</li>
-                                    </ul>
+                                <div class="row" id="franchiseGrid">
+                                    <!-- Franchises will be loaded here -->
                                 </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
                 </div>
             `;
-            
-            // Show modal
+    
             const modal = new bootstrap.Modal(document.getElementById('tradeModal'));
             modal.show();
+    
+            loadFranchiseList();
+        }
+
+        function selectFranchiseForTrade(franchiseId) {
+            document.getElementById('tradeModal').querySelector('.modal-body').innerHTML = `
+                <div class="text-center p-4">
+                    <div class="spinner-border text-warning mb-3"></div>
+                    <p>Saving current roster...</p>
+                </div>
+            `;
+
+            const formData = new FormData(document.getElementById('teamRosterForm'));
+
+            fetch(document.getElementById('teamRosterForm').action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to save roster');
+                }
+
+                // Update modal to show loading
+                document.getElementById('tradeModal').querySelector('.modal-body').innerHTML = `
+                    <div class="text-center p-4">
+                        <div class="spinner-border text-primary mb-3"></div>
+                        <p>Loading trade interface with ${franchiseNames[franchiseId].name}...</p>
+                    </div>
+                `;
+
+                var url = '/Team/GetTradePartial?TeamId=@Model.Id&FranchiseId='+franchiseId;
+                fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    // Replace modal content with trade view
+                    document.getElementById('tradeModal').querySelector('.modal-dialog').className = 'modal-dialog modal-fullscreen';
+                    document.getElementById('tradeModal').querySelector('.modal-content').innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('tradeModal').querySelector('.modal-body').innerHTML = `
+                        <div class="alert alert-danger">
+                            <h6>Error</h6>
+                            <p>${error.message}</p>
+                            <button class="btn btn-primary btn-sm" onclick="selectFranchiseForTrade(${franchiseId}, '${franchiseNames[franchiseId].name}')">Try Again</button>
+                        </div>
+                    `;
+                });
+            })
+            .catch(saveError => {
+                console.error('Save error:', saveError);
+                document.getElementById('tradeModal').querySelector('.modal-body').innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>Error saving roster</h6>
+                        <p>${saveError.message}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function loadFranchiseList() {
+            const franchiseGrid = document.getElementById('franchiseGrid');
+            franchiseGrid.innerHTML = '';
+    
+            // Object.entries(franchiseNames).forEach(([id, franchise]) => {
+            //     const fName = franchise.name.split(' ');
+            //     const isFNameShort = fName.length == 2;
+
+            //     const franchiseCard = document.createElement('div');
+            //     franchiseCard.className = 'col-md-2 mb-3';
+            //     franchiseCard.innerHTML = `
+            //         <div class="card franchise-card h-100" onclick="selectFranchiseForTrade(${id}, '${franchise.name}')">
+            //             <div class="card-body text-center">
+            //                 <h6><span style="white-space:nowrap;">${isFNameShort ? fName[0] : (fName[0]+' '+fName[1])}</span>
+            //                 <span>${isFNameShort ? fName[1] : fName[2]}</span></h6>
+            //                 <small class="text-muted">${franchise.abbreviation}</small>
+            //             </div>
+            //         </div>
+            //     `;
+            //     franchiseGrid.appendChild(franchiseCard);
+            // });
+
+            Object.entries(franchiseNames).forEach(([id, franchise]) => {
+                 const fName = franchise.name.split(' ');
+                 const isFNameShort = fName.length == 2;
+
+                const franchiseCard = document.createElement('div');
+                franchiseCard.className = 'col-xl-1-5 col-lg-3 col-md-4 col-sm-6 mb-3';
+                franchiseCard.innerHTML = `
+                    <div class="card franchise-card h-100">
+                        <div class="card-body text-center p-2">
+                            <h6 class="franchiseAbb">${franchise.abbreviation}</h6>
+                            <small><span style="white-space:nowrap;">${isFNameShort ? fName[0] : (fName[0]+' '+fName[1])}</span>
+                            <br/><span>${isFNameShort ? fName[1] : fName[2]}</span></small>
+                        </div>
+                    </div>
+                `;
+                franchiseCard.addEventListener('click', function() { selectFranchiseForTrade(id); });
+                franchiseGrid.appendChild(franchiseCard);
+            });
         }
 
         // ===== TAB 5: DRAFT RESULTS FUNCTIONS =====
@@ -2500,5 +2604,45 @@
 
     .football-field.defense .scrimmage-line {
         top: 85%;
+    }
+
+    .franchise-card {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .franchise-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-color: #007bff;
+        }
+
+    /* 8 per row on extra large screens */
+    media (min-width: 1000px) {
+        .col-xl-1-5 {
+            flex: 0 0 12.5%;
+            max-width: 12.5%;
+        }
+    }
+
+    .franchiseAbb {
+        font-size: 0.9rem;
+        line-height: 1.2;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Responsive font sizing */
+    media (max-width: 999px) {
+        .franchiseAbb {
+            font-size: 0.85rem;
+            white-space: normal;
+        }
+    }
+
+    .franchise-card .card-body {
+        padding: 0.75rem 0.5rem;
     }
 </style>

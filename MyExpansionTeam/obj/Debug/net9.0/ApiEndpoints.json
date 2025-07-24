@@ -156,7 +156,7 @@
     "ContainingType": "METAPI.Controllers.TeamsController",
     "Method": "GetTradeDto",
     "RelativePath": "api/Teams/GetTradeDto",
-    "HttpMethod": "PUT",
+    "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [

@@ -9,7 +9,7 @@ namespace METCore.DTOs.Team
         public int TeamId { get; set; }
         public int FranchiseId { get; set; }
         public bool Force { get; set; }
-        public double TeamCurrentCap { get; set; }
+        public decimal TeamCurrentCap { get; set; }
 
         public IList<SelectableDto> TeamPlayers { get; set; }
         public IList<int> TeamPicks { get; set; }
@@ -31,6 +31,18 @@ namespace METCore.DTOs.Team
             this.FranchisePlayers = [];
             this.FranchisePicks = [];
         }
+
+        public TradeDto(int TeamId, int FranchiseId)
+        {
+            this.TeamId = TeamId;
+            this.FranchiseId = FranchiseId;
+            this.Force = false;
+            this.TeamPlayers = [];
+            this.TeamPicks = [];
+            this.FranchisePlayers = [];
+            this.FranchisePicks = [];
+        }
+
 
         public TradeDto(int Id, int TeamId, int FranchiseId, bool? Force, int TeamCurrentCap, IList<SelectableDto> TeamPlayers, IList<int> TeamPicks, IList<SelectableDto> FranchisePlayers, IList<int> FranchisePicks)
         {

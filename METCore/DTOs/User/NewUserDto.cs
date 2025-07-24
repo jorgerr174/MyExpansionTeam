@@ -17,7 +17,7 @@
         public string? Tlf { get; set; }
 
 
-        public NewUserDto() 
+        public NewUserDto()
         {
             this.Username = string.Empty;
             this.Password = string.Empty;

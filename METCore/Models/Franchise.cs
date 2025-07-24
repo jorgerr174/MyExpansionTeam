@@ -9,18 +9,20 @@ namespace METCore.Models
         #region Attributes
         public virtual IList<Player> Players { get; set; }
 
-        public virtual Player Protected1 { get; set => this.SetProtected(true, value); }
+        public virtual Player Protected1 { get; set; }// => this.SetProtected(true, value); }
 
-        public virtual Player Protected2 { get; set => this.SetProtected(false, value); }
+        public virtual Player Protected2 { get; set; }// => this.SetProtected(false, value); }
 
-        public virtual Player Protected3 { get; set => this.SetProtected(null, value); }
+        public virtual Player Protected3 { get; set; }// => this.SetProtected(null, value); }
 
-        public void SetProtected(bool? flag, Player player)
-        {
-            this.Protected3 = flag.HasValue ? this.Protected2 : player;
-            this.Protected2 = !flag.HasValue ? this.Protected2 : !flag.Value ? player : this.Protected1;
-            this.Protected1 = (!flag.HasValue || !flag.Value) ? this.Protected1 : player;
-        }
+        /*
+                public void SetProtected(bool? flag, Player player)
+                {
+                    this.Protected3 = flag.HasValue ? this.Protected2 : player;
+                    this.Protected2 = !flag.HasValue ? this.Protected2 : !flag.Value ? player : this.Protected1;
+                    this.Protected1 = (!flag.HasValue || !flag.Value) ? this.Protected1 : player;
+                }
+        */
 
         [NotMapped]
         public virtual IList<Player> ProtectedPlayers => [this.Protected1, this.Protected2, this.Protected3];
@@ -40,11 +42,6 @@ namespace METCore.Models
         public Franchise() : base()
         {
             this.Players = [];
-        }
-
-        public Franchise(string Location, string Mascot, IList<Player>? Players) : base(Location, Mascot)
-        {
-            this.Players = Players ?? [];
         }
         #endregion Constructors
     }

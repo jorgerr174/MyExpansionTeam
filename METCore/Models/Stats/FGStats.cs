@@ -39,21 +39,6 @@ namespace METCore.Models.Stats
 
         #region Constructors
         public FGStats() { }
-
-        public FGStats(int ShMade, int ShAtt, int MidMade, int MidAtt, int LongMade, int LongAtt, int Blk, int Lng)
-        {
-            this.ShMade = ShMade;
-            this.ShAtt = ShAtt;
-
-            this.MidMade = MidMade;
-            this.MidAtt = MidAtt;
-
-            this.LongMade = LongMade;
-            this.LongAtt = LongAtt;
-
-            this.Blk = Blk;
-            this.Lng = Lng;
-        }
         #endregion Constructors
     }
 }
