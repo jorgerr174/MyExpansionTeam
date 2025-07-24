@@ -186,7 +186,7 @@ namespace METAPI.Controllers
         /// Error (No se guardaron los cambios en la BBDD).
         /// Nada (Todo bien).
         /// </returns>
-        [HttpPut("GetTradeDto")]
+        [HttpGet("GetTradeDto")]
         [Authorize]
         public async Task<IActionResult> GetTradeDto([FromBody] TradeDto dto)
         {

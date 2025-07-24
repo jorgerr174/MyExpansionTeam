@@ -19,15 +19,6 @@ namespace METCore.Models.Stats
 
         #region Constructors
         public KOStats() { }
-
-        public KOStats(int Kick, int Yds, int TB, int OOB, int Ret, int RetYds, int TD, int OnSide, int OnSideRec)
-            : base(Kick, Yds, TB, OOB, Ret, RetYds, TD)
-        {
-            {
-                this.OnSide = OnSide;
-                this.OnSideRec = OnSideRec;
-            }
-        }
         #endregion Constructors
     }
     #endregion KOStats
@@ -60,18 +51,6 @@ namespace METCore.Models.Stats
 
         #region Constructors
         public PuntStats() { }
-
-        public PuntStats(int Kick, int Yds, int TB, int OOB, int Ret, int RetYds, int TD, int Inside20, int Down, int FC, int Blk, int Lng)
-            : base(Kick, Yds, TB, OOB, Ret, RetYds, TD)
-        {
-            {
-                this.Inside20 = Inside20;
-                this.Down = Down;
-                this.FC = FC;
-                this.Down = Blk;
-                this.Down = Lng;
-            }
-        }
         #endregion Constructors
     }
     #endregion PuntStats
@@ -112,19 +91,6 @@ namespace METCore.Models.Stats
 
         #region Constructors
         public KickStats() { }
-
-        public KickStats(int Kick, int Yds, int TB, int OOB, int Ret, int RetYds, int TD)
-        {
-            {
-                this.Kick = Kick;
-                this.Yds = Yds;
-                this.TB = TB;
-                this.OOB = OOB;
-                this.Ret = Ret;
-                this.RetYds = RetYds;
-                this.TD = TD;
-            }
-        }
         #endregion Constructors
     }
     #endregion KickStats

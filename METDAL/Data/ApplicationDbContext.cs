@@ -1,11 +1,8 @@
-﻿using METCore.DTOs.Team;
-using METCore.Interfaces;
-using METCore.Models;
+﻿using METCore.Models;
 using METCore.Models.Players;
 using METCore.Models.Teams;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.VisualBasic;
 
 namespace METDAL.Data
 {
@@ -203,7 +200,7 @@ namespace METDAL.Data
                     new ValueComparer<SPLineup>(
                         (l1, l2) => CompareLineups(l1, l2),
                         l => GetLineupHashCode(l == null ? new Lineup() : new Lineup { Formation = l.Formation, Player1 = l.Player1, Player2 = l.Player2, Player3 = l.Player3, Player4 = l.Player4, Player5 = l.Player5 }),
-                        l => l == null ? new Lineup() : new SPLineup { Formation = l.Formation, Player1 = l.Player1, Player2 = l.Player2, Player3 = l.Player3, Player4 = l.Player4, Player5 = l.Player5 })); 
+                        l => l == null ? new Lineup() : new SPLineup { Formation = l.Formation, Player1 = l.Player1, Player2 = l.Player2, Player3 = l.Player3, Player4 = l.Player4, Player5 = l.Player5 }));
             #endregion Team
 
 
@@ -280,7 +277,7 @@ namespace METDAL.Data
             return $"[{spLineup.Formation},{{{playerList}}}]";
         }
 
-        private static T DeserializeLineup<T>(string lineupStr) 
+        private static T DeserializeLineup<T>(string lineupStr)
             where T : SPLineup, new()
         {
             if (string.IsNullOrEmpty(lineupStr)) return null;
@@ -294,7 +291,7 @@ namespace METDAL.Data
 
                 var formation = parts[0];
                 var playersStr = parts[1].Trim('{', '}');
-                var playerIds = 
+                var playerIds =
                     playersStr.Split(',')
                     .Where(s => !string.IsNullOrEmpty(s))
                     .Select(s => int.TryParse(s, out var id) ? id : 0)
@@ -308,7 +305,7 @@ namespace METDAL.Data
                 if (playerIds.Length > 2) spLineup.Player3 = playerIds[2];
                 if (playerIds.Length > 3) spLineup.Player4 = playerIds[3];
                 if (playerIds.Length > 4) spLineup.Player5 = playerIds[4];
-                if (spLineup is Lineup lineup) 
+                if (spLineup is Lineup lineup)
                 {
                     if (playerIds.Length > 5) lineup.Player6 = playerIds[5];
                     if (playerIds.Length > 6) lineup.Player7 = playerIds[6];

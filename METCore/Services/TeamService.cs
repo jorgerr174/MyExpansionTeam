@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using AutoMapper;
+﻿using AutoMapper;
 using METCore.DTOs.Player;
 using METCore.DTOs.Team;
 using METCore.Interfaces;
 using METCore.Models;
-using METCore.Models.Players;
 using METCore.Models.Teams;
 using Microsoft.Extensions.Configuration;
 using static METCore.Enums.Types;
@@ -259,24 +256,23 @@ namespace METCore.Services
             User? user = await _userRepository.GetUserByUsername(username);
             if (user is null) return "Username";
 
-            if (dto.Id < 1) return "TeamId";
-            Team? team = await _teamRepository.GetTById(dto.Id);
+            if (dto.TeamId < 1) return "TeamId";
+            Team? team = await _teamRepository.GetTById(dto.TeamId);
             if (team is null) return "Team";
 
             if (user.Id != team.User.Id) return "User";
 
             Franchise? franchise = await _franchiseRepository.GetTById(dto.FranchiseId);
-            if (franchise is null) return "Franchise";
-
+            if (franchise is null) return "FranchiseId";
 
             dto.Force = false;
-            dto.TeamCurrentCap = team.CurrentCap;
 
-            dto.FranchisePlayers = _mapper.Map<IList<SelectableDto>>(team.Players);
-            dto.FranchisePicks = DraftPicks.Team;
+            dto.TeamPicks = DraftPicks.Team;
+            if ((team.PlayersIds?.Count ?? 0) > 0) dto.TeamPlayers = [.. _mapper.Map<IList<SelectableDto>>(await _playerRepository.GetManyTByIds(team.PlayersIds))];
+            dto.TeamCurrentCap = dto.TeamPlayers.Sum(tpl => decimal.Round(decimal.Parse(tpl.PureAPY.Replace('.', ',')), 2));
 
-            dto.TeamPlayers = _mapper.Map<IList<SelectableDto>>(franchise.Players);
             dto.FranchisePicks = DraftPicks.GetFranchisePicks(dto.FranchiseId);
+            dto.FranchisePlayers = _mapper.Map<IList<SelectableDto>>(franchise.Players);
 
             if (team.Trades is not null && team.Trades.Count > 0)
                 foreach (Trade trade in team.Trades.OrderBy(t => t.Id))

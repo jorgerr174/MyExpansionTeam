@@ -2,10 +2,16 @@
 
 namespace METCore.Models.Settings
 {
-    public class DraftSettings(bool[]? Selected)
+    public class DraftSettings
     {
         [Required]
         [Length(32, 32)]
-        public bool[] Selected { get; set; } = Selected ?? [];
+        public bool[] Selected { get; set; }
+
+
+        public DraftSettings(bool[]? Selected)
+        {
+            this.Selected = Selected ?? [];
+        }
     }
 }

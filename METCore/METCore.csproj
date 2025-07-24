@@ -8,13 +8,34 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Diagramas\**" />
-    <EmbeddedResource Remove="Diagramas\**" />
-    <None Remove="Diagramas\**" />
+    <Compile Remove="DTOs\Team\RosterSettingsDto.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="DTOs\Team\RosterSettingsDto.cs" />
+    <None Remove="Diagramas\DiagramaDeClases_Final.png" />
+    <None Remove="Diagramas\DiagramaDeClases_Inicial.png" />
+    <None Remove="Diagramas\DiagramaDePaquetes_ConCUs.png" />
+    <None Remove="Diagramas\DiagramaDePaquetes_ConRelaciones.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU001.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU002.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU003.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU004.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU005.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU006.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU007.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU008.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU009.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU010.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU011.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU012.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU013.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU014.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU015.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU016.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU017.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU018.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU019.png" />
+    <None Remove="Diagramas\DiagramaSecuencia_CU020.png" />
   </ItemGroup>
 
   <ItemGroup>

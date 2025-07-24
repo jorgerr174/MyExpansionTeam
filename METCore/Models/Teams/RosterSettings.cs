@@ -29,19 +29,6 @@ namespace METCore.Models.Teams
             ProtectedPerTeam = 3;
             ProtectedPlayersIds = [];
         }
-
-        public RosterSettings(decimal? Cap, int? MaxPerTeam, int? ProtectedPerTeam)
-        {
-            this.Cap = Cap;
-            this.MaxPerTeam = MaxPerTeam;
-            this.ProtectedPerTeam = ProtectedPerTeam;
-            ProtectedPlayersIds = [];
-        }
-
-        public RosterSettings(decimal? Cap, int? MaxPerTeam, int? ProtectedPerTeam, List<int> ProtectedPlayersIds) : this(Cap, MaxPerTeam, ProtectedPerTeam)
-        {
-            this.ProtectedPlayersIds = ProtectedPlayersIds;
-        }
         #endregion Constructors
     }
 }

@@ -27,12 +27,6 @@ namespace METCore.Models
             this.Location = "";
             this.Mascot = "";
         }
-
-        public Squad(string Location, string Mascot)
-        {
-            this.Location = Location;
-            this.Mascot = Mascot;
-        }
         #endregion
     }
 }
