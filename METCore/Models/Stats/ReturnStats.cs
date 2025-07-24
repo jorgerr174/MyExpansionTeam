@@ -16,8 +16,6 @@ namespace METCore.Models.Stats
 
         #region Constructors
         public KRStats() { }
-
-        public KRStats(int Ret, int Yds, int TD, int Plus20, int Plus40, int Lng, int FC, int Fmb) : base(Ret, Yds, TD, Plus20, Plus40, Lng, FC, Fmb) { }
         #endregion Constructors
     }
     #endregion KickReturn
@@ -36,8 +34,6 @@ namespace METCore.Models.Stats
 
         #region Constructors
         public PRStats() { }
-
-        public PRStats(int Ret, int Yds, int TD, int Plus20, int Plus40, int Lng, int FC, int Fmb) : base(Ret, Yds, TD, Plus20, Plus40, Lng, FC, Fmb) { }
         #endregion Constructors
     }
     #endregion PRStats
@@ -77,18 +73,6 @@ namespace METCore.Models.Stats
 
         #region Constructors
         public ReturnStats() { }
-
-        public ReturnStats(int Ret, int Yds, int TD, int Plus20, int Plus40, int Lng, int FC, int Fmb)
-        {
-            this.Ret = Ret;
-            this.Yds = Yds;
-            this.TD = TD;
-            this.Plus20 = Plus20;
-            this.Plus40 = Plus40;
-            this.Lng = Lng;
-            this.FC = FC;
-            this.Fmb = Fmb;
-        }
         #endregion Constructors
     }
     #endregion ReturnStats

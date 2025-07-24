@@ -45,25 +45,6 @@ namespace METCore.Models.Players
 
         #region Constructors
         public Prospect() : base() { }
-
-        public Prospect(int Id, int Year, int Consensus,
-            string? HandSize, string? ArmLength, string? Wingspan, string? FortyYardDash, string? BenchPress,
-            string? VertJump, string? BroadJump, string? ThreeConeDrill, string? TwentyYardShuttle, int AthScore)
-        {
-            this.Id = Id;
-            this.Year = Year;
-            this.Consensus = Consensus;
-            this.HandSize = HandSize;
-            this.ArmLength = ArmLength;
-            this.Wingspan = Wingspan;
-            this.FortyYardDash = FortyYardDash;
-            this.BenchPress = BenchPress;
-            this.VertJump = VertJump;
-            this.BroadJump = BroadJump;
-            this.ThreeConeDrill = ThreeConeDrill;
-            this.TwentyYardShuttle = TwentyYardShuttle;
-            this.AthScore = AthScore;
-        }
         #endregion Constructors
     }
 }

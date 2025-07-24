@@ -2,16 +2,8 @@
 
 <!-- Trade Modal Content -->
 <div class="container-fluid">
-    <!-- Step 1: Franchise Selection -->
-    <div id="franchiseSelectionStep" class="trade-step">
-        <h6 class="mb-3">Select Franchise to Trade With</h6>
-        <div class="row" id="franchiseGrid">
-            <!-- Franchises will be populated here -->
-        </div>
-    </div>
 
-    <!-- Step 2: Trade Builder -->
-    <div id="tradeBuilderStep" class="trade-step" style="display: none;">
+    <div id="tradeBuilderStep" class="trade-step">
         <!-- Hidden form for trade data -->
         <form id="tradeForm">
             @Html.HiddenFor(m => m.Id)
@@ -196,14 +188,14 @@
         let currentPickNumber = 0; // Current pick in draft to filter passed picks
 
         // Available items from model
-        let availableUserPicks = [];
-        let availableUserPlayers = @Html.Raw(Json.Serialize(Model.FranchisePlayers ?? []));
-        let availableFranchisePicks = [];
-        let availableFranchisePlayers = @Html.Raw(Json.Serialize(Model.TeamPlayers ?? []));
+        let teamPicks = [@Html.Raw(String.Join(", ", (Model.TeamPicks ?? []).Select(pick => $"\"r{pick / 100}p{pick % 100}\"")))];
+        let teamPlayers = @Html.Raw(Json.Serialize(Model.TeamPlayers ?? []));
+        let franchisePicks = [@Html.Raw(String.Join(", ", (Model.FranchisePicks ?? []).Select(pick => $"\"r{pick / 100}p{pick % 100}\"")))];
+        let franchisePlayers = @Html.Raw(Json.Serialize(Model.FranchisePlayers ?? []));
 
         // NFL Franchises
         const nflFranchises = {
-            1: { name: "Arizona Cardinals", abbreviation: "ARIZ" },
+            1: { name: "Arizona Cardinals", abbreviation: "ARI" },
             2: { name: "Atlanta Falcons", abbreviation: "ATL" },
             3: { name: "Baltimore Ravens", abbreviation: "BAL" },
             4: { name: "Buffalo Bills", abbreviation: "BUF" },
@@ -237,6 +229,9 @@
             32: { name: "Washington Commanders", abbreviation: "WAS" }
         };
 
+        selectedFranchiseName = nflFranchises[selectedFranchiseId]?.name || 'Unknown Franchise';
+        showTradeBuilder();
+
         // Parse pick string (e.g., "r3p25") to get overall pick number
         function parsePickToOverall(pickString) {
             const match = pickString.match(/r(\d+)p(\d+)/);
@@ -259,66 +254,6 @@
             return picks.filter(pickString => {
                 const overallPick = parsePickToOverall(pickString);
                 return overallPick > currentPickNumber;
-            });
-        }
-
-        // Initialize franchise selection
-        function initializeFranchiseSelection() {
-            currentPickNumber = getCurrentPickNumber();
-
-            // Parse picks from model (format: "r1p1->101,r3p25->325")
-            const userPicksString = '@string.Join(",", Model.FranchisePicks ?? new List<int>())';
-            const franchisePicksString = '@string.Join(",", Model.TeamPicks ?? new List<int>())';
-
-            if (userPicksString) {
-                const picks = userPicksString.split(',');
-                picks.forEach(pick => {
-                    const parts = pick.split('->');
-                    if (parts.length === 2) {
-                        availableUserPicks.push(parts[0].trim());
-                    }
-                });
-            }
-
-            if (franchisePicksString) {
-                const picks = franchisePicksString.split(',');
-                picks.forEach(pick => {
-                    const parts = pick.split('->');
-                    if (parts.length === 2) {
-                        availableFranchisePicks.push(parts[0].trim());
-                    }
-                });
-            }
-
-            // Filter out passed picks
-            availableUserPicks = filterPassedPicks(availableUserPicks);
-            availableFranchisePicks = filterPassedPicks(availableFranchisePicks);
-
-            // If franchise is already selected, skip to trade builder
-            if (selectedFranchiseId > 0) {
-                selectedFranchiseName = nflFranchises[selectedFranchiseId]?.name || 'Unknown Franchise';
-                showTradeBuilder();
-                return;
-            }
-
-            const container = document.getElementById('franchiseGrid');
-            container.innerHTML = '';
-
-            Object.entries(nflFranchises).forEach(([id, franchise]) => {
-                const franchiseId = parseInt(id);
-                const col = document.createElement('div');
-                col.className = 'col-md-3 col-sm-4 col-6 mb-2';
-
-                col.innerHTML = `
-                    <div class="card franchise-card" data-franchise-id="${franchiseId}" onclick="selectFranchise(${franchiseId}, '${franchise.name}')">
-                        <div class="card-body text-center p-2">
-                            <h6 class="mb-1">${franchise.name}</h6>
-                            <small class="text-muted">${franchise.abbreviation}</small>
-                        </div>
-                    </div>
-                `;
-
-                container.appendChild(col);
             });
         }
 
@@ -356,7 +291,6 @@
 
         // Show trade builder step
         function showTradeBuilder() {
-            document.getElementById('franchiseSelectionStep').style.display = 'none';
             document.getElementById('tradeBuilderStep').style.display = 'block';
             document.getElementById('selectedFranchiseName').textContent = selectedFranchiseName;
 
@@ -370,8 +304,8 @@
             const userPicksContainer = document.getElementById('userPicksList');
             userPicksContainer.innerHTML = '';
 
-            if (availableUserPicks.length > 0) {
-                availableUserPicks.forEach(pickString => {
+            if (teamPicks.length > 0) {
+                teamPicks.forEach(pickString => {
                     const pickDiv = createPickElement(pickString, 'user');
                     userPicksContainer.appendChild(pickDiv);
                 });
@@ -383,8 +317,8 @@
             const userPlayersContainer = document.getElementById('userPlayersList');
             userPlayersContainer.innerHTML = '';
 
-            if (availableUserPlayers.length > 0) {
-                availableUserPlayers.forEach(player => {
+            if (teamPlayers.length > 0) {
+                teamPlayers.forEach(player => {
                     const playerDiv = createPlayerElement(player, 'user');
                     userPlayersContainer.appendChild(playerDiv);
                 });
@@ -396,8 +330,8 @@
             const franchisePicksContainer = document.getElementById('franchisePicksList');
             franchisePicksContainer.innerHTML = '';
 
-            if (availableFranchisePicks.length > 0) {
-                availableFranchisePicks.forEach(pickString => {
+            if (franchisePicks.length > 0) {
+                franchisePicks.forEach(pickString => {
                     const pickDiv = createPickElement(pickString, 'franchise');
                     franchisePicksContainer.appendChild(pickDiv);
                 });
@@ -409,8 +343,8 @@
             const franchisePlayersContainer = document.getElementById('franchisePlayersList');
             franchisePlayersContainer.innerHTML = '';
 
-            if (availableFranchisePlayers.length > 0) {
-                availableFranchisePlayers.forEach(player => {
+            if (franchisePlayers.length > 0) {
+                franchisePlayers.forEach(player => {
                     const playerDiv = createPlayerElement(player, 'franchise');
                     franchisePlayersContainer.appendChild(playerDiv);
                 });
@@ -510,7 +444,7 @@
                 if (type === 'pick') {
                     userSelectedPicks.push(id);
                 } else {
-                    const player = availableUserPlayers.find(p => p.id == id);
+                    const player = teamPlayers.find(p => p.id == id);
                     if (player) userSelectedPlayers.push(player);
                 }
                 userTotalValue += value;
@@ -518,7 +452,7 @@
                 if (type === 'pick') {
                     franchiseSelectedPicks.push(id);
                 } else {
-                    const player = availableFranchisePlayers.find(p => p.id == id);
+                    const player = franchisePlayers.find(p => p.id == id);
                     if (player) franchiseSelectedPlayers.push(player);
                 }
                 franchiseTotalValue += value;
@@ -762,7 +696,6 @@
         // Go back to franchise selection
         window.goBackToFranchiseSelection = function() {
             document.getElementById('tradeBuilderStep').style.display = 'none';
-            document.getElementById('franchiseSelectionStep').style.display = 'block';
 
             // Reset selection
             selectedFranchiseId = 0;
@@ -795,9 +728,6 @@
             updateTradeEquality();
             updateHiddenFields();
         }
-
-        // Initialize the view
-        initializeFranchiseSelection();
     });
 </script>
 

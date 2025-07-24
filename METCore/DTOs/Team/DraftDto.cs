@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using METCore.DTOs.Player;
+using static METCore.Enums.Types;
 
 namespace METCore.DTOs.Team
 {
@@ -26,7 +27,7 @@ namespace METCore.DTOs.Team
         public DraftDto() : base()
         {
             this.Rounds = 3;
-            this.Picks = [];
+            this.Picks = DraftPicks.GetAllPicks();
             this.Prospects = [];
         }
 
@@ -36,7 +37,7 @@ namespace METCore.DTOs.Team
         {
             this.Rounds = Rounds ?? 3;
             this.Selections = Selections;
-            this.Picks = [];
+            this.Picks = DraftPicks.GetAllPicks();
             this.Prospects = [];
         }
         #endregion Constructors

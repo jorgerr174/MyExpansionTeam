@@ -24,14 +24,6 @@ namespace METCore.Models.Stats
 
         #region Constructors
         public IntStats() { }
-
-        public IntStats(int INT, int TD, int Yds, int Lng)
-        {
-            this.INT = INT;
-            this.TD = TD;
-            this.Yds = Yds;
-            this.Lng = Lng;
-        }
         #endregion Constructors
     }
 }
