@@ -1,11 +1,4 @@
 .vs/*
-/METCore/*.png
-/METCore/bin
-/METCore/obj
-/METDAL/bin
-/METDAL/obj
-/WebApp/bin
-/WebApp/obj
-/MyExpansionTeam/bin
-/MyExpansionTeam/obj
-*.png
+*/Diagramas/*.png
+*/bin/*
+*/obj/*
