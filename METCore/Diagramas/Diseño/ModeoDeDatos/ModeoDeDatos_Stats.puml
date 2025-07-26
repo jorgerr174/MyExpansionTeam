@@ -1,0 +1,179 @@
+@startuml METAPI_Database_ER_Diagram
+
+!define ENTITY_COLOR #E8F4FD
+!define WEAK_ENTITY_COLOR #FFF2CC
+!define STATS_COLOR #E1F5FE
+
+
+entity "Players" as players
+
+
+entity "SeasonStats" as season_stats {
+  * Id : int <<PK>>
+  --
+  Season : int
+  PlayerId : int <<FK>>
+  FGStatsId : int <<FK>>
+  KRStatsId : int <<FK>>
+  KOStatsId : int <<FK>>
+  IntStatsId : int <<FK>>
+  PRStatsId : int <<FK>>
+  TackleStatsId : int <<FK>>
+  PuntStatsId : int <<FK>>
+  PassStatsId : int <<FK>>
+  RushStatsId : int <<FK>>
+  RecStatsId : int <<FK>>
+}
+
+' Stats Entities
+entity "FGStats" as fg_stats <<STATS_COLOR>> {
+  * Id : int <<PK>>
+  --
+  ShMade : int
+  ShAtt : int
+  MidMade : int
+  MidAtt : int
+  LongMade : int
+  LongAtt : int
+  Blk : int
+  Lng : int
+}
+
+entity "IntStats" as int_stats <<STATS_COLOR>> {
+  * Id : int <<PK>>
+  --
+  INT : int
+  TD : int
+  Yds : int
+  Lng : int
+}
+
+entity "TackleStats" as tackle_stats <<STATS_COLOR>> {
+  * Id : int <<PK>>
+  --
+  Comb : int
+  Solo : int
+  Asst : int
+  Sck : float
+}
+
+entity "KOStats" as ko_stats <<STATS_COLOR>> {
+  * Id : int <<PK>>
+  --
+  OnSide : int
+  OnSideRec : int
+  Kick : int
+  Yds : int
+  TB : int
+  OOB : int
+  Ret : int
+  RetYds : int
+  TD : int
+}
+
+entity "PuntStats" as punt_stats <<STATS_COLOR>> {
+  * Id : int <<PK>>
+  --
+  Inside20 : int
+  Down : int
+  FC : int
+  Blk : int
+  Lng : int
+  Kick : int
+  Yds : int
+  TB : int
+  OOB : int
+  Ret : int
+  RetYds : int
+  TD : int
+}
+
+entity "KRStats" as kr_stats <<STATS_COLOR>> {
+  * Id : int <<PK>>
+  --
+  Ret : int
+  Yds : int
+  TD : int
+  Plus20 : int
+  Plus40 : int
+  Lng : int
+  FC : int
+  Fmb : int
+}
+
+entity "PRStats" as pr_stats <<STATS_COLOR>> {
+  * Id : int <<PK>>
+  --
+  Ret : int
+  Yds : int
+  TD : int
+  Plus20 : int
+  Plus40 : int
+  Lng : int
+  FC : int
+  Fmb : int
+}
+
+entity "PassStats" as pass_stats <<STATS_COLOR>> {
+  * Id : int <<PK>>
+  --
+  Cmp : int
+  INT : int
+  PR : float
+  Sck : int
+  SckYds : int
+  Yds : int
+  Att : int
+  TD : int
+  Plus20 : int
+  Plus40 : int
+  Reach1st : int
+  Lng : int
+}
+
+entity "RecStats" as rec_stats <<STATS_COLOR>> {
+  * Id : int <<PK>>
+  --
+  Rec : int
+  Fmb : int
+  YAC : int
+  Yds : int
+  Att : int
+  TD : int
+  Plus20 : int
+  Plus40 : int
+  Reach1st : int
+  Lng : int
+}
+
+entity "RushStats" as rush_stats <<STATS_COLOR>> {
+  * Id : int <<PK>>
+  --
+  Fmb : int
+  Yds : int
+  Att : int
+  TD : int
+  Plus20 : int
+  Plus40 : int
+  Reach1st : int
+  Lng : int
+}
+
+' Relationships
+players ||-l-o{ season_stats : "has season stats"
+
+' Season Stats to individual stat entities
+season_stats ||-u-o| fg_stats : "field goal stats"
+season_stats ||-u-o| int_stats : "interception stats"
+season_stats ||-u-o| tackle_stats : "tackle stats"
+season_stats ||-u-o| ko_stats : "kickoff stats"
+season_stats ||-l-o| punt_stats : "punt stats"
+season_stats ||-d-o| kr_stats : "kick return stats"
+season_stats ||-d-o| pr_stats : "punt return stats"
+season_stats ||-d-o| pass_stats : "passing stats"
+season_stats ||-d-o| rec_stats : "receiving stats"
+season_stats ||-d-o| rush_stats : "rushing stats"
+
+note right of season_stats : "Unique constraint on PlayerId + Season"
+
+@enduml

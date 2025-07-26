@@ -1,0 +1,33 @@
+@startuml Vista_Arquitectonica_METAPI_Diseno
+
+package "UserManagement" as userSubsystem <<designSubsystem>> {
+    
+    object "UserControl" as userControl <<control>>
+
+    object "UserService" as userService {
+        + configuration : IConfiguration
+        + userRepository : IUserRepository
+        + mapper : IMapper
+        + GetDtoByUsername(string username) : Task<UserDto?>
+        + UpdateUser(string username, UserDto dto) : Task<string>
+    }
+    
+    object "User" as user <<entity>> {
+        + Id : int {key}
+        + FirstName : string
+        + LastName : string
+        + Username : string
+        + Password : string
+        + Email : string
+        + Tlf : string?
+        + Active : bool
+        + Role : RoleEnum
+    }
+}
+
+userControl - userService
+userControl -d- user
+
+userService -d|> user
+
+@enduml

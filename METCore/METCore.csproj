@@ -12,8 +12,50 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Diagramas\Analisis\DiagramaDeClases_Final\DiagramaDeClases_Final.png" />
+    <None Remove="Diagramas\Analisis\DiagramaDeClases_Final\DiagramaDeClases_Final_Controladores.png" />
+    <None Remove="Diagramas\Analisis\DiagramaDeClases_Final\DiagramaDeClases_Final_Controladores_OnlyGroupedEntities.png" />
+    <None Remove="Diagramas\Analisis\DiagramaDeClases_Final\DiagramaDeClases_Final_Resto.png" />
+    <None Remove="Diagramas\Analisis\DiagramaDeClases_Final\DiagramaDeClases_Final_Stats.png" />
+    <None Remove="Diagramas\Analisis\DiagramaDeClases_Final\DiagramaDeClases_Final_TodoDeBaseClass.png" />
+    <None Remove="Diagramas\Analisis\DiagramaDeClases_Inicial\DiagramaDeClases_Inicial.png" />
+    <None Remove="Diagramas\Analisis\DiagramaDeClases_Inicial\DiagramaDeClases_Inicial_Resto.png" />
+    <None Remove="Diagramas\Analisis\DiagramaDeClases_Inicial\DiagramaDeClases_Inicial_Stats.png" />
+    <None Remove="Diagramas\Analisis\DiagramaDeClases_Inicial\DiagramaDeClases_Inicial_TodoDeBaseClass.png" />
+    <None Remove="Diagramas\Analisis\DiagramaDePaquetes\DiagramaDePaquetes_ConCUs.png" />
+    <None Remove="Diagramas\Analisis\DiagramaDePaquetes\DiagramaDePaquetes_ConCUs_Admin.png" />
+    <None Remove="Diagramas\Analisis\DiagramaDePaquetes\DiagramaDePaquetes_ConCUs_GestionUsuarios.png" />
+    <None Remove="Diagramas\Analisis\DiagramaDePaquetes\DiagramaDePaquetes_ConCUs_Resto.png" />
+    <None Remove="Diagramas\Analisis\DiagramaDePaquetes\DiagramaDePaquetes_ConRelaciones.png" />
+    <None Remove="Diagramas\Componentes\DiagramaDeComponentes_Players.png" />
+    <None Remove="Diagramas\Componentes\DiagramaDeComponentes_Teams.png" />
+    <None Remove="Diagramas\Componentes\DiagramaDeComponentes_Users.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU001.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU002.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU003.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU004.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU005.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU006.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU007.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU008.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU009.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU010.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU011.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU012.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU013.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU014.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU015.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU016.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU017.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU018.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU019.png" />
+    <None Remove="Diagramas\DeSecuencia\DiagramaSecuencia_CU020.png" />
+    <None Remove="Diagramas\Despliegue\VistaArquitectonica\VistaArquitectonica.png" />
     <None Remove="Diagramas\DiagramaDeClases_Final.png" />
     <None Remove="Diagramas\DiagramaDeClases_Inicial.png" />
+    <None Remove="Diagramas\DiagramaDeClases_Inicial_Resto.png" />
+    <None Remove="Diagramas\DiagramaDeClases_Inicial_Stats.png" />
+    <None Remove="Diagramas\DiagramaDeClases_Inicial_TodoDeBaseClass.png" />
     <None Remove="Diagramas\DiagramaDePaquetes_ConCUs.png" />
     <None Remove="Diagramas\DiagramaDePaquetes_ConRelaciones.png" />
     <None Remove="Diagramas\DiagramaSecuencia_CU001.png" />
@@ -36,6 +78,18 @@
     <None Remove="Diagramas\DiagramaSecuencia_CU018.png" />
     <None Remove="Diagramas\DiagramaSecuencia_CU019.png" />
     <None Remove="Diagramas\DiagramaSecuencia_CU020.png" />
+    <None Remove="Diagramas\Diseño\DiagramaDeClases\DiagramaDeClases_Auth.png" />
+    <None Remove="Diagramas\Diseño\DiagramaDeClases\DiagramaDeClases_Franchises.png" />
+    <None Remove="Diagramas\Diseño\DiagramaDeClases\DiagramaDeClases_Players.png" />
+    <None Remove="Diagramas\Diseño\DiagramaDeClases\DiagramaDeClases_PlayersOnlyEntities.png" />
+    <None Remove="Diagramas\Diseño\DiagramaDeClases\DiagramaDeClases_Teams.png" />
+    <None Remove="Diagramas\Diseño\DiagramaDeClases\DiagramaDeClases_Users.png" />
+    <None Remove="Diagramas\Diseño\ModeoDeDatos\ModeoDeDatos_Resto.png" />
+    <None Remove="Diagramas\Diseño\ModeoDeDatos\ModeoDeDatos_Stats.png" />
+    <None Remove="Diagramas\Diseño\ModeoDeDatos_Resto.png" />
+    <None Remove="Diagramas\Diseño\ModeoDeDatos_Stats.png" />
+    <None Remove="Diagramas\Despliegue\VistaArquitectonica.png" />
+    <None Remove="Diagramas\Implementacion\VistaArquitectonica\VistaArquitectonica.png" />
   </ItemGroup>
 
   <ItemGroup>

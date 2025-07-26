@@ -1,0 +1,145 @@
+@startuml
+
+class SeasonStats {
+    + Id : int {key}
+    + Player : Player
+    + Season : int
+    + FGStats : FGStats?
+    + IntStats : IntStats?
+    + TackleStats : TackleStats?
+    + PassStats : PassStats?
+    + RecStats : RecStats?
+    + RushStats : RushStats?
+    + KOStats : KOStats?
+    + PuntStats : PuntStats?
+    + KRStats : KRStats?
+    + PRStats : PRStats?
+}
+
+class FGStats {
+    + Id : int {key}
+    + ShAtt : int
+    + ShMade : int
+    + MidAtt : int
+    + MidMade : int
+    + LongAtt : int
+    + LongMade : int
+    + Lng : int
+    + Blk : int
+}
+
+class IntStats {
+    + Id : int {key}
+    + INT : int
+    + Yds : int
+    + TD : int
+    + Lng : int
+}
+
+class TackleStats {
+    + Id : int {key}
+    + Comb : int
+    + Solo : int
+    + Asst : int
+    + Sck : int
+}
+
+abstract class KickStats {
+    + Id : int {key}
+    + Kick : int
+    + Yds : int
+    + TB : int
+    + OOB : int
+    + Ret : int
+    + RetYds : int
+    + TD : int
+}
+
+class KOStats {
+    + OnSide : int {key}
+    + OnSideRec : int
+}
+
+class PuntStats {
+    + Inside20 : int {key}
+    + Down : int
+    + FC : int
+    + Blk : int
+    + Lng : int
+}
+
+abstract class ReturnStats {
+    + Id : int {key}
+    + Ret : int
+    + Yds : int
+    + TD : int
+    + Plus20 : int
+    + Plus40 : int
+    + Lng : int
+    + FC : int
+    + Fumb : int
+}
+
+class KRStats {
+}
+
+class PRStats {
+}
+
+abstract class SkillStats {
+    + Id : int {key}
+    + Yds : int
+    + Att : int
+    + TD : int
+    + Plus20 : int
+    + Plus40 : int
+    + Reach1st : int
+    + Lng : int
+}
+
+class PassStats {
+    + Cmp : int
+    + INT : int
+    + PR : int
+    + Sck : int
+    + SckYds : int
+}
+
+class RecStats {
+    + Rec : int
+    + Fmb : int
+    + YAC : int
+}
+
+class RushStats {
+    + Fmb : int {key}
+}
+
+
+' Inheritance relationships
+KickStats <|-u- KOStats
+KickStats <|-u- PuntStats
+
+ReturnStats <|-u- KRStats
+ReturnStats <|-u- PRStats
+
+SkillStats <|-u- PassStats
+SkillStats <|-u- RecStats
+SkillStats <|-u- RushStats
+
+
+' Composition relationships
+Player ||--o{ SeasonStats : "has"
+
+SeasonStats ||--|| FGStats : "references"
+SeasonStats |o--|| IntStats : "references"
+SeasonStats |o--|| TackleStats : "references"
+SeasonStats |o--|| PassStats : "references"
+SeasonStats |o--|| RecStats : "references"
+SeasonStats |o--|| RushStats : "references"
+SeasonStats |o--|| PRStats : "references"
+SeasonStats |o--|| KRStats : "references"
+SeasonStats |o--|| KOStats : "references"
+SeasonStats |o--|| PuntStats : "references"
+
+@enduml

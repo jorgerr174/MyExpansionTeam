@@ -1,0 +1,126 @@
+@startuml METAPI_Database_ER_Diagram
+
+!define ENTITY_COLOR #E8F4FD
+!define WEAK_ENTITY_COLOR #FFF2CC
+!define STATS_COLOR #E1F5FE
+
+' Main Entities
+entity "Users" as users {
+  * Id : int <<PK>>
+  --
+  FirstName : nvarchar(50)
+  LastName : nvarchar(50)
+  Username : nvarchar(max)
+  Password : nvarchar(max)
+  Email : nvarchar(max)
+  Tlf : nvarchar(max)
+  Active : bit
+  Role : int
+}
+
+entity "Players" as players {
+  * Id : int <<PK>>
+  --
+  Position : int
+  Position2 : int
+  Position3 : int
+  Retired : bit
+  Name : nvarchar(70)
+  BirthDate : date
+  College : nvarchar(max)
+  Height : int
+  Weight : int
+}
+
+entity "Franchises" as franchises {
+  * Id : int <<PK>>
+  --
+  Location : nvarchar(50)
+  Mascot : nvarchar(50)
+  Protected1Id : int <<FK>>
+  Protected2Id : int <<FK>>
+  Protected3Id : int <<FK>>
+}
+
+entity "Teams" as teams {
+  * Id : int <<PK>>
+  --
+  UserId : int <<FK>>
+  Date : datetime2(7)
+  Abb : nvarchar(3)
+  Complete : bit
+  Location : nvarchar(50)
+  Mascot : nvarchar(50)
+  Cap : decimal(3,2)
+  MaxPerTeam : int
+  ProtectedPerTeam : int
+  ProtectedPlayersIds : nvarchar(max)
+  RosterSettings_ProtectedPlayersIds : nvarchar(max)
+  Selections : nvarchar(max)
+  PlayersIds : nvarchar(max)
+  SPLineup : nvarchar(max)
+  DefLineup : nvarchar(max)
+  OffLineup : nvarchar(max)
+}
+
+entity "Contracts" as contracts {
+  * Id : int <<PK>>
+  --
+  PlayerId : int <<FK>>
+  Active : bit
+  FranchiseId : int
+  Guaranteed : bigint
+  Length : int
+  Total : bigint
+  YearSigned : int
+}
+
+entity "Prospects" as prospects {
+  * Id : int <<PK,FK>>
+  --
+  Year : int
+  HandSize : nvarchar(max)
+  ArmLength : nvarchar(max)
+  Wingspan : nvarchar(max)
+  FortyYardDash : nvarchar(max)
+  BenchPress : nvarchar(max)
+  VertJump : nvarchar(max)
+  BroadJump : nvarchar(max)
+  ThreeConeDrill : nvarchar(max)
+  TwentyYardShuttle : nvarchar(max)
+  AthScore : int
+  PlayerId : int
+  Consensus : int
+}
+
+entity "Trades" as trades {
+  * Id : int <<PK>>
+  --
+  FranchiseId : int
+  TeamPlayers : nvarchar(max)
+  TeamPicks : nvarchar(max)
+  FranchisePlayers : nvarchar(max)
+  FranchisePicks : nvarchar(max)
+  TeamId : int <<FK>>
+}
+
+
+' Relationships
+users ||--o{ teams : "creates"
+teams ||--o{ trades : "initiates"
+
+players ||--o| prospects : "has prospect data"
+players ||--o{ contracts : "has contracts"
+
+' Franchise protected players (self-referencing)
+franchises ||--o| players : "protects (1)"
+franchises ||--o| players : "protects (2)" 
+franchises ||--o| players : "protects (3)"
+
+note right of prospects : "Weak entity - shares PK with Players\nProspect Id = Player Id"
+
+note right of franchises : "Check constraint: Id < 33"
+
+note right of teams : "Stores lineup data as JSON strings\nPlayersIds, SPLineup, DefLineup, OffLineup"
+
+@enduml

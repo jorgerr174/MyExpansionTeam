@@ -1,0 +1,72 @@
+@startuml
+!theme aws-orange
+
+abstract class BaseClass {
+    + Id : int {key}
+}
+
+class User 
+
+abstract class Squad 
+
+class Franchise
+
+class Team 
+
+class Player 
+
+class Prospect 
+
+class Contract 
+
+class Trade 
+
+class RosterSettings 
+
+class SPLineup 
+
+class Lineup 
+
+class SeasonStats 
+
+class FGStats 
+
+class IntStats 
+
+class TackleStats 
+
+abstract class KickStats 
+
+class KOStats 
+
+class PuntStats
+
+abstract class ReturnStats 
+
+class KRStats 
+
+class PRStats 
+
+abstract class SkillStats 
+
+class PassStats 
+
+class RecStats 
+
+class RushStats 
+
+BaseClass <|-- User
+BaseClass <|-- Squad
+BaseClass <|-- Player
+BaseClass <|-- Prospect
+BaseClass <|-- Contract
+BaseClass <|-- Trade
+BaseClass <|-- SeasonStats
+BaseClass <|-- FGStats
+BaseClass <|-- IntStats
+BaseClass <|-- TackleStats
+BaseClass <|-- KickStats
+BaseClass <|-- ReturnStats
+BaseClass <|-- SkillStats
+
+@enduml

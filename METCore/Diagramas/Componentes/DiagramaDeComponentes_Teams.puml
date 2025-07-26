@@ -1,0 +1,23 @@
+@startuml METAPI_Database_ER_Diagram
+
+
+component IU_TeamsController.cshtml <<interface>>
+
+component TeamsController.cs <<file>>
+
+component Team.cs <<file>>
+component Franchise.cs <<file>>
+
+component Teams.db <<table>>
+component Franchises.db <<table>>
+
+'huidcsbi
+IU_TeamsController.cshtml - TeamsController.cs
+IU_TeamsController.cshtml <|. Team.cs
+IU_TeamsController.cshtml <|. Franchise.cs
+TeamsController.cs -d- Team.cs
+TeamsController.cs -d- Franchise.cs
+Team.cs .d.> Teams.db
+Franchise.cs .d.> Franchises.db
+
+@enduml
