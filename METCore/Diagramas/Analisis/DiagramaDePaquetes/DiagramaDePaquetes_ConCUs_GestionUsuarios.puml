@@ -1,0 +1,22 @@
+@startuml PaquetesConCasosDeUso
+left to right direction 
+
+actor Anonymous
+actor User
+
+package "Gestión de Usuarios" {
+    usecase "CU001: Registro de usuario" as UC001
+    usecase "CU002: Inicio de sesión" as UC002
+    usecase "CU003: Cerrado de sesión" as UC003
+    usecase "CU004: Modificación credenciales" as UC004
+    usecase "CU005: Baja de usuario" as UC005
+}
+
+Anonymous --> UC001
+Anonymous --> UC002
+
+User --> UC003
+User --> UC004
+User --> UC005
+
+@enduml

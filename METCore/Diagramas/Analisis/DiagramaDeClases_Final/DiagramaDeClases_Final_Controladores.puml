@@ -1,0 +1,49 @@
+@startuml
+allowmixing
+
+class AuthController <<controller>> {
+    + AuthService : AuthService
+}
+class FranchisesController <<controller>> {
+    + FranchisesService : FranchisesService
+}
+class ImportController <<controller>> {
+    + ImportService : ImportService
+}
+class PlayersController <<controller>> {
+    + PlayersService : PlayersService
+}
+class TeamsController <<controller>> {
+    + TeamsService : TeamsService
+}
+class UsersController <<controller>> {
+    + UsersService : UsersService
+}
+
+
+package Players 
+
+package Teams
+
+package Users 
+
+package Franchises 
+
+
+' Implementation relationships
+AuthController .. Users
+UsersController .l. Users
+
+FranchisesController .. Franchises
+FranchisesController .. Players
+
+ImportController .u. Players
+
+PlayersController .. Players
+
+TeamsController .u. Users
+TeamsController .d. Teams
+TeamsController .u. Franchises
+TeamsController .u. Players
+
+@enduml

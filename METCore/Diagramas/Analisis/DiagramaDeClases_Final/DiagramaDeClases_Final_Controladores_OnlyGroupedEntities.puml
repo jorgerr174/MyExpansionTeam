@@ -1,0 +1,42 @@
+@startuml
+
+package Players {
+    class Player <<entity>>
+    class Prospect <<entity>>
+    class Contract <<entity>>
+    
+    package Stats {
+        class SeasonStats <<entity>>
+        class FGStats <<entity>>
+        class IntStats <<entity>>
+        class TackleStats <<entity>>
+        class KOStats <<entity>>
+        class PuntStats <<entity>>
+        class KRStats <<entity>>
+        class PRStats <<entity>>
+        class PassStats <<entity>>
+        class RecStats <<entity>>
+        class RushStats <<entity>>
+    }
+}
+
+package Teams {
+
+    class Team <<entity>>
+    class Trade <<entity>>
+    class SPLineup <<entity>>
+    class Lineup <<entity>>
+    class RosterSettings <<entity>>
+    class DraftSettings <<entity>>
+
+}
+
+package Users {
+    class User <<entity>>
+}
+
+package Franchises {
+    class Franchise <<entity>>
+}
+
+@enduml

@@ -1,0 +1,49 @@
+@startuml PaquetesConCasosDeUsoYRelaciones
+
+actor User
+
+package "Gestión de Equipos" {
+
+    package "Gestión de Equipo" {
+        usecase "CU006: Creación de equipo" as UC006
+        usecase "CU007: Modificación de equipo" as UC007
+        usecase "CU008: Duplicado de equipo" as UC008
+        usecase "CU009: Borrado de equipos" as UC009
+    }
+    
+    package "Gestión de Roster" {
+        usecase "CU010: Modificación ajustes" as UC010
+        usecase "CU011: Jugadores protegidos" as UC011
+        usecase "CU012: Elección jugadores" as UC012
+        usecase "CU013: Realización trueques" as UC013
+    }
+    
+    package "Gestión de Draft" {
+        usecase "CU014: Realización draft" as UC014
+        usecase "CU015: Simulación draft" as UC015
+        usecase "CU016: Ajustes del draft" as UC016
+    }
+
+}
+
+package "Análisis" {
+    usecase "CU017: Seguimiento rendimiento" as UC017
+    usecase "CU018: Interacción usuarios" as UC018
+}
+
+
+User --> UC006
+User --> UC007
+User --> UC008
+User --> UC009
+User --> UC010
+User --> UC011
+User --> UC012
+User --> UC013
+User --> UC014
+User --> UC015
+User --> UC016
+User --> UC017
+User --> UC018
+
+@enduml

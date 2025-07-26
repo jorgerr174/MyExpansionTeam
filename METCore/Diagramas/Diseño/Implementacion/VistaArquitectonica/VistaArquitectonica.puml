@@ -1,0 +1,132 @@
+@startuml Vista_Arquitectonica_METAPI_Diseno
+
+interface IC_Users <<interface>>
+package UserManagement <<implementationSubsystem>> {
+}
+
+interface IC_Import <<interface>> {
++importarJugadores()
++importarContratos()
++importarEstadisticas()
++importarProspectos()
+
+}
+package ImportManagement <<implementationSubsystem>> {
+}
+
+interface IC_Franchises <<interface>> {
++obtenerJugadoresProtegibles()
++obtenerJugadoresSeleccionables()
++obtenerInfoFranquicia()
++obtenerListaFranquicias()
+}
+package FranchiseManagement <<implementationSubsystem>> {
+}
+
+interface IC_Teams <<interface>> {
++crearEquipo()
++obtenerEquipo()
++actualizarEquipo()
++obtenerEquipos()
++obtenerMisEquipos()
++actualizarConfiguracion()
++actualizarRoster()
++obtenerDatosTraspaso()
+}
+package TeamManagement <<implementationSubsystem>> {
+}
+
+interface IC_Players <<interface>> {
++obtenerProspectosDraft()
++buscarJugadores()
++obtenerEstadisticas()
++obtenerJugadorInfo()
+}
+package PlayerManagement <<implementationSubsystem>> {
+}
+
+interface IC_Auth <<interface>>{
++autenticar()
+}
+package AuthManagement <<implementationSubsystem>> {
+}
+
+' Interface to Subsystem connections
+IC_Users -d- UserManagement
+IC_Users -l[hidden]- IC_Import
+IC_Users -d[hidden]- IC_Teams
+IC_Users -r[hidden]- IC_Franchises
+IC_Users -d[hidden]- ImportManagement
+IC_Users -d[hidden]- TeamManagement
+IC_Users -d[hidden]- FranchiseManagement
+IC_Users -d[hidden]- IC_Players
+IC_Users -d[hidden]- IC_Auth
+IC_Users -d[hidden]- PlayerManagement
+IC_Users -d[hidden]- AuthManagement
+
+UserManagement .l( IC_Import : <<access>>
+UserManagement -.d( IC_Teams : <<access>>
+UserManagement .r( IC_Franchises : <<access>>
+UserManagement -d[hidden]- ImportManagement
+UserManagement -d[hidden]- TeamManagement
+UserManagement -d[hidden]- FranchiseManagement
+UserManagement .d( IC_Players : <<access>>
+UserManagement .d( IC_Auth : <<access>>
+UserManagement -d[hidden]- PlayerManagement
+UserManagement -d[hidden]- AuthManagement
+
+IC_Import -r[hidden]- IC_Teams
+IC_Import -r[hidden]- IC_Franchises
+IC_Import -d- ImportManagement
+IC_Import -d[hidden]- TeamManagement
+IC_Import -d[hidden]- FranchiseManagement
+IC_Import -d[hidden]- IC_Players
+IC_Import -d[hidden]- IC_Auth
+IC_Import -d[hidden]- PlayerManagement
+IC_Import -d[hidden]- AuthManagement
+
+IC_Teams -r[hidden]- IC_Franchises
+IC_Teams -d[hidden]- ImportManagement
+IC_Teams -d[hidden]- FranchiseManagement
+IC_Teams -d- TeamManagement
+IC_Teams -d[hidden]- IC_Players
+IC_Teams -d[hidden]- IC_Auth
+IC_Teams -d[hidden]- PlayerManagement
+IC_Teams -d[hidden]- AuthManagement
+
+IC_Franchises -l[hidden]- ImportManagement 
+IC_Franchises -d- FranchiseManagement
+IC_Franchises ).l. TeamManagement : <<access>>
+IC_Franchises -r[hidden]- IC_Players
+IC_Franchises -d[hidden]- PlayerManagement
+IC_Franchises -d[hidden]- IC_Auth
+IC_Franchises -d[hidden]- AuthManagement
+
+ImportManagement -r[hidden]- FranchiseManagement
+ImportManagement -r[hidden]- TeamManagement
+ImportManagement .d( IC_Players : <<access>>
+ImportManagement -d[hidden]- PlayerManagement
+ImportManagement -d[hidden]- IC_Auth
+ImportManagement -d[hidden]- AuthManagement
+
+TeamManagement -r[hidden]- FranchiseManagement
+TeamManagement .d( IC_Players : <<access>>
+TeamManagement -d[hidden]- PlayerManagement
+TeamManagement .d( IC_Auth : <<access>>
+TeamManagement -d[hidden]- AuthManagement
+
+FranchiseManagement .( IC_Players : <<access>>
+FranchiseManagement -l[hidden]- PlayerManagement
+FranchiseManagement .( IC_Auth : <<access>>
+FranchiseManagement -d[hidden]- AuthManagement
+
+IC_Players -- PlayerManagement
+IC_Players -r[hidden]- IC_Auth
+IC_Players -r[hidden]- AuthManagement
+
+IC_Auth ). PlayerManagement : <<access>>
+IC_Auth -d- AuthManagement
+
+PlayerManagement -u[hidden]- AuthManagement
+
+@enduml

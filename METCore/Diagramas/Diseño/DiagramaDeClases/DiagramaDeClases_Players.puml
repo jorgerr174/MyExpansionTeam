@@ -1,0 +1,88 @@
+@startuml Vista_Arquitectonica_METAPI_Diseno
+left to right direction
+package PlayerManagement <<designSubsystem>> {
+    
+    object PlayerControl <<control>>
+
+    object PlayerService {
+        + configuration : IConfiguration
+        + playerRepository : IPlayerRepository
+        + mapper : IMapper
+        + GetDraftProspects(int year) : Task<IList<ProspectDto>>
+    }
+    
+    object Player <<entity>> {
+    }
+    
+    object Prospect <<entity>> {
+    }
+    
+    object Contract <<entity>> {
+    }
+    
+    object SeasonStats <<entity>> {
+    }
+    
+    object FGStats <<entity>> {
+    }
+    
+    object IntStats {
+    }
+    
+    object TackleStats <<entity>> {
+    }
+    
+    object KOStats <<entity>> {
+    }
+    
+    object PuntStats <<entity>> {
+    }
+    
+    object KRStats <<entity>> {
+    }
+    
+    object PRStats <<entity>> {
+    }
+    
+    object PassStats <<entity>> {
+    }
+    
+    object RecStats <<entity>> {
+    }
+    
+    object RushStats <<entity>> {
+    }
+}
+
+PlayerControl - PlayerService
+PlayerControl -d- Player
+PlayerControl -d- Prospect
+PlayerControl -d- Contract
+PlayerControl -d- SeasonStats
+PlayerControl -d- FGStats
+PlayerControl -d- IntStats
+PlayerControl -d- TackleStats
+PlayerControl -d- KOStats
+PlayerControl -d- PuntStats
+PlayerControl -d- KRStats
+PlayerControl -d- PRStats
+PlayerControl -d- PassStats
+PlayerControl -d- RecStats
+PlayerControl -d- RushStats
+
+PlayerService -u|> Player
+PlayerService -u|> Prospect
+PlayerService -u|> Contract
+PlayerService -u|> SeasonStats
+PlayerService -u|> FGStats
+PlayerService -u|> IntStats
+PlayerService -u|> TackleStats
+PlayerService -u|> KOStats
+PlayerService -u|> PuntStats
+PlayerService -u|> KRStats
+PlayerService -u|> PRStats
+PlayerService -u|> PassStats
+PlayerService -u|> RecStats
+PlayerService -u|> RushStats
+
+@enduml

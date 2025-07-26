@@ -1,0 +1,546 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="METCore.Models.BaseClass" Collapsed="true">
+    <Position X="21.5" Y="0.5" Width="1.5" />
+    <Members>
+      <Property Name="Id" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\BaseClass.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Players.Player" Collapsed="true">
+    <Position X="2.25" Y="1.75" Width="1.5" />
+    <Members>
+      <Property Name="ActiveContract" Hidden="true" />
+      <Property Name="Age" Hidden="true" />
+      <Property Name="APY" Hidden="true" />
+      <Property Name="BirthDate" Hidden="true" />
+      <Property Name="College" Hidden="true" />
+      <Property Name="Contracts" Hidden="true" />
+      <Property Name="FranchiseId" Hidden="true" />
+      <Property Name="Height" Hidden="true" />
+      <Property Name="Id" Hidden="true" />
+      <Property Name="ImportProspectAttrs" Hidden="true" />
+      <Property Name="IsRookie" Hidden="true" />
+      <Property Name="Name" Hidden="true" />
+      <Method Name="Player" Hidden="true" />
+      <Property Name="Position" Hidden="true" />
+      <Property Name="Position2" Hidden="true" />
+      <Property Name="Position3" Hidden="true" />
+      <Property Name="Prospect" Hidden="true" />
+      <Property Name="Retired" Hidden="true" />
+      <Property Name="Stats" Hidden="true" />
+      <Property Name="Weight" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>EBRCAAAABAQAABAwAEAAABQgACAAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>Models\Players\Player.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Players.Prospect" Collapsed="true">
+    <Position X="4.5" Y="1.75" Width="1.5" />
+    <Members>
+      <Property Name="ArmLength" Hidden="true" />
+      <Property Name="AthScore" Hidden="true" />
+      <Property Name="BenchPress" Hidden="true" />
+      <Property Name="BroadJump" Hidden="true" />
+      <Property Name="Consensus" Hidden="true" />
+      <Property Name="FortyYardDash" Hidden="true" />
+      <Property Name="HandSize" Hidden="true" />
+      <Property Name="Id" Hidden="true" />
+      <Property Name="ImportAttributes" Hidden="true" />
+      <Method Name="Prospect" Hidden="true" />
+      <Property Name="ThreeConeDrill" Hidden="true" />
+      <Property Name="TwentyYardShuttle" Hidden="true" />
+      <Property Name="VertJump" Hidden="true" />
+      <Property Name="Wingspan" Hidden="true" />
+      <Property Name="Year" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>QAACAAAKBAAAAAAAAAAwAAAgAAEAAAAEABAAAAABCAA=</HashCode>
+      <FileName>Models\Players\Prospect.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Settings.DraftSettings" Collapsed="true">
+    <Position X="43" Y="0.5" Width="1.5" />
+    <Members>
+      <Method Name="DraftSettings" Hidden="true" />
+      <Property Name="Selected" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>Models\Settings\DraftSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Stats.FGStats" Collapsed="true">
+    <Position X="20.25" Y="1.75" Width="1.5" />
+    <Members>
+      <Property Name="Att" Hidden="true" />
+      <Property Name="Blk" Hidden="true" />
+      <Method Name="FGStats" Hidden="true" />
+      <Property Name="Id" Hidden="true" />
+      <Property Name="Lng" Hidden="true" />
+      <Property Name="LongAtt" Hidden="true" />
+      <Property Name="LongMade" Hidden="true" />
+      <Property Name="Made" Hidden="true" />
+      <Property Name="MidAtt" Hidden="true" />
+      <Property Name="MidMade" Hidden="true" />
+      <Property Name="Pct" Hidden="true" />
+      <Property Name="ShAtt" Hidden="true" />
+      <Property Name="ShMade" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AQACAAAAAAAAABAAEgAAAAAAAACAAAAAAhAAAAIgAgA=</HashCode>
+      <FileName>Models\Stats\FGStats.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="METCore.Models.Stats.IntStats" Collapsed="true">
+    <Position X="29.25" Y="1.75" Width="1.5" />
+    <Members>
+      <Property Name="Id" Hidden="true" />
+      <Property Name="INT" Hidden="true" />
+      <Method Name="IntStats" Hidden="true" />
+      <Property Name="Lng" Hidden="true" />
+      <Property Name="TD" Hidden="true" />
+      <Property Name="Yds" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AQACAAIAAAAABAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Stats\IntStats.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="METCore.Models.Stats.KOStats" Collapsed="true">
+    <Position X="33.75" Y="3.25" Width="1.5" />
+    <Members>
+      <Method Name="KOStats" Hidden="true" />
+      <Property Name="OnSide" Hidden="true" />
+      <Property Name="OnSideRec" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Models\Stats\KickStats.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Stats.PuntStats" Collapsed="true">
+    <Position X="36" Y="3.25" Width="1.5" />
+    <Members>
+      <Property Name="Avg" Hidden="true" />
+      <Property Name="Blk" Hidden="true" />
+      <Property Name="Down" Hidden="true" />
+      <Property Name="FC" Hidden="true" />
+      <Property Name="Inside20" Hidden="true" />
+      <Property Name="Lng" Hidden="true" />
+      <Property Name="NetAvg" Hidden="true" />
+      <Method Name="PuntStats" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AQAAAAJBAAAAAACAAAAAAAAAAAAAAAAAABAAIAAAAAA=</HashCode>
+      <FileName>Models\Stats\KickStats.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Stats.KickStats" Collapsed="true">
+    <Position X="34.75" Y="1.75" Width="2" />
+    <Members>
+      <Property Name="Id" Hidden="true" />
+      <Property Name="Kick" Hidden="true" />
+      <Method Name="KickStats" Hidden="true" />
+      <Property Name="OOB" Hidden="true" />
+      <Property Name="Ret" Hidden="true" />
+      <Property Name="RetAvg" Hidden="true" />
+      <Property Name="RetYds" Hidden="true" />
+      <Property Name="TB" Hidden="true" />
+      <Property Name="TBPct" Hidden="true" />
+      <Property Name="TD" Hidden="true" />
+      <Property Name="Yds" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAACAAIAABACBgAAAAAAAAAAABAAAABAAAAAAAAQAAA=</HashCode>
+      <FileName>Models\Stats\KickStats.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="METCore.Models.Stats.KRStats" Collapsed="true">
+    <Position X="38.25" Y="3.25" Width="1.5" />
+    <Members>
+      <Method Name="KRStats" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Stats\ReturnStats.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Stats.PRStats" Collapsed="true">
+    <Position X="40.5" Y="3.25" Width="1.5" />
+    <Members>
+      <Method Name="PRStats" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Stats\ReturnStats.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Stats.ReturnStats" Collapsed="true">
+    <Position X="39.5" Y="1.75" Width="1.5" />
+    <Members>
+      <Property Name="Avg" Hidden="true" />
+      <Property Name="FC" Hidden="true" />
+      <Property Name="Fmb" Hidden="true" />
+      <Property Name="Id" Hidden="true" />
+      <Property Name="Lng" Hidden="true" />
+      <Property Name="Plus20" Hidden="true" />
+      <Property Name="Plus40" Hidden="true" />
+      <Property Name="Ret" Hidden="true" />
+      <Method Name="ReturnStats" Hidden="true" />
+      <Property Name="TD" Hidden="true" />
+      <Property Name="Yds" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AQCCAAIAIAAAJgCAAAAAAAAAAAAAAAAAAAAAIAAAAAA=</HashCode>
+      <FileName>Models\Stats\ReturnStats.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="METCore.Models.Stats.PassStats" Collapsed="true">
+    <Position X="22.5" Y="3.25" Width="1.5" />
+    <Members>
+      <Property Name="Cmp" Hidden="true" />
+      <Property Name="CmpPct" Hidden="true" />
+      <Property Name="INT" Hidden="true" />
+      <Method Name="PassStats" Hidden="true" />
+      <Property Name="PR" Hidden="true" />
+      <Property Name="Sck" Hidden="true" />
+      <Property Name="SckYds" Hidden="true" />
+      <Property Name="Y_S" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAABAAAAAAACAEIAAAAAAAAAIAQAAA=</HashCode>
+      <FileName>Models\Stats\SkillStats.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Stats.RecStats" Collapsed="true">
+    <Position X="24.75" Y="3.25" Width="1.5" />
+    <Members>
+      <Property Name="Fmb" Hidden="true" />
+      <Property Name="R_A" Hidden="true" />
+      <Property Name="Rec" Hidden="true" />
+      <Method Name="RecStats" Hidden="true" />
+      <Property Name="YAC" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAABAAAAIAAAAgAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Stats\SkillStats.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Stats.RushStats" Collapsed="true">
+    <Position X="27" Y="3.25" Width="1.5" />
+    <Members>
+      <Property Name="Fmb" Hidden="true" />
+      <Method Name="RushStats" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Stats\SkillStats.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Stats.SkillStats" Collapsed="true">
+    <Position X="24.75" Y="1.75" Width="1.5" />
+    <Members>
+      <Property Name="Att" Hidden="true" />
+      <Property Name="Id" Hidden="true" />
+      <Property Name="Lng" Hidden="true" />
+      <Property Name="Plus20" Hidden="true" />
+      <Property Name="Plus40" Hidden="true" />
+      <Property Name="Reach1st" Hidden="true" />
+      <Property Name="Reach1stPct" Hidden="true" />
+      <Method Name="SkillStats" Hidden="true" />
+      <Property Name="TD" Hidden="true" />
+      <Property Name="Y_A" Hidden="true" />
+      <Property Name="Yds" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AQCCAAIAAAAAJAAABAAAAAAAAACAAAAAAAAAAAAgEAA=</HashCode>
+      <FileName>Models\Stats\SkillStats.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="METCore.Models.Stats.TackleStats" Collapsed="true">
+    <Position X="31.5" Y="1.75" Width="1.5" />
+    <Members>
+      <Property Name="Asst" Hidden="true" />
+      <Property Name="Comb" Hidden="true" />
+      <Property Name="Id" Hidden="true" />
+      <Property Name="Sck" Hidden="true" />
+      <Property Name="Solo" Hidden="true" />
+      <Method Name="TackleStats" Hidden="true" />
+      <Property Name="Total" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAABAAAQIAAAAQAAAAAAAAAAQAAA=</HashCode>
+      <FileName>Models\Stats\TackleStats.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="METCore.Models.Teams.RosterSettings" Collapsed="true">
+    <Position X="44.75" Y="0.5" Width="1.5" />
+    <Members>
+      <Property Name="Cap" Hidden="true" />
+      <Property Name="MaxPerTeam" Hidden="true" />
+      <Property Name="ProtectedPerTeam" Hidden="true" />
+      <Property Name="ProtectedPlayersIds" Hidden="true" />
+      <Method Name="RosterSettings" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAAAAAAAAAAAAAAgAAAAIgAAAAAAAA=</HashCode>
+      <FileName>Models\Teams\RosterSettings.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Teams.Team" Collapsed="true">
+    <Position X="11.25" Y="3.25" Width="1.5" />
+    <Members>
+      <Property Name="Abb" Hidden="true" />
+      <Property Name="Complete" Hidden="true" />
+      <Property Name="CurrentCap" Hidden="true" />
+      <Property Name="Date" Hidden="true" />
+      <Property Name="DefLineup" Hidden="true" />
+      <Property Name="OffLineup" Hidden="true" />
+      <Property Name="Players" Hidden="true" />
+      <Property Name="PlayersIds" Hidden="true" />
+      <Property Name="ProtectedPlayersIds" Hidden="true" />
+      <Property Name="RosterSettings" Hidden="true" />
+      <Property Name="Selections" Hidden="true" />
+      <Property Name="SPLineup" Hidden="true" />
+      <Method Name="Team" Hidden="true" />
+      <Property Name="Trades" Hidden="true" />
+      <Property Name="User" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>BAABAAQAAAgAAAIAgAAAACAAAAAggBIBAgAAAAAgAAA=</HashCode>
+      <FileName>Models\Teams\Team.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Contract" Collapsed="true">
+    <Position X="15.75" Y="1.75" Width="1.5" />
+    <Members>
+      <Property Name="Active" Hidden="true" />
+      <Property Name="APY" Hidden="true" />
+      <Method Name="Contract" Hidden="true" />
+      <Property Name="FranchiseId" Hidden="true" />
+      <Property Name="Guaranteed" Hidden="true" />
+      <Property Name="Id" Hidden="true" />
+      <Property Name="LastSeason" Hidden="true" />
+      <Property Name="Length" Hidden="true" />
+      <Property Name="Total" Hidden="true" />
+      <Property Name="YearSigned" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAABAAAAAAAAAAABBgAEBAQAAgAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Contract.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="METCore.Models.Franchise" Collapsed="true">
+    <Position X="9" Y="3.25" Width="1.5" />
+    <Members>
+      <Property Name="Abb" Hidden="true" />
+      <Method Name="Franchise" Hidden="true" />
+      <Property Name="Players" Hidden="true" />
+      <Property Name="PlayersByPosition" Hidden="true" />
+      <Property Name="PlayersToProtect" Hidden="true" />
+      <Property Name="Protected1" Hidden="true" />
+      <Property Name="Protected2" Hidden="true" />
+      <Property Name="Protected3" Hidden="true" />
+      <Property Name="ProtectedPlayers" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAAIgAAAAAAAAAAgAAAAAAAAAMACAAA=</HashCode>
+      <FileName>Models\Franchise.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.SeasonStats" Collapsed="true">
+    <Position X="18" Y="1.75" Width="1.5" />
+    <Members>
+      <Property Name="FGStats" Hidden="true" />
+      <Property Name="Id" Hidden="true" />
+      <Property Name="IntStats" Hidden="true" />
+      <Property Name="KOStats" Hidden="true" />
+      <Property Name="KRStats" Hidden="true" />
+      <Property Name="PassStats" Hidden="true" />
+      <Property Name="PRStats" Hidden="true" />
+      <Property Name="PuntStats" Hidden="true" />
+      <Property Name="RecStats" Hidden="true" />
+      <Property Name="RushStats" Hidden="true" />
+      <Property Name="Season" Hidden="true" />
+      <Method Name="SeasonStats" Hidden="true" />
+      <Property Name="TackleStats" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>ASACAAAAAQAAAAAAgIBIAAABAAAAAAAAAQIIAAAAAAA=</HashCode>
+      <FileName>Models\SeasonStats.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Squad" Collapsed="true">
+    <Position X="10.25" Y="1.75" Width="1.5" />
+    <Members>
+      <Property Name="FullName" Hidden="true" />
+      <Property Name="Id" Hidden="true" />
+      <Property Name="Location" Hidden="true" />
+      <Property Name="Mascot" Hidden="true" />
+      <Method Name="Squad" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAIAAAAIAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Squad.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.User" Collapsed="true">
+    <Position X="13.5" Y="1.75" Width="1.5" />
+    <Members>
+      <Property Name="Active" Hidden="true" />
+      <Property Name="Email" Hidden="true" />
+      <Property Name="FirstName" Hidden="true" />
+      <Property Name="Id" Hidden="true" />
+      <Property Name="LastName" Hidden="true" />
+      <Property Name="Password" Hidden="true" />
+      <Property Name="Role" Hidden="true" />
+      <Property Name="Tlf" Hidden="true" />
+      <Method Name="User" Hidden="true" />
+      <Property Name="Username" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAACAEAAACAAAAAAEQAAAAAAAAAAAAAiBAAAAAAAAAg=</HashCode>
+      <FileName>Models\User.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Teams.Trade" Collapsed="true">
+    <Position X="6.75" Y="1.75" Width="1.5" />
+    <Members>
+      <Property Name="FranchiseId" Hidden="true" />
+      <Property Name="FranchisePicks" Hidden="true" />
+      <Property Name="FranchisePlayers" Hidden="true" />
+      <Property Name="Id" Hidden="true" />
+      <Property Name="TeamId" Hidden="true" />
+      <Property Name="TeamPicks" Hidden="true" />
+      <Property Name="TeamPlayers" Hidden="true" />
+      <Method Name="Trade" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAACABACAABAAAEAAAAAAAAAABA=</HashCode>
+      <FileName>Models\Teams\Trade.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Teams.Lineup" Collapsed="true">
+    <Position X="0.5" Y="8.75" Width="1.5" />
+    <Members>
+      <Method Name="Lineup" Hidden="true" />
+      <Property Name="Player10" Hidden="true" />
+      <Property Name="Player11" Hidden="true" />
+      <Property Name="Player6" Hidden="true" />
+      <Property Name="Player7" Hidden="true" />
+      <Property Name="Player8" Hidden="true" />
+      <Property Name="Player9" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAMYBAAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Models\Teams\Lineup.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="METCore.Models.Teams.SPLineup" Collapsed="true">
+    <Position X="0.5" Y="7.5" Width="1.5" />
+    <Members>
+      <Property Name="Formation" Hidden="true" />
+      <Property Name="Player1" Hidden="true" />
+      <Property Name="Player2" Hidden="true" />
+      <Property Name="Player3" Hidden="true" />
+      <Property Name="Player4" Hidden="true" />
+      <Property Name="Player5" Hidden="true" />
+      <Method Name="SPLineup" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAA4BgAAAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>Models\Teams\SPLineup.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="METCore.Interfaces.Importing.IImportable" Collapsed="true">
+    <Position X="43" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\Importing\IImportable.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="METCore.Interfaces.Importing.IImportableDto" Collapsed="true">
+    <Position X="44.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Interfaces\Importing\IImportable.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="METCore.Interfaces.IBaseRepository&lt;T&gt;" Collapsed="true">
+    <Position X="7.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEAAAAAAAAAAAAAAAEEAABAAAAAQAACE=</HashCode>
+      <FileName>Interfaces\IBaseRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="METCore.Interfaces.IContractRepository" Collapsed="true">
+    <Position X="3.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IContractRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="METCore.Interfaces.IFranchiseRepository" Collapsed="true">
+    <Position X="10" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IFranchiseRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="METCore.Interfaces.ILineup" Collapsed="true">
+    <Position X="43" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAA4BgAAAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\ILineup.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="METCore.Interfaces.IPlayerRepository" Collapsed="true">
+    <Position X="5.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAgBQAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAg=</HashCode>
+      <FileName>Interfaces\IPlayerRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="METCore.Interfaces.ISeasonStatsRepository" Collapsed="true">
+    <Position X="12.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\ISeasonStatsRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="METCore.Interfaces.ITeamRepository" Collapsed="true">
+    <Position X="1" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\ITeamRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="METCore.Interfaces.ITradeRepository" Collapsed="true">
+    <Position X="7.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\ITradeRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="METCore.Interfaces.IUserRepository" Collapsed="true">
+    <Position X="14.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAQAAAAAAEAAgAAAAAAAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\IUserRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
