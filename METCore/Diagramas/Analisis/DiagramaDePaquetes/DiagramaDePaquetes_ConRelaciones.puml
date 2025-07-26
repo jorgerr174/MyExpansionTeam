@@ -1,0 +1,22 @@
+@startuml DiagramaPaquetes
+left to right direction
+
+package "Gestión de Usuarios" as GestionDeUsuarios
+
+package "Gestión de Equipos" as GestionDeEquipos {
+
+    package "Gestión de Equipo" 
+    
+    package "Gestión de Roster" 
+    
+    package "Gestión de Draft" 
+
+}
+
+package "Administración" as Administracion 
+
+GestionDeUsuarios --> GestionDeEquipos : <<uses>>
+Administracion --> GestionDeEquipos : <<accesses>>
+Administracion --> GestionDeUsuarios : <<accesses>>
+
+@enduml

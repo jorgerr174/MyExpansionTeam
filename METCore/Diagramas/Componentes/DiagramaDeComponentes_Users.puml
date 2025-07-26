@@ -1,0 +1,23 @@
+@startuml METAPI_Database_ER_Diagram
+
+
+component IU_AuthController.cshtml <<interface>>
+component IU_UsersController.cshtml <<interface>>
+
+component AuthController.cs <<file>>
+component UsersController.cs <<file>>
+
+component Users.cs <<file>>
+
+component Users.db <<table>>
+
+'huidcsbi
+IU_AuthController.cshtml - AuthController.cs
+IU_UsersController.cshtml - UsersController.cs
+IU_AuthController.cshtml <|. Users.cs
+IU_UsersController.cshtml <|. Users.cs
+AuthController.cs -d- Users.cs
+UsersController.cs -d- Users.cs
+Users.cs .> Users.db
+
+@enduml

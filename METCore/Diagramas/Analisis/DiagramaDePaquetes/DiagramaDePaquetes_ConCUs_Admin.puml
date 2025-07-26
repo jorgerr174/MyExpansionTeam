@@ -1,0 +1,13 @@
+@startuml PaquetesConCasosDeUsoYRelaciones
+
+actor Admin
+
+package "Administración" {
+    usecase "CU019: Importación datos" as UC019
+    usecase "CU020: Gestión roles" as UC020
+}
+
+Admin --> UC019
+Admin --> UC020
+
+@enduml

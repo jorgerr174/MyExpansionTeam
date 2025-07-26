@@ -1,0 +1,44 @@
+@startuml
+
+abstract class BaseClass {
+    + Id : int {key}
+}
+
+abstract class Squad
+
+abstract class KickStats 
+
+abstract class ReturnStats 
+
+abstract class SkillStats 
+
+
+' Implementation relationships
+IStats <|.u. FGStats
+IStats <|.u. IntStats
+IStats <|.u. TackleStats
+IStats <|.u. KickStats
+IStats <|.u. ReturnStats
+IStats <|.u. SkillStats
+
+IImportable <|.u. Contract
+
+
+' Inheritance relationships
+IImportable <|-l- IStats
+
+BaseClass <|-u- User
+BaseClass <|-u- Squad
+BaseClass <|-u- Player
+BaseClass <|-u- Prospect
+BaseClass <|-r- Contract
+BaseClass <|-u- Trade
+BaseClass <|-u- SeasonStats
+BaseClass <|-d- FGStats
+BaseClass <|-d- IntStats
+BaseClass <|-d- TackleStats
+BaseClass <|-d- KickStats
+BaseClass <|-d- ReturnStats
+BaseClass <|-d- SkillStats
+
+@enduml

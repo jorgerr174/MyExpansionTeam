@@ -42,22 +42,6 @@ namespace METCore.DTOs.Team
             this.FranchisePlayers = [];
             this.FranchisePicks = [];
         }
-
-
-        public TradeDto(int Id, int TeamId, int FranchiseId, bool? Force, int TeamCurrentCap, IList<SelectableDto> TeamPlayers, IList<int> TeamPicks, IList<SelectableDto> FranchisePlayers, IList<int> FranchisePicks)
-        {
-            this.Id = Id;
-            this.TeamId = TeamId;
-            this.FranchiseId = FranchiseId;
-            this.Force = Force.HasValue && Force.Value;
-            this.TeamCurrentCap = TeamCurrentCap;
-
-            this.TeamPlayers = TeamPlayers ?? [];
-            this.TeamPicks = TeamPicks ?? [];
-
-            this.FranchisePlayers = FranchisePlayers ?? [];
-            this.FranchisePicks = FranchisePicks ?? [];
-        }
         #endregion Constructors
     }
 }

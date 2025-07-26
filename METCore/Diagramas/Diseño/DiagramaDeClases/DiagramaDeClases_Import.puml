@@ -1,0 +1,33 @@
+@startuml Vista_Arquitectonica_METAPI_Diseno
+
+package "PlayerManagement" as playerSubsystem <<designSubsystem>> {
+    
+    object "PlayerControl" as playerControl <<control>>
+
+    object "PlayerService" as playerService {
+        + configuration : IConfiguration
+        + playerRepository : IPlayerRepository
+        + mapper : IMapper
+        + GetDtoByPlayername(string playername) : Task<PlayerDto?>
+        + UpdatePlayer(string playername, PlayerDto dto) : Task<string>
+    }
+    
+    object "Player" as player <<entity>> {
+        + Id : int {key}
+        + FirstName : string
+        + LastName : string
+        + Playername : string
+        + Password : string
+        + Email : string
+        + Tlf : string?
+        + Active : bool
+        + Role : RoleEnum
+    }
+}
+
+playerControl - playerService
+playerControl -d- player
+
+playerService -d|> player
+
+@enduml

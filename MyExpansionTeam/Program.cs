@@ -96,8 +96,6 @@ namespace METAPI
             services.AddScoped<FranchiseService>();
             services.AddScoped<TeamService>();
             services.AddScoped<PlayerService>();
-            services.AddScoped<ContractService>();
-            services.AddScoped<SeasonStatsService>();
 
             // Repositories
             services.AddScoped<IUserRepository, UserRepository>();
