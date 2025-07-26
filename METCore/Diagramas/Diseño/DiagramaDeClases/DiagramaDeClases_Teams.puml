@@ -1,0 +1,102 @@
+@startuml Vista_Arquitectonica_METAPI_Diseno
+
+package TeamManagement <<designSubsystem>> {
+    
+    object TeamControl <<control>>
+
+    object TeamService {
+        + configuration : IConfiguration
+        + teamRepository : ITeamRepository
+        + playerRepository : IPlayerRepository
+        + userRepository : IUserRepository
+        + franchiseRepository : IFranchiseRepository
+        + tradeRepository : ITradeRepository
+        + mapper : IMapper
+        + ValidateTeamBasicInfo(TeamBasicInfoDto dto, string? username) : Task<string> 
+        + CreateTeamFromBasicInfo(TeamBasicInfoDto dto, string username) : Task<TeamInfoDto?> 
+        + GetDtoById(int id) : Task<TeamDto?>
+        + GetInfoDtoById(int id) : Task<TeamInfoDto?>
+        + GetTeamDraftDtoById(int id) : Task<DraftDto?>
+        + GetBasicInfoDtoById(int id) : Task<TeamBasicInfoDto?>
+        + ListTeams(bool mine, string? username) : Task<IEnumerable<TeamInfoDto>?>
+        + GetValidProtectedIds(IList<int> Ids) : Task<IList<int>> 
+        + GetDefaultProtectedPlayers(int numPerFranchise) : List<int> 
+        + UpdateTeam(string? username, TeamInfoDto dto) : Task<string>
+        + UpdateRosterSettings(string? username, TeamInfoDto dto) : Task<string>
+        + UpdateRoster(string? username, TeamDto dto) : Task<string>
+        + GetTradeDto(string username, TradeDto dto) : Task<string?>
+        + SaveTrade(string username, TradeDto dto) : Task<string?>
+    }
+    
+    object Team <<entity>> {
+        + User : User
+        + Date : DateTime
+        + Abb : string
+        + Complete : bool
+        + RosterSettings : RosterSettings?
+        + PlayersIds : IList<int>
+        + OffLineup : Lineup
+        + DefLineup : Lineup
+        + SPLineup : SPLineup
+        + ProtectedPlayersIds : IList<int>
+        + Trades : IList<Trade>
+        + Selections : IDictionary<int, int>?
+    }
+    
+    object Trade <<entity>> {
+        + Id : int {key}
+        + Franchise : Franchise
+        + Team : Team
+        + TeamPlayers : IList<int>
+        + TeamPicks : IList<int>
+        + FranchisePlayers : IList<int>
+        + FranchisePicks : IList<int>
+        + Complete : bool
+    }
+    
+    object RosterSettings <<entity>> {
+        + Cap : decimal
+        + MaxPerTeam : int
+        + BlockedPerTeam : int
+    }
+    
+    object SPLineup <<entity>> {
+        + Formation : string
+        + Player1 : int
+        + Player2 : int
+        + Player3 : int
+        + Player4 : int
+        + Player5 : int
+    }
+    
+    object Lineup <<entity>> {
+        + Formation : string
+        + Player1 : int
+        + Player2 : int
+        + Player3 : int
+        + Player4 : int
+        + Player5 : int
+        + Player6 : int
+        + Player7 : int
+        + Player8 : int
+        + Player9 : int
+        + Player10 : int
+        + Player11 : int
+    }
+
+}
+
+TeamControl - TeamService
+TeamControl -d- Team
+TeamControl -d- Trade
+TeamControl -d- RosterSettings
+TeamControl -d- SPLineup
+TeamControl -d- Lineup
+
+TeamService -d|> Team
+TeamService -d- Trade
+TeamService -d- RosterSettings
+TeamService -d- SPLineup
+TeamService -d- Lineup
+
+@enduml

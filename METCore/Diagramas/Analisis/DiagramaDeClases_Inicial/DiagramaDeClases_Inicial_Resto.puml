@@ -1,0 +1,147 @@
+@startuml
+class User {
+    + Id : int {key}
+    + FirstName : string
+    + LastName : string
+    + Username : string
+    + Password : string
+    + Email : string
+    + Tlf : string?
+    + Active : bool
+    + Role : RoleEnum
+}
+
+abstract class Squad {
+    + Id : int {key}
+    + Location : string
+    + Mascot : string
+}
+
+class Franchise {
+    + Protected1 : Player
+    + Protected2 : Player
+    + Protected3 : Player
+}
+
+class Team {
+    + User : User
+    + Date : DateTime
+    + Abb : string
+    + Complete : bool
+    + RosterSettings : RosterSettings?
+    + PlayersIds : IList<int>
+    + OffLineup : Lineup
+    + DefLineup : Lineup
+    + SPLineup : SPLineup
+    + ProtectedPlayersIds : IList<int>
+    + Trades : IList<Trade>
+    + Selections : IDictionary<int, int>?
+}
+
+class Player {
+    + Id : int {key}
+    + Name : string
+    + Height : int
+    + Weight : int
+    + BirthDate : DateOnly?
+    + Position : PositionEnum
+    + Position2 : PositionEnum?
+    + Position3 : PositionEnum?
+    + Contracts : IList<Contract>
+    + Stats : IList<SeasonStats>
+    + Prospect : Prospect?
+    + College : string
+    + Retired : bool
+}
+
+class Prospect {
+    + Id : int {key}
+    + Year : int
+    + Consensus : int
+    + HandSize : string?
+    + ArmLength : string?
+    + Wingspan : string?
+    + FortyYardDash : string?
+    + BenchPress : string?
+    + VertJump : string?
+    + BroadJump : string?
+    + ThreeConeDrill : string?
+    + TwentyYardShuttle : string?
+    + AthScore : int
+}
+
+class Contract {
+    + Id : int {key}
+    + Franchise : Franchise
+    + YearSigned : int
+    + Length : int
+    + Total : long
+    + Guaranteed : long
+    + Active : bool
+}
+
+class Trade {
+    + Id : int {key}
+    + Franchise : Franchise
+    + Team : Team
+    + TeamPlayers : IList<int>
+    + TeamPicks : IList<int>
+    + FranchisePlayers : IList<int>
+    + FranchisePicks : IList<int>
+    + Complete : bool
+}
+
+class RosterSettings {
+    + Cap : decimal
+    + MaxPerTeam : int
+    + BlockedPerTeam : int
+}
+
+class SPLineup {
+    + Formation : string
+    + Player1 : int
+    + Player2 : int
+    + Player3 : int
+    + Player4 : int
+    + Player5 : int
+}
+
+class Lineup {
+    + Player6 : int
+    + Player7 : int
+    + Player8 : int
+    + Player9 : int
+    + Player10 : int
+    + Player11 : int
+}
+
+class SeasonStats 
+
+
+' Inheritance relationships
+Squad <|-- Franchise
+Squad <|-- Team
+
+SPLineup <|-- Lineup
+
+
+' Composition relationships
+Squad *-- Player : "has"
+
+Franchise |o-l-|| Player : "protects"
+Franchise |o-l-|| Player : "protects"
+Franchise |o-l-|| Player : "protects"
+
+Team }o--|| User : "owns"
+Team ||--o| RosterSettings : "has"
+Team ||--o| Lineup : "has offensive"
+Team ||--o| Lineup : "has defensive"
+Team ||-r-o| SPLineup : "has"
+Team ||--o{ Trade : "participates in"
+Franchise ||--o{ Trade : "participates in"
+
+Player ||--o{ Contract : "owns"
+Player ||--o| Prospect : "is"
+Player ||--o{ SeasonStats : "has"
+
+@enduml

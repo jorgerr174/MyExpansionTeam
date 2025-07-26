@@ -1,0 +1,227 @@
+@startuml Vista_Arquitectonica_METAPI_Diseno
+
+package PlayerManagement <<designSubsystem>> {
+    
+    object PlayerControl <<control>>
+
+    object PlayerService {
+        + configuration : IConfiguration
+        + playerRepository : IPlayerRepository
+        + mapper : IMapper
+        + GetDraftProspects(int year) : Task<IList<ProspectDto>>
+    }
+    
+    object Player <<entity>> {
+        + Id : int {key}
+        + Name : string
+        + Height : int
+        + Weight : int
+        + BirthDate : DateOnly?
+        + Position : PositionEnum
+        + Position2 : PositionEnum?
+        + Position3 : PositionEnum?
+        + Contracts : IList<Contract>
+        + Stats : IList<SeasonStats>
+        + Prospect : Prospect?
+        + College : string
+        + Retired : bool
+    }
+    
+    object Prospect <<entity>> {
+        + Id : int {key}
+        + Year : int
+        + Consensus : int
+        + HandSize : string?
+        + ArmLength : string?
+        + Wingspan : string?
+        + FortyYardDash : string?
+        + BenchPress : string?
+        + VertJump : string?
+        + BroadJump : string?
+        + ThreeConeDrill : string?
+        + TwentyYardShuttle : string?
+        + AthScore : int
+    }
+    
+    object Contract <<entity>> {
+        + Id : int {key}
+        + Franchise : Franchise
+        + YearSigned : int
+        + Length : int
+        + Total : long
+        + Guaranteed : long
+        + Active : bool
+    }
+    
+    object SeasonStats <<entity>> {
+        + Id : int {key}
+        + Player : Player
+        + Season : int
+        + FGStats : FGStats?
+        + IntStats : IntStats?
+        + TackleStats : TackleStats?
+        + PassStats : PassStats?
+        + RecStats : RecStats?
+        + RushStats : RushStats?
+        + KOStats : KOStats?
+        + PuntStats : PuntStats?
+        + KRStats : KRStats?
+        + PRStats : PRStats?
+    }
+    
+    object FGStats <<entity>> {
+        + Id : int {key}
+        + ShAtt : int
+        + ShMade : int
+        + MidAtt : int
+        + MidMade : int
+        + LongAtt : int
+        + LongMade : int
+        + Lng : int
+        + Blk : int
+    }
+    
+    object IntStats {
+        + Id : int {key}
+        + INT : int
+        + Yds : int
+        + TD : int
+        + Lng : int
+    }
+    
+    object TackleStats <<entity>> {
+        + Id : int {key}
+        + Comb : int
+        + Solo : int
+        + Asst : int
+        + Sck : int
+    }
+    
+    object KOStats <<entity>> {
+        + Id : int {key}
+        + Kick : int
+        + Yds : int
+        + TB : int
+        + OOB : int
+        + Ret : int
+        + RetYds : int
+        + TD : int
+        + OnSide : int
+        + OnSideRec : int
+    }
+    
+    object PuntStats <<entity>> {
+        + Id : int {key}
+        + Kick : int
+        + Yds : int
+        + TB : int
+        + OOB : int
+        + Ret : int
+        + RetYds : int
+        + TD : int
+        + Inside20 : int
+        + Down : int
+        + FC : int
+        + Blk : int
+        + Lng : int
+    }
+    
+    object KRStats <<entity>> {
+        + Id : int {key}
+        + Ret : int
+        + Yds : int
+        + TD : int
+        + Plus20 : int
+        + Plus40 : int
+        + Lng : int
+        + FC : int
+        + Fumb : int
+    }
+    
+    object PRStats <<entity>> {
+        + Id : int {key}
+        + Ret : int
+        + Yds : int
+        + TD : int
+        + Plus20 : int
+        + Plus40 : int
+        + Lng : int
+        + FC : int
+        + Fumb : int
+    }
+    
+    object PassStats <<entity>> {
+        + Id : int {key}
+        + Yds : int
+        + Att : int
+        + TD : int
+        + Plus20 : int
+        + Plus40 : int
+        + Reach1st : int
+        + Lng : int
+        + Cmp : int
+        + INT : int
+        + PR : int
+        + Sck : int
+        + SckYds : int
+    }
+    
+    object RecStats <<entity>> {
+        + Id : int {key}
+        + Yds : int
+        + Att : int
+        + TD : int
+        + Plus20 : int
+        + Plus40 : int
+        + Reach1st : int
+        + Lng : int
+        + Rec : int
+        + Fmb : int
+        + YAC : int
+    }
+    
+    object RushStats <<entity>> {
+        + Id : int {key}
+        + Yds : int
+        + Att : int
+        + TD : int
+        + Plus20 : int
+        + Plus40 : int
+        + Reach1st : int
+        + Lng : int
+        + Fmb : int
+    }
+}
+
+PlayerControl - PlayerService
+PlayerControl -d- Player
+PlayerControl -d- Prospect
+PlayerControl -d- Contract
+PlayerControl -d- SeasonStats
+PlayerControl -d- FGStats
+PlayerControl -d- IntStats
+PlayerControl -d- TackleStats
+PlayerControl -d- KOStats
+PlayerControl -d- PuntStats
+PlayerControl -d- KRStats
+PlayerControl -d- PRStats
+PlayerControl -d- PassStats
+PlayerControl -d- RecStats
+PlayerControl -d- RushStats
+
+PlayerService -u|> Player
+PlayerService -u|> Prospect
+PlayerService -u|> Contract
+PlayerService -u|> SeasonStats
+PlayerService -u|> FGStats
+PlayerService -u|> IntStats
+PlayerService -u|> TackleStats
+PlayerService -u|> KOStats
+PlayerService -u|> PuntStats
+PlayerService -u|> KRStats
+PlayerService -u|> PRStats
+PlayerService -u|> PassStats
+PlayerService -u|> RecStats
+PlayerService -u|> RushStats
+
+@enduml

@@ -8,15 +8,14 @@ namespace METAPI.Controllers
 {
     [Route("api/[Controller]")]
     [ApiController]
-    public class TeamsController(TeamService teamService, FranchiseService franchiseService) : ControllerBase
+    public class TeamsController(TeamService teamService) : ControllerBase
     {
         private readonly TeamService _teamService = teamService;
-        private readonly FranchiseService _franchiseService = franchiseService;
 
         #region Private
         private async Task<IEnumerable<TeamInfoDto>?> ListTeams(bool? mine = false, string? username = null)
         {
-            return await _teamService.ListTeams(mine.HasValue ? mine.Value : false, username);
+            return await _teamService.ListTeams(mine ?? false, username);
         }
         #endregion Private
 

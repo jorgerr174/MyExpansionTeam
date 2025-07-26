@@ -1,0 +1,90 @@
+@startuml METAPI_Database_ER_Diagram
+
+
+component IU_PlayersController.cshtml <<interface>>
+
+
+component PlayersController.cs <<file>>
+
+component Players.cs <<file>>
+component Contracts.cs <<file>>
+component Prospects.cs <<file>>
+component SeasonStats.cs <<file>>
+component FGStats.cs <<file>>
+component IntStats.cs <<file>>
+component TackleStats.cs <<file>>
+component KOStats.cs <<file>>
+component PuntStats.cs <<file>>
+component KRStats.cs <<file>>
+component PRStats.cs <<file>>
+component PassStats.cs <<file>>
+component RecStats.cs <<file>>
+component RushStats.cs <<file>>
+
+
+component Players.db <<table>>
+component Contracts.db <<table>>
+component Prospects.db <<table>>
+component SeasonStats.db <<table>>
+component FGStats.db <<table>>
+component IntStats.db <<table>>
+component TackleStats.db <<table>>
+component KOStats.db <<table>>
+component PuntStats.db <<table>>
+component KRStats.db <<table>>
+component PRStats.db <<table>>
+component PassStats.db <<table>>
+component RecStats.db <<table>>
+component RushStats.db <<table>>
+
+
+'huidcsbi
+IU_PlayersController.cshtml - PlayersController.cs
+
+IU_PlayersController.cshtml <|.d. Players.cs
+IU_PlayersController.cshtml <|.d. Contracts.cs
+IU_PlayersController.cshtml <|.d. Prospects.cs
+IU_PlayersController.cshtml <|.d. SeasonStats.cs
+IU_PlayersController.cshtml <|.d. FGStats.cs
+IU_PlayersController.cshtml <|.d. IntStats.cs
+IU_PlayersController.cshtml <|.d. TackleStats.cs
+IU_PlayersController.cshtml <|.d. KOStats.cs
+IU_PlayersController.cshtml <|.d. PuntStats.cs
+IU_PlayersController.cshtml <|.d. KRStats.cs
+IU_PlayersController.cshtml <|.d. PRStats.cs
+IU_PlayersController.cshtml <|.d. PassStats.cs
+IU_PlayersController.cshtml <|.d. RecStats.cs
+IU_PlayersController.cshtml <|.d. RushStats.cs
+
+PlayersController.cs -d- Players.cs
+PlayersController.cs -d- Contracts.cs
+PlayersController.cs -d- Prospects.cs
+PlayersController.cs -d- SeasonStats.cs
+PlayersController.cs -d- FGStats.cs
+PlayersController.cs -d- IntStats.cs
+PlayersController.cs -d- TackleStats.cs
+PlayersController.cs -d- KOStats.cs
+PlayersController.cs -d- PuntStats.cs
+PlayersController.cs -d- KRStats.cs
+PlayersController.cs -d- PRStats.cs
+PlayersController.cs -d- PassStats.cs
+PlayersController.cs -d- RecStats.cs
+PlayersController.cs -d- RushStats.cs
+
+
+Players.cs .d.> Players.db
+Contracts.cs .d.> Contracts.db
+Prospects.cs .d.> Prospects.db
+SeasonStats.cs .d.> SeasonStats.db
+FGStats.cs .d.> FGStats.db
+IntStats.cs .d.> IntStats.db
+TackleStats.cs .d.> TackleStats.db
+KOStats.cs .d.> KOStats.db
+PuntStats.cs .d.> PuntStats.db
+KRStats.cs .d.> KRStats.db
+PRStats.cs .d.> PRStats.db
+PassStats.cs .d.> PassStats.db
+RecStats.cs .d.> RecStats.db
+RushStats.cs .d.> RushStats.db
+
+@enduml

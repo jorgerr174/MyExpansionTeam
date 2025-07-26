@@ -1,0 +1,35 @@
+@startuml Vista_Arquitectonica_METAPI_Diseno
+
+package "AuthManagement" as userSubsystem <<designSubsystem>> {
+    
+    object "AuthControl" as authControl <<control>>
+    
+    object "AuthService" as authService {
+        + configuration : IConfiguration
+        + userRepository : IUserRepository
+        + mapper : IMapper
+        + UpdateCredentials(string username, UpdateCredentialsDto model) : Task<string>
+        + DeleteUser(string username) : Task<string>
+        + Authenticate(string username, string password) : Task<string>
+        + SignUp(NewUserDto dto) : Task<string>
+    }
+
+    object "User" as user <<entity>> {
+        + Id : int {key}
+        + FirstName : string
+        + LastName : string
+        + Username : string
+        + Password : string
+        + Email : string
+        + Tlf : string?
+        + Active : bool
+        + Role : RoleEnum
+    }
+}
+
+authControl - authService
+authControl -d- user
+
+authService -d|> user
+
+@enduml

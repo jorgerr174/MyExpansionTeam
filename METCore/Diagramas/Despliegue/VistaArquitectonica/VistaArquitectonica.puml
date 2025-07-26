@@ -1,0 +1,68 @@
+@startuml METAPI_Database_ER_Diagram
+
+node Client [
+    <b>\tCliente</b>
+    ----
+    <b>\tComponents</b>
+    IU_AuthController.cshtml
+    IU_PlayersController.cshtml
+    IU_TeamsController.cshtml
+    IU_UsersController.cshtml
+]
+
+node Server [
+    <b>\tServidor</b>
+    ----
+    <b>\tComponents</b>
+    AuthController.cs
+    PlayersController.cs
+    TeamsController.cs
+    UsersController.cs
+    User.cs
+    Players.cs
+    Franchises.cs
+    Teams.cs
+    Contracts.cs
+    Prospects.cs
+    Trades.cs
+    SeasonStats.cs
+    FGStats.cs
+    IntStats.cs
+    TackleStats.cs
+    KOStats.cs
+    PuntStats.cs
+    KRStats.cs
+    PRStats.cs
+    PassStats.cs
+    RecStats.cs
+    RushStats.cs
+]
+
+node BD [
+    <b>\tServidor de la BD</b>
+    ----
+    <b>\tComponents</b>
+    User.db
+    Players.db
+    Franchises.db
+    Teams.db
+    Contracts.db
+    Prospects.db
+    Trades.db
+    SeasonStats.db
+    FGStats.db
+    IntStats.db
+    TackleStats.db
+    KOStats.db
+    PuntStats.db
+    KRStats.db
+    PRStats.db
+    PassStats.db
+    RecStats.db
+    RushStats.db
+]
+
+Client -r- Server : internet
+Server -r- BD : intranet
+
+@enduml
