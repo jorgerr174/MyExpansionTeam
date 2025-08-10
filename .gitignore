@@ -1,4 +1,43 @@
-.vs/*
+# Images
 */Diagramas/*.png
-*/bin/*
-*/obj/*
+
+# Ignorar compilaciones en cualquier subcarpeta
+**/bin/
+**/obj/
+**/[Dd]ebug/
+**/[Rr]elease/
+**/[Bb]uild/
+**/x64/
+**/x86/
+**/[Aa]rtifacts/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+!packages/repositories.config
+**/packages/
+
+# Logs
+*.log
+
+# Archivos temporales
+**/[Tt]emp/
+*.tmp
+*.temp
+
+# Publicaciones
+**/publish/
+
+# Configuraciones sensibles
+appsettings.*.json
+
+# Otros
+_ReSharper*/
+*.resharper
+*.DotSettings.user
