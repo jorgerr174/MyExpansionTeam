@@ -12,6 +12,12 @@ C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\Azure.Co
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\Azure.Identity.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\CsvHelper.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\Humanizer.dll
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\System.Web.Mvc.dll
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\System.Web.Razor.dll
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\System.Web.Helpers.dll
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\System.Web.WebPages.Deployment.dll
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\System.Web.WebPages.Razor.dll
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\System.Web.WebPages.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\Microsoft.AspNetCore.JsonPatch.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\Microsoft.AspNetCore.Mvc.Razor.Extensions.dll
@@ -63,6 +69,7 @@ C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\Microsof
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\Microsoft.VisualStudio.Web.CodeGeneration.Templating.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\Microsoft.VisualStudio.Web.CodeGeneration.Utils.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\Microsoft.VisualStudio.Web.CodeGenerators.Mvc.dll
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\Microsoft.Web.Infrastructure.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\Mono.TextTemplating.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\Newtonsoft.Json.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\Newtonsoft.Json.Bson.dll
@@ -333,3 +340,4 @@ C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\refint\W
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.pdb
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.genruntimeconfig.cache
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\ref\WebApp.dll
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.MvcApplicationPartsAssemblyInfo.cs

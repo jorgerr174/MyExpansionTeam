@@ -1,0 +1,7 @@
+@startuml
+
+actor Anónimo
+actor Usuario
+actor "Admin" as Admin
+
+@enduml

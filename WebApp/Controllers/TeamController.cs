@@ -236,11 +236,8 @@ namespace WebApp.Controllers
         [Authorize]
         public async Task<IActionResult> Draft(DraftDto dto)
         {
-            if (!ModelState.IsValid)
-                return View(dto);
-
             var response = await SendRequest(HttpMethod.Post, "Teams", "SaveDraft", dto);
-            return RedirectToAction("Roster", new { dto.Id, response.IsSuccessStatusCode });
+            return RedirectToAction("EditRoster", new { Id = dto.Id, unsuccessfulDraft = !response.IsSuccessStatusCode });
         }
 
 
@@ -262,25 +259,52 @@ namespace WebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<DraftDto> GetTeamDraft(int TeamId)
+        public async Task<DraftDto?> GetTeamDraft(int TeamId)
         {
-            var response = await SendRequest(HttpMethod.Get, "Teams", "GetTeamDraft", new IdDto(TeamId));
-            return !response.IsSuccessStatusCode ? new DraftDto() : await GetResult<DraftDto>(response);
+            var response = await SendRequest(HttpMethod.Get, "Teams", "TeamDraft", new IdDto(TeamId));
+            return !response.IsSuccessStatusCode ? null : await GetResult<DraftDto>(response);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetTradePartial(int TeamId, int FranchiseId)
         {
             var response = await SendRequest(HttpMethod.Get, "Teams", "GetTradeDto", new TradeDto(TeamId, FranchiseId));
+
             return response.IsSuccessStatusCode 
-                ? PartialView("Trade", await GetResult<TradeDto>(response)) 
-                : PartialView("TradeError", await GetResult<MessageDto>(response));
+                ? View("Trade", await GetResult<TradeDto>(response)) 
+                : View("TradeError", await GetResult<MessageDto>(response));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTradePartialAsString(int TeamId, int FranchiseId, int CurrentPick)
+        {
+            var response = await SendRequest(HttpMethod.Get, "Teams", "GetTradeDto", new TradeDto(TeamId, FranchiseId));
+            
+            ResultDto<string> result;
+            if (response.IsSuccessStatusCode)
+            {
+                ViewData["CurrentPick"] = CurrentPick;
+                result = await RenderViewToString(this, "Trade", await GetResult<TradeDto>(response));
+            }
+            else
+                result = new ResultDto<string>((await GetResult<MessageDto>(response)).Message);
+
+            return Json(result);
+        }
+
+        [HttpGet]
+        public async Task<object> GetTradeModel(int TeamId, int FranchiseId)
+        {
+            var response = await SendRequest(HttpMethod.Get, "Teams", "GetTradeDto", new TradeDto(TeamId, FranchiseId));
+            return response.IsSuccessStatusCode 
+                ? await GetResult<TradeDto>(response)
+                : await GetResult<MessageDto>(response);
         }
 
         [HttpPost]
         public async Task<MessageDto> RequestTrade(TradeDto dto)
         {
-            return await GetResult<MessageDto>(await SendRequest(HttpMethod.Get, "Teams", "SaveTrade", dto));
+            return await GetResult<MessageDto>(await SendRequest(HttpMethod.Post, "Teams", "SaveTrade", dto));
         }
         #endregion Trade
     }

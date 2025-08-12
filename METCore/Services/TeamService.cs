@@ -1,9 +1,16 @@
-﻿using AutoMapper;
+﻿using System.Diagnostics;
+using System.Numerics;
+using AutoMapper;
+using AutoMapper.Configuration.Conventions;
 using METCore.DTOs.Player;
+using METCore.DTOs.Shared;
 using METCore.DTOs.Team;
 using METCore.Interfaces;
 using METCore.Models;
+using METCore.Models.Players;
 using METCore.Models.Teams;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using static METCore.Enums.Types;
 
@@ -73,17 +80,46 @@ namespace METCore.Services
             if (team is null) return null;
 
             TeamDto dto = _mapper.Map<TeamDto>(team);
+            dto.Picks = DraftPicks.Team;
+            IList<int> tradedPlayersIds = [];
+            IList<int> teamPlayersIds = team.PlayersIds;
+
             if (team.Trades is not null && team.Trades.Count > 0)
-                foreach (Trade trade in team.Trades.OrderBy(t => t.Id))
+                foreach (Trade trade in team.Trades.OrderBy(t => t.Date))
                 {
                     foreach (int tpi in trade.TeamPicks)
                         dto.Picks.Remove(tpi);
                     foreach (int fpi in trade.FranchisePicks)
-                        dto.Picks.Add(fpi);
+                        if (!dto.Picks.Contains(fpi)) dto.Picks.Add(fpi);
 
-                    dto.TradedPlayers = [.. dto.TradedPlayers, _mapper.Map<PlayerBasicDto>(_playerRepository.GetManyTByIds(trade.TeamPlayers))];
+                    foreach (int tpl in trade.TeamPlayers)
+                    {
+                        if (!tradedPlayersIds.Contains(tpl)) tradedPlayersIds.Add(tpl);
+                        teamPlayersIds.Remove(tpl);
+                    }
+                    foreach (int fpl in trade.FranchisePlayers)
+                    {
+                        if (!teamPlayersIds.Contains(fpl)) teamPlayersIds.Add(fpl);
+                        tradedPlayersIds.Remove(fpl);
+                    }
                 }
-            if ((team.PlayersIds?.Count ?? 0) > 0) dto.Players = [.. _mapper.Map<IList<RosteredDto>>(await _playerRepository.GetManyTByIds(team.PlayersIds))];
+            dto.TradedPlayers = [.. dto.TradedPlayers.Concat(_mapper.Map<IList<PlayerBasicDto>>(await _playerRepository.GetManyTByIds(tradedPlayersIds)))];
+            if ((team.PlayersIds?.Count ?? 0) > 0) dto.Players = [.. _mapper.Map<IList<RosteredDto>>(await _playerRepository.GetManyTByIds(teamPlayersIds))];
+
+            if((team.Selections?.Count ?? 0) > 0)
+            {
+                foreach(KeyValuePair<int, int> selection in team.Selections){
+                    RosteredDto rookie = _mapper.Map<RosteredDto>(await _playerRepository.GetTById(selection.Value));
+                    
+                    int pickAPY = DraftPicks.GetPickAPY(selection.Key);
+                    rookie.PureAPY = Math.Round(pickAPY / 1000000.0, 2).ToString();
+                    rookie.APY = "$" + rookie.PureAPY + "M";
+                    rookie.PureAPY = rookie.PureAPY.Replace(',', '.');
+
+                    dto.Players.Add(rookie);
+                }
+            }
+
             return dto;
         }
 
@@ -115,20 +151,8 @@ namespace METCore.Services
             if (team is null) return null;
             DraftDto dto = _mapper.Map<DraftDto>(team);
 
-            if (team.Trades is not null && team.Trades.Count > 0)
-                foreach (Trade trade in team.Trades.OrderBy(t => t.Id))
-                {
-                    foreach (int tp in trade.FranchisePicks)
-                    {
-                        dto.Picks[0].Remove(tp);
-                        dto.Picks[trade.FranchiseId].Add(tp);
-                    }
-                    foreach (int fp in trade.FranchisePlayers)
-                    {
-                        dto.Picks[0].Remove(fp);
-                        dto.Picks[trade.FranchiseId].Add(fp);
-                    }
-                }
+            dto.Prospects = dto.Selections.Count < 1 ? [] : _mapper.Map<IList<ProspectDto>>(await _playerRepository.GetManyTByIds([..dto.Selections.Values]));
+
             return dto;
         }
 
@@ -189,6 +213,8 @@ namespace METCore.Services
             if (user is null) return "Username";
 
             Team newTeam = _mapper.Map<Team>(dto);
+
+            newTeam.PlayersIds = [..newTeam.PlayersIds.Where(p => !newTeam.Selections?.Values?.Contains(p) ?? true)];
             newTeam.Date = DateTime.Now;
             return await _teamRepository.UpdateT(newTeam) < 1 ? "Error" : "";
         }
@@ -233,6 +259,8 @@ namespace METCore.Services
             if (idCount != 0 && await _playerRepository.CountManyTByIds(dto.SelectedIds) != idCount) return "PlayerIds";
 
             team.PlayersIds = dto.SelectedIds;
+            if(team.Selections != null && team.Selections.Count > 0 && team.PlayersIds != null && team.PlayersIds.Count > 0) 
+                team.PlayersIds = [.. team.PlayersIds.Where(p => !team.Selections.Values.Contains(p))];
 
             team.OffLineup = _mapper.Map<Lineup>(dto.OffLineup);
             team.DefLineup = _mapper.Map<Lineup>(dto.DefLineup);
@@ -268,44 +296,130 @@ namespace METCore.Services
             dto.Force = false;
 
             dto.TeamPicks = DraftPicks.Team;
-            if ((team.PlayersIds?.Count ?? 0) > 0) dto.TeamPlayers = [.. _mapper.Map<IList<SelectableDto>>(await _playerRepository.GetManyTByIds(team.PlayersIds))];
-            dto.TeamCurrentCap = dto.TeamPlayers.Sum(tpl => decimal.Round(decimal.Parse(tpl.PureAPY.Replace('.', ',')), 2));
+
+            IList<int> teamPlayers = team.PlayersIds;
+            IList<int> franchisePlayers = [.. franchise.Players.Select(p => p.Id)];
+
+//            if ((team.PlayersIds?.Count ?? 0) > 0) dto.TeamPlayers = [.. _mapper.Map<IList<SelectableDto>>(await _playerRepository.GetManyTByIds(team.PlayersIds))];
 
             dto.FranchisePicks = DraftPicks.GetFranchisePicks(dto.FranchiseId);
-            dto.FranchisePlayers = _mapper.Map<IList<SelectableDto>>(franchise.Players);
+//            dto.FranchisePlayers = _mapper.Map<IList<SelectableDto>>(franchise.Players);
 
             if (team.Trades is not null && team.Trades.Count > 0)
-                foreach (Trade trade in team.Trades.OrderBy(t => t.Id))
+                foreach (Trade trade in team.Trades.OrderBy(t => t.Date))
                 {
                     bool isFranchise = trade.FranchiseId == dto.FranchiseId;
 
-                    foreach (int tpl in trade.TeamPlayers)
-                    {
-                        if (isFranchise) dto.FranchisePlayers.Add(_mapper.Map<SelectableDto>(_playerRepository.GetTById(tpl)));
-                    }
                     foreach (int tpi in trade.TeamPicks)
                     {
                         dto.TeamPicks.Remove(tpi);
                         if (isFranchise) dto.FranchisePicks.Add(tpi);
-                    }
-
-                    foreach (int fpl in trade.FranchisePlayers)
-                    {
-                        SelectableDto franchisePlayer = _mapper.Map<SelectableDto>(_playerRepository.GetTById(fpl));
-                        dto.TeamPlayers.Add(franchisePlayer);
-                        if (isFranchise) dto.FranchisePlayers.Remove(dto.FranchisePlayers.First(pl => pl.Id == fpl));
                     }
                     foreach (int fpi in trade.FranchisePicks)
                     {
                         dto.TeamPicks.Add(fpi);
                         if (isFranchise) dto.FranchisePicks.Remove(fpi);
                     }
+
+                    if (isFranchise)
+                    {
+                        foreach (int tpl in trade.TeamPlayers)
+                            franchisePlayers.Add(tpl);
+                        foreach (int fpl in trade.FranchisePlayers)
+                            franchisePlayers.Remove(fpl);
+                    }
                 }
+            dto.TeamPicks = dto.TeamPicks.OrderBy(p => p).ToList();
+            dto.FranchisePicks = dto.FranchisePicks.OrderBy(p => p).ToList();
+
+            foreach(int pId in teamPlayers)
+                franchisePlayers.Remove(pId);
+
+            dto.TeamPlayers = 
+                [.. _mapper.Map<IList<SelectableDto>>((await _playerRepository.GetManyTByIds(teamPlayers)).OrderBy(p => p.Position).ThenByDescending(p => p.APY))];
+            dto.FranchisePlayers = 
+                [.._mapper.Map<IList<SelectableDto>>((await _playerRepository.GetManyTByIds(franchisePlayers)).OrderBy(p => p.Position).ThenByDescending(p => p.APY))] ;
 
             return null;
         }
 
         public async Task<string?> SaveTrade(string username, TradeDto dto)
+        {
+            User? user = await _userRepository.GetUserByUsername(username);
+            if (user is null) return "Username";
+
+            if (dto.TeamId < 1) return "TeamId";
+            Team? team = await _teamRepository.GetTById(dto.TeamId);
+            if (team is null) return "Team";
+
+            if (user.Id != team.User.Id) return "User";
+
+            if (!dto.Force && !await ValidTrade(dto)) return "Unfair";
+
+            dto.Date = DateOnly.FromDateTime(DateTime.Now);
+            Trade trade = _mapper.Map<Trade>(dto);
+
+            if (await _tradeRepository.CreateT(trade) < 1) return "Error";
+            
+            foreach(int tpl in trade.TeamPlayers)
+                team.PlayersIds.Remove(tpl);
+            foreach(int fpl in trade.FranchisePlayers)
+                if (!team.PlayersIds.Contains(fpl)) team.PlayersIds.Add(fpl);
+            
+            return await _teamRepository.UpdateT(team) < 1 ? "Error" : null;
+        }
+
+        private async Task<bool> ValidTrade(TradeDto dto)
+        {
+
+            int teamValue = 0;
+            int franchiseValue = 0;
+
+            foreach (int pick in dto.TeamPicks)
+                teamValue += DraftPicks.GetPickValue(pick);
+            foreach (int pick in dto.FranchisePicks)
+                franchiseValue += DraftPicks.GetPickValue(pick);
+
+            foreach (Player player in await _playerRepository.GetManyTByIds(dto.TeamPlayers.Select(p => p.Id).ToList()))
+                teamValue += DraftPicks.GetPlayerValue(player);
+            foreach (Player player in await _playerRepository.GetManyTByIds(dto.FranchisePlayers.Select(p => p.Id).ToList()))
+                franchiseValue += DraftPicks.GetPlayerValue(player);
+
+            return Math.Abs(teamValue-franchiseValue) < 50;
+        }
+
+        public async Task<ResultDto<IList<TradeDto>>> GetTeamTrades(string username, int TeamId)
+        {
+            User? user = await _userRepository.GetUserByUsername(username);
+            if (user is null) return new ResultDto<IList<TradeDto>>("Username");
+
+            if (TeamId < 1) return new ResultDto<IList<TradeDto>>("TeamId");
+            Team? team = await _teamRepository.GetTById(TeamId);
+            if (team is null) return new ResultDto<IList<TradeDto>>("Team");
+
+            if (user.Id != team.User.Id) return new ResultDto<IList<TradeDto>>("User");
+
+            IList<TradeDto> list = [];
+            TradeDto dto;
+            foreach(Trade trade in team.Trades)
+            {
+                dto = _mapper.Map<TradeDto>(trade);
+                if (trade.TeamPlayers.Count > 0) 
+                    dto.TeamPlayers = _mapper.Map<IList<SelectableDto>>(await _playerRepository.GetManyTByIds(trade.TeamPlayers));
+                if (trade.FranchisePlayers.Count > 0) 
+                    dto.FranchisePlayers = _mapper.Map<IList<SelectableDto>>(await _playerRepository.GetManyTByIds(trade.FranchisePlayers));
+
+                list.Add(dto);
+            }
+
+            return new ResultDto<IList<TradeDto>>(string.Empty, list);
+        }
+        #endregion Trade
+
+        #region Draft
+        [HttpPost("SaveDraft")]
+        [Authorize]
+        public async Task<string?> SaveDraft(string username, DraftDto dto)
         {
             User? user = await _userRepository.GetUserByUsername(username);
             if (user is null) return "Username";
@@ -319,11 +433,11 @@ namespace METCore.Services
             // lógica de:
             // trade is not Force
             // and control si trade es equilibrado
+            team.Selections = dto.Selections;
 
-            Trade trade = _mapper.Map<Trade>(dto);
-
-            return await _tradeRepository.CreateT(trade) < 1 ? "Error" : null;
+            return await _teamRepository.UpdateT(team) < 1 ? "Error" : null;
         }
-        #endregion Trade
+        #endregion Draft
+
     }
 }

@@ -20,7 +20,7 @@
                 </li>
             </ul>
 
-            <form asp-action="SaveDraft" method="post" id="draftForm">
+            <form asp-action="Draft" method="post" id="draftForm">
                 @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 @Html.HiddenFor(m => m.Id)
                 @Html.HiddenFor(m => m.Location)
@@ -177,12 +177,19 @@
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h5 class="mb-0">Draft Order</h5>
-                                        <button type="button" class="btn btn-success btn-sm" id="tradingButton" style="display: none;">
-                                            <i class="fas fa-exchange-alt me-1"></i>Trade
+                                        <button type="button" class="btn btn-primary btn-sm" id="newTradeOffer">
+                                            <i class="fas fa-plus me-1"></i>New Trade Offer
+                                        </button>
+                                        <button type="button" class="btn btn-warning btn-sm" id="simulationToggleButton" style="display: none;">
+                                            <i class="fas fa-start me-1" id="simulationToggleIcon"></i>
+                                            <span id="simulationToggleText">Start</span>
                                         </button>
                                     </div>
                                     <div class="card-body p-0">
                                         <div class="draft-order-container" style="max-height: 600px; overflow-y: auto;">
+                                            <button type="button" data-mdb-button-init data-mdb-ripple-init class="btn btn-outline-info btn-floating btn-lg" id="backToCurrent">
+                                                Actual
+                                            </button>
                                             <div id="draftOrderList">
                                                 <!-- Draft order will be populated by JavaScript -->
                                             </div>
@@ -242,6 +249,23 @@
     </div>
 </div>
 
+<!-- Draft Summary Section (Hidden by default) -->
+<div id="draftSummarySection" class="card mt-4" style="display: none;">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">
+            <i class="fas fa-trophy me-2"></i>Your Draft Summary - @Model.Location @Model.Mascot
+        </h5>
+    </div>
+    <div class="card-body">
+        <div id="draftSummaryContent">
+            <!-- Summary content will be populated by JavaScript -->
+        </div>
+    </div>
+</div>
+
+<!-- Trade Modal Container -->
+<div id="tradeModalContainer"></div>
+
 <!-- Bootstrap and jQuery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
@@ -264,9 +288,11 @@
         let franchiseControlledPicks = []; // List of picks for other franchises user controls
         let franchiseDraftOrder = []; // Array of 32 franchises with draft positions and needs
         let allPicksData = []; // IList<int>[] containing picks for all 33 entities (0=team, 1-32=franchises)
+        let automaticScroll = true;
+        let stopSimulation = true;
 
         // NFL Franchises using enum values (1-32)
-        const nflFranchises = {
+        const franchiseNames = {
             1: { name: "Arizona Cardinals", abbreviation: "ARI" },
             2: { name: "Atlanta Falcons", abbreviation: "ATL" },
             3: { name: "Baltimore Ravens", abbreviation: "BAL" },
@@ -301,9 +327,9 @@
             32: { name: "Washington Commanders", abbreviation: "WAS" }
         };
 
-        const ROUND_SIZES = { 1: 33, 2: 33, 3: 37, 4: 37, 5: 38, 6: 41, 7: 42 };
+        const ROUND_SIZES = { 1: 33, 2: 33, 3: 39, 4: 37, 5: 39, 6: 41, 7: 42 };
 
-        const ROUND_START_PICKS = { 1: 1, 2: 34, 3: 67, 4: 104, 5: 141, 6: 179, 7: 220 };
+        const ROUND_START_PICKS = { 1: 1, 2: 34, 3: 67, 4: 106, 5: 143, 6: 182, 7: 223 };
 
         // Convert rpp format (r1p1 -> 101) to overall pick number
         function rppToOverall(rppNumber) {
@@ -323,11 +349,11 @@
             return overallPick < 1
                 ? 0 : overallPick <= 33
                 ? 1 : overallPick <= 66
-                ? 2 : overallPick <= 103
-                ? 3 : overallPick <= 140
-                ? 4 : overallPick <= 178
-                ? 5 : overallPick <= 219
-                ? 6 : overallPick <= 261
+                ? 2 : overallPick <= 105
+                ? 3 : overallPick <= 142
+                ? 4 : overallPick <= 181
+                ? 5 : overallPick <= 222
+                ? 6 : overallPick <= 264
                 ? 7 : 0;
         }
 
@@ -347,74 +373,6 @@
                 return rppToOverall(rppNumber);
             }
             return 0;
-        }
-
-        function displayDraftResults(prospects, selections) {
-            const draftDisplay = document.getElementById('draftResultsDisplay');
-    
-            if (!prospects || prospects.length === 0) {
-                draftDisplay.innerHTML = `
-                    <div class="text-center text-muted p-5">
-                        <i class="fas fa-trophy fa-2x mb-3"></i>
-                        <p>No draft completed yet.</p>
-                        <p><small class="text-muted">Complete the roster building process and proceed to the draft.</small></p>
-                    </div>
-                `;
-                return;
-            }
-
-            // Create a map of player ID to pick number from selections
-            const pickMap = {};
-            if (selections && selections.length > 0) {
-                selections.forEach(selection => {
-                    if (selection.playerId && selection.pick) {
-                        pickMap[selection.playerId] = selection.pick;
-                    }
-                });
-            }
-
-            let draftHtml = '<div class="row">';
-            prospects.forEach((prospect, index) => {
-                // Get the actual pick number from selections, or use index + 1 as fallback
-                const draftPick = pickMap[prospect.id] || (index + 1);
-                const round = overallToRound(draftPick); // FIXED: Use correct round calculation
-                const pickInRound = overallToPickInRound(draftPick); // Get pick in round
-            
-                draftHtml += `
-                    <div class="col-md-4 mb-3">
-                        <div class="card border-success">
-                            <div class="card-header bg-success text-white">
-                                <h6 class="mb-0">Pick #${draftPick}</h6>
-                                <small>Round ${round}, Pick ${pickInRound}</small>
-                            </div>
-                            <div class="card-body">
-                                <div class="d-flex align-items-center mb-2">
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-1">${prospect.name || prospect.player || 'Unknown Player'}</h6>
-                                        <small class="text-muted">${prospect.position || 'N/A'} - ${prospect.college || 'N/A'}</small>
-                                    </div>
-                                </div>
-                                <div class="row text-center">
-                                    <div class="col-4">
-                                        <small class="text-muted">Height</small>
-                                        <div>${prospect.height || 0}"</div>
-                                    </div>
-                                    <div class="col-4">
-                                        <small class="text-muted">Weight</small>
-                                        <div>${prospect.weight || 0} lbs</div>
-                                    </div>
-                                    <div class="col-4">
-                                        <small class="text-muted">Score</small>
-                                        <div>${prospect.athScore || 0}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            draftHtml += '</div>';
-            draftDisplay.innerHTML = draftHtml;
         }
 
         // Initialize page
@@ -553,7 +511,7 @@
             const container = document.getElementById('franchiseCheckboxes');
             container.innerHTML = '';
 
-            Object.entries(nflFranchises).forEach(([id, franchise]) => {
+            Object.entries(franchiseNames).forEach(([id, franchise]) => {
                 const colDiv = document.createElement('div');
                 colDiv.className = 'col-md-4 col-sm-6 mb-2';
                 
@@ -642,17 +600,24 @@
             isDraftActive = true;
             simulationSpeed = document.getElementById('Speed').value || 'normal';
 
+            const settingsTab = document.getElementById('settings-tab');
+            settingsTab.classList.add('disabled');
+            settingsTab.disabled = true;
+
             // Enable draft tab
             const draftTab = document.getElementById('draft-tab');
             draftTab.classList.remove('disabled');
             draftTab.disabled = false;
 
-            const tab = new bootstrap.Tab(draftTab);
-            tab.show();
+            const tabDraft = new bootstrap.Tab(draftTab);
+            tabDraft.show();
 
             // Show/hide trading button based on settings
-            const tradingButton = document.getElementById('tradingButton');
-            tradingButton.style.display = enableTrading ? 'inline-block' : 'none';
+            document.getElementById('newTradeOffer').style.display = enableTrading ? 'inline-block' : 'none';
+
+            // Show simulation toggle button
+            const simulationToggleButton = document.getElementById('simulationToggleButton');
+            simulationToggleButton.style.display = 'inline-block';
 
             // Initialize draft data
             initializeDraftData();
@@ -669,9 +634,6 @@
             .then(prospects => {
                 availablePlayersData = prospects;
                 displayAvailablePlayers();
-                
-                // Start draft processing
-                processDraftPick();
             });
         }
 
@@ -698,7 +660,7 @@
                             pickInRound: pickInRound,
                             entityIndex: i,
                             isTeam: i === 0,
-                            franchiseId: i === 0 ? parseInt('@Model.Id') : i
+                            teamId: i
                         });
                     });
                 }
@@ -709,24 +671,14 @@
 
             // Create draft order
             allPicks.forEach(pick => {
-                let teamName, teamAbbr;
-                if (pick.isTeam) {
-                    teamName = '@Model.Location @Model.Mascot';
-                    teamAbbr = '@Model.Abb';
-                } else {
-                    const franchise = nflFranchises[pick.franchiseId];
-                    teamName = franchise ? franchise.name : `Team ${pick.franchiseId}`;
-                    teamAbbr = franchise ? franchise.abbreviation : `T${pick.franchiseId}`;
-                }
-
                 draftOrder.push({
                     overall: pick.pickNumber,
                     rppFormat: pick.rppNumber, // Store rpp format for reference
                     round: pick.round,
                     pickInRound: pick.pickInRound,
-                    teamId: pick.franchiseId,
-                    teamName: teamName,
-                    teamAbbr: teamAbbr,
+                    teamId: pick.teamId,
+                    teamName: pick.isTeam ? '@Model.Location @Model.Mascot' : franchiseNames[pick.teamId].name,
+                    teamAbbr: pick.isTeam ? '@Model.Abb' : franchiseNames[pick.teamId].abbreviation,
                     isUserControlled: shouldControlPick(pick),
                     selectedPlayer: null,
                     neededPositions: [] // This could be enhanced with actual team needs
@@ -738,12 +690,8 @@
 
         // Determine if user should control this pick
         function shouldControlPick(pick) {
-            if (draftMethod === 'full') return false;
-            if (draftMethod === 'myteam') return pick.isTeam;
-            if (draftMethod === 'multiple') {
-                return pick.isTeam || selectedFranchises.includes(pick.franchiseId);
-            }
-            return false;
+            return draftMethod !== 'full' 
+                && (pick.isTeam || (draftMethod === 'multiple' && selectedFranchises.includes(pick.teamId)));
         }
 
         // Display draft order
@@ -916,6 +864,11 @@
     
         // Process current draft pick
         function processDraftPick() {
+            if (stopSimulation) {
+                console.log('Simulation paused, waiting for resume...');
+                return;
+            }   
+
             if (currentPickIndex >= draftOrder.length) {
                 // Draft is complete
                 completeDraft();
@@ -939,7 +892,7 @@
 
             // Scroll to current pick in draft order (only if it's visible in filtered list)
             const pickElement = document.getElementById(`pick-${currentPickIndex}`);
-            if (pickElement) {
+            if (automaticScroll && pickElement) {
                 pickElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
 
@@ -991,7 +944,7 @@
             currentPick.selectedPlayer = player;
             
             // If this is a team pick, record it in selections
-            if (currentPick.teamId === parseInt('@Model.Id')) {
+            if (currentPick.teamId === 0) {
                 teamDraftSelections.set(currentPick.overall, player.id);
             }
 
@@ -1081,6 +1034,10 @@
                 // Record the selection
                 currentPick.selectedPlayer = selectedPlayer;
 
+                if (currentPick.teamId === 0) {
+                    teamDraftSelections.set(currentPick.overall, selectedPlayer.id);
+                }
+
                 // Remove player from available list
                 availablePlayersData = availablePlayersData.filter(p => p.id !== selectedPlayer.id);
 
@@ -1106,18 +1063,29 @@
             document.getElementById('currentPickInfo').innerHTML = `
                 <div class="alert alert-success">
                     <h5><i class="fas fa-trophy me-2"></i>Draft Complete!</h5>
-                    <p>All picks have been made. Review your selections and save the results.</p>
+                    <p>All picks have been made. Review your selections below and save the results.</p>
                 </div>
             `;
+
+            document.getElementById('newTradeOffer').style.display = 'none';
+            document.getElementById('simulationToggleButton').style.display = 'none';
+
+            $('.draft-order-container').off("wheel");
+            $('#backToCurrent').css("display", "none");
+            showDraftSummary();
 
             // Show save section
             document.getElementById('saveSection').style.display = 'block';
             
             // Update hidden fields one final time
             updateHiddenFields();
-            
+            teamDraftSelections.forEach((playerId, pickNumber) => {
+                $('#draftSelections').append(`<input type="hidden" name="Selections[${pickNumber}]" value="${playerId}" />`);
+            });
+
             // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('draftSummarySection').scrollIntoView({ behavior: 'smooth' });
+            automaticScroll = false;
         }
 
         // Form submission handler
@@ -1125,6 +1093,321 @@
             // Update hidden fields before submission
             updateHiddenFields();
         });
+
+
+        // Toggle simulation pause/resume
+        function toggleSimulation() {
+            stopSimulation = !stopSimulation;
+
+            const toggleButton = document.getElementById('simulationToggleButton');
+            const toggleIcon = document.getElementById('simulationToggleIcon');
+            const toggleText = document.getElementById('simulationToggleText');
+
+            if (stopSimulation) {
+                // Simulation is now paused
+                toggleButton.classList.remove('btn-warning');
+                toggleButton.classList.add('btn-success');
+                toggleIcon.classList.remove('fa-pause');
+                toggleIcon.classList.add('fa-play');
+                toggleText.textContent = 'Resume';
+
+                // Update current pick info to show paused state
+                const pickInfo = document.getElementById('currentPickInfo');
+                if (pickInfo.style.display !== 'none') {
+                    const currentContent = pickInfo.innerHTML;
+                    if (!currentContent.includes('PAUSED')) {
+                        pickInfo.innerHTML = currentContent + `
+                            <div class="mt-2">
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-pause me-1"></i>SIMULATION PAUSED
+                                </span>
+                            </div>
+                        `;
+                    }
+                }
+            } else {
+                // Simulation is now resumed
+                toggleButton.classList.remove('btn-success');
+                toggleButton.classList.add('btn-warning');
+                toggleIcon.classList.remove('fa-play');
+                toggleIcon.classList.add('fa-pause');
+                toggleText.textContent = 'Pause';
+
+                // Remove paused indicator and continue simulation
+                updateCurrentPickInfo();
+
+                // Continue with the current pick if it's not user controlled
+                if (!isUserControlled) {
+                    processDraftPick();
+                }
+            }
+        }
+
+        function updateCurrentPickInfo() {
+            const currentPick = draftOrder[currentPickIndex];
+            const pickInfo = document.getElementById('currentPickInfo');
+    
+            pickInfo.style.display = 'block';
+            pickInfo.innerHTML = `
+                <strong>Pick #${currentPick.overall}</strong> - ${currentPick.teamName}
+                <br>Round ${currentPick.round}, Pick ${currentPick.pickInRound}
+                ${currentPick.isUserControlled ? '<br><span class="badge bg-warning text-dark">Your Turn!</span>' : ''}
+            `;
+        }
+
+        // Add this to your setupEventHandlers() function
+        document.getElementById('simulationToggleButton').addEventListener('click', function() {
+            toggleSimulation();
+        });
+
+        $('.draft-order-container').on("wheel", function (event) {
+            $('#backToCurrent').css("display", "block");
+            automaticScroll = false;
+        });
+
+        // When the user clicks on the button, scroll to the top of the document
+        $('#backToCurrent').click(function () {
+            $('#backToCurrent').css("display", "none");
+            automaticScroll = true;
+            document.getElementById(`pick-${currentPickIndex}`).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+
+
+        // Show draft summary for the team
+        function showDraftSummary() {
+            const summarySection = document.getElementById('draftSummarySection');
+            const summaryContent = document.getElementById('draftSummaryContent');
+
+            // Get all picks made by the team
+            const teamPicks = draftOrder.filter(pick => pick.teamId === 0 && pick.selectedPlayer !== null);
+
+            if (teamPicks.length === 0) {
+                summaryContent.innerHTML = `
+                    <div class="text-center text-muted p-4">
+                        <i class="fas fa-info-circle fa-2x mb-3"></i>
+                        <p>No picks were made by your team during this draft.</p>
+                    </div>
+                `;
+            } else {
+                // Sort picks by overall pick number
+                teamPicks.sort((a, b) => a.overall - b.overall);
+
+                let summaryHtml = `
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Total Picks:</strong> ${teamPicks.length}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                `;
+
+                teamPicks.forEach((pick, index) => {
+                    const player = pick.selectedPlayer;
+
+                    // Format height from inches to feet'inches
+                    const heightFeet = Math.floor((player.height || 0) / 12);
+                    const heightInches = (player.height || 0) % 12;
+                    const heightDisplay = `${heightFeet}'${heightInches}"`;
+
+                    summaryHtml += `
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card border-success h-100">
+                                <div class="card-header bg-success text-white py-2">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">Pick #${pick.overall}</h6>
+                                        <small>Round ${pick.round}</small>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="card-title text-success">${player.name}</h6>
+                                    <div class="mb-2">
+                                        <span class="badge bg-primary me-2">${player.position}</span>
+                                        <small class="text-muted">${player.college || 'Unknown College'}</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            <strong>Physical:</strong> ${heightDisplay} | ${player.weight || 0} lbs
+                                        </small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-info">
+                                            ${player.fortyYardDash ? `40yd: ${player.fortyYardDash}` : ''}
+                                            ${player.vertJump ? ` | Vert: ${player.vertJump}"` : ''}
+                                        </small>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="badge bg-success">Ath: ${player.athScore || 0}</span>
+                                        <span class="badge bg-warning text-dark">Rank: ${player.consensus || 'N/A'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                summaryHtml += '</div>';
+                summaryContent.innerHTML = summaryHtml;
+            }
+
+            // Show the summary section
+            summarySection.style.display = 'block';
+        }
+
+
+
+
+
+
+        document.getElementById('newTradeOffer').addEventListener('click', function() {
+            openTradeModal();
+        });
+
+        function openTradeModal() {
+            if(!stopSimulation) toggleSimulation();
+            showFranchiseSelectionModal();
+        }
+
+        function showFranchiseSelectionModal() {
+            const modalContainer = document.getElementById('tradeModalContainer');
+            modalContainer.innerHTML = `
+                <div class="modal fade" id="tradeModal" tabindex="-1">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Select Franchise to Trade With</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row" id="franchiseGrid">
+                                    <!-- Franchises will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const modalElement = document.getElementById('tradeModal');
+            const modal = new bootstrap.Modal(modalElement);
+
+            // modalElement.removeAttribute('aria-hidden');
+            modal.show();
+
+            // modalElement.addEventListener('hidden.bs.modal', function () {
+            //     modalElement.setAttribute('aria-hidden', 'true');
+            // });
+
+            loadFranchiseList();
+        }
+
+        function selectFranchiseForTrade(franchiseId) {
+
+            // Update loading message
+            document.getElementById('tradeModal').querySelector('.modal-body').innerHTML = `
+                <div class="text-center p-4">
+                    <div class="spinner-border text-primary mb-3"></div>
+                    <p>Loading trade interface with ${franchiseNames[franchiseId].name}...</p>
+                </div>
+            `;
+
+            // Load trade modal content using fetch
+            fetch(`/Team/GetTradePartialAsString?TeamId=@Model.Id&FranchiseId=${franchiseId}&CurrentPick=${draftOrder[currentPickIndex].rppFormat}`)
+            .then(result => {
+                if (!result.ok) {
+                    // Handle error case
+                    throw new Error(`Unable to load the trade interface with ${franchiseNames[franchiseId].name}`);
+                }
+                else {
+                    return result.json();
+                }
+            })
+            .then(json => {
+                if (json.message != undefined) {
+                    // Handle error case
+                    throw new Error(`Unable to load the trade interface with ${franchiseNames[franchiseId].name}`);
+                }
+                else {
+                    return json.value;
+                }
+            })
+            .then(text => {
+                let $contenedorDialog = $("#tradeModal .modal-content");
+                $contenedorDialog.html(text);
+                $contenedorDialog.addClass('modal-dialog pt-1');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                let $contenedorDialog = $("#tradeModal .modal-content");
+                $contenedorDialog.html(`
+                    <div class="modal-header">
+                        <h5 class="modal-title">Error</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-danger">
+                            <h6>Network Error</h6>
+                            <p>Failed to load trade interface: ${error.message}</p>
+                            <button class="btn btn-primary btn-sm" onclick="selectFranchiseForTrade(${franchiseId})">Try Again</button>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+
+        function loadFranchiseList() {
+            const franchiseGrid = document.getElementById('franchiseGrid');
+            franchiseGrid.innerHTML = '';
+
+            Object.entries(franchiseNames).forEach(([id, franchise]) => {
+                 const fName = franchise.name.split(' ');
+                 const isFNameShort = fName.length == 2;
+
+                const franchiseCard = document.createElement('div');
+                franchiseCard.className = 'col-xl-1-5 col-lg-3 col-md-4 col-sm-6 mb-3';
+                franchiseCard.innerHTML = `
+                    <div class="card franchise-card h-100">
+                        <div class="card-body text-center p-2">
+                            <h6 class="franchiseAbb">${franchise.abbreviation}</h6>
+                            <small><span style="white-space:nowrap;">${isFNameShort ? fName[0] : (fName[0]+' '+fName[1])}</span>
+                            <br/><span>${isFNameShort ? fName[1] : fName[2]}</span></small>
+                        </div>
+                    </div>
+                `;
+                franchiseCard.addEventListener('click', function() { selectFranchiseForTrade(id); });
+                franchiseGrid.appendChild(franchiseCard);
+            });
+        }
+
+
+        // Add this function to handle trade completion from draft context
+        window.onTradeCompleted = function(tradeResult) {
+            debugger;
+
+            tradeResult.teamTraded.forEach(selection => updateDraftPickAfterTrade(selection, 0, tradeResult.franchiseId));
+            tradeResult.franchiseTraded.forEach(selection => updateDraftPickAfterTrade(selection, tradeResult.franchiseId, 0));
+            allPicksData[0].sort();
+            allPicksData[tradeResult.franchiseId].sort();
+
+            // Refresh the draft order display with updated picks
+            updateHiddenFields();
+            displayDraftOrder();
+        };
+
+        let totalAtRound = [0, 33, 66, 103, 140, 178, 219]
+        // Function to update draft picks after a trade
+        function updateDraftPickAfterTrade(pick, origin, destiny) {
+
+            allPicksData[origin].filter(p => p !== pick);
+            allPicksData[destiny].push(pick);
+            
+            let thisPick = draftOrder[totalAtRound[Math.floor(pick/100)-1]+(pick%100)-1];
+            thisPick.teamId = destiny;
+            thisPick.teamName = destiny === 0 ? '@Model.Location @Model.Mascot' : franchiseNames[destiny].name;
+            thisPick.teamAbbr = destiny === 0 ? '@Model.Abb' : franchiseNames[destiny].abbreviation;
+            thisPick.isUserControlled = draftMethod !== 'full' && (destiny === 0 || (draftMethod === 'multiple' && selectedFranchises.includes(destiny)));
+            thisPick.selectedPlayer = null;
+            thisPick.neededPositions = [];
+        }
     });
 </script>
 
@@ -1254,5 +1537,65 @@
 
     .player-card:last-child {
         margin-bottom: 0 !important;
+    }
+
+    #backToCurrent {
+        position: fixed;
+        margin-top: 10px;
+        display: none;
+    }
+
+    .btn-group .btn {
+        border-radius: 0.375rem !important;
+        margin-left: 0.25rem;
+    }
+
+        .btn-group .btn:first-child {
+            margin-left: 0;
+        }
+
+    .franchise-card {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+        .franchise-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-color: #007bff;
+        }
+
+        .franchise-card .card-body {
+            padding: 0.75rem 0.5rem;
+        }
+
+    /* Draft Summary Styles */
+    #draftSummarySection .card-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    }
+
+    #draftSummarySection .card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #draftSummarySection .card-body {
+        padding: 1rem;
+    }
+
+    .draft-pick-summary-card {
+        transition: transform 0.2s ease;
+    }
+
+        .draft-pick-summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+    /* Responsive adjustments for draft summary */
+    media (max-width: 768px) {
+        #draftSummarySection .col-lg-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
     }
 </style>

@@ -576,6 +576,68 @@
         }
       }
     },
+    "/api/Teams/GetTeamTrades": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Teams/SaveDraft": {
+      "post": {
+        "tags": [
+          "Teams"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DraftDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DraftDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DraftDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Users/Profile": {
       "get": {
         "tags": [
@@ -622,6 +684,79 @@
   },
   "components": {
     "schemas": {
+      "DraftDto": {
+        "required": [
+          "abb",
+          "id",
+          "location",
+          "mascot",
+          "rounds",
+          "selections"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "location": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "abb": {
+            "maxLength": 3,
+            "minLength": 2,
+            "type": "string"
+          },
+          "mascot": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "userUsername": {
+            "type": "string",
+            "nullable": true
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "complete": {
+            "type": "boolean"
+          },
+          "rounds": {
+            "maximum": 7,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "selections": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "picks": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "nullable": true
+          },
+          "prospects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProspectDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "IdDto": {
         "type": "object",
         "properties": {
@@ -763,6 +898,87 @@
           "apy": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProspectDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "height": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "weight": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
+          "college": {
+            "type": "string",
+            "nullable": true
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "consensus": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "handSize": {
+            "type": "string",
+            "nullable": true
+          },
+          "armLength": {
+            "type": "string",
+            "nullable": true
+          },
+          "wingspan": {
+            "type": "string",
+            "nullable": true
+          },
+          "fortyYardDash": {
+            "type": "string",
+            "nullable": true
+          },
+          "benchPress": {
+            "type": "string",
+            "nullable": true
+          },
+          "vertJump": {
+            "type": "string",
+            "nullable": true
+          },
+          "broadJump": {
+            "type": "string",
+            "nullable": true
+          },
+          "threeConeDrill": {
+            "type": "string",
+            "nullable": true
+          },
+          "twentyYardShuttle": {
+            "type": "string",
+            "nullable": true
+          },
+          "athScore": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -1125,6 +1341,10 @@
           "id": {
             "type": "integer",
             "format": "int32"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
           },
           "teamId": {
             "type": "integer",

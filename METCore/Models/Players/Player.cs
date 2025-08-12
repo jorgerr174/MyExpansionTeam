@@ -34,6 +34,12 @@ namespace METCore.Models.Players
 
         public string College { get; set; }
 
+        public int Madden { get; set; }
+
+        public int Jersey { get; set; }
+
+        public int DraftYear { get; set; }
+
         public bool Retired { get; set; }
 
         [NotMapped]
