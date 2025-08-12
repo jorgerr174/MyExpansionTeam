@@ -38,6 +38,8 @@ node Server [
     RushStats.cs
 ]
 
+node Server2 as "Servidor Redundante"
+
 node BD [
     <b>\tServidor de la BD</b>
     ----
@@ -62,7 +64,11 @@ node BD [
     RushStats.db
 ]
 
+node BD2 as "Servidor de BD Redundante"
+
 Client -r- Server : internet
+Server -d- Server2 : intranet
 Server -r- BD : intranet
+BD -d- BD2 : intranet
 
 @enduml

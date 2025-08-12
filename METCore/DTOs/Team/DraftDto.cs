@@ -14,9 +14,9 @@ namespace METCore.DTOs.Team
         [Required]
         public IDictionary<int, int>? Selections { get; set; }
 
-        public IList<int>[] Picks { get; set; }
+        public IList<IList<int>> Picks { get; set; }
 
-        public IList<SelectableDto> Prospects { get; set; }
+        public IList<ProspectDto> Prospects { get; set; }
         #region Not Mapped
         #endregion Not Mapped
 

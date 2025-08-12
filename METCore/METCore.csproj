@@ -78,6 +78,11 @@
     <None Remove="Diagramas\DiagramaSecuencia_CU018.png" />
     <None Remove="Diagramas\DiagramaSecuencia_CU019.png" />
     <None Remove="Diagramas\DiagramaSecuencia_CU020.png" />
+    <None Remove="Diagramas\DigramaDeActores\DiagramaDeActores.png" />
+    <None Remove="Diagramas\DigramaDeCasosDeUso\DigramaDeCasosDeUso.png" />
+    <None Remove="Diagramas\DigramaDeCasosDeUso\DigramaDeCasosDeUsoAnonimosYAdmin.png" />
+    <None Remove="Diagramas\DigramaDeCasosDeUso\DigramaDeCasosDeUsoRelaciones.png" />
+    <None Remove="Diagramas\DigramaDeCasosDeUso\DigramaDeCasosDeUsoUsuario.png" />
     <None Remove="Diagramas\Diseño\DiagramaDeClases\DiagramaDeClases_Auth.png" />
     <None Remove="Diagramas\Diseño\DiagramaDeClases\DiagramaDeClases_Franchises.png" />
     <None Remove="Diagramas\Diseño\DiagramaDeClases\DiagramaDeClases_Players.png" />

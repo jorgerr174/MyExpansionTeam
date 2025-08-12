@@ -6,6 +6,7 @@ namespace METCore.DTOs.Team
     {
         #region Attributes
         public int Id { get; set; }
+        public DateOnly Date { get; set; }
         public int TeamId { get; set; }
         public int FranchiseId { get; set; }
         public bool Force { get; set; }

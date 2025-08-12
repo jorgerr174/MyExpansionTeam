@@ -8,6 +8,8 @@ namespace METCore.Models.Teams
         [Required]
         [Key]
         public override int Id { get; set; }
+        public DateOnly Date { get; set; }
+
         public int TeamId { get; set; }
         public int FranchiseId { get; set; }
 
