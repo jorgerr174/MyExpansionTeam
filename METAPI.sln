@@ -11,6 +11,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "METCore", "METCore\METCore.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "METDAL", "METDAL\METDAL.csproj", "{2E34C3E2-D884-4B27-B8E2-2053C18E36CA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MobileApp", "MobileApp\MobileApp.csproj", "{4B998488-C4C9-43F9-8824-F35D46B6E4CA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2E34C3E2-D884-4B27-B8E2-2053C18E36CA} = {2E34C3E2-D884-4B27-B8E2-2053C18E36CA}
+		{C587D878-C8E2-4E3D-9737-A3B73249313B} = {C587D878-C8E2-4E3D-9737-A3B73249313B}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +39,10 @@ Global
 		{2E34C3E2-D884-4B27-B8E2-2053C18E36CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E34C3E2-D884-4B27-B8E2-2053C18E36CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E34C3E2-D884-4B27-B8E2-2053C18E36CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B998488-C4C9-43F9-8824-F35D46B6E4CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B998488-C4C9-43F9-8824-F35D46B6E4CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B998488-C4C9-43F9-8824-F35D46B6E4CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B998488-C4C9-43F9-8824-F35D46B6E4CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
