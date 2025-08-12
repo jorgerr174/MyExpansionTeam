@@ -135,7 +135,7 @@ namespace METCore.Mapping
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(x => x.Name))
                 .ForMember(dest => dest.Position, opt => opt.MapFrom(x => x.Position.ToString()))
                 .ForMember(dest => dest.APY, opt => opt.MapFrom(x => x.APY == 0 ? string.Empty : ("$" + x.APY.ToString() + "M")));
-            
+
             CreateMap<Player, ProtectableDto>()
                 .IncludeBase<Player, PlayerBasicDto>()
                 .ForMember(dest => dest.Height, opt => opt.MapFrom(x => (x.Height / 12) + "-" + (x.Height % 12)))

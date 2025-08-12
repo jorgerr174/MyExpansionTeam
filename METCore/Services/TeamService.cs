@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Numerics;
-using AutoMapper;
-using AutoMapper.Configuration.Conventions;
+﻿using AutoMapper;
 using METCore.DTOs.Player;
 using METCore.DTOs.Shared;
 using METCore.DTOs.Team;
@@ -106,11 +103,12 @@ namespace METCore.Services
             dto.TradedPlayers = [.. dto.TradedPlayers.Concat(_mapper.Map<IList<PlayerBasicDto>>(await _playerRepository.GetManyTByIds(tradedPlayersIds)))];
             if ((team.PlayersIds?.Count ?? 0) > 0) dto.Players = [.. _mapper.Map<IList<RosteredDto>>(await _playerRepository.GetManyTByIds(teamPlayersIds))];
 
-            if((team.Selections?.Count ?? 0) > 0)
+            if ((team.Selections?.Count ?? 0) > 0)
             {
-                foreach(KeyValuePair<int, int> selection in team.Selections){
+                foreach (KeyValuePair<int, int> selection in team.Selections)
+                {
                     RosteredDto rookie = _mapper.Map<RosteredDto>(await _playerRepository.GetTById(selection.Value));
-                    
+
                     int pickAPY = DraftPicks.GetPickAPY(selection.Key);
                     rookie.PureAPY = Math.Round(pickAPY / 1000000.0, 2).ToString();
                     rookie.APY = "$" + rookie.PureAPY + "M";
@@ -151,7 +149,7 @@ namespace METCore.Services
             if (team is null) return null;
             DraftDto dto = _mapper.Map<DraftDto>(team);
 
-            dto.Prospects = dto.Selections.Count < 1 ? [] : _mapper.Map<IList<ProspectDto>>(await _playerRepository.GetManyTByIds([..dto.Selections.Values]));
+            dto.Prospects = dto.Selections.Count < 1 ? [] : _mapper.Map<IList<ProspectDto>>(await _playerRepository.GetManyTByIds([.. dto.Selections.Values]));
 
             return dto;
         }
@@ -214,7 +212,7 @@ namespace METCore.Services
 
             Team newTeam = _mapper.Map<Team>(dto);
 
-            newTeam.PlayersIds = [..newTeam.PlayersIds.Where(p => !newTeam.Selections?.Values?.Contains(p) ?? true)];
+            newTeam.PlayersIds = [.. newTeam.PlayersIds.Where(p => !newTeam.Selections?.Values?.Contains(p) ?? true)];
             newTeam.Date = DateTime.Now;
             return await _teamRepository.UpdateT(newTeam) < 1 ? "Error" : "";
         }
@@ -259,7 +257,7 @@ namespace METCore.Services
             if (idCount != 0 && await _playerRepository.CountManyTByIds(dto.SelectedIds) != idCount) return "PlayerIds";
 
             team.PlayersIds = dto.SelectedIds;
-            if(team.Selections != null && team.Selections.Count > 0 && team.PlayersIds != null && team.PlayersIds.Count > 0) 
+            if (team.Selections != null && team.Selections.Count > 0 && team.PlayersIds != null && team.PlayersIds.Count > 0)
                 team.PlayersIds = [.. team.PlayersIds.Where(p => !team.Selections.Values.Contains(p))];
 
             team.OffLineup = _mapper.Map<Lineup>(dto.OffLineup);
@@ -300,10 +298,10 @@ namespace METCore.Services
             IList<int> teamPlayers = team.PlayersIds;
             IList<int> franchisePlayers = [.. franchise.Players.Select(p => p.Id)];
 
-//            if ((team.PlayersIds?.Count ?? 0) > 0) dto.TeamPlayers = [.. _mapper.Map<IList<SelectableDto>>(await _playerRepository.GetManyTByIds(team.PlayersIds))];
+            //            if ((team.PlayersIds?.Count ?? 0) > 0) dto.TeamPlayers = [.. _mapper.Map<IList<SelectableDto>>(await _playerRepository.GetManyTByIds(team.PlayersIds))];
 
             dto.FranchisePicks = DraftPicks.GetFranchisePicks(dto.FranchiseId);
-//            dto.FranchisePlayers = _mapper.Map<IList<SelectableDto>>(franchise.Players);
+            //            dto.FranchisePlayers = _mapper.Map<IList<SelectableDto>>(franchise.Players);
 
             if (team.Trades is not null && team.Trades.Count > 0)
                 foreach (Trade trade in team.Trades.OrderBy(t => t.Date))
@@ -332,13 +330,13 @@ namespace METCore.Services
             dto.TeamPicks = dto.TeamPicks.OrderBy(p => p).ToList();
             dto.FranchisePicks = dto.FranchisePicks.OrderBy(p => p).ToList();
 
-            foreach(int pId in teamPlayers)
+            foreach (int pId in teamPlayers)
                 franchisePlayers.Remove(pId);
 
-            dto.TeamPlayers = 
+            dto.TeamPlayers =
                 [.. _mapper.Map<IList<SelectableDto>>((await _playerRepository.GetManyTByIds(teamPlayers)).OrderBy(p => p.Position).ThenByDescending(p => p.APY))];
-            dto.FranchisePlayers = 
-                [.._mapper.Map<IList<SelectableDto>>((await _playerRepository.GetManyTByIds(franchisePlayers)).OrderBy(p => p.Position).ThenByDescending(p => p.APY))] ;
+            dto.FranchisePlayers =
+                [.. _mapper.Map<IList<SelectableDto>>((await _playerRepository.GetManyTByIds(franchisePlayers)).OrderBy(p => p.Position).ThenByDescending(p => p.APY))];
 
             return null;
         }
@@ -360,12 +358,12 @@ namespace METCore.Services
             Trade trade = _mapper.Map<Trade>(dto);
 
             if (await _tradeRepository.CreateT(trade) < 1) return "Error";
-            
-            foreach(int tpl in trade.TeamPlayers)
+
+            foreach (int tpl in trade.TeamPlayers)
                 team.PlayersIds.Remove(tpl);
-            foreach(int fpl in trade.FranchisePlayers)
+            foreach (int fpl in trade.FranchisePlayers)
                 if (!team.PlayersIds.Contains(fpl)) team.PlayersIds.Add(fpl);
-            
+
             return await _teamRepository.UpdateT(team) < 1 ? "Error" : null;
         }
 
@@ -385,7 +383,7 @@ namespace METCore.Services
             foreach (Player player in await _playerRepository.GetManyTByIds(dto.FranchisePlayers.Select(p => p.Id).ToList()))
                 franchiseValue += DraftPicks.GetPlayerValue(player);
 
-            return Math.Abs(teamValue-franchiseValue) < 50;
+            return Math.Abs(teamValue - franchiseValue) < 50;
         }
 
         public async Task<ResultDto<IList<TradeDto>>> GetTeamTrades(string username, int TeamId)
@@ -401,12 +399,12 @@ namespace METCore.Services
 
             IList<TradeDto> list = [];
             TradeDto dto;
-            foreach(Trade trade in team.Trades)
+            foreach (Trade trade in team.Trades)
             {
                 dto = _mapper.Map<TradeDto>(trade);
-                if (trade.TeamPlayers.Count > 0) 
+                if (trade.TeamPlayers.Count > 0)
                     dto.TeamPlayers = _mapper.Map<IList<SelectableDto>>(await _playerRepository.GetManyTByIds(trade.TeamPlayers));
-                if (trade.FranchisePlayers.Count > 0) 
+                if (trade.FranchisePlayers.Count > 0)
                     dto.FranchisePlayers = _mapper.Map<IList<SelectableDto>>(await _playerRepository.GetManyTByIds(trade.FranchisePlayers));
 
                 list.Add(dto);

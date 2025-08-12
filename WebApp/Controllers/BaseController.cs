@@ -135,7 +135,7 @@ namespace WebApp.Controllers
                 return new ResultDto<string>(String.Format("Failed - {0}", ex.Message));
             }
         }
-        
+
         //protected static ResultDto<string> RenderViewToString(System.Web.Mvc.ControllerContext context, string controller, string viewName, object? model = null, bool partial = false)
         //{
         //    string viewPath = String.Format("~/{0}/{1}.cshtml", controller, viewName);

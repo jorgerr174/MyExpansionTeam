@@ -252,6 +252,7 @@ C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.G
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.AssemblyInfoInputs.cache
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.AssemblyInfo.cs
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.csproj.CoreCompileInputs.cache
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.RazorAssemblyInfo.cache
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.RazorAssemblyInfo.cs
@@ -340,4 +341,3 @@ C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\refint\W
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.pdb
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.genruntimeconfig.cache
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\ref\WebApp.dll
-C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.MvcApplicationPartsAssemblyInfo.cs
