@@ -270,8 +270,8 @@ namespace WebApp.Controllers
         {
             var response = await SendRequest(HttpMethod.Get, "Teams", "GetTradeDto", new TradeDto(TeamId, FranchiseId));
 
-            return response.IsSuccessStatusCode 
-                ? View("Trade", await GetResult<TradeDto>(response)) 
+            return response.IsSuccessStatusCode
+                ? View("Trade", await GetResult<TradeDto>(response))
                 : View("TradeError", await GetResult<MessageDto>(response));
         }
 
@@ -279,7 +279,7 @@ namespace WebApp.Controllers
         public async Task<IActionResult> GetTradePartialAsString(int TeamId, int FranchiseId, int CurrentPick)
         {
             var response = await SendRequest(HttpMethod.Get, "Teams", "GetTradeDto", new TradeDto(TeamId, FranchiseId));
-            
+
             ResultDto<string> result;
             if (response.IsSuccessStatusCode)
             {
@@ -296,7 +296,7 @@ namespace WebApp.Controllers
         public async Task<object> GetTradeModel(int TeamId, int FranchiseId)
         {
             var response = await SendRequest(HttpMethod.Get, "Teams", "GetTradeDto", new TradeDto(TeamId, FranchiseId));
-            return response.IsSuccessStatusCode 
+            return response.IsSuccessStatusCode
                 ? await GetResult<TradeDto>(response)
                 : await GetResult<MessageDto>(response);
         }

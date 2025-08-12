@@ -220,8 +220,8 @@ namespace METAPI.Controllers
 
             ResultDto<IList<TradeDto>> result = await _teamService.GetTeamTrades(User?.Identity?.Name, dto.Id);
 
-            return !String.IsNullOrWhiteSpace(result.Message) 
-                ? BadRequest(new MessageDto(result.Message)) 
+            return !String.IsNullOrWhiteSpace(result.Message)
+                ? BadRequest(new MessageDto(result.Message))
                 : Ok(result.Value);
         }
         #endregion Trade
