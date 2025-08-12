@@ -46,21 +46,19 @@ entity "Teams" as teams {
   * Id : int <<PK>>
   --
   UserId : int <<FK>>
-  Date : datetime2(7)
-  Abb : nvarchar(3)
-  Complete : bit
   Location : nvarchar(50)
+  Abb : nvarchar(3)
   Mascot : nvarchar(50)
+  Complete : bit
+  Date : datetime2(7)
   Cap : decimal(3,2)
   MaxPerTeam : int
   ProtectedPerTeam : int
   ProtectedPlayersIds : nvarchar(max)
-  RosterSettings_ProtectedPlayersIds : nvarchar(max)
-  Selections : nvarchar(max)
   PlayersIds : nvarchar(max)
-  SPLineup : nvarchar(max)
-  DefLineup : nvarchar(max)
   OffLineup : nvarchar(max)
+  DefLineup : nvarchar(max)
+  SPLineup : nvarchar(max)
 }
 
 entity "Contracts" as contracts {
@@ -116,6 +114,7 @@ players ||--o{ contracts : "has contracts"
 franchises ||--o| players : "protects (1)"
 franchises ||--o| players : "protects (2)" 
 franchises ||--o| players : "protects (3)"
+franchises ||--o{ contracts : "has contracts"
 
 note right of prospects : "Weak entity - shares PK with Players\nProspect Id = Player Id"
 
