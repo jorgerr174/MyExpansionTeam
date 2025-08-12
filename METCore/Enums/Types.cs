@@ -1,6 +1,4 @@
 ﻿using METCore.Models.Players;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace METCore.Enums
 {
@@ -372,7 +370,7 @@ namespace METCore.Enums
             public static IList<IList<int>> GetAllPicks() =>
                 [Team, ARI, ATL, BAL, BUF, CAR, CHI, CIN, CLE, DAL, DEN, DET, GB, HOU, IND, JAX, KC, LV, LAC, LAR, MIA, MIN, NE, NO, NYG, NYJ, PHI, PIT, SF, SEA, TB, TEN, WSH];
 
-            public static int GetPickValue(int pick) { try { return PickValues[GetPickOverall(pick)-1]; } catch { return 0; } }
+            public static int GetPickValue(int pick) { try { return PickValues[GetPickOverall(pick) - 1]; } catch { return 0; } }
 
             public static int GetPickAPY(int pick) { try { return PickAPYs[pick - 1]; } catch { return 0; } }
 
