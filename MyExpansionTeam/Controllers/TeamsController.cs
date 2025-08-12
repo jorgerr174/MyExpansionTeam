@@ -210,6 +210,34 @@ namespace METAPI.Controllers
 
             return Ok(new ResultDto<TradeDto>(result, dto));
         }
+
+        [HttpGet("GetTeamTrades")]
+        [Authorize]
+        public async Task<IActionResult> GetTeamTrades(IdDto dto)
+        {
+            string? username = User?.Identity?.Name;
+            if (String.IsNullOrWhiteSpace(username)) return BadRequest(new MessageDto("Username"));
+
+            ResultDto<IList<TradeDto>> result = await _teamService.GetTeamTrades(User?.Identity?.Name, dto.Id);
+
+            return !String.IsNullOrWhiteSpace(result.Message) 
+                ? BadRequest(new MessageDto(result.Message)) 
+                : Ok(result.Value);
+        }
         #endregion Trade
+
+        #region Draft
+        [HttpPost("SaveDraft")]
+        [Authorize]
+        public async Task<IActionResult> SaveDraft([FromBody] DraftDto dto)
+        {
+            string? username = User?.Identity?.Name;
+            if (String.IsNullOrWhiteSpace(username)) return BadRequest(new MessageDto("Username"));
+
+            string result = await _teamService.SaveDraft(User?.Identity?.Name, dto);
+
+            return !String.IsNullOrWhiteSpace(result) ? BadRequest() : Ok();
+        }
+        #endregion Draft
     }
 }

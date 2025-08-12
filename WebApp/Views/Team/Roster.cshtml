@@ -286,9 +286,6 @@
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <h5>Draft History & Results</h5>
-                                        <button type="button" class="btn btn-primary btn-sm" id="newTradeOfferDraft">
-                                            <i class="fas fa-plus me-1"></i>New Trade Offer
-                                        </button>
                                     </div>
                                     <div class="card-body">
                                         <div id="draftResultsDisplay">
@@ -344,8 +341,8 @@
     document.addEventListener('DOMContentLoaded', function () {
         // ===== STATE VARIABLES =====
         // Core application state and configuration
+        let protectedPlayersArray = @Html.Raw(Json.Serialize(Model.RosterSettingsProtectedPlayersIds));
         let rosterPlayersArray = [];
-        let protectedPlayersArray = @Html.Raw(Json.Serialize(Model.RosterSettingsProtectedPlayersIds ?? new List<int>()));
         let currentFranchiseId = null;
         let maxPerFranchise = @Model.RosterSettingsMaxPerTeam;
         let salaryCapPercentage = @Model.RosterSettingsCap;
@@ -371,7 +368,7 @@
         let defenseStartersConfiguration = {};
         let specialStartersConfiguration = {};
 
-        let tradedPlayersArray = @Html.Raw(Json.Serialize(Model.TradedPlayers));
+        let tradedPlayersIds = @Html.Raw(Json.Serialize(Model.TradedPlayers.Select(p => p.Id)));
         let lineupsData = {}; // Store loaded lineups data
 
         // ===== REFERENCE DATA =====
@@ -808,7 +805,27 @@
         function updateFranchiseSelectedCount() {
             if (currentFranchiseId) {
                 const count = getFranchiseSelectedCount(currentFranchiseId);
-                document.getElementById('franchiseSelectedCount').textContent = count;
+                $('#franchiseSelectedCount').text(count);
+                $(`.franchise-item[data-franchise-id="${currentFranchiseId}"] > div > span`).html(`${count}/${maxPerFranchise}`);
+
+                if(!count && count == 0) {
+                    $(`.franchise-item[data-franchise-id="${currentFranchiseId}"]`).removeClass('list-group-item-success');
+                    $(`.franchise-item[data-franchise-id="${currentFranchiseId}"]`).removeClass('list-group-item-warning');
+                    $(`.franchise-item[data-franchise-id="${currentFranchiseId}"] > div > span`).removeClass('bg-success');
+                    $(`.franchise-item[data-franchise-id="${currentFranchiseId}"] > div > span`).removeClass('bg-warning');
+                }
+                else if(count < maxPerFranchise) {
+                    $(`.franchise-item[data-franchise-id="${currentFranchiseId}"]`).removeClass('list-group-item-success');
+                    $(`.franchise-item[data-franchise-id="${currentFranchiseId}"]`).addClass('list-group-item-warning');
+                    $(`.franchise-item[data-franchise-id="${currentFranchiseId}"] > div > span`).removeClass('bg-success');
+                    $(`.franchise-item[data-franchise-id="${currentFranchiseId}"] > div > span`).addClass('bg-warning');
+                }
+                else {
+                    $(`.franchise-item[data-franchise-id="${currentFranchiseId}"]`).removeClass('list-group-item-warning');
+                    $(`.franchise-item[data-franchise-id="${currentFranchiseId}"]`).addClass('list-group-item-success');
+                    $(`.franchise-item[data-franchise-id="${currentFranchiseId}"] > div > span`).removeClass('bg-warning');
+                    $(`.franchise-item[data-franchise-id="${currentFranchiseId}"] > div > span`).addClass('bg-success');
+                }
             }
         }
 
@@ -832,7 +849,7 @@
                 const selectedCount = getFranchiseSelectedCount(franchiseId);
                 const hasSelections = selectedCount > 0;
                 const isMaxed = selectedCount >= maxPerFranchise;
-                const statusClass = isMaxed ? 'list-group-item-danger' : hasSelections ? 'list-group-item-success' : '';
+                const statusClass = isMaxed ? 'list-group-item-success' : hasSelections ? 'list-group-item-warning' : '';
 
                 const franchiseInfo = franchiseNames[franchiseId] || { name: `Franchise ${franchiseId}`, abbreviation: `F${franchiseId}` };
 
@@ -846,7 +863,7 @@
                             <strong>${franchiseInfo.name}</strong>
                             <br><small class="text-muted">${franchiseInfo.abbreviation}</small>
                         </div>
-                        <span class="badge ${isMaxed ? 'bg-danger' : hasSelections ? 'bg-success' : 'bg-secondary'}">${selectedCount}/${maxPerFranchise}</span>
+                        <span class="badge ${isMaxed ? 'bg-success' : hasSelections ? 'bg-warning' : 'bg-secondary'}">${selectedCount}/${maxPerFranchise}</span>
                     </div>
                 `;
 
@@ -1006,7 +1023,7 @@
                 const positionContainer = positionSection.querySelector(`#position-${position}`);
 
                 playersByPosition[position].forEach(player => {
-                    const isTraded = tradedPlayersArray.includes(player.id);
+                    const isTraded = tradedPlayersIds.includes(player.id);
                     const isProtected = protectedPlayersArray.includes(player.id);
                     const isSelected = rosterPlayersArray.includes(player.id);
 
@@ -1036,7 +1053,7 @@
 
                     if (isTraded || isProtected) {
                         const protectedOverlay = document.createElement('div');
-                        protectedOverlay.className = 'unlselectable-overlay';
+                        protectedOverlay.className = 'unselectable-overlay';
                         protectedOverlay.innerHTML = '<i class="fas fa-lock"></i>';
                         playerCard.appendChild(protectedOverlay);
 
@@ -1128,7 +1145,6 @@
                             updateRosterPlayersHiddenFields();
                             updateSalaryCapDisplay();
                             updateFranchiseSelectedCount();
-                            populateFranchisesList();
                             refreshRosterDisplay();
                         });
                     }
@@ -1930,12 +1946,7 @@
         function loadTradeHistory() {
             const tradesDisplay = document.getElementById('tradesDisplay');
             
-            fetch(`/Team/GetTeamTrades/${teamId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
+            fetch('/Team/GetTeamTrades?TeamId='+@Model.Id)
             .then(response => {
                 if (!response.ok) {
                     // If endpoint doesn't exist (404), show empty state
@@ -1990,26 +2001,27 @@
             let tradesHtml = '<div class="row">';
             trades.forEach((trade, index) => {
                 tradesHtml += `
-                    <div class="col-md-6 mb-3">
-                        <div class="card border-info">
-                            <div class="card-header bg-info text-white">
+                    <div class="mb-3">
+                        <div class="card border-info" style="display: flex; flex-direction: row;">
+                            <div class="col-md-2 card-header bg-info text-white">
                                 <h6 class="mb-0">Trade #${index + 1}</h6>
-                                <small>Date: ${new Date(trade.date).toLocaleDateString()}</small>
+                                <small>Date: ${new Date(trade.date).toLocaleDateString()}</small></br>
+                                <small><bold>With: ${franchiseNames[trade.franchiseId].name}</bold></small>
                             </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-6">
                                         <h6 class="text-success">Received:</h6>
                                         <ul class="list-unstyled small">
-                                            ${trade.teamPlayers ? trade.teamPlayers.map(p => `<li><i class="fas fa-user me-1"></i>${p.name}</li>`).join('') : ''}
-                                            ${trade.teamPicks ? trade.teamPicks.map(p => `<li><i class="fas fa-trophy me-1"></i>Pick ${p}</li>`).join('') : ''}
+                                            ${trade.franchisePlayers ? trade.franchisePlayers.map(p => `<li><i class="fas fa-user me-1"></i>${p.name}</li>`).join('') : ''}
+                                            ${trade.franchisePicks ? trade.franchisePicks.map(p => `<li><i class="fas fa-trophy me-1"></i>Pick ${p}</li>`).join('') : ''}
                                         </ul>
                                     </div>
                                     <div class="col-6">
                                         <h6 class="text-danger">Traded Away:</h6>
                                         <ul class="list-unstyled small">
-                                            ${trade.franchisePlayers ? trade.franchisePlayers.map(p => `<li><i class="fas fa-user me-1"></i>${p.name}</li>`).join('') : ''}
-                                            ${trade.franchisePicks ? trade.franchisePicks.map(p => `<li><i class="fas fa-trophy me-1"></i>Pick ${p}</li>`).join('') : ''}
+                                            ${trade.teamPlayers ? trade.teamPlayers.map(p => `<li><i class="fas fa-user me-1"></i>${p.name}</li>`).join('') : ''}
+                                            ${trade.teamPicks ? trade.teamPicks.map(p => `<li><i class="fas fa-trophy me-1"></i>Pick ${p}</li>`).join('') : ''}
                                         </ul>
                                     </div>
                                 </div>
@@ -2037,7 +2049,7 @@
             const modalContainer = document.getElementById('tradeModalContainer');
             modalContainer.innerHTML = `
                 <div class="modal fade" id="tradeModal" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
+                    <div class="modal-dialog modal-xl">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title">Select Franchise to Trade With</h5>
@@ -2053,9 +2065,16 @@
                 </div>
             `;
     
-            const modal = new bootstrap.Modal(document.getElementById('tradeModal'));
+            const modalElement = document.getElementById('tradeModal');
+            const modal = new bootstrap.Modal(modalElement);
+    
+            // modalElement.removeAttribute('aria-hidden');
             modal.show();
     
+            // modalElement.addEventListener('hidden.bs.modal', function () {
+            //     modalElement.setAttribute('aria-hidden', 'true');
+            // });
+            
             loadFranchiseList();
         }
 
@@ -2069,6 +2088,7 @@
 
             const formData = new FormData(document.getElementById('teamRosterForm'));
 
+            // Save roster using fetch
             fetch(document.getElementById('teamRosterForm').action, {
                 method: 'POST',
                 body: formData
@@ -2078,75 +2098,62 @@
                     throw new Error('Failed to save roster');
                 }
 
-                // Update modal to show loading
-                document.getElementById('tradeModal').querySelector('.modal-body').innerHTML = `
-                    <div class="text-center p-4">
-                        <div class="spinner-border text-primary mb-3"></div>
-                        <p>Loading trade interface with ${franchiseNames[franchiseId].name}...</p>
-                    </div>
-                `;
+		        // Update loading message
+		        document.getElementById('tradeModal').querySelector('.modal-body').innerHTML = `
+			        <div class="text-center p-4">
+				        <div class="spinner-border text-primary mb-3"></div>
+				        <p>Loading trade interface with ${franchiseNames[franchiseId].name}...</p>
+			        </div>
+		        `;
 
-                var url = '/Team/GetTradePartial?TeamId=@Model.Id&FranchiseId='+franchiseId;
-                fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
-                    return response.text();
-                })
-                .then(html => {
-                    // Replace modal content with trade view
-                    document.getElementById('tradeModal').querySelector('.modal-dialog').className = 'modal-dialog modal-fullscreen';
-                    document.getElementById('tradeModal').querySelector('.modal-content').innerHTML = html;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('tradeModal').querySelector('.modal-body').innerHTML = `
-                        <div class="alert alert-danger">
-                            <h6>Error</h6>
-                            <p>${error.message}</p>
-                            <button class="btn btn-primary btn-sm" onclick="selectFranchiseForTrade(${franchiseId}, '${franchiseNames[franchiseId].name}')">Try Again</button>
-                        </div>
-                    `;
-                });
+		        // Load trade modal content using fetch
+                return fetch(`/Team/GetTradePartialAsString?TeamId=@Model.Id&FranchiseId=${franchiseId}&CurrentPick=-1`);
             })
-            .catch(saveError => {
-                console.error('Save error:', saveError);
-                document.getElementById('tradeModal').querySelector('.modal-body').innerHTML = `
-                    <div class="alert alert-danger">
-                        <h6>Error saving roster</h6>
-                        <p>${saveError.message}</p>
+            .then(result => {
+                if (!result.ok) {
+                    // Handle error case
+                    throw new Error(`Unable to load the trade interface with ${franchiseNames[franchiseId].name}`);
+                }
+                else {
+                    return result.json();
+                }
+            })
+            .then(json => {
+                if (json.message && json.message != "") {
+                    // Handle error case
+                    throw new Error(`Unable to load the trade interface with ${franchiseNames[franchiseId].name}`);
+                }
+                else {
+                    return json.value;
+                }
+            })
+            .then(text => {
+                let $contenedorDialog = $("#tradeModal .modal-content");
+                $contenedorDialog.html(text);
+			    $contenedorDialog.addClass('modal-dialog pt-1');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                let $contenedorDialog = $("#tradeModal .modal-content");
+                $contenedorDialog.html(`
+                    <div class="modal-header">
+                        <h5 class="modal-title">Error</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                `;
+                    <div class="modal-body">
+                        <div class="alert alert-danger">
+                            <h6>Network Error</h6>
+                            <p>Failed to load trade interface: ${error.message}</p>
+                            <button class="btn btn-primary btn-sm" onclick="selectFranchiseForTrade(${franchiseId})">Try Again</button>
+                        </div>
+                    </div>
+                `);
             });
         }
 
         function loadFranchiseList() {
             const franchiseGrid = document.getElementById('franchiseGrid');
             franchiseGrid.innerHTML = '';
-    
-            // Object.entries(franchiseNames).forEach(([id, franchise]) => {
-            //     const fName = franchise.name.split(' ');
-            //     const isFNameShort = fName.length == 2;
-
-            //     const franchiseCard = document.createElement('div');
-            //     franchiseCard.className = 'col-md-2 mb-3';
-            //     franchiseCard.innerHTML = `
-            //         <div class="card franchise-card h-100" onclick="selectFranchiseForTrade(${id}, '${franchise.name}')">
-            //             <div class="card-body text-center">
-            //                 <h6><span style="white-space:nowrap;">${isFNameShort ? fName[0] : (fName[0]+' '+fName[1])}</span>
-            //                 <span>${isFNameShort ? fName[1] : fName[2]}</span></h6>
-            //                 <small class="text-muted">${franchise.abbreviation}</small>
-            //             </div>
-            //         </div>
-            //     `;
-            //     franchiseGrid.appendChild(franchiseCard);
-            // });
 
             Object.entries(franchiseNames).forEach(([id, franchise]) => {
                  const fName = franchise.name.split(' ');
@@ -2175,15 +2182,10 @@
         function loadDraftResults() {
             const draftDisplay = document.getElementById('draftResultsDisplay');
             
-            fetch(`/Team/GetTeamDraft/${teamId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
+            fetch(`/Team/GetTeamDraft?TeamId=${teamId}`)
+            .then(response => {return response.json();})
             .then(draftData => {
-                // draftData contains { prospects: [], selections: [] }
+
                 const prospects = draftData.prospects || [];
                 const selections = draftData.selections || [];
                 
@@ -2307,15 +2309,15 @@
 
         // Initialize formation display when formation tab is clicked
         document.getElementById('formation-tab').addEventListener('click', function() {
+            // if (!formationDraftLoaded) {
+            //     loadDraftResults();
+            //     formationDraftLoaded = true;
+            // }
             initializeFormationDisplay();
         });
 
         // Handle new trade offer button clicks
         document.getElementById('newTradeOffer').addEventListener('click', function() {
-            openTradeModal();
-        });
-        
-        document.getElementById('newTradeOfferDraft').addEventListener('click', function() {
             openTradeModal();
         });
 
@@ -2429,7 +2431,7 @@
     }
 
     /* Protected overlay - top right corner */
-    .unlselectable-overlay {
+    .unselectable-overlay {
         position: absolute;
         top: 8px;
         right: 8px;
@@ -2617,6 +2619,10 @@
             border-color: #007bff;
         }
 
+        .franchise-card .card-body {
+            padding: 0.75rem 0.5rem;
+        }
+
     /* 8 per row on extra large screens */
     media (min-width: 1000px) {
         .col-xl-1-5 {
@@ -2642,7 +2648,20 @@
         }
     }
 
-    .franchise-card .card-body {
-        padding: 0.75rem 0.5rem;
+    /* Draft pick styling in formation view */
+    .available-player.border-success {
+        background-color: rgba(25, 135, 84, 0.05);
+    }
+
+    .available-player .badge.bg-success {
+        background-color: #198754 !important;
+    }
+
+    .available-player .badge.bg-info {
+        background-color: #0dcaf0 !important;
+    }
+
+    .available-player .badge.bg-primary {
+        background-color: #0d6efd !important;
     }
 </style>

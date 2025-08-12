@@ -154,6 +154,22 @@
   },
   {
     "ContainingType": "METAPI.Controllers.TeamsController",
+    "Method": "GetTeamTrades",
+    "RelativePath": "api/Teams/GetTeamTrades",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "METCore.DTOs.Shared.IdDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "METAPI.Controllers.TeamsController",
     "Method": "GetTradeDto",
     "RelativePath": "api/Teams/GetTradeDto",
     "HttpMethod": "GET",
@@ -176,6 +192,22 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "METAPI.Controllers.TeamsController",
+    "Method": "SaveDraft",
+    "RelativePath": "api/Teams/SaveDraft",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "METCore.DTOs.Team.DraftDto",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {

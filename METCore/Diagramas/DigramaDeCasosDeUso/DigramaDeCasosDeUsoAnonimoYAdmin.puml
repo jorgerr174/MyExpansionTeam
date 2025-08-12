@@ -1,0 +1,20 @@
+@startuml
+left to right direction
+
+actor "Anónimo" as Anonimo
+actor "Admin" as Admin
+
+usecase "CU001\nRegistro de usuario" as CU001
+usecase "CU002\nInicio de sesión" as CU002
+usecase "CU018\nImportación de datos" as CU018
+usecase "CU019\nAlteración de roles de usuarios" as CU019
+
+' Conexiones Actor Anónimo
+Anonimo -- CU001
+Anonimo -- CU002
+
+' Conexiones Actor Admin
+Admin -- CU018
+Admin -- CU019
+
+@enduml

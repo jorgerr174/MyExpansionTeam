@@ -1,0 +1,45 @@
+@startuml
+left to right direction
+
+actor "Usuario" as Usuario  
+
+usecase "CU003\nCerrado de sesión" as CU003
+usecase "CU004\nModificación de credenciales" as CU004
+usecase "CU005\nBaja de usuario" as CU005
+usecase "CU006\nCreación de equipo" as CU006
+usecase "CU007\nModificación de equipo" as CU007
+usecase "CU008\nDuplicado de equipo" as CU008
+usecase "CU009\nBorrado de equipos" as CU009
+usecase "CU010\nModificación de ajustes de juego" as CU010
+usecase "CU011\nElección de jugadores protegidos" as CU011
+usecase "CU012\nElección de jugadores" as CU012
+usecase "CU013\nRealización de trueques" as CU013
+usecase "CU014\nRealización del draft" as CU014
+usecase "CU015\nSimulación del draft" as CU015
+usecase "CU016\nModificación de ajustes del draft" as CU016
+usecase "CU017\nSeguimiento de rendimiento de equipos" as CU017
+
+' Conexiones Actor Usuario
+Usuario -l- CU003
+Usuario -l- CU004
+Usuario -u- CU005
+CU005 -r[hidden]- CU007
+Usuario -d- CU006
+Usuario -u- CU007
+CU007 -r[hidden]- CU009
+Usuario -d- CU008
+Usuario -u- CU009
+CU009 -r[hidden]- CU011
+Usuario -d- CU010
+Usuario -u- CU011
+CU011 -r[hidden]- CU013
+Usuario -d- CU012
+Usuario -u- CU013
+CU013 -r[hidden]- CU015
+Usuario -d- CU014
+Usuario -u- CU015
+Usuario -r- CU016
+CU016 -r[hidden]- CU017
+Usuario -r- CU017
+
+@enduml

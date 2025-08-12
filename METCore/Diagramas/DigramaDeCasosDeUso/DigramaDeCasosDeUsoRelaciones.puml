@@ -1,0 +1,78 @@
+@startuml
+left to right direction 
+
+usecase CU001 [
+    CU001
+    Registro de usuario
+    --
+    Registro exitoso
+]
+usecase "CU002\nInicio de sesión" as CU002
+
+usecase "CU003\nCerrado de sesión" as CU003
+usecase "CU004\nModificación de credenciales" as CU004
+usecase "CU005\nBaja de usuario" as CU005
+usecase CU006 [
+    CU006
+    Creación de equipo
+    --
+    Ajustes del juego manuales
+]
+usecase CU007 [
+    CU007
+    Modificación de equipo
+    --
+    Elección de jugadores protegidos
+    Elección de jugadores
+    Realización de truques
+    Realización del draft
+]
+usecase "CU008\nDuplicado de equipo" as CU008
+usecase "CU009\nBorrado de equipos" as CU009
+usecase "CU010\nModificación de ajustes de juego" as CU010
+usecase "CU011\nElección de jugadores protegidos" as CU011
+usecase "CU012\nElección de jugadores" as CU012
+usecase "CU013\nRealización de trueques" as CU013
+usecase CU014 [
+    CU014
+    Realización del draft
+    --
+    Ajustes del draft manuales
+    Simulación del draft
+]
+usecase "CU015\nSimulación del draft" as CU015
+usecase "CU016\nModificación de ajustes del draft" as CU016
+usecase "CU017\nSeguimiento de rendimiento de equipos" as CU017
+
+usecase "CU018\nImportación de datos" as CU018
+usecase "CU019\nAlteración de roles de usuarios" as CU019
+
+' Conexiones Actor Usuario
+CU002 .r.> CU001 : <<extends>>
+CU003 -d-> CU002 : <<includes>>
+CU004 -d-> CU002 : <<includes>>
+CU005 -d-> CU002 : <<includes>>
+CU006 -u-> CU002 : <<includes>>
+CU007 -u-> CU002 : <<includes>>
+CU008 -d-> CU002 : <<includes>>
+CU009 -d-> CU002 : <<includes>>
+CU010 -u-> CU002 : <<includes>>
+CU010 .d.> CU006 : <<extends>>
+CU011 -u-> CU002 : <<includes>>
+CU011 .d.> CU007 : <<extends>>
+CU012 -u-> CU002 : <<includes>>
+CU012 .d.> CU007 : <<extends>>
+CU013 -u-> CU002 : <<includes>>
+CU013 .d.> CU007 : <<extends>>
+CU014 -u-> CU002 : <<includes>>
+CU014 .d.> CU007 : <<extends>>
+CU015 -u-> CU002 : <<includes>>
+CU015 .d.> CU014 : <<extends>>
+CU016 -u-> CU002 : <<includes>>
+CU016 .d.> CU014 : <<extends>>
+CU017 -d-> CU002 : <<includes>>
+CU018 -d-> CU002 : <<includes>>
+CU019 -d-> CU002 : <<includes>>
+
+
+@enduml
