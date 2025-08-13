@@ -60,8 +60,155 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.8" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="System.Net.Http.Json" Version="9.0.8" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\METCore\METCore.csproj" />		
+		<ProjectReference Include="..\METDAL\METDAL.csproj" />		
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Views\Account\UpdateUser.xaml.cs">
+	    <DependentUpon>UpdateUser.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Account\UpdateCredentials.xaml.cs">
+	    <DependentUpon>UpdateCredentials.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Account\SignUp.xaml.cs">
+	    <DependentUpon>SignUp.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Account\Profile.xaml.cs">
+	    <DependentUpon>Profile.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Account\EditProfile.xaml.cs">
+	    <DependentUpon>EditProfile.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Account\LogIn.xaml.cs">
+	    <DependentUpon>LogIn.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Home\Index.xaml.cs">
+	    <DependentUpon>Index.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Home\Privacy.xaml.cs">
+	    <DependentUpon>Privacy.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Shared\Error.xaml.cs">
+	    <DependentUpon>Error.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Shared\_ValidationScriptsPartial.xaml.cs">
+	    <DependentUpon>_ValidationScriptsPartial.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Shared\_TeamList.xaml.cs">
+	    <DependentUpon>_TeamList.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Shared\_Layout.xaml.cs">
+	    <DependentUpon>_Layout.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Team\Create.xaml.cs">
+	    <DependentUpon>Create.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Team\Details.xaml.cs">
+	    <DependentUpon>Details.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Team\Draft.xaml.cs">
+	    <DependentUpon>Draft.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Team\Edit.xaml.cs">
+	    <DependentUpon>Edit.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Team\List.xaml.cs">
+	    <DependentUpon>List.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Team\MyTeams.xaml.cs">
+	    <DependentUpon>MyTeams.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Team\TradeError.xaml.cs">
+	    <DependentUpon>TradeError.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Team\Trade.xaml.cs">
+	    <DependentUpon>Trade.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Team\RosterSettings.xaml.cs">
+	    <DependentUpon>RosterSettings.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Team\Roster.xaml.cs">
+	    <DependentUpon>Roster.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Views\Account\UpdateUser.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Account\UpdateCredentials.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Account\SignUp.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Account\Profile.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Account\EditProfile.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Account\LogIn.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Home\Index.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Home\Privacy.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Shared\Error.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Shared\_ValidationScriptsPartial.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Shared\_TeamList.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Shared\_Layout.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Team\Create.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Team\Details.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Team\Draft.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Team\Edit.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Team\List.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Team\MyTeams.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Team\TradeError.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Team\Trade.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Team\RosterSettings.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Team\Roster.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 </Project>
