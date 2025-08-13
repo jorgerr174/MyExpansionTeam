@@ -3,12 +3,17 @@
     x:Class="MobileApp.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:MobileApp"
-    Title="MobileApp">
+    xmlns:home="clr-namespace:MobileApp.Views.Home"
+    xmlns:account="clr-namespace:MobileApp.Views.Account">
 
+    <!-- 🎯 HOME PAGE FIRST - Just like WebApp /Home/Index -->
     <ShellContent
         Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        ContentTemplate="{DataTemplate home:Index}"/>
+
+    <!-- Other pages -->
+    <ShellContent
+        Title="Login"
+        ContentTemplate="{DataTemplate account:LogIn}"/>
 
 </Shell>
