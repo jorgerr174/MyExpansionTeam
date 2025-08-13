@@ -58,6 +58,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\css\Account\LogIn.css" />
+    <None Include="wwwroot\js\Account\LogIn.js" />
     <None Include="wwwroot\js\Team\Roster.js" />
     <None Include="wwwroot\js\SessionRefresh.js" />
   </ItemGroup>

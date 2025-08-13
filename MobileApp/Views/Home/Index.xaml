@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="MobileApp.Views.Home.Index"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="Home">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="20">
+
+            <!-- Direct translation of your Home/Index.cshtml -->
+
+            <!-- <h1 class="display-4">Bienvenid@@s</h1> -->
+            <Label Text="Bienvenid@s" 
+                   FontSize="32" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center" />
+
+            <!-- Learn about building Web apps link -->
+            <Label>
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Learn about " />
+                        <Span Text="building Web apps with ASP.NET Core" 
+                              TextColor="Blue" 
+                              TextDecorations="Underline" />
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+
+            <!-- @if (User?.Identity?.IsAuthenticated ?? false) -->
+            <StackLayout x:Name="AuthenticatedContent" IsVisible="False" Spacing="15">
+
+                <!-- @if (User.Claims.ToList().FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value == "Admin") -->
+                <StackLayout x:Name="AdminSection" IsVisible="False">
+                    <!-- <a asp-area="" asp-controller="Admin" asp-action="Index">Admin actions</a> -->
+                    <Button Text="Admin actions" 
+                            Clicked="OnAdminClicked"
+                            BackgroundColor="Orange" />
+                </StackLayout>
+
+                <!-- <div id="teams"> -->
+                <StackLayout x:Name="TeamsSection">
+                    <!-- Teams will be loaded here -->
+                    <CollectionView x:Name="TeamsCollectionView">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="10">
+                                    <Label Text="{Binding Location}" 
+                                           FontAttributes="Bold" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+
+                <!-- <a class="btn btn-primary" asp-action="MyTeams" asp-controller="Team">Mis equipos</a> -->
+                <Button Text="Mis equipos" 
+                        Clicked="OnMyTeamsClicked"
+                        BackgroundColor="Blue"
+                        TextColor="White" />
+
+                <!-- <a class="btn btn-primary" asp-action="Create" asp-controller="Team">Nuevo equipo</a> -->
+                <Button Text="Nuevo equipo" 
+                        Clicked="OnCreateTeamClicked"
+                        BackgroundColor="Blue"
+                        TextColor="White" />
+
+            </StackLayout>
+
+            <!-- Not authenticated - show login option -->
+            <StackLayout x:Name="NotAuthenticatedContent" IsVisible="True">
+                <Button Text="Log In" 
+                        Clicked="OnLoginClicked"
+                        BackgroundColor="Blue"
+                        TextColor="White" />
+            </StackLayout>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>
