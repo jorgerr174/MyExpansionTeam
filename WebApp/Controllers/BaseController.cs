@@ -16,20 +16,20 @@ namespace WebApp.Controllers
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("_httpClient");
         private readonly HttpClient _importClient = httpClientFactory.CreateClient("_importClient");
         private readonly IConfiguration _configuration = configuration;
-        private readonly JsonSerializerOptions jsonOptions = new()
+        private readonly JsonSerializerOptions _jsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,
             IncludeFields = true
         };
 
 
+        #region SendRequest
         protected async Task<HttpResponseMessage> SendRequest(HttpMethod method, string controller, string function, Object? obj = null)
         {
             var request = new HttpRequestMessage(method, controller + "/" + function);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["jwt"]);
             return (obj is FileDto fileDto && fileDto.File is not null) ? await SendImportRequest(request, fileDto) : await SendNormalRequest(request, obj);
         }
-
 
         private async Task<HttpResponseMessage> SendImportRequest(HttpRequestMessage request, FileDto fileDto)
         {
@@ -43,21 +43,22 @@ namespace WebApp.Controllers
             return await _importClient.SendAsync(request);
         }
 
-
         private async Task<HttpResponseMessage> SendNormalRequest(HttpRequestMessage request, Object? obj = null)
         {
             if (obj != null) request.Content = JsonContent.Create(obj);
             return await _httpClient.SendAsync(request);
         }
+        #endregion SendRequest
 
 
+        #region GetResult
         protected async Task<T> GetResult<T>(HttpResponseMessage response)
         {
             string content = await response.Content.ReadAsStringAsync();
 
             try
             {
-                var successResult = JsonSerializer.Deserialize<T>(content, jsonOptions);
+                var successResult = JsonSerializer.Deserialize<T>(content, _jsonOptions);
                 if (successResult != null) return successResult!;
             }
             catch
@@ -79,7 +80,7 @@ namespace WebApp.Controllers
             string content = await response.Content.ReadAsStringAsync();
             try
             {
-                var successResult = JsonSerializer.Deserialize<ResultDto<T>>(content, jsonOptions);
+                var successResult = JsonSerializer.Deserialize<ResultDto<T>>(content, _jsonOptions);
                 if (successResult != null) return successResult;
             }
             catch
@@ -95,7 +96,10 @@ namespace WebApp.Controllers
 
             return new ResultDto<T>(content, fallbackValue);
         }
+        #endregion GetResult
 
+
+        #region RenderViewToString
         protected static async Task<ResultDto<string>> RenderViewToString(Controller controller, string viewNamePath, object model)
         {
             if (string.IsNullOrEmpty(viewNamePath))
@@ -135,34 +139,7 @@ namespace WebApp.Controllers
                 return new ResultDto<string>(String.Format("Failed - {0}", ex.Message));
             }
         }
-
-        //protected static ResultDto<string> RenderViewToString(System.Web.Mvc.ControllerContext context, string controller, string viewName, object? model = null, bool partial = false)
-        //{
-        //    string viewPath = String.Format("~/{0}/{1}.cshtml", controller, viewName);
-
-        //    // first find the ViewEngine for this view            
-        //    System.Web.Mvc.ViewEngineResult viewEngineResult = partial 
-        //        ? System.Web.Mvc.ViewEngines.Engines.FindPartialView(context, viewPath)
-        //        : System.Web.Mvc.ViewEngines.Engines.FindView(context, viewPath, null);
-
-        //    if (viewEngineResult is null)
-        //        throw new FileNotFoundException("View cannot be found.");
-
-        //    // get the view and attach the model to view data
-        //    var view = viewEngineResult.View;
-        //    context.Controller.ViewData.Model = model;
-
-        //    string result = null;
-
-        //    using (var sw = new StringWriter())
-        //    {
-        //        var ctx = new System.Web.Mvc.ViewContext(context, view, context.Controller.ViewData, context.Controller.TempData, sw);
-        //        view.Render(ctx, sw);
-        //        result = sw.ToString();
-        //    }
-
-        //    return new(null, result);
-        //}
+        #endregion RenderViewToString
     }
 
     public static class TempStorage

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using MobileApp.Services;
 
 namespace MobileApp
 {
@@ -8,16 +9,30 @@ namespace MobileApp
         {
             var builder = MauiApp.CreateBuilder();
             builder
-                .UseMauiApp<App>()
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                });
+            .UseMauiApp<App>()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+            });
 
-#if DEBUG
-            builder.Logging.AddDebug();
-#endif
+            builder.Services.AddHttpClient<HomeService>(client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7071/api/");
+                client.Timeout = TimeSpan.FromMinutes(3);
+            });
+
+            builder.Services.AddHttpClient<AccountService>(client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7071/api/");
+                client.Timeout = TimeSpan.FromMinutes(3);
+            });
+
+            builder.Services.AddSingleton<HomeService>();
+            builder.Services.AddSingleton<AccountService>();
+
+            builder.Services.AddTransient<Views.Home.Index>();
+            builder.Services.AddTransient<Views.Account.LogIn>();
+            builder.Services.AddTransient<Models.Account.LogInViewModel>();
 
             return builder.Build();
         }
