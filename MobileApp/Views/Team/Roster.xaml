@@ -2,5 +2,153 @@
 <ContentPage x:Class="MobileApp.Views.Team.Roster"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
+             x:DataType="viewmodels:RosterViewModel"
              Title="Roster">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+
+            <!-- Header -->
+            <Label Text="{Binding TeamName}" 
+                FontSize="24" 
+                FontAttributes="Bold" 
+                HorizontalOptions="Center" />
+
+            <Label Text="Build Roster - Phase 1" 
+                FontSize="18" 
+                HorizontalOptions="Center" />
+
+            <!-- Salary Cap Display -->
+            <Frame BackgroundColor="LightBlue" Padding="15">
+                <StackLayout>
+                    <Label Text="{Binding SalaryCapText}" 
+                        FontAttributes="Bold" 
+                        HorizontalOptions="Center" />
+                    <Label Text="{Binding AvailableCapText}" 
+                        FontSize="12" 
+                        HorizontalOptions="Center" />
+                    <Label Text="{Binding SelectedPlayerCount, StringFormat='Players Selected: {0}'}" 
+                        FontSize="12" 
+                        HorizontalOptions="Center" />
+                </StackLayout>
+            </Frame>
+
+            <!-- Franchise Selection -->
+            <StackLayout IsVisible="{Binding ShowPlayerSelection, Converter={StaticResource InvertedBoolConverter}}">
+                <Label Text="Select a Franchise:" FontAttributes="Bold" />
+
+                <CollectionView ItemsSource="{Binding Franchises}"
+                            SelectionMode="Single"
+                            SelectedItem="{Binding SelectedFranchise}"
+                            SelectionChangedCommand="{Binding SelectFranchiseCommand}"
+                            SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="10" BackgroundColor="LightGray" Margin="2">
+                                <StackLayout Orientation="Horizontal">
+                                    <Label Text="{Binding Abbreviation}" 
+                                        FontAttributes="Bold" 
+                                        VerticalOptions="Center" />
+                                    <Label Text="{Binding Name}" 
+                                        VerticalOptions="Center" 
+                                        Margin="10,0,0,0" />
+                                </StackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+
+            <!-- Player Selection (shown when franchise selected) -->
+            <StackLayout IsVisible="{Binding ShowPlayerSelection}">
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="{Binding SelectedFranchise.Name, StringFormat='Players from {0}'}" 
+                        FontAttributes="Bold" 
+                        VerticalOptions="Center" />
+                    <Button Text="Back to Franchises" 
+                        Command="{Binding HidePlayerSelectionCommand}"
+                        BackgroundColor="Gray"
+                        TextColor="White"
+                        HorizontalOptions="EndAndExpand" />
+                </StackLayout>
+
+                <CollectionView ItemsSource="{Binding AvailablePlayers}"
+                            HeightRequest="400">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="5" Margin="2">
+                                <Frame BackgroundColor="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}}"
+                                    Opacity="{Binding CanBeToggled, Converter={StaticResource BoolToOpacityConverter}}">
+                                    <StackLayout>
+                                        <StackLayout.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.TogglePlayerSelectionCommand}"
+                                                            CommandParameter="{Binding}" />
+                                        </StackLayout.GestureRecognizers>
+
+                                        <StackLayout Orientation="Horizontal">
+                                            <Label Text="{Binding Name}" 
+                                                FontAttributes="Bold" 
+                                                VerticalOptions="Center" />
+                                            <Label Text="{Binding Position}" 
+                                                FontSize="12"
+                                                VerticalOptions="Center"
+                                                Margin="10,0,0,0" />
+                                        </StackLayout>
+
+                                        <StackLayout Orientation="Horizontal">
+                                            <Label Text="{Binding APY, StringFormat='Salary: {0}'}" 
+                                                FontSize="12" />
+                                            <Label Text="{Binding IsAlreadyRostered, Converter={StaticResource BoolToTextConverter}}" 
+                                                FontSize="10"
+                                                TextColor="Red"
+                                                IsVisible="{Binding IsAlreadyRostered}" />
+                                        </StackLayout>
+                                    </StackLayout>
+                                </Frame>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+
+            <!-- Current Roster Summary -->
+            <Frame BackgroundColor="LightGreen" Padding="15">
+                <StackLayout>
+                    <Label Text="Current Roster" FontAttributes="Bold" />
+                    <Label Text="{Binding RosterPlayers.Count, StringFormat='Players: {0}'}" />
+
+                    <Button Text="Clear All Players" 
+                        Command="{Binding ClearRosterCommand}"
+                        BackgroundColor="Red"
+                        TextColor="White"
+                        IsVisible="{Binding RosterPlayers.Count, Converter={StaticResource CountToBoolConverter}}" />
+                </StackLayout>
+            </Frame>
+
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}" 
+                TextColor="Red" 
+                IsVisible="{Binding HasError}" />
+
+            <!-- Save Button -->
+            <Button Text="Save Roster" 
+                Command="{Binding SaveRosterCommand}"
+                IsEnabled="{Binding IsFormEnabled}"
+                BackgroundColor="Green"
+                TextColor="White" />
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                            IsVisible="{Binding IsLoading}" />
+
+            <!-- Go Back Button -->
+            <Button Text="Go Back" 
+                Command="{Binding GoBackCommand}"
+                BackgroundColor="Transparent"
+                TextColor="Blue" />
+
+        </StackLayout>
+    </ScrollView>
+
 </ContentPage>

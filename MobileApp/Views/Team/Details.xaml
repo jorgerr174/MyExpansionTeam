@@ -1,6 +1,86 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage x:Class="MobileApp.Views.Team.Create"
+<ContentPage x:Class="MobileApp.Views.Team.Details"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             Title="Create">
+             xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
+             x:DataType="viewmodels:DetailsViewModel"
+             Title="Details">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+
+            <!-- Team Info -->
+            <Label Text="{Binding Team.Location}" 
+               FontSize="24" 
+               FontAttributes="Bold" 
+               HorizontalOptions="Center" />
+
+            <Label Text="{Binding Team.Mascot}" 
+               FontSize="20" 
+               HorizontalOptions="Center" />
+
+            <Frame BackgroundColor="LightGray" Padding="15">
+                <StackLayout>
+                    <Label Text="{Binding Team.Abb}" FontSize="16" />
+                    <Label Text="{Binding Team.UserUsername}" FontSize="14" />
+                    <Label Text="{Binding Team.Date, StringFormat='{0:yyyy-MM-dd}'}" FontSize="12" />
+                </StackLayout>
+            </Frame>
+
+            <!-- Owner-only buttons -->
+            <!-- Owner-only buttons -->
+            <StackLayout IsVisible="{Binding IsOwner}">
+                <Button Text="Build Roster" 
+                    Command="{Binding BuildRosterCommand}"
+                    BackgroundColor="Green"
+                    TextColor="White" />
+
+                <Button Text="Review Roster" 
+                    Command="{Binding ReviewRosterCommand}"
+                    BackgroundColor="Blue"
+                    TextColor="White" />
+
+                <Button Text="Set Formation" 
+                    Command="{Binding SetFormationCommand}"
+                    BackgroundColor="Purple"
+                    TextColor="White" />
+                
+                <Button Text="Past Trades" 
+                    Command="{Binding ViewTradesCommand}"
+                    BackgroundColor="Orange"
+                    TextColor="White" />
+
+                <Button Text="Draft Results" 
+                    Command="{Binding ViewDraftResultsCommand}"
+                    BackgroundColor="Navy"
+                    TextColor="White" />
+
+                <Button Text="Edit Team" 
+                    Command="{Binding EditTeamCommand}"
+                    BackgroundColor="Gray"
+                    TextColor="White" />
+
+                <Button Text="Roster Settings" 
+                    Command="{Binding RosterSettingsCommand}"
+                    BackgroundColor="Brown"
+                    TextColor="White" />
+            </StackLayout>
+
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}" 
+               TextColor="Red" 
+               IsVisible="{Binding HasError}" />
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                         IsVisible="{Binding IsLoading}" />
+
+            <!-- Go Back Button -->
+            <Button Text="Go Back" 
+                Command="{Binding GoBackCommand}"
+                BackgroundColor="Transparent"
+                TextColor="Blue" />
+
+        </StackLayout>
+    </ScrollView>
 </ContentPage>

@@ -1,6 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage x:Class="MobileApp.Views.Team.Details"
+<ContentPage x:Class="MobileApp.Views.Team.Create"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             Title="Details">
+             xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
+             x:DataType="viewmodels:CreateViewModel"
+             Title="Create">
+
+    <!-- Location -->
+    <StackLayout>
+        <Label Text="Location *" />
+        <Entry Text="{Binding Location}" 
+           Placeholder="Enter team location"
+           IsEnabled="{Binding IsFormEnabled}" />
+    </StackLayout>
+
+    <!-- Abbreviation -->
+    <StackLayout>
+        <Label Text="Abbreviation *" />
+        <Entry Text="{Binding Abbreviation}" 
+           Placeholder="Enter team abbreviation (e.g. NYY)"
+           IsEnabled="{Binding IsFormEnabled}" />
+    </StackLayout>
+
+    <!-- Mascot -->
+    <StackLayout>
+        <Label Text="Mascot *" />
+        <Entry Text="{Binding Mascot}" 
+           Placeholder="Enter team mascot"
+           IsEnabled="{Binding IsFormEnabled}" />
+    </StackLayout>
 </ContentPage>

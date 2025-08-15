@@ -13,7 +13,7 @@ namespace METAPI.Controllers
         private readonly AuthService _authService = authService;
 
 
-        #region Create
+        #region CU001 SignUp
         /// <summary>
         /// Crear un nuevo User.
         /// </summary>
@@ -34,10 +34,35 @@ namespace METAPI.Controllers
 
             return Ok();
         }
-        #endregion Create
+        #endregion CU001 SignUp
 
 
-        #region Update
+        #region CU002 LogIn
+        /// <summary>
+        /// Actualizar las credenciales de acceso del User logeado.
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>Opciones:
+        /// Null (credenciales inválidas).
+        /// Token generado.
+        /// </returns>
+        [HttpPost("LogIn")]
+        public async Task<IActionResult> LogIn([FromBody] LogInDto dto)
+        {
+            string? Token = await _authService.Authenticate(dto.Identifier, dto.Password);
+            if (String.IsNullOrWhiteSpace(Token))
+                return Unauthorized();
+
+            return Ok(new MessageDto(Token));
+        }
+        #endregion CU002 LogIn
+
+
+        #region CU003 LogOut
+        #endregion CU003 LogOut
+
+
+        #region CU004 UpdateCredentials
         /// <summary>
         /// Actualizar las credenciales de acceso del User logeado.
         /// </summary>
@@ -64,10 +89,10 @@ namespace METAPI.Controllers
 
             return Ok();
         }
-        #endregion
+        #endregion CU004 UpdateCredentials
 
 
-        #region Delete
+        #region CU005 DeleteUser
         /// <summary>
         /// Borrar el User logeado.
         /// </summary>
@@ -89,27 +114,6 @@ namespace METAPI.Controllers
 
             return Ok();
         }
-        #endregion
-
-
-        #region Other
-        /// <summary>
-        /// Actualizar las credenciales de acceso del User logeado.
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns>Opciones:
-        /// Null (credenciales inválidas).
-        /// Token generado.
-        /// </returns>
-        [HttpPost("LogIn")]
-        public async Task<IActionResult> LogIn([FromBody] LogInDto dto)
-        {
-            string? Token = await _authService.Authenticate(dto.Identifier, dto.Password);
-            if (String.IsNullOrWhiteSpace(Token))
-                return Unauthorized();
-
-            return Ok(new MessageDto(Token));
-        }
-        #endregion Other
+        #endregion CU005 DeleteUser
     }
 }

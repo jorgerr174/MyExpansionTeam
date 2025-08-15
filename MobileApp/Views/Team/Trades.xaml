@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="MobileApp.Views.Team.Trades"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
+             x:DataType="viewmodels:TradesViewModel"
+             Title="Past Trades">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+
+            <!-- Header -->
+            <Label Text="{Binding TeamName}" 
+                FontSize="24" 
+                FontAttributes="Bold" 
+                HorizontalOptions="Center" />
+
+            <Label Text="Past Trades - Phase 4" 
+                FontSize="18" 
+                HorizontalOptions="Center" />
+
+            <!-- Action Buttons -->
+            <StackLayout Orientation="Horizontal" Spacing="10">
+                <Button Text="Make New Trade" 
+                    Command="{Binding GoToNewTradeCommand}"
+                    BackgroundColor="Green"
+                    TextColor="White"
+                    HorizontalOptions="FillAndExpand" />
+
+                <Button Text="Refresh" 
+                    Command="{Binding LoadTradesCommand}"
+                    CommandParameter="{Binding TeamId}"
+                    BackgroundColor="Blue"
+                    TextColor="White"
+                    HorizontalOptions="FillAndExpand" />
+            </StackLayout>
+
+            <!-- Year Filter -->
+            <StackLayout>
+                <Label Text="Filter by Year:" FontAttributes="Bold" />
+
+                <CollectionView ItemsSource="{Binding YearFilters}"
+                            ItemsLayout="HorizontalList"
+                            HeightRequest="50">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Button Text="{Binding}" 
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FilterByYearCommand}"
+                                CommandParameter="{Binding}"
+                                BackgroundColor="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedYearFilter, Converter={StaticResource SelectedFilterColorConverter}, ConverterParameter={Binding}}"
+                                TextColor="White"
+                                Margin="2" />
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+
+            <!-- Trades Summary -->
+            <Frame BackgroundColor="LightBlue" Padding="15" IsVisible="{Binding FilteredTrades.Count, Converter={StaticResource CountToBoolConverter}}">
+                <StackLayout>
+                    <Label Text="{Binding FilteredTrades.Count, StringFormat='Total Trades: {0}'}" 
+                        FontAttributes="Bold" 
+                        HorizontalOptions="Center" />
+                    <Label Text="{Binding SelectedYearFilter, StringFormat='Showing trades for: {0}'}" 
+                        FontSize="12" 
+                        HorizontalOptions="Center" />
+                </StackLayout>
+            </Frame>
+
+            <!-- Trades List -->
+            <StackLayout IsVisible="{Binding HasNoTrades, Converter={StaticResource InvertedBoolConverter}}">
+                <Label Text="{Binding FilteredTrades.Count, StringFormat='Showing {0} trades'}" 
+                    FontSize="12" />
+
+                <CollectionView ItemsSource="{Binding FilteredTrades}"
+                            HeightRequest="400">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="5" Margin="2">
+                                <Frame BackgroundColor="LightGray" Padding="15">
+                                    <StackLayout>
+                                        <StackLayout.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ViewTradeDetailsCommand}"
+                                                            CommandParameter="{Binding}" />
+                                        </StackLayout.GestureRecognizers>
+
+                                        <!-- Trade Header -->
+                                        <StackLayout Orientation="Horizontal">
+                                            <Label Text="{Binding TradeTitle}" 
+                                                FontAttributes="Bold" 
+                                                VerticalOptions="Center"
+                                                HorizontalOptions="StartAndExpand" />
+
+                                            <Label Text="⚠️" 
+                                                VerticalOptions="Center"
+                                                IsVisible="{Binding IsForced}"
+                                                ToolTipProperties.Text="Forced Trade" />
+                                        </StackLayout>
+
+                                        <!-- Trade Info -->
+                                        <Label Text="{Binding TradeSubtitle}" 
+                                            FontSize="12"
+                                            TextColor="Gray" />
+
+                                        <!-- Trade Summary -->
+                                        <Label Text="{Binding TradeSummary}" 
+                                            FontSize="12"
+                                            FontAttributes="Italic" />
+
+                                        <!-- Quick Preview -->
+                                        <StackLayout Orientation="Horizontal" Spacing="20" Margin="0,5,0,0">
+                                            <!-- Given -->
+                                            <StackLayout HorizontalOptions="FillAndExpand">
+                                                <Label Text="Gave:" FontSize="10" FontAttributes="Bold" />
+                                                <StackLayout>
+                                                    <Label Text="{Binding TeamPlayers.Count, StringFormat='{0} Players'}" 
+                                                        FontSize="10" 
+                                                        IsVisible="{Binding TeamPlayers.Count, Converter={StaticResource CountToBoolConverter}}" />
+                                                    <Label Text="{Binding TeamPicks.Count, StringFormat='{0} Picks'}" 
+                                                        FontSize="10" 
+                                                        IsVisible="{Binding TeamPicks.Count, Converter={StaticResource CountToBoolConverter}}" />
+                                                </StackLayout>
+                                            </StackLayout>
+
+                                            <!-- Received -->
+                                            <StackLayout HorizontalOptions="FillAndExpand">
+                                                <Label Text="Received:" FontSize="10" FontAttributes="Bold" />
+                                                <StackLayout>
+                                                    <Label Text="{Binding FranchisePlayers.Count, StringFormat='{0} Players'}" 
+                                                        FontSize="10" 
+                                                        IsVisible="{Binding FranchisePlayers.Count, Converter={StaticResource CountToBoolConverter}}" />
+                                                    <Label Text="{Binding FranchisePicks.Count, StringFormat='{0} Picks'}" 
+                                                        FontSize="10" 
+                                                        IsVisible="{Binding FranchisePicks.Count, Converter={StaticResource CountToBoolConverter}}" />
+                                                </StackLayout>
+                                            </StackLayout>
+                                        </StackLayout>
+
+                                        <!-- Tap hint -->
+                                        <Label Text="Tap for details" 
+                                            FontSize="10" 
+                                            TextColor="Blue"
+                                            HorizontalOptions="End" />
+                                    </StackLayout>
+                                </Frame>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+
+            <!-- No Trades State -->
+            <StackLayout IsVisible="{Binding HasNoTrades}">
+                <Frame BackgroundColor="LightGray" Padding="30">
+                    <StackLayout HorizontalOptions="Center">
+                        <Label Text="📈" 
+                            FontSize="48" 
+                            HorizontalOptions="Center" />
+                        <Label Text="No Trades Found" 
+                            FontSize="18" 
+                            FontAttributes="Bold"
+                            HorizontalOptions="Center" />
+                        <Label Text="This team hasn't made any trades yet." 
+                            FontSize="14" 
+                            HorizontalOptions="Center"
+                            Margin="0,5,0,0" />
+                        <Button Text="Make Your First Trade" 
+                            Command="{Binding GoToNewTradeCommand}"
+                            BackgroundColor="Green"
+                            TextColor="White"
+                            Margin="0,15,0,0" />
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
+
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}" 
+                TextColor="Red" 
+                IsVisible="{Binding HasError}" />
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                            IsVisible="{Binding IsLoading}" />
+
+            <!-- Go Back Button -->
+            <Button Text="Go Back" 
+                Command="{Binding GoBackCommand}"
+                BackgroundColor="Transparent"
+                TextColor="Blue" />
+
+        </StackLayout>
+    </ScrollView>
+
+</ContentPage>
