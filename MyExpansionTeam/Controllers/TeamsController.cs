@@ -20,7 +20,7 @@ namespace METAPI.Controllers
         #endregion Private
 
 
-        #region Create
+        #region CU006 Create
         /// <summary>
         /// Crear un nuevo Team.
         /// </summary>
@@ -43,7 +43,7 @@ namespace METAPI.Controllers
             TeamInfoDto dto2 = await _teamService.CreateTeamFromBasicInfo(dto, User?.Identity?.Name);
             return dto2 is null ? BadRequest(new MessageDto("Error")) : Ok(dto2);
         }
-        #endregion Create
+        #endregion CU006 Create
 
 
         #region Get
@@ -225,6 +225,7 @@ namespace METAPI.Controllers
                 : Ok(result.Value);
         }
         #endregion Trade
+
 
         #region Draft
         [HttpPost("SaveDraft")]

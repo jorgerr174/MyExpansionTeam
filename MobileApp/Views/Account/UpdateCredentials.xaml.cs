@@ -1,10 +1,13 @@
-﻿namespace MobileApp.Views.Account
+﻿using MobileApp.Models.Account;
+
+namespace MobileApp.Views.Account
 {
     public partial class UpdateCredentials : ContentPage
     {
-        public UpdateCredentials()
+        public UpdateCredentials(UpdateCredentialsViewModel viewModel)
         {
             InitializeComponent();
+            BindingContext = viewModel;
         }
     }
 }

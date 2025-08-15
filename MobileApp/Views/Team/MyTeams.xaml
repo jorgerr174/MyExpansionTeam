@@ -2,5 +2,28 @@
 <ContentPage x:Class="MobileApp.Views.Team.MyTeams"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
+             xmlns:shared="clr-namespace:MobileApp.Views.Shared"
+             x:DataType="viewmodels:MyTeamsViewModel"
              Title="MyTeams">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+
+            <Label Text="My Teams" 
+               FontSize="24" 
+               FontAttributes="Bold" 
+               HorizontalOptions="Center" />
+
+            <shared:_TeamList BindingContext="{Binding}" />
+
+            <Label Text="{Binding ErrorMessage}" 
+               TextColor="Red" 
+               IsVisible="{Binding HasError}" />
+
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                         IsVisible="{Binding IsLoading}" />
+
+        </StackLayout>
+    </ScrollView>
 </ContentPage>

@@ -2,5 +2,321 @@
 <ContentPage x:Class="MobileApp.Views.Team.Draft"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             Title="Draft">
+             xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
+             x:DataType="viewmodels:DraftViewModel"
+             Title="Draft"
+             BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}">
+
+    <Grid>
+        <!-- Loading Indicator -->
+        <ActivityIndicator IsVisible="{Binding IsLoading}"
+                         IsRunning="{Binding IsLoading}"
+                         Color="{StaticResource Primary}"
+                         VerticalOptions="Center"
+                         HorizontalOptions="Center" />
+
+        <!-- Main Content -->
+        <ScrollView IsVisible="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}">
+            <StackLayout Padding="16" Spacing="16">
+
+                <!-- Header -->
+                <Frame BackgroundColor="{StaticResource Primary}" 
+                       HasShadow="True" 
+                       CornerRadius="10">
+                    <StackLayout>
+                        <Label Text="{Binding TeamName}"
+                               FontSize="24"
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               HorizontalOptions="Center" />
+                        <Label Text="NFL Draft"
+                               FontSize="16"
+                               TextColor="White"
+                               HorizontalOptions="Center" />
+                    </StackLayout>
+                </Frame>
+
+                <!-- Draft Settings Card -->
+                <Frame IsVisible="{Binding IsSettingsVisible}"
+                       BackgroundColor="{AppThemeBinding Light=White, Dark=#2d2d30}"
+                       HasShadow="True" 
+                       CornerRadius="10">
+                    <StackLayout Spacing="16">
+
+                        <!-- Settings Header -->
+                        <Label Text="Draft Configuration"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light=Black, Dark=White}" />
+
+                        <!-- Manual Rounds -->
+                        <StackLayout>
+                            <Label Text="{Binding ManualRounds, StringFormat='Manual Rounds: {0}'}"
+                                   FontSize="16"
+                                   TextColor="{AppThemeBinding Light=Black, Dark=White}" />
+                            <Slider Value="{Binding ManualRounds}"
+                                    Minimum="0"
+                                    Maximum="7"
+                                    ThumbColor="{StaticResource Primary}"
+                                    MinimumTrackColor="{StaticResource Primary}" />
+                            <Label Text="0 = Auto-pick all | 7 = Manual control all"
+                                   FontSize="12"
+                                   TextColor="{AppThemeBinding Light=#666, Dark=#ccc}"
+                                   HorizontalOptions="Center" />
+                        </StackLayout>
+
+                        <!-- Trading Toggle -->
+                        <StackLayout Orientation="Horizontal">
+                            <Label Text="Enable Trading"
+                                   FontSize="16"
+                                   TextColor="{AppThemeBinding Light=Black, Dark=White}"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="StartAndExpand" />
+                            <Switch IsToggled="{Binding EnableTrading}"
+                                    OnColor="{StaticResource Primary}" />
+                        </StackLayout>
+
+                        <!-- Draft Preview -->
+                        <Frame BackgroundColor="{AppThemeBinding Light=#e3f2fd, Dark=#1a1a1a}"
+                               HasShadow="False"
+                               CornerRadius="8">
+                            <StackLayout Spacing="8">
+                                <Label Text="Draft Preview"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource Primary}" />
+
+                                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+                                    <Label Grid.Row="0" Grid.Column="0"
+                                           Text="Control Method:"
+                                           FontSize="14"
+                                           TextColor="{AppThemeBinding Light=Black, Dark=White}" />
+                                    <Label Grid.Row="0" Grid.Column="1"
+                                           Text="{Binding ControlMethodText}"
+                                           FontSize="14"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=Black, Dark=White}" />
+
+                                    <Label Grid.Row="1" Grid.Column="0"
+                                           Text="Trading:"
+                                           FontSize="14"
+                                           TextColor="{AppThemeBinding Light=Black, Dark=White}" />
+                                    <Label Grid.Row="1" Grid.Column="1"
+                                           Text="{Binding TradingStatusText}"
+                                           FontSize="14"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=Black, Dark=White}" />
+                                </Grid>
+
+                                <Label Text="{Binding TeamPicksText}"
+                                       FontSize="14"
+                                       TextColor="{AppThemeBinding Light=Black, Dark=White}" />
+
+                                <Label Text="{Binding NextPickText}"
+                                       FontSize="14"
+                                       TextColor="{StaticResource Primary}"
+                                       FontAttributes="Bold" />
+                            </StackLayout>
+                        </Frame>
+
+                        <!-- Start Draft Button -->
+                        <Button Text="Start Draft Simulation"
+                                Command="{Binding StartDraftCommand}"
+                                BackgroundColor="{StaticResource Primary}"
+                                TextColor="White"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                CornerRadius="8"
+                                HeightRequest="50" />
+                    </StackLayout>
+                </Frame>
+
+                <!-- Draft Simulation Card -->
+                <StackLayout IsVisible="{Binding IsDraftSimulationVisible}" Spacing="16">
+
+                    <!-- Current Pick Info -->
+                    <Frame BackgroundColor="{StaticResource Primary}"
+                           HasShadow="True"
+                           CornerRadius="10">
+                        <StackLayout>
+                            <Label Text="{Binding CurrentPickText}"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="White"
+                                   HorizontalOptions="Center" />
+
+                            <!-- Action Buttons -->
+                            <StackLayout Orientation="Horizontal" 
+                                         HorizontalOptions="Center"
+                                         Spacing="10"
+                                         Margin="0,10,0,0">
+                                <Button Text="Make Pick"
+                                        Command="{Binding MakePickCommand}"
+                                        IsVisible="{Binding CanMakePick}"
+                                        BackgroundColor="White"
+                                        TextColor="{StaticResource Primary}"
+                                        FontAttributes="Bold"
+                                        CornerRadius="20"
+                                        WidthRequest="120" />
+
+                                <Button Text="Simulate Pick"
+                                        Command="{Binding SimulatePickCommand}"
+                                        IsVisible="{Binding CanSimulatePick}"
+                                        BackgroundColor="#4CAF50"
+                                        TextColor="White"
+                                        FontAttributes="Bold"
+                                        CornerRadius="20"
+                                        WidthRequest="120" />
+
+                                <Button Text="{Binding PauseResumeText}"
+                                        Command="{Binding PauseResumeCommand}"
+                                        BackgroundColor="#FF9800"
+                                        TextColor="White"
+                                        FontAttributes="Bold"
+                                        CornerRadius="20"
+                                        WidthRequest="80" />
+                            </StackLayout>
+                        </StackLayout>
+                    </Frame>
+
+                    <!-- Draft Order and Prospects Tabs -->
+                    <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,*">
+
+                        <!-- Tab Headers -->
+                        <Frame Grid.Row="0" Grid.Column="0"
+                               BackgroundColor="{StaticResource Primary}"
+                               HasShadow="False"
+                               CornerRadius="10,0,0,0"
+                               Margin="0,0,1,0">
+                            <Label Text="Draft Order"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="White"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Frame>
+
+                        <Frame Grid.Row="0" Grid.Column="1"
+                               BackgroundColor="{AppThemeBinding Light=#f5f5f5, Dark=#3d3d42}"
+                               HasShadow="False"
+                               CornerRadius="0,10,0,0"
+                               Margin="1,0,0,0">
+                            <Label Text="Available Prospects"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=Black, Dark=White}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Frame>
+
+                        <!-- Draft Order List -->
+                        <Frame Grid.Row="1" Grid.Column="0"
+                               BackgroundColor="{AppThemeBinding Light=White, Dark=#2d2d30}"
+                               HasShadow="False"
+                               CornerRadius="0,0,0,10"
+                               Margin="0,0,1,0">
+                            <CollectionView ItemsSource="{Binding DraftOrder}"
+                                            HeightRequest="400">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Padding="8" ColumnDefinitions="Auto,*,Auto">
+                                            <Label Grid.Column="0"
+                                                   Text="{Binding Overall}"
+                                                   FontSize="14"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{StaticResource Primary}"
+                                                   VerticalOptions="Center" />
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding TeamName}"
+                                                   FontSize="14"
+                                                   TextColor="{AppThemeBinding Light=Black, Dark=White}"
+                                                   VerticalOptions="Center"
+                                                   Margin="8,0,0,0" />
+                                            <Label Grid.Column="2"
+                                                   Text="{Binding Round, StringFormat='R{0}'}"
+                                                   FontSize="12"
+                                                   TextColor="{AppThemeBinding Light=#666, Dark=#ccc}"
+                                                   VerticalOptions="Center" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </Frame>
+
+                        <!-- Available Prospects List -->
+                        <Frame Grid.Row="1" Grid.Column="1"
+                               BackgroundColor="{AppThemeBinding Light=White, Dark=#2d2d30}"
+                               HasShadow="False"
+                               CornerRadius="0,0,10,0"
+                               Margin="1,0,0,0">
+                            <CollectionView ItemsSource="{Binding AvailableProspects}"
+                                            HeightRequest="400">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Padding="8" ColumnDefinitions="*,Auto,Auto">
+                                            <StackLayout Grid.Column="0">
+                                                <Label Text="{Binding Name}"
+                                                       FontSize="14"
+                                                       FontAttributes="Bold"
+                                                       TextColor="{AppThemeBinding Light=Black, Dark=White}" />
+                                                <Label Text="{Binding College}"
+                                                       FontSize="12"
+                                                       TextColor="{AppThemeBinding Light=#666, Dark=#ccc}" />
+                                            </StackLayout>
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding Position}"
+                                                   FontSize="12"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{StaticResource Primary}"
+                                                   VerticalOptions="Center"
+                                                   Margin="8,0,0,0" />
+                                            <Label Grid.Column="2"
+                                                   Text="{Binding Consensus, StringFormat='#{0}'}"
+                                                   FontSize="12"
+                                                   TextColor="{AppThemeBinding Light=#666, Dark=#ccc}"
+                                                   VerticalOptions="Center"
+                                                   Margin="8,0,0,0" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </Frame>
+                    </Grid>
+
+                    <!-- Trading and Controls -->
+                    <StackLayout Orientation="Horizontal" 
+                                 HorizontalOptions="Center"
+                                 Spacing="10">
+                        <Button Text="New Trade Offer"
+                                Command="{Binding NewTradeCommand}"
+                                BackgroundColor="#FF5722"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                CornerRadius="20"
+                                WidthRequest="140" />
+
+                        <Button Text="Save Draft"
+                                Command="{Binding SaveDraftCommand}"
+                                BackgroundColor="#2196F3"
+                                TextColor="White"
+                                FontAttributes="Bold"
+                                CornerRadius="20"
+                                WidthRequest="100" />
+                    </StackLayout>
+
+                </StackLayout>
+
+                <!-- Back Button -->
+                <Button Text="Back to Team"
+                        Command="{Binding BackCommand}"
+                        BackgroundColor="{AppThemeBinding Light=#f5f5f5, Dark=#3d3d42}"
+                        TextColor="{AppThemeBinding Light=Black, Dark=White}"
+                        FontAttributes="Bold"
+                        CornerRadius="8"
+                        HeightRequest="45" />
+
+            </StackLayout>
+        </ScrollView>
+    </Grid>
+
 </ContentPage>
