@@ -1,10 +1,13 @@
-﻿namespace MobileApp.Views.Account
+﻿using MobileApp.Models.Account;
+
+namespace MobileApp.Views.Account
 {
     public partial class UpdateUser : ContentPage
     {
-        public UpdateUser()
+        public UpdateUser(UpdateUserViewModel viewModel)
         {
             InitializeComponent();
+            BindingContext = viewModel;
         }
     }
 }

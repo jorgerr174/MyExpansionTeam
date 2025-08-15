@@ -1,4 +1,5 @@
 ﻿using MobileApp.Services;
+using MobileApp.Views.Shared;
 
 namespace MobileApp;
 
@@ -11,21 +12,17 @@ public partial class App : Application
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        return new Window(new AppShell());
+        return new Window(new AppShell(new Models.Shared.AppShellViewModel(Handler?.MauiContext?.Services.GetService<AccountService>())));
     }
 
     // 🎯 EXACT equivalent of WebApp startup behavior
-    protected override async void OnStart()
+    protected override void OnStart()
     {
         base.OnStart();
-
-        // Just like WebApp starts with /Home/Index regardless of auth state
-        // The Home/Index page will handle auth checking internally (same as WebApp)
-        await Shell.Current.GoToAsync("Home/Index");
     }
 
     // Handle app sleep/resume for token validation
-    protected override async void OnSleep()
+    protected override void OnSleep()
     {
         base.OnSleep();
         // App going to sleep - could save state here if needed

@@ -2,5 +2,65 @@
 <ContentPage x:Class="MobileApp.Views.Team.Edit"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
+             x:DataType="viewmodels:EditViewModel"
              Title="Edit">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+
+            <!-- Title -->
+            <Label Text="Edit Team" 
+               FontSize="24" 
+               FontAttributes="Bold" 
+               HorizontalOptions="Center" />
+
+            <!-- Location -->
+            <StackLayout>
+                <Label Text="Location *" />
+                <Entry Text="{Binding Location}" 
+                   Placeholder="Enter team location"
+                   IsEnabled="{Binding IsFormEnabled}" />
+            </StackLayout>
+
+            <!-- Abbreviation -->
+            <StackLayout>
+                <Label Text="Abbreviation *" />
+                <Entry Text="{Binding Abbreviation}" 
+                   Placeholder="Enter team abbreviation"
+                   IsEnabled="{Binding IsFormEnabled}" />
+            </StackLayout>
+
+            <!-- Mascot -->
+            <StackLayout>
+                <Label Text="Mascot *" />
+                <Entry Text="{Binding Mascot}" 
+                   Placeholder="Enter team mascot"
+                   IsEnabled="{Binding IsFormEnabled}" />
+            </StackLayout>
+
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}" 
+               TextColor="Red" 
+               IsVisible="{Binding HasError}" />
+
+            <!-- Update Button -->
+            <Button Text="Update Team" 
+                Command="{Binding UpdateTeamCommand}"
+                IsEnabled="{Binding IsFormEnabled}"
+                BackgroundColor="Blue"
+                TextColor="White" />
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                         IsVisible="{Binding IsLoading}" />
+
+            <!-- Go Back Button -->
+            <Button Text="Go Back" 
+                Command="{Binding GoBackCommand}"
+                BackgroundColor="Transparent"
+                TextColor="Blue" />
+
+        </StackLayout>
+    </ScrollView>
 </ContentPage>

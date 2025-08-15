@@ -1,12 +1,57 @@
 using METCore.DTOs.Shared;
 using METCore.DTOs.User;
+using MobileApp.Models.Account;
 
 namespace MobileApp.Services
 {
     public class AccountService(IHttpClientFactory httpClientFactory) : BaseService(httpClientFactory)
     {
-        // DIRECT TRANSLATION of your API call from AccountController
-        public async Task<bool> LoginAsync(string identifier, string password)
+        #region TryAutoLogin
+        public async Task<bool> TryAutoLoginAsync()
+        {
+            var token = await SecureStorage.GetAsync("jwt_token");
+            return !string.IsNullOrEmpty(token);
+        }
+        #endregion TryAutoLogin
+
+
+        #region GetUsername
+        public static async Task<string?> GetUsernameAsync()
+        {
+            return await SecureStorage.GetAsync("username");
+        }
+        #endregion GetUsername
+
+
+        #region GetProfile
+        public async Task<ProfileViewModel?> GetProfileAsync()
+        {
+            try
+            {
+                var response = await SendRequest(HttpMethod.Get, "User", "Profile");
+                return response.IsSuccessStatusCode ? await GetResult<ProfileViewModel>(response) : null;
+            }
+            catch { return null; }
+        }
+        #endregion GetProfile
+
+
+        #region CU001 SignUp
+        public async Task<bool> SignUpAsync(string username, string password, string confirmPassword, string firstName, string lastName, string email, string tlf)
+        {
+            try
+            {
+                var signUpDto = new NewUserDto(username, password, confirmPassword, firstName, lastName, email, tlf);
+                var response = await SendRequest(HttpMethod.Post, "Auth", "SignUp", signUpDto);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex) { return false; }
+        }
+        #endregion CU001 SignUp
+
+
+        #region CU002 LogIn
+        public async Task<bool> LogInAsync(string identifier, string password)
         {
             try
             {
@@ -33,16 +78,47 @@ namespace MobileApp.Services
                 return false;
             }
         }
+        #endregion CU002 LogIn
 
-        public static void LogoutAsync()
+
+        #region CU003 LogOut
+        public static void LogOutAsync()
         {
             SecureStorage.Remove("jwt_token");
             SecureStorage.Remove("username");
         }
+        #endregion CU003 LogOut
 
-        public static async Task<string?> GetUsernameAsync()
+
+        #region CU004 UpdateCredentials
+        public async Task<bool> UpdateCredentialsAsync(string currentPassword, string newUsername, string newPassword)
         {
-            return await SecureStorage.GetAsync("username");
+            try
+            {
+                var updateDto = new UpdateCredentialsDto(currentPassword, newUsername, newPassword);
+                var response = await SendRequest(HttpMethod.Put, "Auth", "UpdateCredentials", updateDto);
+                return response.IsSuccessStatusCode;
+            }
+            catch { return false; }
         }
+        #endregion CU004 UpdateCredentials
+
+
+        #region CU005 DeleteUser
+        public async Task<bool> DeleteUserAsync()
+        {
+            try
+            {
+                var response = await SendRequest(HttpMethod.Delete, "Auth", "DeleteUser");
+                if (response.IsSuccessStatusCode)
+                {
+                    LogOutAsync(); // Clear stored tokens
+                    return true;
+                }
+                return false;
+            }
+            catch { return false; }
+        }
+        #endregion CU005 DeleteUser
     }
 }
