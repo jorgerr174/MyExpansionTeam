@@ -5,4 +5,89 @@
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Account"
              x:DataType="viewmodels:SignUpViewModel"
              Title="SignUp">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+
+            <!-- Title -->
+            <Label Text="Sign Up" 
+               FontSize="24" 
+               FontAttributes="Bold" 
+               HorizontalOptions="Center" />
+
+            <!-- First Name -->
+            <StackLayout>
+                <Label Text="First Name" />
+                <Entry Text="{Binding FirstName}" 
+                   Placeholder="Enter your first name"
+                   IsEnabled="{Binding IsFormEnabled}" />
+            </StackLayout>
+
+            <!-- Last Name -->
+            <StackLayout>
+                <Label Text="Last Name" />
+                <Entry Text="{Binding LastName}" 
+                   Placeholder="Enter your last name"
+                   IsEnabled="{Binding IsFormEnabled}" />
+            </StackLayout>
+
+            <!-- Email -->
+            <StackLayout>
+                <Label Text="Email" />
+                <Entry Text="{Binding Email}" 
+                   Placeholder="Enter your email"
+                   Keyboard="Email"
+                   IsEnabled="{Binding IsFormEnabled}" />
+            </StackLayout>
+
+            <!-- Phone -->
+            <StackLayout>
+                <Label Text="Phone" />
+                <Entry Text="{Binding Tlf}" 
+                   Placeholder="Enter your phone number"
+                   Keyboard="Telephone"
+                   IsEnabled="{Binding IsFormEnabled}" />
+            </StackLayout>
+
+            <!-- Username -->
+            <StackLayout>
+                <Label Text="Username" />
+                <Entry Text="{Binding Username}" 
+                   Placeholder="Choose a username"
+                   IsEnabled="{Binding IsFormEnabled}" />
+            </StackLayout>
+
+            <!-- Password -->
+            <StackLayout>
+                <Label Text="Password" />
+                <Entry Text="{Binding Password}" 
+                   IsPassword="True"
+                   Placeholder="Choose a password"
+                   IsEnabled="{Binding IsFormEnabled}" />
+            </StackLayout>
+
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}" 
+               TextColor="Red" 
+               IsVisible="{Binding HasError}" />
+
+            <!-- Sign Up Button -->
+            <Button Text="Sign Up" 
+                Command="{Binding SignUpCommand}"
+                IsEnabled="{Binding IsFormEnabled}"
+                BackgroundColor="Green"
+                TextColor="White" />
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                         IsVisible="{Binding IsLoading}" />
+
+            <!-- Go Back Button -->
+            <Button Text="Go Back" 
+                Command="{Binding GoBackCommand}"
+                BackgroundColor="Transparent"
+                TextColor="Blue" />
+
+        </StackLayout>
+    </ScrollView>
 </ContentPage>

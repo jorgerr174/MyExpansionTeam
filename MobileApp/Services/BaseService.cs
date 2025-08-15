@@ -26,11 +26,6 @@ namespace MobileApp.Services
             if (!string.IsNullOrEmpty(token))
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            return await SendNormalRequest(request, obj);
-        }
-
-        private async Task<HttpResponseMessage> SendNormalRequest(HttpRequestMessage request, object? obj = null)
-        {
             if (obj != null) request.Content = JsonContent.Create(obj);
             return await _httpClient.SendAsync(request);
         }

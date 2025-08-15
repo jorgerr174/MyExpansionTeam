@@ -1,0 +1,266 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="MobileApp.Views.Team.DraftResults"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
+             x:DataType="viewmodels:DraftResultsViewModel"
+             Title="Draft Results">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+
+            <!-- Header -->
+            <Label Text="{Binding TeamName}" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center" />
+
+            <Label Text="Draft Results - Phase 5" 
+                   FontSize="18" 
+                   HorizontalOptions="Center" />
+
+            <!-- Draft Summary -->
+            <Frame BackgroundColor="LightGreen" Padding="15" IsVisible="{Binding HasDraftData}">
+                <StackLayout>
+                    <Label Text="{Binding DraftRounds, StringFormat='Draft: {0} Rounds'}" 
+                           FontAttributes="Bold" 
+                           HorizontalOptions="Center" />
+                    <Label Text="{Binding DraftedProspects.Count, StringFormat='Players Drafted: {0}'}" 
+                           HorizontalOptions="Center" />
+                    <Label Text="{Binding AvailablePicks.Count, StringFormat='Picks Remaining: {0}'}" 
+                           HorizontalOptions="Center" />
+                    <Label Text="✓ Draft Complete" 
+                           TextColor="Green"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           IsVisible="{Binding IsDraftComplete}" />
+                </StackLayout>
+            </Frame>
+
+            <!-- Action Buttons -->
+            <StackLayout Orientation="Horizontal" Spacing="10" IsVisible="{Binding HasDraftData}">
+                <Button Text="Go to Draft" 
+                        Command="{Binding GoToDraftCommand}"
+                        BackgroundColor="Blue"
+                        TextColor="White"
+                        HorizontalOptions="FillAndExpand" />
+
+                <Button Text="Clear Filters" 
+                        Command="{Binding ClearFiltersCommand}"
+                        BackgroundColor="Gray"
+                        TextColor="White"
+                        HorizontalOptions="FillAndExpand" />
+            </StackLayout>
+
+            <!-- Filters -->
+            <StackLayout IsVisible="{Binding HasDraftData}">
+                <!-- Round Filter -->
+                <StackLayout>
+                    <Label Text="Filter by Round:" FontAttributes="Bold" />
+
+                    <CollectionView ItemsSource="{Binding RoundFilters}"
+                                  ItemsLayout="HorizontalList"
+                                  HeightRequest="50">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Button Text="{Binding}" 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FilterByRoundCommand}"
+                                        CommandParameter="{Binding}"
+                                        BackgroundColor="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedRoundFilter, Converter={StaticResource SelectedFilterColorConverter}, ConverterParameter={Binding}}"
+                                        TextColor="White"
+                                        Margin="2" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+
+                <!-- Position Filter -->
+                <StackLayout>
+                    <Label Text="Filter by Position:" FontAttributes="Bold" />
+
+                    <CollectionView ItemsSource="{Binding PositionFilters}"
+                                  ItemsLayout="HorizontalList"
+                                  HeightRequest="50">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Button Text="{Binding}" 
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FilterByPositionCommand}"
+                                        CommandParameter="{Binding}"
+                                        BackgroundColor="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedPositionFilter, Converter={StaticResource SelectedFilterColorConverter}, ConverterParameter={Binding}}"
+                                        TextColor="White"
+                                        Margin="2" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+            </StackLayout>
+
+            <!-- Drafted Players List -->
+            <StackLayout IsVisible="{Binding FilteredProspects.Count, Converter={StaticResource CountToBoolConverter}}">
+                <Label Text="{Binding FilteredProspects.Count, StringFormat='Showing {0} drafted players'}" 
+                       FontSize="12" />
+
+                <CollectionView ItemsSource="{Binding FilteredProspects}"
+                              HeightRequest="400">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="5" Margin="2">
+                                <Frame BackgroundColor="LightBlue" Padding="15">
+                                    <StackLayout>
+                                        <StackLayout.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ViewProspectDetailsCommand}"
+                                                                CommandParameter="{Binding}" />
+                                        </StackLayout.GestureRecognizers>
+
+                                        <!-- Player Header -->
+                                        <StackLayout Orientation="Horizontal">
+                                            <Label Text="{Binding Player}" 
+                                                   FontAttributes="Bold" 
+                                                   FontSize="16"
+                                                   VerticalOptions="Center"
+                                                   HorizontalOptions="StartAndExpand" />
+
+                                            <Label Text="{Binding Position}" 
+                                                   BackgroundColor="Blue"
+                                                   TextColor="White"
+                                                   Padding="5,2"
+                                                   VerticalOptions="Center" />
+                                        </StackLayout>
+
+                                        <!-- College and Measurements -->
+                                        <Label Text="{Binding College}" 
+                                               FontSize="14"
+                                               TextColor="Gray" />
+
+                                        <StackLayout Orientation="Horizontal">
+                                            <Label Text="{Binding Height, Converter={StaticResource HeightConverter}}" 
+                                                   FontSize="12" />
+                                            <Label Text="{Binding Weight, StringFormat='{0} lbs'}" 
+                                                   FontSize="12"
+                                                   Margin="10,0,0,0" />
+                                        </StackLayout>
+
+                                        <!-- Draft Info -->
+                                        <StackLayout Orientation="Horizontal" Margin="0,5,0,0">
+                                            <Label Text="{Binding Year, StringFormat='Year: {0}'}" 
+                                                   FontSize="12"
+                                                   BackgroundColor="Green"
+                                                   TextColor="White"
+                                                   Padding="5,2" />
+                                            <Label Text="{Binding Consensus, StringFormat='Rank: #{0}'}" 
+                                                   FontSize="12"
+                                                   BackgroundColor="Orange"
+                                                   TextColor="White"
+                                                   Padding="5,2"
+                                                   Margin="5,0,0,0" />
+                                        </StackLayout>
+
+                                        <!-- Athletic Score -->
+                                        <Label Text="{Binding AthScore, StringFormat='Athletic Score: {0}'}" 
+                                               FontSize="12"
+                                               FontAttributes="Italic"
+                                               IsVisible="{Binding AthScore, Converter={StaticResource CountToBoolConverter}}" />
+
+                                        <!-- Tap hint -->
+                                        <Label Text="Tap for full details" 
+                                               FontSize="10" 
+                                               TextColor="Blue"
+                                               HorizontalOptions="End"
+                                               Margin="0,5,0,0" />
+                                    </StackLayout>
+                                </Frame>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+
+            <!-- Draft Picks Overview -->
+            <StackLayout IsVisible="{Binding AllPicks.Count, Converter={StaticResource CountToBoolConverter}}">
+                <Label Text="Draft Picks Overview:" FontAttributes="Bold" />
+
+                <CollectionView ItemsSource="{Binding AllPicks}"
+                              HeightRequest="200">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="3" Margin="1">
+                                <Frame BackgroundColor="{Binding StatusColor}" Padding="10">
+                                    <StackLayout>
+                                        <Label Text="{Binding PickDisplayText}" 
+                                               FontAttributes="Bold" 
+                                               TextColor="White" />
+                                        <Label Text="{Binding OverallPickText}" 
+                                               FontSize="12"
+                                               TextColor="White" />
+                                        <Label Text="{Binding StatusText}" 
+                                               FontSize="12"
+                                               TextColor="White"
+                                               FontAttributes="Italic" />
+                                    </StackLayout>
+                                </Frame>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+
+            <!-- No Draft Data State -->
+            <StackLayout IsVisible="{Binding HasDraftData, Converter={StaticResource InvertedBoolConverter}}">
+                <Frame BackgroundColor="LightGray" Padding="30">
+                    <StackLayout HorizontalOptions="Center">
+                        <Label Text="🏈" 
+                               FontSize="48" 
+                               HorizontalOptions="Center" />
+                        <Label Text="No Draft Results" 
+                               FontSize="18" 
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center" />
+                        <Label Text="This team hasn't participated in any drafts yet." 
+                               FontSize="14" 
+                               HorizontalOptions="Center"
+                               Margin="0,5,0,0" />
+                        <Button Text="Go to Draft" 
+                                Command="{Binding GoToDraftCommand}"
+                                BackgroundColor="Blue"
+                                TextColor="White"
+                                Margin="0,15,0,0" />
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
+
+            <!-- Empty Filter Results -->
+            <StackLayout IsVisible="{Binding FilteredProspects.Count, Converter={StaticResource CountToInvertedBoolConverter}}"
+                        Margin="0,10,0,0">
+                <Frame BackgroundColor="LightYellow" Padding="20">
+                    <StackLayout HorizontalOptions="Center">
+                        <Label Text="No players match the current filters" 
+                               FontSize="16" 
+                               HorizontalOptions="Center" />
+                        <Button Text="Clear Filters" 
+                                Command="{Binding ClearFiltersCommand}"
+                                BackgroundColor="Gray"
+                                TextColor="White"
+                                Margin="0,10,0,0" />
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
+
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}" 
+                   TextColor="Red" 
+                   IsVisible="{Binding HasError}" />
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                             IsVisible="{Binding IsLoading}" />
+
+            <!-- Go Back Button -->
+            <Button Text="Go Back" 
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="Blue" />
+
+        </StackLayout>
+    </ScrollView>
+
+</ContentPage>

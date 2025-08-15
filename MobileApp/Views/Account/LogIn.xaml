@@ -20,7 +20,7 @@
                 <Label Text="Identifier" />
                 <Entry Text="{Binding Identifier}" 
                        Placeholder="Username or Email"
-                       IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}" />
+                       IsEnabled="{Binding IsFormEnabled}" />
             </StackLayout>
 
             <!-- Password Input - Direct translation of @Html.PasswordFor(m => m.Password) -->
@@ -29,18 +29,21 @@
                 <Entry Text="{Binding Password}" 
                        IsPassword="True"
                        Placeholder="Password"
-                       IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}" />
+                       IsEnabled="{Binding IsFormEnabled}" />
             </StackLayout>
 
             <!-- Error Message - Translation of ValidationSummary -->
             <Label Text="{Binding ErrorMessage}" 
                    TextColor="Red" 
-                   IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />
+                   IsVisible="{Binding HasError}" />
+            <!--<Label Text="{Binding ErrorMessage}" 
+                   TextColor="Red" 
+                   IsVisible="{Binding ErrorMessage, Converter={StaticResource StringToBoolConverter}}" />-->
 
             <!-- Login Button - Direct translation of your submit button -->
-            <Button Text="LogIn" 
+            <Button Text="Log In" 
                     Command="{Binding LoginCommand}"
-                    IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"
+                    IsEnabled="{Binding IsFormEnabled}"
                     BackgroundColor="Blue"
                     TextColor="White" />
 

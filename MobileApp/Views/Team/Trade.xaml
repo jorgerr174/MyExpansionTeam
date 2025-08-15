@@ -2,5 +2,228 @@
 <ContentPage x:Class="MobileApp.Views.Team.Trade"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
+             x:DataType="viewmodels:TradeViewModel"
              Title="Trade">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+
+            <!-- Header -->
+            <Label Text="Propose Trade" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center" />
+            
+            <Label Text="{Binding TradeContext, StringFormat='Context: {0}'}" 
+                   FontSize="12" 
+                   HorizontalOptions="Center" />
+
+            <!-- Franchise Selection -->
+            <StackLayout IsVisible="{Binding ShowFranchiseSelection}">
+                <Label Text="Select Franchise to Trade With:" FontAttributes="Bold" />
+                
+                <CollectionView ItemsSource="{Binding Franchises}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="5" Margin="2">
+                                <Frame BackgroundColor="LightGray" Padding="15">
+                                    <StackLayout>
+                                        <StackLayout.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectFranchiseCommand}"
+                                                                CommandParameter="{Binding}" />
+                                        </StackLayout.GestureRecognizers>
+                                        
+                                        <StackLayout Orientation="Horizontal">
+                                            <Label Text="{Binding Abbreviation}" 
+                                                   FontAttributes="Bold" 
+                                                   VerticalOptions="Center" />
+                                            <Label Text="{Binding Name}" 
+                                                   VerticalOptions="Center" 
+                                                   Margin="10,0,0,0" />
+                                        </StackLayout>
+                                    </StackLayout>
+                                </Frame>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+
+            <!-- Trade Builder -->
+            <StackLayout IsVisible="{Binding ShowTradeBuilder}">
+                
+                <!-- Trade Header -->
+                <Frame BackgroundColor="LightBlue" Padding="15">
+                    <StackLayout>
+                        <Label Text="{Binding SelectedFranchise.Name, StringFormat='Trading with: {0}'}" 
+                               FontAttributes="Bold" 
+                               HorizontalOptions="Center" />
+                        <Label Text="{Binding TradeValueComparison}" 
+                               FontSize="12" 
+                               HorizontalOptions="Center" />
+                    </StackLayout>
+                </Frame>
+
+                <!-- Action Buttons Row -->
+                <StackLayout Orientation="Horizontal" Spacing="10">
+                    <Button Text="Change Franchise" 
+                            Command="{Binding BackToFranchiseSelectionCommand}"
+                            BackgroundColor="Gray"
+                            TextColor="White"
+                            HorizontalOptions="FillAndExpand" />
+                    
+                    <Button Text="Cancel" 
+                            Command="{Binding CancelTradeCommand}"
+                            BackgroundColor="Red"
+                            TextColor="White"
+                            HorizontalOptions="FillAndExpand" />
+                </StackLayout>
+
+                <!-- Your Team Section -->
+                <Label Text="Your Team Offers:" FontAttributes="Bold" />
+                
+                <!-- Your Players -->
+                <StackLayout>
+                    <Label Text="Players:" FontSize="14" FontAttributes="Bold" />
+                    <CollectionView ItemsSource="{Binding AvailableTeamPlayers}"
+                                  HeightRequest="150">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="2">
+                                    <Frame BackgroundColor="{Binding Id, Converter={StaticResource PlayerSelectionColorConverter}, ConverterParameter={Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedTeamPlayers}}" 
+                                           Padding="10">
+                                        <StackLayout>
+                                            <StackLayout.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleTeamPlayerCommand}"
+                                                                    CommandParameter="{Binding}" />
+                                            </StackLayout.GestureRecognizers>
+                                            
+                                            <StackLayout Orientation="Horizontal">
+                                                <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                                <Label Text="{Binding Position}" FontSize="12" Margin="10,0,0,0" />
+                                            </StackLayout>
+                                            <Label Text="{Binding APY}" FontSize="12" />
+                                        </StackLayout>
+                                    </Frame>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+
+                <!-- Your Picks -->
+                <StackLayout>
+                    <Label Text="Draft Picks:" FontSize="14" FontAttributes="Bold" />
+                    <CollectionView ItemsSource="{Binding AvailableTeamPicks}"
+                                  HeightRequest="100">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="2">
+                                    <Frame BackgroundColor="{Binding Id, Converter={StaticResource PlayerSelectionColorConverter}, ConverterParameter={Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedTeamPlayers}}" 
+                                        Padding="10">
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleTeamPlayerCommand}"
+                                                CommandParameter="{Binding}" />
+                                        </Frame.GestureRecognizers>
+
+                                        <StackLayout>
+                                            <StackLayout Orientation="Horizontal">
+                                                <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                                <Label Text="{Binding Position}" FontSize="12" Margin="10,0,0,0" />
+                                            </StackLayout>
+                                            <Label Text="{Binding APY}" FontSize="12" />
+                                        </StackLayout>
+                                    </Frame>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+
+                <!-- Franchise Section -->
+                <Label Text="{Binding SelectedFranchise.Name, StringFormat='{0} Offers:'}" FontAttributes="Bold" />
+                
+                <!-- Franchise Players -->
+                <StackLayout>
+                    <Label Text="Players:" FontSize="14" FontAttributes="Bold" />
+                    <CollectionView ItemsSource="{Binding AvailableFranchisePlayers}"
+                                  HeightRequest="150">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="2">
+                                    <Frame BackgroundColor="{Binding Id, Converter={StaticResource PlayerSelectionColorConverter}, ConverterParameter={Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedFranchisePlayers}}" 
+                                           Padding="10">
+                                        <StackLayout>
+                                            <StackLayout.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleFranchisePlayerCommand}"
+                                                                    CommandParameter="{Binding}" />
+                                            </StackLayout.GestureRecognizers>
+                                            
+                                            <StackLayout Orientation="Horizontal">
+                                                <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                                <Label Text="{Binding Position}" FontSize="12" Margin="10,0,0,0" />
+                                            </StackLayout>
+                                            <Label Text="{Binding APY}" FontSize="12" />
+                                        </StackLayout>
+                                    </Frame>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+
+                <!-- Franchise Picks -->
+                <StackLayout>
+                    <Label Text="Draft Picks:" FontSize="14" FontAttributes="Bold" />
+                    <CollectionView ItemsSource="{Binding AvailableFranchisePicks}"
+                                  HeightRequest="100">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="2">
+                                    <Frame BackgroundColor="{Binding ., Converter={StaticResource PickSelectionColorConverter}, ConverterParameter={Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedTeamPicks}}" 
+                                        Padding="10">
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleTeamPickCommand}"
+                                                CommandParameter="{Binding}" />
+                                        </Frame.GestureRecognizers>
+
+                                        <Label Text="{Binding}" FontAttributes="Bold" />
+                                    </Frame>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+
+                <!-- Trade Action Buttons -->
+                <StackLayout Orientation="Horizontal" Spacing="10" Margin="0,20,0,0">
+                    <Button Text="Request Trade" 
+                            Command="{Binding RequestTradeCommand}"
+                            IsEnabled="{Binding HasSelectedItems}"
+                            BackgroundColor="Blue"
+                            TextColor="White"
+                            HorizontalOptions="FillAndExpand" />
+                    
+                    <Button Text="Force Trade" 
+                            Command="{Binding ForceTradeCommand}"
+                            IsEnabled="{Binding HasSelectedItems}"
+                            BackgroundColor="Orange"
+                            TextColor="White"
+                            HorizontalOptions="FillAndExpand" />
+                </StackLayout>
+
+            </StackLayout>
+
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}" 
+                   TextColor="Red" 
+                   IsVisible="{Binding HasError}" />
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                             IsVisible="{Binding IsLoading}" />
+
+        </StackLayout>
+    </ScrollView>
 </ContentPage>

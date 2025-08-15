@@ -21,7 +21,8 @@
       },
       {
         "Path": "MobileApp\\MobileApp.csproj",
-        "Action": "Start"
+        "Action": "Start",
+        "DebugTarget": "Pixel 7 - API 35 (Android 15.0 - API 35)"
       }
     ]
   },
@@ -38,7 +39,22 @@
       },
       {
         "Path": "MobileApp\\MobileApp.csproj",
+        "Action": "Start",
+        "DebugTarget": "Pixel 7 - API 35 (Android 15.0 - API 35)"
+      }
+    ]
+  },
+  {
+    "Name": "Mobile PC",
+    "Projects": [
+      {
+        "Path": "MyExpansionTeam\\METAPI.csproj",
         "Action": "Start"
+      },
+      {
+        "Path": "MobileApp\\MobileApp.csproj",
+        "Action": "Start",
+        "DebugTarget": "Windows Machine"
       }
     ]
   }

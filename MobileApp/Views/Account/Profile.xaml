@@ -5,4 +5,67 @@
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Account"
              x:DataType="viewmodels:ProfileViewModel"
              Title="Profile">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+
+            <!-- Title with Username -->
+            <Label Text="{Binding Username}" 
+               FontSize="24" 
+               FontAttributes="Bold" 
+               HorizontalOptions="Center" />
+
+            <!-- Admin Control Center (if admin) -->
+            <Button Text="Admin Control Center" 
+                Command="{Binding GoToAdminCommand}"
+                IsVisible="{Binding IsAdmin}"
+                BackgroundColor="Red"
+                TextColor="White" />
+
+            <!-- Profile Info Display -->
+            <Frame BackgroundColor="LightGray" Padding="15">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*">
+
+                    <Label Text="First Name:" Grid.Row="0" Grid.Column="0" FontAttributes="Bold" />
+                    <Label Text="{Binding FirstName}" Grid.Row="0" Grid.Column="1" />
+
+                    <Label Text="Last Name:" Grid.Row="1" Grid.Column="0" FontAttributes="Bold" />
+                    <Label Text="{Binding LastName}" Grid.Row="1" Grid.Column="1" />
+
+                    <Label Text="Email:" Grid.Row="2" Grid.Column="0" FontAttributes="Bold" />
+                    <Label Text="{Binding Email}" Grid.Row="2" Grid.Column="1" />
+
+                    <Label Text="Phone:" Grid.Row="3" Grid.Column="0" FontAttributes="Bold" />
+                    <Label Text="{Binding Tlf}" Grid.Row="3" Grid.Column="1" />
+
+                </Grid>
+            </Frame>
+
+            <!-- Action Buttons -->
+            <Button Text="Edit Profile" 
+                Command="{Binding EditProfileCommand}"
+                BackgroundColor="Blue"
+                TextColor="White" />
+
+            <Button Text="LogOut" 
+                Command="{Binding LogOutCommand}"
+                BackgroundColor="Orange"
+                TextColor="White" />
+
+            <Button Text="Delete Account" 
+                Command="{Binding DeleteUserCommand}"
+                BackgroundColor="Red"
+                TextColor="White" />
+            
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}" 
+               TextColor="Red" 
+               IsVisible="{Binding HasError}" />
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                         IsVisible="{Binding IsLoading}" />
+
+        </StackLayout>
+    </ScrollView>
 </ContentPage>

@@ -122,11 +122,26 @@
 	  <Compile Update="Views\Team\Edit.xaml.cs">
 	    <DependentUpon>Edit.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\Team\DraftResults.xaml.cs">
+	    <DependentUpon>DraftResults.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Team\ProspectSelectionModal.xaml.cs">
+	    <DependentUpon>ProspectSelectionModal.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Team\Trades.xaml.cs">
+	    <DependentUpon>Trades.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\Team\List.xaml.cs">
 	    <DependentUpon>List.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\Team\MyTeams.xaml.cs">
 	    <DependentUpon>MyTeams.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Team\ReviewRoster.xaml.cs">
+	    <DependentUpon>ReviewRoster.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Team\Formation.xaml.cs">
+	    <DependentUpon>Formation.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\Team\TradeError.xaml.cs">
 	    <DependentUpon>TradeError.xaml</DependentUpon>
@@ -191,10 +206,25 @@
 	  <MauiXaml Update="Views\Team\Edit.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\Team\DraftResults.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Team\ProspectSelectionModal.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Team\Trades.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\Team\List.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Team\MyTeams.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Team\ReviewRoster.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Team\Formation.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Team\TradeError.xaml">
