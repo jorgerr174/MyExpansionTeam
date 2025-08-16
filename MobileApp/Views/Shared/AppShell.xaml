@@ -11,28 +11,23 @@
     <TabBar>
         <ShellContent Title="Home" 
                       Icon="home.png"
-                      Route="Home/Index"
+                      Route="Home"
                       ContentTemplate="{DataTemplate home:Index}" />
 
         <ShellContent Title="Teams" 
                       Icon="teams.png"
-                      Route="Team/List"
+                      Route="List"
                       ContentTemplate="{DataTemplate team:List}" />
 
         <ShellContent Title="My Teams" 
                       Icon="myteams.png"
-                      Route="Team/MyTeams"
+                      Route="MyTeams"
                       ContentTemplate="{DataTemplate team:MyTeams}" />
 
-        <ShellContent Title="Log In" 
-                      IsVisible="{Binding isNotLoggedIn}"
-                      Icon="login.png"
-                      Route="Account/LogIn"
-                      ContentTemplate="{DataTemplate account:LogIn}" />
         <ShellContent Title="Profile" 
                       IsVisible="{Binding isLoggedIn}"
                       Icon="profile.png"
-                      Route="Account/Profile"
+                      Route="Profile"
                       ContentTemplate="{DataTemplate account:Profile}" />
     </TabBar>
 </Shell>

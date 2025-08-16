@@ -1,9 +1,7 @@
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.Player;
 using METCore.DTOs.Team;
-using METCore.Models.Teams;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
 
@@ -149,7 +147,7 @@ namespace MobileApp.Models.Team
 
                 if (success)
                 {
-                    await Shell.Current.GoToAsync("//MyTeams");
+                    await Shell.Current.GoToAsync("MyTeams");
                 }
                 else
                 {

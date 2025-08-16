@@ -19,8 +19,8 @@
             <StackLayout IsVisible="{Binding IsNotAuthenticated}">
                 <Label Text="Please log in to continue" 
                     HorizontalOptions="Center" />
-                <Button Text="Go to Login" 
-                    Command="{Binding GoToLoginCommand}" />
+                <Button Text="Go to LogIn" 
+                    Command="{Binding GoToLogInCommand}" />
             </StackLayout>
 
 
@@ -32,11 +32,14 @@
                    FontAttributes="Bold" />
 
                 <!-- Admin button (only if admin) -->
-                <Button Text="Admin actions" 
+                <Button Text="Admin Control Center" 
                     Command="{Binding GoToAdminCommand}"
                     IsVisible="{Binding IsAdmin}"
                     BackgroundColor="Red"
-                    TextColor="White" />
+                    TextColor="White"
+                    FontSize="16"
+                    HeightRequest="50"
+                    CornerRadius="10" />
 
                 <!-- Teams section -->
                 <Label Text="Your Teams:" 

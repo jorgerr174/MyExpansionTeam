@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="MobileApp.Views.Admin.AssignRoles"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:MobileApp.Models.Admin"
+             x:DataType="viewmodels:AssignRolesViewModel"
+             Title="Assign Roles">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="20">
+
+            <Label Text="Assign Roles" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center" />
+
+            <Label Text="This functionality has not been implemented yet." 
+                   FontSize="16" 
+                   HorizontalOptions="Center"
+                   TextColor="Gray" />
+
+            <Button Text="Back" 
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="Gray"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50" />
+
+        </StackLayout>
+    </ScrollView>
+
+</ContentPage>

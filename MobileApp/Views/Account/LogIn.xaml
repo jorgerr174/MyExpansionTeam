@@ -42,7 +42,7 @@
 
             <!-- Login Button - Direct translation of your submit button -->
             <Button Text="Log In" 
-                    Command="{Binding LoginCommand}"
+                    Command="{Binding LogInCommand}"
                     IsEnabled="{Binding IsFormEnabled}"
                     BackgroundColor="Blue"
                     TextColor="White" />
