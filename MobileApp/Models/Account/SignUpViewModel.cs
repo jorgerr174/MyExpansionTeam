@@ -46,7 +46,7 @@ namespace MobileApp.Models.Account
                 bool success = await _authService.SignUpAsync(Username, Password, ConfirmPassword, FirstName, LastName, Email, Tlf);
 
                 if (success)
-                    await Shell.Current.GoToAsync("//Login");
+                    await Shell.Current.GoToAsync("LogIn");
                 else
                     ErrorMessage = "Sign up failed";
             }

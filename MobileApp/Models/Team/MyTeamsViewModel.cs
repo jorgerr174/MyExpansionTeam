@@ -15,7 +15,7 @@ namespace MobileApp.Models.Team
             _teamService = teamService;
         }
 
-        [ObservableProperty] private IEnumerable<TeamInfoDto> teams = new List<TeamInfoDto>();
+        [ObservableProperty] private IEnumerable<TeamInfoDto> teams = [];
 
 
         [RelayCommand]
@@ -24,7 +24,7 @@ namespace MobileApp.Models.Team
             IsLoading = true;
             try
             {
-                Teams = await _teamService.GetMyTeamsAsync() ?? new List<TeamInfoDto>();
+                Teams = await _teamService.GetMyTeamsAsync() ?? [];
             }
             catch (Exception ex)
             {
@@ -39,42 +39,7 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         public async Task ViewTeam(int teamId)
         {
-            await Shell.Current.GoToAsync($"Team/Details?teamId={teamId}");
-        }
-
-        [RelayCommand]
-        public async Task DeleteTeam(int teamId)
-        {
-            bool confirm = await Shell.Current.DisplayAlert("Confirm Delete",
-                "Are you sure you want to delete this team?",
-                "Yes", "No");
-
-            if (!confirm) return;
-
-            IsLoading = true;
-            ErrorMessage = string.Empty;
-
-            try
-            {
-                bool success = await _teamService.DeleteTeamAsync(teamId);
-                if (success)
-                {
-                    // Reload the teams list to reflect the deletion
-                    await LoadTeams();
-                }
-                else
-                {
-                    ErrorMessage = "Failed to delete team";
-                }
-            }
-            catch (Exception ex)
-            {
-                ErrorMessage = $"Delete failed: {ex.Message}";
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            await Shell.Current.GoToAsync($"TeamDetails?teamId={teamId}");
         }
     }
 }

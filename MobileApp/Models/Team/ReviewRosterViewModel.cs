@@ -135,7 +135,7 @@ namespace MobileApp.Models.Team
 
                 if (success)
                 {
-                    await Shell.Current.GoToAsync("//MyTeams");
+                    await Shell.Current.GoToAsync("MyTeams");
                 }
                 else
                 {
@@ -155,7 +155,7 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         public async Task GoToBuildRoster()
         {
-            await Shell.Current.GoToAsync($"Team/Roster?teamId={TeamId}");
+            await Shell.Current.GoToAsync($"Roster?teamId={TeamId}");
         }
 
         private void ApplyPositionFilter()

@@ -10,7 +10,7 @@ namespace MobileApp.Models.Shared
         public AppShellViewModel(AccountService authService)
         {
             _authService = authService;
-            checkLogin();
+            checkLogIn();
         }
 
         [ObservableProperty] public bool isLoggedIn = false;
@@ -18,9 +18,9 @@ namespace MobileApp.Models.Shared
         public bool isNotLoggedIn => !IsLoggedIn;
 
 
-        private async void checkLogin()
+        private async void checkLogIn()
         {
-            IsLoggedIn = await _authService.TryAutoLoginAsync();
+            IsLoggedIn = await _authService.TryAutoLogInAsync();
             OnPropertyChanged(nameof(isNotLoggedIn));
         }
     }

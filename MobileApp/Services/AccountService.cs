@@ -1,18 +1,17 @@
 using METCore.DTOs.Shared;
 using METCore.DTOs.User;
-using MobileApp.Models.Account;
 
 namespace MobileApp.Services
 {
     public class AccountService(IHttpClientFactory httpClientFactory) : BaseService(httpClientFactory)
     {
-        #region TryAutoLogin
-        public async Task<bool> TryAutoLoginAsync()
+        #region TryAutoLogIn
+        public async Task<bool> TryAutoLogInAsync()
         {
             var token = await SecureStorage.GetAsync("jwt_token");
             return !string.IsNullOrEmpty(token);
         }
-        #endregion TryAutoLogin
+        #endregion TryAutoLogIn
 
 
         #region GetUsername
@@ -24,12 +23,12 @@ namespace MobileApp.Services
 
 
         #region GetProfile
-        public async Task<ProfileViewModel?> GetProfileAsync()
+        public async Task<UserDto?> GetProfileAsync()
         {
             try
             {
                 var response = await SendRequest(HttpMethod.Get, "User", "Profile");
-                return response.IsSuccessStatusCode ? await GetResult<ProfileViewModel>(response) : null;
+                return response.IsSuccessStatusCode ? await GetResult<UserDto>(response) : null;
             }
             catch { return null; }
         }
@@ -55,10 +54,10 @@ namespace MobileApp.Services
         {
             try
             {
-                var loginDto = new LogInDto(identifier, password);
+                var logInDto = new LogInDto(identifier, password);
 
                 // Same API call as your WebApp makes
-                var response = await SendRequest(HttpMethod.Post, "Auth", "LogIn", loginDto);
+                var response = await SendRequest(HttpMethod.Post, "Auth", "LogIn", logInDto);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -73,7 +72,7 @@ namespace MobileApp.Services
 
                 return false;
             }
-            catch
+            catch (Exception ex)
             {
                 return false;
             }

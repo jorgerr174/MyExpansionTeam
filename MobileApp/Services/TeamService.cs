@@ -217,44 +217,6 @@ namespace MobileApp.Services
 
         // Add these methods to the existing TeamService class
 
-
-        public async Task<DraftDto> GetDraftAsync(int teamId)
-        {
-            var response = await SendRequest(HttpMethod.Get, "Teams", $"GetDraft/{teamId}");
-
-            if (response.IsSuccessStatusCode)
-            {
-                return await GetResult<DraftDto>(response);
-            }
-
-            throw new Exception("Failed to load draft data");
-        }
-
-        public async Task<IEnumerable<ProspectDto>> GetDraftProspectsAsync(int year = 0)
-        {
-            if (year == 0) year = DateTime.Now.Year;
-
-            var response = await SendRequest(HttpMethod.Get, "Teams", $"GetDraftProspects?year={year}");
-
-            if (response.IsSuccessStatusCode)
-            {
-                return await GetResult<IEnumerable<ProspectDto>>(response);
-            }
-
-            throw new Exception("Failed to load prospects");
-        }
-
-        public async Task SaveDraftAsync(DraftDto draftData)
-        {
-            var response = await SendRequest(HttpMethod.Post, "Teams", "SaveDraft", draftData);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Failed to save draft: {error}");
-            }
-        }
-
         public async Task SaveDraftProgressAsync(DraftDto draftData)
         {
             var response = await SendRequest(HttpMethod.Post, "Teams", "SaveDraftProgress", draftData);
@@ -264,6 +226,27 @@ namespace MobileApp.Services
                 var error = await response.Content.ReadAsStringAsync();
                 throw new Exception($"Failed to save draft progress: {error}");
             }
+        }
+
+        public async Task<IEnumerable<ProspectDto>> GetDraftProspectsAsync(int year = 0)
+        {
+            try
+            {
+                if (year == 0) year = DateTime.Now.Year;
+                var response = await SendRequest(HttpMethod.Get, "Players", "GetDraftProspects", new IdDto(year));
+                return response.IsSuccessStatusCode ? await GetResult<IEnumerable<ProspectDto>>(response) : new List<ProspectDto>();
+            }
+            catch { return new List<ProspectDto>(); }
+        }
+
+        public async Task<bool> SaveDraftAsync(DraftDto draftDto)
+        {
+            try
+            {
+                var response = await SendRequest(HttpMethod.Post, "Teams", "SaveDraft", draftDto);
+                return response.IsSuccessStatusCode;
+            }
+            catch { return false; }
         }
     }
 }

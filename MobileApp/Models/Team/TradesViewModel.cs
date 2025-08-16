@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using METCore.DTOs.Player;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
-using METCore.DTOs.Player;
 
 namespace MobileApp.Models.Team
 {
@@ -94,7 +94,7 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         public async Task GoToNewTrade()
         {
-            await Shell.Current.GoToAsync($"Team/Trade?teamId={TeamId}");
+            await Shell.Current.GoToAsync($"Trade?teamId={TeamId}");
         }
 
         private void ApplyYearFilter()

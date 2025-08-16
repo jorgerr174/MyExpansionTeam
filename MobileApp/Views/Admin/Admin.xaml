@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="MobileApp.Views.Admin.Admin"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:MobileApp.Models.Admin"
+             x:DataType="viewmodels:AdminViewModel"
+             Title="Admin Control Center">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="20">
+
+            <Label Text="Admin actions" 
+                   FontSize="28" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center" />
+
+            <Frame BackgroundColor="LightGray" Padding="20" CornerRadius="10">
+                <StackLayout Spacing="20">
+
+                    <Button Text="Assign Roles" 
+                            Command="{Binding GoToAssignRolesCommand}"
+                            BackgroundColor="Orange"
+                            TextColor="White"
+                            FontSize="18"
+                            HeightRequest="60"
+                            CornerRadius="10" />
+
+                    <Button Text="Import" 
+                            Command="{Binding GoToImportCommand}"
+                            BackgroundColor="Blue"
+                            TextColor="White"
+                            FontSize="18"
+                            HeightRequest="60"
+                            CornerRadius="10" />
+
+                </StackLayout>
+            </Frame>
+
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                             IsVisible="{Binding IsLoading}" />
+
+            <Label Text="{Binding ErrorMessage}" 
+                   TextColor="Red" 
+                   IsVisible="{Binding HasError}"
+                   HorizontalOptions="Center" />
+
+            <Button Text="Back" 
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="Gray"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50" />
+
+        </StackLayout>
+    </ScrollView>
+
+</ContentPage>

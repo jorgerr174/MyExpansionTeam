@@ -39,7 +39,7 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         public async Task ViewTeam(int teamId)
         {
-            await Shell.Current.GoToAsync($"Team/Details?teamId={teamId}");
+            await Shell.Current.GoToAsync($"TeamDetails?teamId={teamId}");
         }
     }
 }

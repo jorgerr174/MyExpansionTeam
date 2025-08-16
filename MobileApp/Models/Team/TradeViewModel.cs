@@ -2,7 +2,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.Player;
 using METCore.DTOs.Team;
-using METCore.Models.Teams;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
 
@@ -288,7 +287,7 @@ namespace MobileApp.Models.Team
             else
             {
                 // Return to roster/team details (will reload)
-                await Shell.Current.GoToAsync("//MyTeams");
+                await Shell.Current.GoToAsync("MyTeams");
             }
         }
 
@@ -300,7 +299,7 @@ namespace MobileApp.Models.Team
             }
             else
             {
-                await Shell.Current.GoToAsync("//MyTeams");
+                await Shell.Current.GoToAsync("MyTeams");
             }
         }
 

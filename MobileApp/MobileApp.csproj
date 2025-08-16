@@ -92,6 +92,15 @@
 	  <Compile Update="Views\Account\LogIn.xaml.cs">
 	    <DependentUpon>LogIn.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\Admin\AssignRoles.xaml.cs">
+	    <DependentUpon>AssignRoles.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Admin\Import.xaml.cs">
+	    <DependentUpon>Import.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\Admin\Admin.xaml.cs">
+	    <DependentUpon>Admin.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\Home\Index.xaml.cs">
 	    <DependentUpon>Index.xaml</DependentUpon>
 	  </Compile>
@@ -174,6 +183,15 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Account\LogIn.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Admin\AssignRoles.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Admin\Import.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\Admin\Admin.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Home\Index.xaml">
