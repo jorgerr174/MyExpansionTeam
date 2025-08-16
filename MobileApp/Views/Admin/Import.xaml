@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="MobileApp.Views.Admin.Import"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:MobileApp.Models.Admin"
+             xmlns:converters="clr-namespace:MobileApp.Converters"
+             x:DataType="viewmodels:ImportViewModel"
+             Title="Import Data">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="20">
+
+            <Label Text="Import Data" 
+                   FontSize="24" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="Center" />
+
+            <!-- Error Messages (at top for visibility) -->
+            <Label Text="{Binding ErrorMessage}" 
+                   TextColor="Red" 
+                   IsVisible="{Binding HasError}"
+                   HorizontalOptions="Center"
+                   FontAttributes="Bold" />
+
+            <!-- Import Type Selection -->
+            <Frame BackgroundColor="LightBlue" Padding="15" CornerRadius="10">
+                <StackLayout>
+                    <Label Text="Import Type" 
+                           FontSize="16" 
+                           FontAttributes="Bold" />
+
+                    <Picker ItemsSource="{Binding ImportTypes}" 
+                            SelectedItem="{Binding SelectedImportType}"
+                            ItemDisplayBinding="{Binding DisplayName}"
+                            Title="Select import type" />
+                </StackLayout>
+            </Frame>
+
+            <!-- Year Selection (for Stats) -->
+            <Frame BackgroundColor="LightGreen" 
+                   Padding="15" 
+                   CornerRadius="10"
+                   IsVisible="{Binding ShowYearSelection}">
+                <StackLayout>
+                    <Label Text="Year" 
+                           FontSize="16" 
+                           FontAttributes="Bold" />
+                    <Label Text="Choose a year (from last three) to import to" 
+                           FontSize="12" 
+                           TextColor="Gray" />
+
+                    <Picker ItemsSource="{Binding AvailableYears}" 
+                            SelectedItem="{Binding SelectedYear}"
+                            Title="Select year" />
+                </StackLayout>
+            </Frame>
+
+            <!-- Stats Type Selection (for Stats) -->
+            <Frame BackgroundColor="LightYellow" 
+                   Padding="15" 
+                   CornerRadius="10"
+                   IsVisible="{Binding ShowStatsTypeSelection}">
+                <StackLayout>
+                    <Label Text="Stats Type" 
+                           FontSize="16" 
+                           FontAttributes="Bold" />
+                    <Label Text="Choose the type of stats to import" 
+                           FontSize="12" 
+                           TextColor="Gray" />
+
+                    <Picker ItemsSource="{Binding StatsTypes}" 
+                            SelectedItem="{Binding SelectedStatsType}"
+                            ItemDisplayBinding="{Binding DisplayName}"
+                            Title="Select stats type" />
+                </StackLayout>
+            </Frame>
+
+            <!-- File Selection -->
+            <Frame BackgroundColor="LightCoral" Padding="15" CornerRadius="10">
+                <StackLayout>
+                    <Label Text="File Selection" 
+                           FontSize="16" 
+                           FontAttributes="Bold" />
+
+                    <Button Text="Select CSV File" 
+                            Command="{Binding SelectFileCommand}"
+                            BackgroundColor="Blue"
+                            TextColor="White"
+                            CornerRadius="5" />
+
+                    <Label Text="{Binding SelectedFileName}" 
+                           FontSize="14" 
+                           TextColor="Gray"
+                           HorizontalOptions="Center" />
+                </StackLayout>
+            </Frame>
+
+            <!-- Import Button -->
+            <Button Text="Upload CSV" 
+                    Command="{Binding ImportDataCommand}"
+                    BackgroundColor="Green"
+                    TextColor="White"
+                    FontSize="18"
+                    HeightRequest="60"
+                    CornerRadius="10"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}" />
+
+            <!-- Loading Indicator -->
+            <StackLayout IsVisible="{Binding IsLoading}" 
+                         HorizontalOptions="Center">
+                <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                                 Color="Blue" />
+                <Label Text="Importing data..." 
+                       HorizontalOptions="Center" />
+            </StackLayout>
+
+            <!-- Import Result -->
+            <Frame BackgroundColor="LightGreen" 
+                   Padding="15" 
+                   CornerRadius="10"
+                   IsVisible="{Binding HasImportResult}">
+                <StackLayout>
+                    <Label Text="{Binding ImportResult}" 
+                           FontSize="14"
+                           FontAttributes="Bold" />
+
+                    <!-- Error File Download -->
+                    <Button Text="Download Error Report" 
+                            Command="{Binding DownloadErrorFileCommand}"
+                            IsVisible="{Binding HasErrorFile}"
+                            BackgroundColor="Orange"
+                            TextColor="White"
+                            CornerRadius="5"
+                            Margin="0,10,0,0" />
+                </StackLayout>
+            </Frame>
+
+            <!-- Back Button -->
+            <Button Text="Back" 
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="Gray"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="50" />
+
+        </StackLayout>
+    </ScrollView>
+
+</ContentPage>

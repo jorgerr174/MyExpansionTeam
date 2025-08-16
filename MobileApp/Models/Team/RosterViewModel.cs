@@ -180,7 +180,7 @@ namespace MobileApp.Models.Team
 
                 if (success)
                 {
-                    await Shell.Current.GoToAsync("//MyTeams");
+                    await Shell.Current.GoToAsync("MyTeams");
                 }
                 else
                 {

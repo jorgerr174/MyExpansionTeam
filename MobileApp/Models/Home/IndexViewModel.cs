@@ -34,15 +34,41 @@ namespace MobileApp.Models.Home
             {
                 Username = await AccountService.GetUsernameAsync() ?? "User";
                 Teams = await _homeService.GetMyTeamsAsync() ?? [];
+
+                IsAdmin = (await _accountService.GetProfileAsync())?.Role == METCore.Enums.Types.RoleEnum.Admin;
             }
 
             OnPropertyChanged(nameof(IsNotAuthenticated));
         }
 
         [RelayCommand]
-        public async Task GoToLogin()
+        public async Task GoToLogIn()
         {
-            await Shell.Current.GoToAsync("Account/LogIn");
+            await Shell.Current.GoToAsync("LogIn");
+        }
+
+        [RelayCommand]
+        public async Task GoToAdmin()
+        {
+            await Shell.Current.GoToAsync("Admin");
+        }
+
+        [RelayCommand]
+        public async Task MyTeams()
+        {
+            await Shell.Current.GoToAsync("MyTeams");
+        }
+
+        [RelayCommand]
+        public async Task CreateTeam()
+        {
+            await Shell.Current.GoToAsync("TeamCreate");
+        }
+
+        [RelayCommand]
+        public async Task ViewTeam(int teamId)
+        {
+            await Shell.Current.GoToAsync($"TeamDetails?teamId={teamId}");
         }
     }
 }

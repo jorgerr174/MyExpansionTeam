@@ -55,7 +55,7 @@ namespace MobileApp.Models.Team
                 IsLoading = true;
 
                 // Get draft results from service
-                var draftData = await _teamService.GetDraftAsync(TeamId);
+                var draftData = await _teamService.GetTeamDraftAsync(TeamId);
 
                 DraftResults.Clear();
 

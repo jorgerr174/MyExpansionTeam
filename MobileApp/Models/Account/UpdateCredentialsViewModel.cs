@@ -48,7 +48,7 @@ namespace MobileApp.Models.Account
                 bool success = await _accountService.UpdateCredentialsAsync(CurrentPassword, NewUsername, NewPassword);
                 if (success)
                 {
-                    await Shell.Current.GoToAsync("//Profile");
+                    await Shell.Current.GoToAsync("Profile");
                 }
                 else
                 {

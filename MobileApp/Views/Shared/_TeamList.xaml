@@ -13,13 +13,18 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <Label Text="{Binding Name}" 
+                    <Label
                            FontSize="18" 
                            FontAttributes="Bold" 
-                           Grid.Row="0" />
-
-                    <Label Text="{Binding Location}" 
-                           Grid.Row="1" />
+                           Grid.Row="0">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="{Binding Location}" />
+                                <Span Text=" " />
+                                <Span Text="{Binding Mascot}" />
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
 
                     <StackLayout Orientation="Horizontal" Grid.Row="2">
                         <Button Text="View Details" 
@@ -27,12 +32,6 @@
                             CommandParameter="{Binding Id}"
                             BackgroundColor="Blue"
                             TextColor="White" />
-                        <Button Text="Delete" 
-                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentView}}, Path=BindingContext.DeleteTeamCommand}"
-                            CommandParameter="{Binding Id}"
-                            BackgroundColor="Red"
-                            TextColor="White" 
-                            IsVisible="{Binding Source={RelativeSource AncestorType={x:Type ContentView}}, Path=BindingContext.ShowDeleteButton}" />
                     </StackLayout>
                 </Grid>
             </DataTemplate>

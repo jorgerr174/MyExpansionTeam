@@ -5,7 +5,7 @@ namespace MobileApp.Models.Shared
 {
     public abstract partial class BaseViewModel() : ObservableObject
     {
-        protected string backPath = "Home/Index";
+        protected string backPath = "Home";
 
         [ObservableProperty]
         private bool isLoading = false;
