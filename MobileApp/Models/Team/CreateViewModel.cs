@@ -36,7 +36,7 @@ namespace MobileApp.Models.Team
 
                 if ((teamId ?? 0) > 0)
                 {
-                    await Shell.Current.GoToAsync($"Team/RosterSettings?teamId={teamId}");
+                    await Shell.Current.GoToAsync($"RosterSettings?teamId={teamId}");
                 }
                 else
                 {

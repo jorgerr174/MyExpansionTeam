@@ -9,6 +9,7 @@ namespace MobileApp.Services
     {
         private readonly HttpClient _fastClient = httpClientFactory.CreateClient("_fastClient");
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("_httpClient");
+        protected readonly HttpClient _importClient = httpClientFactory.CreateClient("_importClient");
         private readonly JsonSerializerOptions _jsonOptions = new()
         {
             PropertyNameCaseInsensitive = true,

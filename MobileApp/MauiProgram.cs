@@ -20,18 +20,78 @@ namespace MobileApp
                 client.BaseAddress = new Uri(MauiSettings.apiURL);
                 client.Timeout = TimeSpan.FromMinutes(1);
             });
-
             builder.Services.AddHttpClient("_httpClient", client =>
             {
                 client.BaseAddress = new Uri(MauiSettings.apiURL);
                 client.Timeout = TimeSpan.FromMinutes(3);
+            }).ConfigurePrimaryHttpMessageHandler(() =>
+            {
+#if DEBUG && ANDROID
+                var handler = new HttpClientHandler();
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+                return handler;
+#else
+                return new HttpClientHandler();
+#endif
+            });
+            builder.Services.AddHttpClient("_importClient", client =>
+            {
+                client.BaseAddress = new Uri(MauiSettings.apiURL);
+                client.Timeout = TimeSpan.FromMinutes(10);
             });
 
+
+            #region Routing
+            #region Views.Account
+            Routing.RegisterRoute("EditProfile", typeof(Views.Account.EditProfile));
+            Routing.RegisterRoute("LogIn", typeof(Views.Account.LogIn));
+            Routing.RegisterRoute("Profile", typeof(Views.Account.Profile));
+            //builder.Services.AddTransient<Views.Account.SignUp>();
+            //builder.Services.AddTransient<Views.Account.UpdateCredentials>();
+            //builder.Services.AddTransient<Views.Account.UpdateUser>();
+            #endregion Views.Account
+
+            #region Views.Admin
+            Routing.RegisterRoute("Admin", typeof(Views.Admin.Admin));
+            Routing.RegisterRoute("AssignRoles", typeof(Views.Admin.AssignRoles));
+            Routing.RegisterRoute("Import", typeof(Views.Admin.Import));
+            #endregion Views.Admin
+
+            #region Views.Home
+            Routing.RegisterRoute("Home", typeof(Views.Home.Index));
+            #endregion Views.Home
+
+            //#region Views.Shared
+            //builder.Services.AddSingleton<Views.Shared.AppShell>();
+            //builder.Services.AddSingleton<Views.Shared.Error>();
+            //#endregion Views.Shared
+
+            //#region Views.Team
+            Routing.RegisterRoute("TeamCreate", typeof(Views.Team.Create));
+            Routing.RegisterRoute("TeamDetails", typeof(Views.Team.Details));
+            //builder.Services.AddTransient<Views.Team.Draft>();
+            Routing.RegisterRoute("DraftResults", typeof(Views.Team.DraftResults));
+            Routing.RegisterRoute("TeamEdit", typeof(Views.Team.Edit));
+            Routing.RegisterRoute("Formation", typeof(Views.Team.Formation));
+            Routing.RegisterRoute("List", typeof(Views.Team.List));
+            Routing.RegisterRoute("MyTeams", typeof(Views.Team.MyTeams));
+            Routing.RegisterRoute("ReviewRoster", typeof(Views.Team.ReviewRoster));
+            Routing.RegisterRoute("Roster", typeof(Views.Team.Roster));
+            Routing.RegisterRoute("RosterSettings", typeof(Views.Team.RosterSettings));
+            Routing.RegisterRoute("Trades", typeof(Views.Team.Trades));
+            Routing.RegisterRoute("Trade", typeof(Views.Team.Trade));
+            //builder.Services.AddTransient<Views.Team.TradeError>();
+            //#endregion Views.Team
+            #endregion Routing
+
+
             #region Services
-            builder.Services.AddSingleton<HomeService>();
             builder.Services.AddSingleton<AccountService>();
+            builder.Services.AddSingleton<AdminService>();
+            builder.Services.AddSingleton<HomeService>();
             builder.Services.AddTransient<TeamService>();
             #endregion Services
+
 
             #region Views
             #region Views.Account
@@ -42,6 +102,12 @@ namespace MobileApp
             builder.Services.AddTransient<Views.Account.UpdateCredentials>();
             builder.Services.AddTransient<Views.Account.UpdateUser>();
             #endregion Views.Account
+
+            #region Views.Admin
+            builder.Services.AddTransient<Views.Admin.Admin>();
+            builder.Services.AddTransient<Models.Admin.AssignRolesViewModel>();
+            builder.Services.AddTransient<Views.Admin.Import>();
+            #endregion Views.Admin
 
             #region Views.Home
             builder.Services.AddTransient<Views.Home.Index>();
@@ -66,6 +132,7 @@ namespace MobileApp
             #endregion Views.Team
             #endregion Views
 
+
             #region Models
             #region Models.Account
             builder.Services.AddTransient<Models.Account.EditProfileViewModel>();
@@ -89,7 +156,10 @@ namespace MobileApp
             #region Models.Team
             builder.Services.AddTransient<Models.Team.CreateViewModel>();
             builder.Services.AddTransient<Models.Team.DetailsViewModel>();
-            builder.Services.AddTransient<Models.Team.DraftViewModel>();
+            builder.Services.AddTransient<Models.Team.DraftViewModel>(
+                provider => new Models.Team.DraftViewModel(
+                    provider.GetRequiredService<TeamService>()
+                ));
             builder.Services.AddTransient<Models.Team.DraftResultsViewModel>();
             builder.Services.AddTransient<Models.Team.EditViewModel>();
             builder.Services.AddTransient<Models.Team.FormationViewModel>();
@@ -111,6 +181,12 @@ namespace MobileApp
 
     public static class MauiSettings
     {
-        public static string apiURL = "https://localhost:7087/api/";
+#if ANDROID
+        public static string apiURL = "http://10.0.2.2:5088/api/"; // Android emulator
+#elif IOS
+    public static string apiURL = "https://localhost:7087/api/"; // iOS simulator
+#else
+    public static string apiURL = "https://localhost:7087/api/"; // Other platforms
+#endif
     }
 }

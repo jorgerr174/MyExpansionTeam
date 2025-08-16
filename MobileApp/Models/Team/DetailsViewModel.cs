@@ -48,49 +48,49 @@ namespace MobileApp.Models.Team
         public async Task EditTeam()
         {
             if (Team != null)
-                await Shell.Current.GoToAsync($"Team/Edit?teamId={Team.Id}");
+                await Shell.Current.GoToAsync($"TeamEdit?teamId={Team.Id}");
         }
 
         [RelayCommand]
         public async Task RosterSettings()
         {
             if (Team != null)
-                await Shell.Current.GoToAsync($"Team/RosterSettings?teamId={Team.Id}");
+                await Shell.Current.GoToAsync($"RosterSettings?teamId={Team.Id}");
         }
 
         [RelayCommand]
         public async Task BuildRoster()
         {
             if (Team != null)
-                await Shell.Current.GoToAsync($"Team/Roster?teamId={Team.Id}");
+                await Shell.Current.GoToAsync($"Roster?teamId={Team.Id}");
         }
 
         [RelayCommand]
         public async Task ReviewRoster()
         {
             if (Team != null)
-                await Shell.Current.GoToAsync($"Team/ReviewRoster?teamId={Team.Id}");
+                await Shell.Current.GoToAsync($"ReviewRoster?teamId={Team.Id}");
         }
 
         [RelayCommand]
         public async Task SetFormation()
         {
             if (Team != null)
-                await Shell.Current.GoToAsync($"Team/Formation?teamId={Team.Id}");
+                await Shell.Current.GoToAsync($"Formation?teamId={Team.Id}");
         }
 
         [RelayCommand]
         public async Task ViewTrades()
         {
             if (Team != null)
-                await Shell.Current.GoToAsync($"Team/Trades?teamId={Team.Id}");
+                await Shell.Current.GoToAsync($"Trades?teamId={Team.Id}");
         }
 
         [RelayCommand]
         public async Task ViewDraftResults()
         {
             if (Team != null)
-                await Shell.Current.GoToAsync($"Team/DraftResults?teamId={Team.Id}");
+                await Shell.Current.GoToAsync($"DraftResults?teamId={Team.Id}");
         }
     }
 }

@@ -26,14 +26,15 @@ namespace MobileApp.Models.Account
             IsLoading = true;
             try
             {
-                var userInfo = await _accountService.GetProfileAsync();
-                if (userInfo != null)
+                var userDto = await _accountService.GetProfileAsync();
+                if (userDto != null)
                 {
-                    FirstName = userInfo.FirstName;
-                    LastName = userInfo.LastName;
-                    Email = userInfo.Email;
-                    Tlf = userInfo.Tlf;
-                    Username = await AccountService.GetUsernameAsync() ?? "";
+                    FirstName = userDto.FirstName;
+                    LastName = userDto.LastName;
+                    Email = userDto.Email;
+                    Tlf = userDto.Tlf;
+                    Username = userDto.Username;
+                    IsAdmin = userDto.Role == METCore.Enums.Types.RoleEnum.Admin; // Add this line
                 }
             }
             catch (Exception ex)
@@ -47,16 +48,22 @@ namespace MobileApp.Models.Account
         }
 
         [RelayCommand]
+        public async Task GoToAdmin()
+        {
+            await Shell.Current.GoToAsync("Admin");
+        }
+
+        [RelayCommand]
         public async Task EditProfile()
         {
-            await Shell.Current.GoToAsync("Account/EditProfile");
+            await Shell.Current.GoToAsync("EditProfile");
         }
 
         [RelayCommand]
         public async Task LogOut()
         {
             AccountService.LogOutAsync();
-            await Shell.Current.GoToAsync("Account/LogIn");
+            await Shell.Current.GoToAsync("LogIn");
         }
 
         [RelayCommand]
@@ -76,7 +83,7 @@ namespace MobileApp.Models.Account
                 bool success = await _accountService.DeleteUserAsync();
                 if (success)
                 {
-                    await Shell.Current.GoToAsync("//Login");
+                    await Shell.Current.GoToAsync("LogIn");
                 }
                 else
                 {

@@ -19,7 +19,7 @@ namespace MobileApp.Models.Account
 
 
         [RelayCommand]
-        public async Task LoginAsync()
+        public async Task LogInAsync()
         {
             if (string.IsNullOrWhiteSpace(Identifier) || string.IsNullOrWhiteSpace(Password))
             {
@@ -38,7 +38,7 @@ namespace MobileApp.Models.Account
                 if (success)
                 {
                     // Navigate to main page (equivalent of RedirectUrl in WebApp)
-                    await Shell.Current.GoToAsync("Home/Index");
+                    await Shell.Current.GoToAsync("Home");
                 }
                 else
                 {
