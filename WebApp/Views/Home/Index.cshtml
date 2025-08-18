@@ -1,20 +1,99 @@
 ﻿@using System.Security.Claims
 @model IEnumerable<METCore.DTOs.Team.TeamInfoDto>?
 
-<div class="text-center">
-    <h1 class="display-4">Bienvenid@@s</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    @if (User?.Identity?.IsAuthenticated ?? false)
-    {
-    @if (User.Claims.ToList().FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value == "Admin")
-    {
-    <div>
-        <a asp-area="" asp-controller="Admin" asp-action="Index">Admin actions</a>
-    </div>
-    }
+@{
+    ViewData["Title"] = "Home";
+}
 
-    <div id="teams">
-        @await Html.PartialAsync("~/Views/Shared/_TeamList.cshtml", Model)
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="text-center mb-4">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-home me-3 text-primary"></i>Welcome
+                </h1>
+                <p class="lead text-muted">Fantasy Football Team Management System</p>
+            </div>
+
+            @if (User?.Identity?.IsAuthenticated ?? false)
+            {
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-user me-2"></i>Welcome back, @User.Identity.Name
+                                </h5>
+                                @if (User.Claims.ToList().FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value == "Admin")
+                                {
+                                    <a asp-controller="Admin" asp-action="Index" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-shield-alt me-2"></i>Admin Panel
+                                    </a>
+                                }
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <a asp-controller="Team" asp-action="MyTeams" class="btn btn-primary btn-lg w-100">
+                                            <i class="fas fa-users me-2"></i>My Teams
+                                        </a>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a asp-controller="Team" asp-action="Create" class="btn btn-success btn-lg w-100">
+                                            <i class="fas fa-plus me-2"></i>Create New Team
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (Model != null && Model.Any())
+                {
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-football-ball me-2"></i>Your Recent Teams
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            @{
+                                ViewData["myTeams"] = true;
+                            }
+                            @await Html.PartialAsync("~/Views/Shared/_TeamList.cshtml", Model, ViewData)
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-info text-white text-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Get Started
+                                </h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <p class="mb-4">Please log in to access your fantasy football teams and start managing your roster.</p>
+                                <div class="d-grid gap-2">
+                                    <a asp-controller="Account" asp-action="LogIn" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-sign-in-alt me-2"></i>Log In
+                                    </a>
+                                    <a asp-controller="Account" asp-action="SignUp" class="btn btn-outline-secondary">
+                                        <i class="fas fa-user-plus me-2"></i>Sign Up
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
-	}
 </div>
+
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

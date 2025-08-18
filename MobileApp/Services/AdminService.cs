@@ -1,4 +1,6 @@
 using METCore.DTOs.Admin;
+using METCore.DTOs.Shared;
+using METCore.DTOs.User;
 
 namespace MobileApp.Services
 {
@@ -36,6 +38,26 @@ namespace MobileApp.Services
                 return response.IsSuccessStatusCode ? await GetResult<ResultImportDto>(response) : null;
             }
             catch { return null; }
+        }
+
+        public async Task<SearchResultDto<UserDto>?> GetUsersAsync(SearchDto searchDto)
+        {
+            try
+            {
+                var response = await SendRequest(HttpMethod.Get, "Users", "List", searchDto);
+                return response.IsSuccessStatusCode ? await GetResult<SearchResultDto<UserDto>>(response) : null;
+            }
+            catch { return null; }
+        }
+
+        public async Task<bool> AssignRoleAsync(AssignRoleDto assignRoleDto)
+        {
+            try
+            {
+                var response = await SendRequest(HttpMethod.Post, "Auth", "AssignRole", assignRoleDto);
+                return response.IsSuccessStatusCode;
+            }
+            catch { return false; }
         }
     }
 }

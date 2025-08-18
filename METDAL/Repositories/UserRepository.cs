@@ -67,7 +67,7 @@ namespace METDAL.Repositories
                 .Skip((dto.Page - 1) * dto.PageSize)
                 .Take(dto.PageSize)
                 .ToListAsync(), totalCount);
-        }        
+        }
         #endregion Get
 
 
