@@ -1,11 +1,52 @@
 ﻿@model IEnumerable<METCore.DTOs.Team.TeamInfoDto>?
 
 @{
-    ViewData.Add("myTeams", true);
+    ViewData["Title"] = "My Teams";
+    ViewData["myTeams"] = true;
 }
 
-<div class="text-center">
-    <div id="teams">
-        @await Html.PartialAsync("~/Views/Shared/_TeamList.cshtml", Model, ViewData)
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card mt-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-users me-2"></i>My Teams
+                    </h4>
+                    <a asp-action="Create" class="btn btn-success btn-sm">
+                        <i class="fas fa-plus me-2"></i>New Team
+                    </a>
+                </div>
+
+                @if (Model != null && Model.Any())
+                {
+                    <div class="card-body p-0">
+                        @await Html.PartialAsync("~/Views/Shared/_TeamList.cshtml", Model, ViewData)
+                    </div>
+                }
+                else
+                {
+                    <div class="card-body text-center py-5">
+                        <div class="mb-4">
+                            <i class="fas fa-football-ball fa-3x text-muted"></i>
+                        </div>
+                        <h5 class="text-muted">No teams found</h5>
+                        <p class="text-muted mb-4">You haven't created any teams yet. Get started by creating your first team!</p>
+                        <a asp-action="Create" class="btn btn-success btn-lg">
+                            <i class="fas fa-plus me-2"></i>Create Your First Team
+                        </a>
+                    </div>
+                }
+
+                <div class="card-footer bg-light text-center">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-home me-2"></i>Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

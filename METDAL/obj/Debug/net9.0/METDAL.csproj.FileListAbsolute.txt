@@ -1,6 +1,6 @@
-C:\Users\jorge\workspaces\repos\MyExpansionTeam\METDAL\bin\Debug\net9.0\METDAL.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METDAL\bin\Debug\net9.0\METDAL.deps.json
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METDAL\bin\Debug\net9.0\METDAL.runtimeconfig.json
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\METDAL\bin\Debug\net9.0\METDAL.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METDAL\bin\Debug\net9.0\METDAL.pdb
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METDAL\bin\Debug\net9.0\METCore.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\METDAL\bin\Debug\net9.0\METCore.pdb

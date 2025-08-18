@@ -79,5 +79,76 @@ namespace MobileApp.Models.Team
                 IsLoading = false;
             }
         }
+
+        [RelayCommand]
+        public async Task DuplicateTeam()
+        {
+            try
+            {
+                bool confirm = await Shell.Current.DisplayAlert("Confirm Duplicate",
+                    "¿Está seguro de que desea duplicar este equipo?", "Yes", "No");
+
+                if (!confirm) return;
+
+                IsLoading = true;
+                ErrorMessage = string.Empty;
+
+                var duplicatedTeam = await _teamService.DuplicateTeamAsync(TeamId);
+
+                if (duplicatedTeam != null)
+                {
+                    // Navigate to edit view of the new duplicated team
+                    await Shell.Current.GoToAsync($"Team/Edit?teamId={duplicatedTeam.Id}");
+                }
+                else
+                {
+                    ErrorMessage = "Failed to duplicate team";
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Duplicate failed: {ex.Message}";
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        [RelayCommand]
+        public async Task DeleteTeam()
+        {
+            try
+            {
+                bool confirm = await Shell.Current.DisplayAlert("Confirm Delete",
+                    "¿Está seguro de que desea eliminar este equipo?", "Yes", "No");
+
+                if (!confirm) return;
+
+                IsLoading = true;
+                ErrorMessage = string.Empty;
+
+                bool success = await _teamService.DeleteTeamAsync(TeamId);
+
+                if (success)
+                {
+                    await Shell.Current.DisplayAlert("Success", "Team deleted successfully", "OK");
+                    // Navigate back to teams list
+                    await Shell.Current.GoToAsync("//Home");
+                }
+                else
+                {
+                    ErrorMessage = "Failed to delete team";
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Delete failed: {ex.Message}";
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
     }
 }

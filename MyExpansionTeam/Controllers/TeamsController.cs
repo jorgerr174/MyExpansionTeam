@@ -269,7 +269,7 @@ namespace METAPI.Controllers
 
             ResultDto<TeamBasicInfoDto> result = await _teamService.DuplicateTeam(username, dto.Id);
 
-            return !String.IsNullOrWhiteSpace(result.Message) 
+            return !String.IsNullOrWhiteSpace(result.Message)
                 ? BadRequest(result)
                 : Ok(result);
         }

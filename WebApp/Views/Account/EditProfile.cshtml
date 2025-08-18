@@ -1,33 +1,57 @@
 ﻿@model WebApp.Models.Account.ProfileViewModel
 
 @{
-    bool userTab = ViewData["userTab"] as bool? ?? true; // Default to true if missing
+    ViewData["Title"] = "Edit Profile";
+    bool userTab = ViewData["userTab"] as bool? ?? true;
 }
 
-<h1>@User.Identity.Name</h1>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card mt-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-center align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>Edit Profile - @User.Identity.Name
+                    </h4>
+                </div>
 
-<ul class="nav nav-tabs" id="editProfileTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-        <a class="nav-link @(userTab ? "active" : "")" id="user-tab" data-bs-toggle="tab" href="#user" role="tab">Editar Perfil</a>
-    </li>
-    <li class="nav-item" role="presentation">
-        <a class="nav-link @(!userTab ? "active" : "")" id="credentials-tab" data-bs-toggle="tab" href="#credentials" role="tab">Editar Credenciales</a>
-    </li>
-</ul>
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="editProfileTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link @(userTab ? "active" : "")" id="user-tab" data-bs-toggle="tab" href="#user" role="tab">
+                                <i class="fas fa-user me-2"></i>Edit Profile
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link @(!userTab ? "active" : "")" id="credentials-tab" data-bs-toggle="tab" href="#credentials" role="tab">
+                                <i class="fas fa-key me-2"></i>Edit Credentials
+                            </a>
+                        </li>
+                    </ul>
 
-<div class="tab-content mt-3">
-    <div class="tab-pane fade @(userTab ? "show active" : "")" id="user" role="tabpanel">
-        @await Html.PartialAsync("UpdateUser", Model.UpdateUser)
-    </div>
+                    <div class="tab-content mt-3">
+                        <div class="tab-pane fade @(userTab ? "show active" : "")" id="user" role="tabpanel">
+                            @await Html.PartialAsync("UpdateUser", Model.UpdateUser)
+                        </div>
 
-    <div class="tab-pane fade @(!userTab ? "show active" : "")" id="credentials" role="tabpanel">
-        @await Html.PartialAsync("UpdateCredentials", Model.UpdateCredentials)
+                        <div class="tab-pane fade @(!userTab ? "show active" : "")" id="credentials" role="tabpanel">
+                            @await Html.PartialAsync("UpdateCredentials", Model.UpdateCredentials)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light text-center">
+                    <a asp-action="Profile" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Go Back
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-area="" asp-action="Profile">Go Back</a>
-</div>
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")

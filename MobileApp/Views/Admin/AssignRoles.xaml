@@ -7,26 +7,186 @@
              Title="Assign Roles">
 
     <ScrollView>
-        <StackLayout Padding="20" Spacing="20">
+        <StackLayout Padding="20" Spacing="15">
 
-            <Label Text="Assign Roles" 
+            <!-- Header -->
+            <Label Text="Role Assignment" 
                    FontSize="24" 
                    FontAttributes="Bold" 
                    HorizontalOptions="Center" />
 
-            <Label Text="This functionality has not been implemented yet." 
-                   FontSize="16" 
-                   HorizontalOptions="Center"
-                   TextColor="Gray" />
+            <!-- Search Section -->
+            <Frame BackgroundColor="LightGray" Padding="15" CornerRadius="10">
+                <StackLayout Spacing="10">
+                    <Label Text="Search Users" FontAttributes="Bold" />
 
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <Entry Grid.Column="0" 
+                               Placeholder="Search by username, name, email, or phone..."
+                               Text="{Binding SearchFilter}" 
+                               ReturnCommand="{Binding SearchCommand}" />
+
+                        <Button Grid.Column="1" 
+                                Text="Search" 
+                                Command="{Binding SearchCommand}"
+                                BackgroundColor="Blue"
+                                TextColor="White"
+                                WidthRequest="80" />
+                    </Grid>
+                </StackLayout>
+            </Frame>
+
+            <!-- Pagination Controls -->
+            <Frame BackgroundColor="LightBlue" Padding="15" CornerRadius="10">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <Label Grid.Column="0" 
+                           Text="Show:" 
+                           VerticalOptions="Center" 
+                           FontAttributes="Bold" />
+
+                    <Picker Grid.Column="1" 
+                            ItemsSource="{Binding PageSizeOptions}"
+                            ItemDisplayBinding="{Binding Display}"
+                            SelectedItem="{Binding SelectedPageSize}"
+                            SelectedIndexChanged="OnPageSizeChanged"
+                            HorizontalOptions="Start"
+                            WidthRequest="80" />
+                </Grid>
+            </Frame>
+
+            <!-- Results Info -->
+            <Label Text="{Binding ResultsInfo}" 
+                   FontSize="12" 
+                   TextColor="Gray" 
+                   HorizontalOptions="Center" />
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                             IsVisible="{Binding IsLoading}" />
+
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}" 
+                   TextColor="Red" 
+                   IsVisible="{Binding HasError}"
+                   FontSize="14"
+                   HorizontalOptions="Center" />
+
+            <!-- Users List -->
+            <CollectionView ItemsSource="{Binding Users}" 
+                           IsVisible="{Binding HasUsers}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="viewmodels:UserItem">
+                        <Frame BackgroundColor="White" 
+                               Padding="15" 
+                               Margin="0,5"
+                               CornerRadius="8"
+                               HasShadow="True">
+                            <StackLayout Spacing="8">
+
+                                <!-- Username with conditional red color for inactive users -->
+                                <Label FontAttributes="Bold" FontSize="16">
+                                    <Label.Text>
+                                        <Binding Path="Username" />
+                                    </Label.Text>
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsActive}" Value="False">
+                                            <Setter Property="TextColor" Value="Red" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+
+                                <!-- User Info -->
+                                <Label Text="{Binding FullName}" FontSize="14" />
+                                <Label Text="{Binding Email}" FontSize="12" TextColor="Gray" />
+                                <Label Text="{Binding Phone}" 
+                                       FontSize="12" 
+                                       TextColor="Gray"
+                                       IsVisible="{Binding Phone, Converter={StaticResource IsNotNullOrEmptyConverter}}" />
+
+                                <!-- Role Selection -->
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                    <Label Grid.Column="0" 
+                                           Text="Role:" 
+                                           FontAttributes="Bold" 
+                                           VerticalOptions="Center" />
+
+                                    <Picker Grid.Column="1" 
+                                           SelectedIndex="{Binding SelectedRoleIndex}"
+                                           IsEnabled="{Binding CanChangeRole}"
+                                           SelectedIndexChanged="OnRoleChanged"
+                                           VerticalOptions="Center">
+                                        <Picker.Items>
+                                            <x:String>User</x:String>
+                                            <x:String>Manager</x:String>
+                                            <x:String>Admin</x:String>
+                                        </Picker.Items>
+                                    </Picker>
+
+                                    <Button Grid.Column="2"
+                                           Text="Save New Role" 
+                                           Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AssignRolesViewModel}}, Path=SaveRoleCommand}"
+                                           CommandParameter="{Binding .}"
+                                           IsVisible="{Binding HasChanges}"
+                                           BackgroundColor="Green"
+                                           TextColor="White"
+                                           FontSize="12"
+                                           WidthRequest="100"
+                                           HeightRequest="35" />
+                                </Grid>
+                            </StackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- No Results Message -->
+            <Frame BackgroundColor="LightGray" 
+                   Padding="20" 
+                   IsVisible="{Binding HasUsers, Converter={StaticResource InvertedBoolConverter}}"
+                   CornerRadius="8">
+                <Label Text="No users found." 
+                       HorizontalOptions="Center"
+                       TextColor="Gray"
+                       FontSize="16" />
+            </Frame>
+
+            <!-- Pagination -->
+            <StackLayout IsVisible="{Binding ShowPagination}" 
+                        Orientation="Horizontal" 
+                        HorizontalOptions="Center" 
+                        Spacing="15">
+
+                <Button Text="Previous" 
+                       Command="{Binding GoToPageCommand}"
+                       CommandParameter="{Binding PreviousPage}"
+                       IsEnabled="{Binding CanGoPrevious}"
+                       BackgroundColor="Gray"
+                       TextColor="White"
+                       WidthRequest="100" />
+
+                <Label Text="{Binding PageInfo}" 
+                       VerticalOptions="Center"
+                       FontAttributes="Bold"
+                       FontSize="16" />
+
+                <Button Text="Next" 
+                       Command="{Binding GoToPageCommand}"
+                       CommandParameter="{Binding NextPage}"
+                       IsEnabled="{Binding CanGoNext}"
+                       BackgroundColor="Gray"
+                       TextColor="White"
+                       WidthRequest="100" />
+            </StackLayout>
+
+            <!-- Back Button -->
             <Button Text="Back" 
                     Command="{Binding GoBackCommand}"
                     BackgroundColor="Gray"
                     TextColor="White"
                     CornerRadius="10"
-                    HeightRequest="50" />
+                    HeightRequest="50"
+                    Margin="0,20,0,0" />
 
         </StackLayout>
     </ScrollView>
-
 </ContentPage>
