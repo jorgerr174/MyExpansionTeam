@@ -6,26 +6,15 @@
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
     @if (User?.Identity?.IsAuthenticated ?? false)
     {
-        @if (User.Claims.ToList().FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value == "Admin")
-        {
-            <div>
-                <a asp-area="" asp-controller="Admin" asp-action="Index">Admin actions</a>
-            </div>
-        }
+    @if (User.Claims.ToList().FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value == "Admin")
+    {
+    <div>
+        <a asp-area="" asp-controller="Admin" asp-action="Index">Admin actions</a>
+    </div>
+    }
 
-        <div id="teams">
-            @if ((Model?.Count() ?? 0) > 0)
-            {
-                @await Html.PartialAsync("~/Views/Shared/_TeamList.cshtml", Model)
-            }
-        </div>
-
-        <dl class="row">
-            <dt class="col-sm-12">
-                <a class="btn btn-primary" asp-action="MyTeams" asp-controller="Team">Mis equipos</a>
-                <br/>
-                <a class="btn btn-primary" asp-action="Create" asp-controller="Team">Nuevo equipo</a>
-            </dt>
-        </dl>
+    <div id="teams">
+        @await Html.PartialAsync("~/Views/Shared/_TeamList.cshtml", Model)
+    </div>
 	}
 </div>

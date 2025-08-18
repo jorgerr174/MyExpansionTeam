@@ -1,4 +1,5 @@
-﻿using METCore.Models;
+﻿using METCore.DTOs.Shared;
+using METCore.Models;
 
 namespace METCore.Interfaces
 {
@@ -25,6 +26,8 @@ namespace METCore.Interfaces
         /// <param name="email">Parámetro de búsqueda de User.</param>
         /// <returns>User con Email con igual a email, o Null en su defecto.</returns>
         Task<User?> GetUserByEmail(string email);
+
+        Task<(List<User> Users, int TotalCount)> SearchUsersAsync(SearchDto dto);
         #endregion
 
 

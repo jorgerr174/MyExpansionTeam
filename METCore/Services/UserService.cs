@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using AutoMapper;
+using METCore.DTOs.Shared;
 using METCore.DTOs.User;
 using METCore.Interfaces;
 using METCore.Models;
@@ -49,5 +51,19 @@ namespace METCore.Services
                 await _userRepository.UpdateT(_mapper.Map<User>(dto)) < 1 ? "Error" : "";
         }
         #endregion Update
+
+
+        #region Search
+        public async Task<SearchResultDto<UserDto>> Search(SearchDto dto)
+        {
+            SearchResultDto<UserDto> result = new();
+            IList<User> list;
+
+            ( list, result.Total ) = await _userRepository.SearchUsersAsync(dto);
+            result.List = _mapper.Map<IList<UserDto>>(list);
+
+            return result;
+        }
+        #endregion Search
     }
 }
