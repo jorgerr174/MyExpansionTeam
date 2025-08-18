@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using AutoMapper;
+﻿using AutoMapper;
 using METCore.DTOs.Shared;
 using METCore.DTOs.User;
 using METCore.Interfaces;
@@ -59,7 +58,7 @@ namespace METCore.Services
             SearchResultDto<UserDto> result = new();
             IList<User> list;
 
-            ( list, result.Total ) = await _userRepository.SearchUsersAsync(dto);
+            (list, result.Total) = await _userRepository.SearchUsersAsync(dto);
             result.List = _mapper.Map<IList<UserDto>>(list);
 
             return result;

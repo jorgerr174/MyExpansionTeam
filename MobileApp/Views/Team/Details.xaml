@@ -28,7 +28,6 @@
             </Frame>
 
             <!-- Owner-only buttons -->
-            <!-- Owner-only buttons -->
             <StackLayout IsVisible="{Binding IsOwner}">
                 <Button Text="Build Roster" 
                     Command="{Binding BuildRosterCommand}"
@@ -71,6 +70,49 @@
                TextColor="Red" 
                IsVisible="{Binding HasError}" />
 
+            <!-- Action Buttons -->
+            <StackLayout Spacing="10">
+                <!-- Primary Actions -->
+                <StackLayout Orientation="Horizontal" Spacing="5">
+                    <Button Text="Edit Team" 
+                        Command="{Binding EditTeamCommand}"
+                        BackgroundColor="Blue"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="50"
+                        HorizontalOptions="FillAndExpand" />
+
+                    <Button Text="View Draft" 
+                        Command="{Binding ViewDraftCommand}"
+                        BackgroundColor="Green"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="50"
+                        HorizontalOptions="FillAndExpand" />
+                </StackLayout>
+
+                <!-- Secondary Actions -->
+                <StackLayout Orientation="Horizontal" Spacing="5">
+                    <Button Text="Duplicate Team" 
+                        Command="{Binding DuplicateTeamCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="Blue"
+                        BorderColor="Blue"
+                        BorderWidth="1"
+                        CornerRadius="10"
+                        HeightRequest="45"
+                        HorizontalOptions="FillAndExpand" />
+
+                    <Button Text="Delete Team" 
+                        Command="{Binding DeleteTeamCommand}"
+                        BackgroundColor="Red"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="45"
+                        HorizontalOptions="FillAndExpand" />
+                </StackLayout>
+            </StackLayout>
+            
             <!-- Loading Indicator -->
             <ActivityIndicator IsRunning="{Binding IsLoading}" 
                          IsVisible="{Binding IsLoading}" />

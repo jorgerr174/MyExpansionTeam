@@ -2,64 +2,102 @@
 @model METCore.DTOs.Admin.ImportDto
 
 @{
+    ViewData["Title"] = "Import Data";
     string errorFileName = ViewBag.errorFile as string ?? "";
     int thisYear = ViewBag.thisYear as int? ?? 0;
 }
 
-<h2>Import @Enum.GetName(typeof(ImportEnum), @Model.Type)</h2>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white d-flex justify-content-center align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-file-import me-2"></i>Import Data
+                    </h4>
+                </div>
 
+                <div class="card-body">
+                    @if (!String.IsNullOrWhiteSpace(errorFileName))
+                    {
+                        <div class="alert alert-warning" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Partial Import:</strong> Not all records from <strong>@Model.File?.FileName</strong> were imported successfully.
+                            <div class="mt-2">
+                                <a asp-action="DownloadErrorFile" asp-route-FileName="@errorFileName" class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-download me-2"></i>Download Error Report
+                                </a>
+                            </div>
+                        </div>
+                    }
 
-<form asp-action="Import" enctype="multipart/form-data" method="post">
-    @if (!String.IsNullOrWhiteSpace(errorFileName))
-	{
-		<div class="form-group">
-			<div class="col-md-offset-2 col-md-10">
-                <p class="text-danger">No todos los registros de @Model.File.FileName se importaron con éxito.</p>
-                <p class="text-danger">Pulse a continuación para descargar aquellos no importados.</p>
-                <a asp-action="DownloadErrorFile" asp-route-FileName="@errorFileName" class="btn btn-warning">
-					<i class="fa fa-download"></i> Download Error Report
-				</a>
-			</div>
-		</div>
-	}
-	
-    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-	<br /><br />
+                    <form asp-action="Import" enctype="multipart/form-data" method="post">
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                @Html.ValidationSummary(true, "", new { @class = "mb-0" })
+                            </div>
+                        }
 
-    <div class="form-group">
-		<hr />
-        <div class="form-group">
-            @Html.ValidationMessageFor(m => m.Type, "", new { @class = "text-danger" })
-            <br />
-            @Html.LabelFor(m => m.Type, htmlAttributes: new { @class = "control-label" })
-            @Html.DropDownListFor(m => m.Type, Html.GetEnumSelectList<ImportEnum>())
-        </div>
-        <div class="form-group" id="year-group" hidden>
-			<br />
-			@Html.ValidationMessageFor(m => m.Year, "", new { @class = "text-danger" })
-            <br />
-            @Html.LabelFor(m => m.Year, htmlAttributes: new { @class = "control-label" })
-            @Html.DropDownListFor(m => m.Year, new SelectList(new int[] { DateTime.Now.Year-1, DateTime.Now.Year-2, DateTime.Now.Year-3 }))
-        </div>
-        <div class="form-group" id="typestats-group" hidden>
-			<br />
-			@Html.ValidationMessageFor(m => m.StatsType, "", new { @class = "text-danger" })
-            <br />
-            @Html.LabelFor(m => m.StatsType, htmlAttributes: new { @class = "control-label" })
-            @Html.DropDownListFor(m => m.StatsType, Html.GetEnumSelectList<StatsEnum>())
-        </div>
-        <br />
-        <div class="form-group">
-            @Html.ValidationMessageFor(m => m.File, "", new { @class = "text-danger" })
-            <br />
-            @Html.LabelFor(m => m.File, htmlAttributes: new { @class = "control-label" })
-            <input type="file" name="File" id="File" class="form-control" />
+                        <div class="form-group mb-3">
+                            @Html.LabelFor(m => m.Type, htmlAttributes: new { @class = "form-label fw-bold" })
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-list"></i></span>
+                                @Html.DropDownListFor(m => m.Type, Html.GetEnumSelectList<ImportEnum>(), new { @class = "form-select", id = "Type" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Type, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="form-group mb-3" id="year-group" style="display: none;">
+                            @Html.LabelFor(m => m.Year, htmlAttributes: new { @class = "form-label fw-bold" })
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                @Html.DropDownListFor(m => m.Year, new SelectList(new int[] { DateTime.Now.Year - 1, DateTime.Now.Year - 2, DateTime.Now.Year - 3 }), "Select year", new { @class = "form-select" })
+                            </div>
+                            <div class="form-text">Choose a year from the last three years to import to.</div>
+                            @Html.ValidationMessageFor(m => m.Year, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="form-group mb-3" id="typestats-group" style="display: none;">
+                            @Html.LabelFor(m => m.StatsType, htmlAttributes: new { @class = "form-label fw-bold" })
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-chart-bar"></i></span>
+                                @Html.DropDownListFor(m => m.StatsType, Html.GetEnumSelectList<StatsEnum>(), "Select stats type", new { @class = "form-select" })
+                            </div>
+                            <div class="form-text">Choose the type of statistics to import.</div>
+                            @Html.ValidationMessageFor(m => m.StatsType, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="form-group mb-3">
+                            @Html.LabelFor(m => m.File, htmlAttributes: new { @class = "form-label fw-bold" })
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-file-csv"></i></span>
+                                <input type="file" name="File" id="File" class="form-control" accept=".csv,.xlsx,.xls" />
+                            </div>
+                            <div class="form-text">Upload a CSV or Excel file containing the data to import.</div>
+                            @Html.ValidationMessageFor(m => m.File, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-upload me-2"></i>Upload and Import
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card-footer bg-light text-center">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Admin Panel
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-    <button type="submit" class="btn btn-primary">Upload CSV</button>
-</form>
-
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
@@ -68,15 +106,19 @@
         const statsTypeGroup = document.getElementById('typestats-group');
 
         function updateFormVisibility() {
-            if (typeDropdown.options[typeDropdown.selectedIndex].text === 'Stats') {
-                yearGroup.hidden = false;
-                statsTypeGroup.hidden = false;
+            const selectedText = typeDropdown.options[typeDropdown.selectedIndex].text;
+            if (selectedText === 'Stats') {
+                yearGroup.style.display = 'block';
+                statsTypeGroup.style.display = 'block';
             } else {
-                yearGroup.hidden = true;
-                statsTypeGroup.hidden = true;
+                yearGroup.style.display = 'none';
+                statsTypeGroup.style.display = 'none';
             }
         }
 
         typeDropdown.addEventListener('change', updateFormVisibility);
+
+        // Initialize on page load
+        updateFormVisibility();
     });
 </script>

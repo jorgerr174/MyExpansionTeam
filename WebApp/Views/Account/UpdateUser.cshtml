@@ -1,55 +1,80 @@
 ﻿@model WebApp.Models.Account.UserViewModel
 
 <form asp-action="UpdateUser" method="post">
-    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-    <dl class="row">
-        @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "text-danger" })
-        <dt class="col-sm-1">
-            @Html.DisplayNameFor(m => m.FirstName)
-        </dt>
-        <dd class="col-sm-3">
-            @Html.DisplayFor(m => m.FirstName)
-        </dd>
-        <dd class="col-sm-8">
-            @Html.TextBox("FirstName", "", new { @class = "form-control", placeholder = "New First Name" })
-        </dd>
-    </dl>
-    <dl class="row">
-		@Html.ValidationMessageFor(m => m.LastName, "", new { @class = "text-danger" })
-        <dt class="col-sm-1">
-            @Html.DisplayNameFor(m => m.LastName)
-        </dt>
-        <dd class="col-sm-3">
-            @Html.DisplayFor(m => m.LastName)
-        </dd>
-        <dd class="col-sm-8">
-            @Html.TextBox("LastName", "", new { @class = "form-control", placeholder = "Nuevo apellido" })
-        </dd>
-    </dl>
-    <dl class="row">
-		@Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
-        <dt class="col-sm-1">
-            @Html.DisplayNameFor(m => m.Email)
-        </dt>
-        <dd class="col-sm-3">
-            @Html.DisplayFor(m => m.Email)
-        </dd>
-        <dd class="col-sm-8">
-            @Html.TextBox("Email", "", new { @class = "form-control", placeholder = "Nuevo email" })
-        </dd>
-    </dl>
-    <dl class="row">
-		@Html.ValidationMessageFor(m => m.Tlf, "", new { @class = "text-danger" })
-        <dt class="col-sm-1">
-            @Html.DisplayNameFor(m => m.Tlf)
-        </dt>
-        <dd class="col-sm-3">
-            @Html.DisplayFor(m => m.Tlf)
-        </dd>
-        <dd class="col-sm-8">
-            @Html.TextBox("Tlf", "", new { @class = "form-control", placeholder = "Nuevo teléfono" })
-        </dd>
-    </dl>
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger" role="alert">
+            @Html.ValidationSummary(true, "", new { @class = "mb-0" })
+        </div>
+    }
 
-    <button type="submit" class="btn btn-primary">Update Information</button>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label fw-bold">
+                <i class="fas fa-user me-2"></i>Current First Name
+            </label>
+            <div class="form-control-plaintext bg-light rounded p-2">
+                @Html.DisplayFor(m => m.FirstName)
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-bold">New First Name</label>
+            @Html.TextBox("FirstName", "", new { @class = "form-control", placeholder = "Enter new first name" })
+            @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "text-danger small" })
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label fw-bold">
+                <i class="fas fa-user me-2"></i>Current Last Name
+            </label>
+            <div class="form-control-plaintext bg-light rounded p-2">
+                @Html.DisplayFor(m => m.LastName)
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-bold">New Last Name</label>
+            @Html.TextBox("LastName", "", new { @class = "form-control", placeholder = "Enter new last name" })
+            @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "text-danger small" })
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label fw-bold">
+                <i class="fas fa-envelope me-2"></i>Current Email
+            </label>
+            <div class="form-control-plaintext bg-light rounded p-2">
+                @Html.DisplayFor(m => m.Email)
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-bold">New Email</label>
+            @Html.TextBox("Email", "", new { @class = "form-control", type = "email", placeholder = "Enter new email" })
+            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label fw-bold">
+                <i class="fas fa-phone me-2"></i>Current Phone
+            </label>
+            <div class="form-control-plaintext bg-light rounded p-2">
+                @Html.DisplayFor(m => m.Tlf)
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label fw-bold">New Phone</label>
+            @Html.TextBox("Tlf", "", new { @class = "form-control", type = "tel", placeholder = "Enter new phone number" })
+            @Html.ValidationMessageFor(m => m.Tlf, "", new { @class = "text-danger small" })
+        </div>
+    </div>
+
+    <div class="d-grid">
+        <button type="submit" class="btn btn-success btn-lg">
+            <i class="fas fa-save me-2"></i>Update Information
+        </button>
+    </div>
 </form>

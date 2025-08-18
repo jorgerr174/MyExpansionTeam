@@ -438,7 +438,7 @@ namespace METCore.Services
             Team? team = await _teamRepository.GetTById(Id);
 
             return team is null ? "Team"
-                : team.User != user ? "User" 
+                : team.User != user ? "User"
                     : await _teamRepository.DeleteT(team) < 1 ? "Error" : "";
         }
         #endregion DeleteTeam
@@ -460,7 +460,7 @@ namespace METCore.Services
 
             bool created = await _teamRepository.CreateT(newTeam) > 0;
             return new(
-                created ? string.Empty : "Error", 
+                created ? string.Empty : "Error",
                 created ? await GetBasicInfoDtoById(newTeam.Id) : null);
         }
         #endregion DuplicateTeam

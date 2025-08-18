@@ -9,7 +9,7 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -109,7 +109,7 @@
                     FontSize="18"
                     HeightRequest="60"
                     CornerRadius="10"
-                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}" />
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}" />
 
             <!-- Loading Indicator -->
             <StackLayout IsVisible="{Binding IsLoading}" 

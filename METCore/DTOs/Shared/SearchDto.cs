@@ -7,7 +7,7 @@ namespace METCore.DTOs.Shared
         public int PageSize { get; set; }
 
 
-        public SearchDto() 
+        public SearchDto()
         {
             this.Filter = String.Empty;
         }

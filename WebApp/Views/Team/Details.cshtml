@@ -1,48 +1,117 @@
 ﻿@model METCore.DTOs.Team.TeamInfoDto
 
-<div>
-    <h1>@Model.Location @Model.Mascot</h1>
-    <h4>@User?.Identity?.Name</h4>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Team Header Card -->
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">@Model.Location @Model.Mascot</h4>
+                        <span class="badge bg-light text-primary fs-6">@Model.Abb</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Owner:</strong> <span class="text-muted">@Model.UserUsername</span></p>
+                            <p class="mb-0"><strong>Created:</strong> <span class="text-muted">@Model.Date.ToString("MMM dd, yyyy")</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-md-end">
+                                @if (Model.Complete)
+                                {
+                                    <span class="badge bg-success fs-6">Team Complete</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning fs-6">Setup Required</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Information Cards -->
+        <div class="col-md-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Team Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted">Location</label>
+                        <p class="mb-0">@Model.Location</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted">Mascot</label>
+                        <p class="mb-0">@Model.Mascot</p>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-bold text-muted">Abbreviation</label>
+                        <p class="mb-0">@Model.Abb</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Roster Settings Card -->
+        <div class="col-md-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Roster Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted">Salary Cap</label>
+                        <p class="mb-0 fw-bold text-success">$@Model.RosterSettingsCap.ToString("N0")</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted">Max Players Per Team</label>
+                        <p class="mb-0">@Model.RosterSettingsMaxPerTeam players</p>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-bold text-muted">Protected Players Per Team</label>
+                        <p class="mb-0">@Model.RosterSettingsProtectedPerTeam players</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2 justify-content-between">
+                        <div class="d-flex flex-wrap gap-2">
+                            @if (Model.UserUsername == User?.Identity?.Name)
+                            {
+                                <a asp-controller="Team" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-edit me-1"></i>Edit Team
+                                </a>
+                                <a asp-controller="Team" asp-action="RosterSettings" asp-route-id="@Model.Id" class="btn btn-success btn-sm">
+                                    <i class="fas fa-cog me-1"></i>Roster Settings
+                                </a>
+                                <a asp-controller="Team" asp-action="Roster" asp-route-id="@Model.Id" class="btn btn-info btn-sm">
+                                    <i class="fas fa-users me-1"></i>Build Roster
+                                </a>
+                                <a asp-controller="Team" asp-action="Formation" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-tactics me-1"></i>Formation
+                                </a>
+                            }
+                        </div>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Teams
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @Html.HiddenFor(m => m.Id)
     @Html.HiddenFor(m => m.Complete)
     @Html.HiddenFor(m => m.RosterSettingsProtectedPlayersIds)
-
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Date)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(m => m.Date)</dd>
-    </dl>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Location)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(m => m.Location)</dd>
-    </dl>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Abb)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(m => m.Abb)</dd>
-    </dl>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Mascot)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(m => m.Mascot)</dd>
-    </dl>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.RosterSettingsCap)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(m => m.RosterSettingsCap)</dd>
-    </dl>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.RosterSettingsMaxPerTeam)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(m => m.RosterSettingsMaxPerTeam)</dd>
-    </dl>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.RosterSettingsProtectedPerTeam)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(m => m.RosterSettingsProtectedPerTeam)</dd>
-    </dl>
-</div>
-
-<div>
-    <a asp-area="" asp-controller="Home" asp-action="Index">Go Back</a>
 </div>

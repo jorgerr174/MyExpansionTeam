@@ -184,9 +184,9 @@ namespace MobileApp
 #if ANDROID
         public static string apiURL = "http://10.0.2.2:5088/api/"; // Android emulator
 #elif IOS
-    public static string apiURL = "https://localhost:7087/api/"; // iOS simulator
+        public static string apiURL = "https://localhost:7087/api/"; // iOS simulator
 #else
-    public static string apiURL = "https://localhost:7087/api/"; // Other platforms
+        public static string apiURL = "https://localhost:7087/api/"; // Other platforms
 #endif
     }
 }

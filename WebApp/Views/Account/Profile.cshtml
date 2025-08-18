@@ -1,75 +1,107 @@
 ﻿@model WebApp.Models.Account.UserViewModel
 
-
-<h1>@User.Identity.Name</h1>
-
-@if(User.Identities.First().RoleClaimType == "Admin")
-{
-<hr />
-
-<div class="col-sm-4">
-    <a asp-controller="Admin" asp-action="Index">Admin Control Center</a>
-</div>
-<hr />
-<hr />
+@{
+    ViewData["Title"] = "Profile";
 }
 
-<div>
-    <hr />
-    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(m => m.FirstName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(m => m.FirstName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(m => m.LastName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(m => m.LastName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(m => m.Email)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(m => m.Email)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(m => m.Tlf)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(m => m.Tlf)
-        </dd>
-    </dl>
-</div>
-<div>
-    <br><br />
-    <br><br />
-    <dl class="row">
-        <dt class="col-sm-6">
-            <a asp-action="EditProfile">Editar</a>
-        </dt>
-        <dt class="col-sm-6">
-            <a href="#" onclick="confirmDelete(event)" class="btn btn-primary">Borrar usuario</a>
-        </dt>
-    </dl>
-    <dl class="row">
-        <dt class="col-sm-6">
-            <a asp-controller="Team" asp-action="MyTeams">Equipos</a>
-        </dt>
-        <dd class="col-sm-6">
-            <a asp-controller="Home" asp-action="Index">Volver</a>
-        </dd>
-    </dl>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card mt-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-center align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user me-2"></i>@User.Identity.Name
+                    </h4>
+                </div>
+
+                @if (User.Identities.First().RoleClaimType == "Admin")
+                {
+                    <div class="card-body border-bottom bg-light">
+                        <div class="text-center">
+                            <a asp-controller="Admin" asp-action="Index" class="btn btn-danger">
+                                <i class="fas fa-cog me-2"></i>Admin Control Center
+                            </a>
+                        </div>
+                    </div>
+                }
+
+                <div class="card-body">
+                    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong><i class="fas fa-user me-2"></i>First Name:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Html.DisplayFor(m => m.FirstName)
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong><i class="fas fa-user me-2"></i>Last Name:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Html.DisplayFor(m => m.LastName)
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong><i class="fas fa-envelope me-2"></i>Email:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Html.DisplayFor(m => m.Email)
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong><i class="fas fa-phone me-2"></i>Phone:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Html.DisplayFor(m => m.Tlf)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body border-top">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <a asp-action="EditProfile" class="btn btn-primary w-100">
+                                <i class="fas fa-edit me-2"></i>Edit Profile
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a asp-controller="Team" asp-action="MyTeams" class="btn btn-success w-100">
+                                <i class="fas fa-users me-2"></i>My Teams
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <button onclick="confirmDelete(event)" class="btn btn-danger w-100">
+                                <i class="fas fa-trash me-2"></i>Delete Account
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-arrow-left me-2"></i>Go Back
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 <script>
-    function confirmDelete(event) 
-    {
+    function confirmDelete(event) {
         event.preventDefault();
-        if (confirm('¿Está seguro de que desea eliminar su cuenta?'))
+        if (confirm('Are you sure you want to delete your account?')) {
             window.location.href = '@Url.Action("DeleteUser", "Account")';
+        }
     }
 </script>

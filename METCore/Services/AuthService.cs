@@ -79,7 +79,7 @@ namespace METCore.Services
         {
             User? curUser = await _userRepository.GetUserByUsername(username);
             if (curUser is null) return "User";
-            if (curUser.Role is not Enums.Types.RoleEnum.Admin ) return "NotAdmin";
+            if (curUser.Role is not Enums.Types.RoleEnum.Admin) return "NotAdmin";
 
             User? user = await _userRepository.GetUserByUsername(dto.Username);
             if (user is null) return "Username";

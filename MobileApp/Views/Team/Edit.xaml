@@ -44,13 +44,60 @@
                TextColor="Red" 
                IsVisible="{Binding HasError}" />
 
-            <!-- Update Button -->
-            <Button Text="Update Team" 
-                Command="{Binding UpdateTeamCommand}"
-                IsEnabled="{Binding IsFormEnabled}"
-                BackgroundColor="Blue"
-                TextColor="White" />
+            <!-- Action Buttons -->
+            <StackLayout Spacing="10">
 
+                <!-- Save Button -->
+                <Button Text="Guardar Info" 
+                    Command="{Binding SaveTeamCommand}"
+                    BackgroundColor="Blue"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    CornerRadius="10"
+                    HeightRequest="50" />
+
+                <!-- Navigation Buttons Row 1 -->
+                <StackLayout Orientation="Horizontal" Spacing="5">
+                    <Button Text="Editar ajustes" 
+                        Command="{Binding GoToSettingsCommand}"
+                        BackgroundColor="Orange"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="45"
+                        HorizontalOptions="FillAndExpand" />
+
+                    <Button Text="Editar plantilla" 
+                        Command="{Binding GoToRosterCommand}"
+                        BackgroundColor="Orange"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="45"
+                        HorizontalOptions="FillAndExpand" />
+                </StackLayout>
+
+                <!-- Navigation Buttons Row 2 -->
+                <StackLayout Orientation="Horizontal" Spacing="5">
+                    <Button Text="Duplicar equipo" 
+                        Command="{Binding DuplicateTeamCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="Blue"
+                        BorderColor="Blue"
+                        BorderWidth="1"
+                        CornerRadius="10"
+                        HeightRequest="45"
+                        HorizontalOptions="FillAndExpand" />
+
+                    <Button Text="Borrar equipo" 
+                        Command="{Binding DeleteTeamCommand}"
+                        BackgroundColor="Red"
+                        TextColor="White"
+                        CornerRadius="10"
+                        HeightRequest="45"
+                        HorizontalOptions="FillAndExpand" />
+                </StackLayout>
+
+            </StackLayout>
+            
             <!-- Loading Indicator -->
             <ActivityIndicator IsRunning="{Binding IsLoading}" 
                          IsVisible="{Binding IsLoading}" />
