@@ -1,10 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.Intrinsics.X86;
 using METCore.Models.Stats;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using static METCore.Enums.Types;
 
 namespace METCore.Models.Players
@@ -98,7 +94,7 @@ namespace METCore.Models.Players
             if (stats.Cmp != 0 && stats.Att != 0)
                 display += string.Format("Cmp/Att: {0}/{1}, ", stats.Cmp, stats.Att);
 
-            if(stats.Yds != 0)
+            if (stats.Yds != 0)
                 display += string.Format("{0} yds, ", stats.Yds);
 
             if (stats.TD != 0)
@@ -141,7 +137,7 @@ namespace METCore.Models.Players
             string display = string.Empty;
 
             if (stats.Yds != 0 && stats.Att != 0)
-                display += string.Format("Yds/Att: {0}, ", Math.Round((decimal)stats.Yds/stats.Att, 2));
+                display += string.Format("Yds/Att: {0}, ", Math.Round((decimal)stats.Yds / stats.Att, 2));
 
             if (stats.Yds != 0)
                 display += string.Format("{0} yds, ", stats.Yds);
@@ -195,7 +191,7 @@ namespace METCore.Models.Players
             string display = string.Empty;
 
             if (stats.Yds != 0 && stats.Kick != 0)
-                display += string.Format("Net Yds/Kick: {0}, ", Math.Round((decimal)(stats.Yds-stats.RetYds) / stats.Kick, 2));
+                display += string.Format("Net Yds/Kick: {0}, ", Math.Round((decimal)(stats.Yds - stats.RetYds) / stats.Kick, 2));
 
             if (stats.Inside20 != 0)
                 display += string.Format("{0} In20, ", stats.Inside20);
@@ -213,7 +209,7 @@ namespace METCore.Models.Players
             string display = string.Empty;
 
             if (stats.Yds != 0 && stats.Kick != 0)
-                display += string.Format("Net Yds/Kick: {0}, ", Math.Round((decimal)(stats.Yds-stats.RetYds) / stats.Kick, 2));
+                display += string.Format("Net Yds/Kick: {0}, ", Math.Round((decimal)(stats.Yds - stats.RetYds) / stats.Kick, 2));
 
             if (stats.OOB != 0)
                 display += string.Format("{0} OoB, ", stats.OOB);

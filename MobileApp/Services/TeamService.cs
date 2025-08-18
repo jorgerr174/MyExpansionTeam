@@ -1,6 +1,8 @@
+using METCore.DTOs.Admin;
 using METCore.DTOs.Player;
 using METCore.DTOs.Shared;
 using METCore.DTOs.Team;
+using METCore.DTOs.User;
 
 namespace MobileApp.Services
 {
@@ -112,11 +114,25 @@ namespace MobileApp.Services
         #endregion CU007 UpdateTeam
 
 
-        #region CU008 DuplicateTeam FALTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        #endregion CU008 DuplicateTeam FALTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        #region CU008 DuplicateTeam
+        public async Task<TeamBasicInfoDto?> DuplicateTeamAsync(int teamId)
+        {
+            try
+            {
+                var response = await SendRequest(HttpMethod.Post, "Teams", "DuplicateTeam", new IdDto(teamId));
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await GetResult<ResultDto<TeamBasicInfoDto>>(response);
+                    return result.Value;
+                }
+                return null;
+            }
+            catch { return null; }
+        }
+        #endregion CU008 DuplicateTeam
 
 
-        #region CU009 DeleteTeam FALTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        #region CU009 DeleteTeam
         public async Task<bool> DeleteTeamAsync(int teamId)
         {
             try
@@ -129,7 +145,7 @@ namespace MobileApp.Services
         #endregion CU009 DeleteTeam
 
 
-        #region CU009 DeleteTeam
+        #region GetRosterSettingsAsync
         public async Task<TeamInfoDto?> GetRosterSettingsAsync(int teamId)
         {
             try
@@ -139,7 +155,7 @@ namespace MobileApp.Services
             }
             catch { return null; }
         }
-        #endregion CU009 DeleteTeam
+        #endregion GetRosterSettingsAsync
 
 
         #region CU010 UpdateRosterSettings
@@ -244,6 +260,26 @@ namespace MobileApp.Services
             try
             {
                 var response = await SendRequest(HttpMethod.Post, "Teams", "SaveDraft", draftDto);
+                return response.IsSuccessStatusCode;
+            }
+            catch { return false; }
+        }
+
+        public async Task<SearchResultDto<UserDto>?> GetUsersAsync(SearchDto searchDto)
+        {
+            try
+            {
+                var response = await SendRequest(HttpMethod.Get, "Users", "List", searchDto);
+                return response.IsSuccessStatusCode ? await GetResult<SearchResultDto<UserDto>>(response) : null;
+            }
+            catch { return null; }
+        }
+
+        public async Task<bool> AssignRoleAsync(AssignRoleDto assignRoleDto)
+        {
+            try
+            {
+                var response = await SendRequest(HttpMethod.Post, "Auth", "AssignRole", assignRoleDto);
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }

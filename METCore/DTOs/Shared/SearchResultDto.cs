@@ -6,7 +6,7 @@ namespace METCore.DTOs.Shared
         public int Total { get; set; }
 
 
-        public SearchResultDto() 
+        public SearchResultDto()
         {
             this.List = [];
         }
