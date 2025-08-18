@@ -36,10 +36,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dJbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/Account/LogIn_old.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dJbl9vbGQuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/Account/Profile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxQcm9maWxlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -54,6 +50,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/Account/UpdateUser.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxVcGRhdGVVc2VyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/Admin/AssignRoles.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQXNzaWduUm9sZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/Admin/Import.cshtml]
@@ -80,6 +80,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9UZWFtTGlzdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/Shared/_UserRolesList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Vc2VyUm9sZXNMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -94,10 +98,6 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/Team/Draft.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVhbVxEcmFmdC5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/Team/Draft_old.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVhbVxEcmFmdF9vbGQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/Team/Edit.cshtml]
@@ -120,24 +120,12 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVhbVxSb3N0ZXJTZXR0aW5ncy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/Team/RosterSettings_old.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVhbVxSb3N0ZXJTZXR0aW5nc19vbGQuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/Team/Roster_old.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVhbVxSb3N0ZXJfb2xkLmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/Team/Trade.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVhbVxUcmFkZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/Team/TradeError.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVhbVxUcmFkZUVycm9yLmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/Team/Trade_old.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGVhbVxUcmFkZV9vbGQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/jorge/workspaces/repos/MyExpansionTeam/WebApp/Views/_ViewImports.cshtml]

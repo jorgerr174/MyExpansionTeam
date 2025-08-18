@@ -1,6 +1,6 @@
 ﻿namespace METCore.DTOs.Stats
 {
-    #region PassStats
+    #region PassStatsDto
     public class PassStatsDto(int Yds, int Att, int TD, int Plus20, int Plus40, int Reach1st, int Lng,
         int Cmp, int INT, double PR, int Sck, int SckYds)
         : SkillStatsDto(Yds, Att, TD, Plus20, Plus40, Reach1st, Lng)
@@ -17,7 +17,7 @@
         public double Y_S { get { return Sck == 0 ? 0 : SckYds / Sck; } }
         #endregion NotMapped
     }
-    #endregion PassStats
+    #endregion PassStatsDto
 
 
     #region RecStatsDto

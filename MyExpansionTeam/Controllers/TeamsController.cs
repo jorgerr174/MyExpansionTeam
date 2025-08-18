@@ -132,7 +132,7 @@ namespace METAPI.Controllers
         /// </returns>
         [HttpPut("UpdateTeam")]
         [Authorize]
-        public async Task<IActionResult> UpdateTeam([FromBody] TeamInfoDto dto)
+        public async Task<IActionResult> UpdateTeam([FromBody] TeamBasicInfoDto dto)
         {
             string? username = User?.Identity?.Name;
             if (String.IsNullOrWhiteSpace(username)) return BadRequest(new MessageDto("Username"));
@@ -240,5 +240,39 @@ namespace METAPI.Controllers
             return !String.IsNullOrWhiteSpace(result) ? BadRequest() : Ok();
         }
         #endregion Draft
+
+
+        #region CU008 DeleteTeam
+        [HttpDelete("DeleteTeam")]
+        [Authorize]
+        public async Task<IActionResult> DeleteUser(IdDto dto)
+        {
+            string? username = User?.Identity?.Name;
+            if (String.IsNullOrWhiteSpace(username)) return BadRequest(new MessageDto("Username"));
+
+            string result = await _teamService.DeleteTeam(username, dto.Id);
+            if (!String.IsNullOrWhiteSpace(result))
+                return BadRequest(new ResultDto<TeamInfoDto>(result, await _teamService.GetInfoDtoById(dto.Id)));
+
+            return Ok();
+        }
+        #endregion CU008 DeleteTeam
+
+
+        #region CU009 DuplicateTeam
+        [HttpPost("DuplicateTeam")]
+        [Authorize]
+        public async Task<IActionResult> DuplicateTeam(IdDto dto)
+        {
+            string? username = User?.Identity?.Name;
+            if (String.IsNullOrWhiteSpace(username)) return BadRequest(new MessageDto("Username"));
+
+            ResultDto<TeamBasicInfoDto> result = await _teamService.DuplicateTeam(username, dto.Id);
+
+            return !String.IsNullOrWhiteSpace(result.Message) 
+                ? BadRequest(result)
+                : Ok(result);
+        }
+        #endregion CU009 DuplicateTeam
     }
 }

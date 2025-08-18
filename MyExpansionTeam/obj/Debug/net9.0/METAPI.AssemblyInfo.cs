@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("METAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+96ce658a55b195e33924472d3c5f85de81d0cebe")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+832d2a2b2f606508eccaaef3cb3ed6e38846bb64")]
 [assembly: System.Reflection.AssemblyProductAttribute("METAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("METAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

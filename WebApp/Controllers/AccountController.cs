@@ -198,6 +198,6 @@ namespace WebApp.Controllers
             ModelState.AddModelError("Profile", "Operación de borrado no completada.");
             return View("Profile", profileModel);
         }
-        #endregion
+        #endregion DeleteUser
     }
 }

@@ -197,15 +197,7 @@ namespace METCore.Services
 
 
         #region Update
-        /// <summary>  Actualizar un Team a partir de los valores de TeamDto. </summary>
-        /// <param name="username">Valor de búsqeda de un User.</param>
-        /// <param name="dto">Clase con los nuevos valores.</param>
-        /// <returns>Opciones:
-        /// Username (No existe ningún User con Username igual a parámetro).
-        /// Error (No se guardaron los cambios en la BBDD).
-        /// "" (Todo bien).
-        /// </returns>
-        public async Task<string> UpdateTeam(string? username, TeamInfoDto dto)
+        public async Task<string> UpdateTeam(string? username, TeamBasicInfoDto dto)
         {
             User? user = await _userRepository.GetUserByUsername(username);
             if (user is null) return "Username";
@@ -414,6 +406,7 @@ namespace METCore.Services
         }
         #endregion Trade
 
+
         #region Draft
         [HttpPost("SaveDraft")]
         [Authorize]
@@ -437,5 +430,39 @@ namespace METCore.Services
         }
         #endregion Draft
 
+
+        #region DeleteTeam
+        public async Task<string> DeleteTeam(string username, int Id)
+        {
+            User? user = await _userRepository.GetUserByUsername(username);
+            Team? team = await _teamRepository.GetTById(Id);
+
+            return team is null ? "Team"
+                : team.User != user ? "User" 
+                    : await _teamRepository.DeleteT(team) < 1 ? "Error" : "";
+        }
+        #endregion DeleteTeam
+
+
+        #region DuplicateTeam
+        public async Task<ResultDto<TeamBasicInfoDto>> DuplicateTeam(string username, int Id)
+        {
+            User? user = await _userRepository.GetUserByUsername(username);
+            if (user is null) return new ResultDto<TeamBasicInfoDto>("Username");
+            Team? team = await _teamRepository.GetTById(Id);
+            if (team is null) return new ResultDto<TeamBasicInfoDto>("Team");
+
+            Team newTeam = (Team)((ICloneable)team).Clone();
+            newTeam.Id = 0;
+            newTeam.User = user;
+            newTeam.Date = DateTime.Now;
+            newTeam.Complete = false;
+
+            bool created = await _teamRepository.CreateT(newTeam) > 0;
+            return new(
+                created ? string.Empty : "Error", 
+                created ? await GetBasicInfoDtoById(newTeam.Id) : null);
+        }
+        #endregion DuplicateTeam
     }
 }

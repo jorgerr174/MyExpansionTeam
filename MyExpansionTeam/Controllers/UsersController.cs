@@ -1,4 +1,5 @@
-﻿using METCore.DTOs.Shared;
+﻿using METCore.DTOs.Admin;
+using METCore.DTOs.Shared;
 using METCore.DTOs.User;
 using METCore.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -63,5 +64,14 @@ namespace METAPI.Controllers
             return Ok();
         }
         #endregion
+
+
+        #region AssignRoles
+        [HttpGet("List")]
+        public async Task<SearchResultDto<UserDto>> List(SearchDto dto)
+        {
+            return await _userService.Search(dto);
+        }
+        #endregion AssignRoles
     }
 }

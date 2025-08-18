@@ -129,7 +129,7 @@ namespace WebApp.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Edit(TeamInfoDto model)
+        public async Task<IActionResult> EditTeam(TeamBasicInfoDto model)
         {
             var response = await SendRequest(HttpMethod.Post, "Teams", "UpdateTeam", model);
             if (response.IsSuccessStatusCode) return RedirectToAction("Details", model.Id);
@@ -307,5 +307,40 @@ namespace WebApp.Controllers
             return await GetResult<MessageDto>(await SendRequest(HttpMethod.Post, "Teams", "SaveTrade", dto));
         }
         #endregion Trade
+
+
+        #region DeleteTeam
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> DeleteTeam(int TeamId)
+        {
+            var response = await SendRequest(HttpMethod.Delete, "Teams", "DeleteTeam", new IdDto(TeamId));
+            if (response.IsSuccessStatusCode) return RedirectToAction("MyTeams");
+
+            ResultDto<TeamBasicInfoDto> result = await GetResult<ResultDto<TeamBasicInfoDto>>(response);
+            if (result.Message.Equals("Username")) return RedirectToAction("LogOut", "Auth", new RouteValueDictionary(new { ReturnUrl = Url.Action("EditTeam", "Team", new { TeamId }) }));
+
+            ModelState.AddModelError("Edit", "Operación de borrado no completada.");
+            return View("Edit", result.Value);
+        }
+        #endregion DeleteTeam
+
+
+        #region DuplicateTeam
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> DuplicateTeam(TeamBasicInfoDto Team)
+        {
+            var response = await SendRequest(HttpMethod.Post, "Teams", "DuplicateTeam", new IdDto(Team.Id));
+
+            ResultDto<TeamBasicInfoDto> result = await GetResult<ResultDto<TeamBasicInfoDto>>(response);
+            if (response.IsSuccessStatusCode && String.IsNullOrWhiteSpace(result.Message)) return View("Edit", result.Value);
+
+            if (result.Message.Equals("Username")) return RedirectToAction("LogOut", "Auth", new RouteValueDictionary(new { ReturnUrl = Url.Action("EditTeam", "Team", new { TeamId = Team.Id }) }));
+
+            ModelState.AddModelError("Edit", "Operación de borrado no completada.");
+            return View("Edit", Team);
+        }
+        #endregion DuplicateTeam
     }
 }
