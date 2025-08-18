@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using AutoMapper;
+using METCore.DTOs.Admin;
 using METCore.DTOs.User;
 using METCore.Interfaces;
 using METCore.Models;
@@ -44,7 +45,7 @@ namespace METCore.Services
         #endregion
 
 
-        #region Delete
+        #region DeleteUser
         /// <summary>
         /// Borrar el User logeado.
         /// </summary>
@@ -61,7 +62,33 @@ namespace METCore.Services
             return user == null ? "Username" :
                 await _userRepository.DeleteT(user) < 0 ? "Error" : "";
         }
-        #endregion
+        #endregion DeleteUser
+
+
+        #region DeleteUser
+        /// <summary>
+        /// Borrar el User logeado.
+        /// </summary>
+        /// <param name="username">Username del User logeado.</param>
+        /// <returns>Opciones:
+        /// Username (No existe ningún User con Username igual a parámetro).
+        /// Error (no se guardaron los cambios en la BBDD).
+        /// "" (Todo bien).
+        /// </returns>
+        public async Task<string> AssignRole(string username, AssignRoleDto dto)
+        {
+            User? curUser = await _userRepository.GetUserByUsername(username);
+            if (curUser is null) return "User";
+            if (curUser.Role is not Enums.Types.RoleEnum.Admin ) return "NotAdmin";
+
+            User? user = await _userRepository.GetUserByUsername(dto.Username);
+            if (user is null) return "Username";
+            if (user.Role is Enums.Types.RoleEnum.Admin) return "Admin";
+
+            user.Role = dto.Role;
+            return await _userRepository.UpdateT(user) < 1 ? "Error" : String.Empty;
+        }
+        #endregion DeleteUser
 
 
         #region Other

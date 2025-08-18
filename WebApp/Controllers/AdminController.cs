@@ -1,5 +1,7 @@
+using Humanizer;
 using METCore.DTOs.Admin;
 using METCore.DTOs.Shared;
+using METCore.DTOs.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static METCore.Enums.Types;
@@ -25,6 +27,24 @@ namespace WebApp.Controllers
             return View();
         }
         #endregion AssignRoles
+
+
+        #region AssignRole
+        [HttpPost]
+        public async Task<IActionResult> AssignRole([FromBody] AssignRoleDto dto)
+        {
+            return Json(await GetResult<MessageDto>(await SendRequest(HttpMethod.Post, "Auth", "AssignRole", dto)));
+        }
+        #endregion AssignRole
+
+
+        #region UserList
+        [HttpPost]
+        public async Task<IActionResult> UserList([FromBody] SearchDto dto)
+        {
+            return Json(await GetResult<SearchResultDto<UserDto>>(await SendRequest(HttpMethod.Get, "Users", "List", dto)));
+        }
+        #endregion UserList
 
 
         #region Import

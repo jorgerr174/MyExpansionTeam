@@ -110,6 +110,37 @@
         }
       }
     },
+    "/api/Auth/AssignRole": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignRoleDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignRoleDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Franchises/GetProtectablePlayers": {
       "get": {
         "tags": [
@@ -430,17 +461,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TeamInfoDto"
+                "$ref": "#/components/schemas/TeamBasicInfoDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/TeamInfoDto"
+                "$ref": "#/components/schemas/TeamBasicInfoDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/TeamInfoDto"
+                "$ref": "#/components/schemas/TeamBasicInfoDto"
               }
             }
           }
@@ -638,6 +669,68 @@
         }
       }
     },
+    "/api/Teams/DeleteTeam": {
+      "delete": {
+        "tags": [
+          "Teams"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Teams/DuplicateTeam": {
+      "post": {
+        "tags": [
+          "Teams"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Users/Profile": {
       "get": {
         "tags": [
@@ -680,10 +773,71 @@
           }
         }
       }
+    },
+    "/api/Users/List": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDtoSearchResultDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDtoSearchResultDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDtoSearchResultDto"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "AssignRoleDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "$ref": "#/components/schemas/RoleEnum"
+          }
+        },
+        "additionalProperties": false
+      },
       "DraftDto": {
         "required": [
           "abb",
@@ -1030,6 +1184,10 @@
             "type": "string",
             "nullable": true
           },
+          "stats": {
+            "type": "string",
+            "nullable": true
+          },
           "franchiseId": {
             "type": "integer",
             "format": "int32"
@@ -1061,6 +1219,24 @@
             "format": "int32"
           },
           "player5": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SearchDto": {
+        "type": "object",
+        "properties": {
+          "filter": {
+            "type": "string",
+            "nullable": true
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
             "type": "integer",
             "format": "int32"
           }
@@ -1102,6 +1278,10 @@
             "type": "boolean"
           },
           "pureAPY": {
+            "type": "string",
+            "nullable": true
+          },
+          "stats": {
             "type": "string",
             "nullable": true
           }
@@ -1453,6 +1633,23 @@
           },
           "role": {
             "$ref": "#/components/schemas/RoleEnum"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserDtoSearchResultDto": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserDto"
+            },
+            "nullable": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

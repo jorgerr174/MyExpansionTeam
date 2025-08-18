@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using METCore.DTOs.Shared;
 using METCore.Interfaces;
 using METCore.Models;
 using METDAL.Data;
@@ -42,7 +43,32 @@ namespace METDAL.Repositories
         {
             return await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
         }
-        #endregion
+
+
+        public async Task<(List<User> Users, int TotalCount)> SearchUsersAsync(SearchDto dto)
+        {
+            var baseQuery = _context.Users.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(dto.Filter))
+            {
+                string filter = $"%{dto.Filter}%";
+                baseQuery = baseQuery.Where(u =>
+                    EF.Functions.Like(u.Username, filter) ||
+                    EF.Functions.Like(u.FirstName, filter) ||
+                    EF.Functions.Like(u.LastName, filter) ||
+                    EF.Functions.Like(u.Email, filter) ||
+                    (u.Tlf != null && EF.Functions.Like(u.Tlf, filter)));
+            }
+
+            var totalCount = await baseQuery.CountAsync();
+
+            return (await baseQuery
+                .OrderBy(u => u.Username)
+                .Skip((dto.Page - 1) * dto.PageSize)
+                .Take(dto.PageSize)
+                .ToListAsync(), totalCount);
+        }        
+        #endregion Get
 
 
         #region Update

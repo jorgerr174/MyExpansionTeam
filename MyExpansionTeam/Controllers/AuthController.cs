@@ -1,4 +1,5 @@
-﻿using METCore.DTOs.Shared;
+﻿using METCore.DTOs.Admin;
+using METCore.DTOs.Shared;
 using METCore.DTOs.User;
 using METCore.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -115,5 +116,22 @@ namespace METAPI.Controllers
             return Ok();
         }
         #endregion CU005 DeleteUser
+
+
+        #region CU019 AssignRole
+        [HttpPost("AssignRole")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AssignRole(AssignRoleDto dto)
+        {
+            string? username = User?.Identity?.Name;
+            if (String.IsNullOrWhiteSpace(username)) return BadRequest(new MessageDto("Username"));
+
+            string result = await _authService.AssignRole(username, dto);
+
+            return !String.IsNullOrWhiteSpace(result)
+                ? BadRequest(new MessageDto(result))
+                : Ok();
+        }
+        #endregion CU019 AssignRole
     }
 }

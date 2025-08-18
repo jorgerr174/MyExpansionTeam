@@ -145,7 +145,8 @@ namespace METCore.Mapping
 
             CreateMap<Player, SelectableDto>()
                 .IncludeBase<Player, ProtectableDto>()
-                .ForMember(dest => dest.PureAPY, opt => opt.MapFrom(x => x.APY == 0 ? string.Empty : x.APY.ToString().Replace(',', '.')));
+                .ForMember(dest => dest.PureAPY, opt => opt.MapFrom(x => x.APY == 0 ? string.Empty : x.APY.ToString().Replace(',', '.')))
+                .ForMember(dest => dest.Stats, opt => opt.MapFrom(x => x.StatsHtml()));
 
             CreateMap<Player, RosteredDto>()
                 .IncludeBase<Player, SelectableDto>();

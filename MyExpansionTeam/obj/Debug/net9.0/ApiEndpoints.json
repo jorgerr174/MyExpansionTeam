@@ -1,6 +1,22 @@
 [
   {
     "ContainingType": "METAPI.Controllers.AuthController",
+    "Method": "AssignRole",
+    "RelativePath": "api/Auth/AssignRole",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "METCore.DTOs.Admin.AssignRoleDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "METAPI.Controllers.AuthController",
     "Method": "DeleteUser",
     "RelativePath": "api/Auth/DeleteUser",
     "HttpMethod": "DELETE",
@@ -147,6 +163,38 @@
       {
         "Name": "dto",
         "Type": "METCore.DTOs.Team.TeamBasicInfoDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "METAPI.Controllers.TeamsController",
+    "Method": "DeleteUser",
+    "RelativePath": "api/Teams/DeleteTeam",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "METCore.DTOs.Shared.IdDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "METAPI.Controllers.TeamsController",
+    "Method": "DuplicateTeam",
+    "RelativePath": "api/Teams/DuplicateTeam",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "METCore.DTOs.Shared.IdDto",
         "IsRequired": true
       }
     ],
@@ -332,11 +380,37 @@
     "Parameters": [
       {
         "Name": "dto",
-        "Type": "METCore.DTOs.Team.TeamInfoDto",
+        "Type": "METCore.DTOs.Team.TeamBasicInfoDto",
         "IsRequired": true
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "METAPI.Controllers.UsersController",
+    "Method": "List",
+    "RelativePath": "api/Users/List",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "METCore.DTOs.Shared.SearchDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "METCore.DTOs.Shared.SearchResultDto\u00601[[METCore.DTOs.User.UserDto, METCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "METAPI.Controllers.UsersController",
