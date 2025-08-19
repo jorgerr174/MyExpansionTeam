@@ -208,16 +208,17 @@
                                                 <label for="positionFilter" class="form-label me-2 mb-0">Filter:</label>
                                                 <select id="positionFilter" class="form-select form-select-sm" style="width: auto;">
                                                     <option value="all">All Positions</option>
-                                                    <option value="QB">Quarterback</option>
-                                                    <option value="RB">Running Back</option>
-                                                    <option value="WR">Wide Receiver</option>
-                                                    <option value="TE">Tight End</option>
-                                                    <option value="OL">Offensive Line</option>
-                                                    <option value="DL">Defensive Line</option>
-                                                    <option value="LB">Linebacker</option>
-                                                    <option value="DB">Defensive Back</option>
-                                                    <option value="K">Kicker</option>
-                                                    <option value="P">Punter</option>
+                                                    <option value="QB">QB</option>
+                                                    <option value="HB">HB</option>
+                                                    <option value="WR">WR</option>
+                                                    <option value="TE">TE</option>
+                                                    <option value="OL">OL</option>
+                                                    <option value="DL">DL</option>
+                                                    <option value="LB">LB</option>
+                                                    <option value="DB">DB</option>
+                                                    <option value="P/K">P/K</option>
+                                                    <option value="PR/KR">PR/KR</option>
+                                                    <option value="LS">LS</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -325,6 +326,20 @@
             30: { name: "Tampa Bay Buccaneers", abbreviation: "TB" },
             31: { name: "Tennessee Titans", abbreviation: "TEN" },
             32: { name: "Washington Commanders", abbreviation: "WAS" }
+        };
+
+        const positionMappings = {
+            'QB': ['QB'],
+            'HB': ['RB', 'FB'],
+            'WR': ['WR'],
+            'TE': ['TE'],
+            'OL': ['OT', 'G', 'C'],
+            'DL': ['NT', 'DT', 'ED'],
+            'LB': ['OLB', 'MLB'],
+            'DB': ['DB', 'CB', 'S', 'SS', 'FS'],
+            'P/K': ['P', 'K'],
+            'PR/KR': ['PR', 'KR'],
+            'LS': ['LS']
         };
 
         const ROUND_SIZES = { 1: 33, 2: 33, 3: 39, 4: 37, 5: 39, 6: 41, 7: 42 };
@@ -749,7 +764,7 @@
             let filteredPlayers = availablePlayersData;
             if (currentPositionFilter !== 'all') {
                 filteredPlayers = availablePlayersData.filter(player =>
-                    player.position === currentPositionFilter
+                    positionMappings[currentPositionFilter].includes(player.position)
                 );
             }
 

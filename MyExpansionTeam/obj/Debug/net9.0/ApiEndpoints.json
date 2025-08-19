@@ -234,6 +234,16 @@
   },
   {
     "ContainingType": "METAPI.Controllers.TeamsController",
+    "Method": "List",
+    "RelativePath": "api/Teams/List",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "METAPI.Controllers.TeamsController",
     "Method": "MyTeams",
     "RelativePath": "api/Teams/MyTeams",
     "HttpMethod": "GET",
