@@ -99,11 +99,12 @@ namespace METAPI.Controllers
             return team == null ? BadRequest() : Ok(team);
         }
 
-        /*[HttpPost("List")]
+        [HttpGet("List")]
         public async Task<IActionResult> List()
         {
-            return Ok(await this.ListTeams());
-        }*/
+            IEnumerable<TeamInfoDto>? list = await this.ListTeams(false, User?.Identity?.Name);
+            return Ok(list);
+        }
 
         /// <summary> Obtener los TeamDtos con los valores de los Teams del User logeado.</summary>
         /// <returns>Opciones:
@@ -212,12 +213,8 @@ namespace METAPI.Controllers
         }
 
         [HttpGet("GetTeamTrades")]
-        [Authorize]
         public async Task<IActionResult> GetTeamTrades(IdDto dto)
         {
-            string? username = User?.Identity?.Name;
-            if (String.IsNullOrWhiteSpace(username)) return BadRequest(new MessageDto("Username"));
-
             ResultDto<IList<TradeDto>> result = await _teamService.GetTeamTrades(User?.Identity?.Name, dto.Id);
 
             return !String.IsNullOrWhiteSpace(result.Message)

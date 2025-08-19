@@ -440,6 +440,18 @@
         }
       }
     },
+    "/api/Teams/List": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Teams/MyTeams": {
       "get": {
         "tags": [
