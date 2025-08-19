@@ -23,7 +23,7 @@
                 TextColor="White" />
 
             <!-- Profile Info Display -->
-            <Frame BackgroundColor="LightGray" Padding="15">
+            <Border BackgroundColor="LightGray" Padding="15" Stroke="Gray" StrokeThickness="1">
                 <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*">
 
                     <Label Text="First Name:" Grid.Row="0" Grid.Column="0" FontAttributes="Bold" />
@@ -39,11 +39,11 @@
                     <Label Text="{Binding Tlf}" Grid.Row="3" Grid.Column="1" />
 
                 </Grid>
-            </Frame>
+            </Border>
 
             <!-- Action Buttons -->
             <Button Text="Edit Profile" 
-                Command="{Binding EditProfileCommand}"
+                Command="{Binding GoToEditProfileCommand}"
                 BackgroundColor="Blue"
                 TextColor="White" />
 

@@ -15,8 +15,8 @@ namespace MobileApp.Models.Shared
 
         public static List<FranchiseInfo> GetAllFranchises()
         {
-            return new List<FranchiseInfo>
-            {
+            return
+            [
                 new(1, "Arizona Cardinals", "ARI"),
                 new(2, "Atlanta Falcons", "ATL"),
                 new(3, "Baltimore Ravens", "BAL"),
@@ -49,7 +49,7 @@ namespace MobileApp.Models.Shared
                 new(30, "Tampa Bay Buccaneers", "TB"),
                 new(31, "Tennessee Titans", "TEN"),
                 new(32, "Washington Commanders", "WAS")
-            };
+            ];
         }
     }
 }

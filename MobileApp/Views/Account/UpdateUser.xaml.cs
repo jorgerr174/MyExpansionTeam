@@ -9,5 +9,12 @@ namespace MobileApp.Views.Account
             InitializeComponent();
             BindingContext = viewModel;
         }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            if (BindingContext is UpdateUserViewModel viewModel)
+                await viewModel.LoadProfileCommand.ExecuteAsync(null);
+        }
     }
 }

@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using METCore.DTOs.Team;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
 
@@ -59,16 +60,10 @@ namespace MobileApp.Models.Team
 
             try
             {
-                bool success = await _teamService.UpdateTeamAsync(TeamId, Location, Abbreviation, Mascot);
-
-                if (success)
-                {
-                    await Shell.Current.GoToAsync("MyTeams");
-                }
+                if (await _teamService.UpdateTeamAsync(TeamId, Location, Abbreviation, Mascot))
+                    await _teamService.GoToMyTeamsTabAsync();
                 else
-                {
                     ErrorMessage = "Failed to update team";
-                }
             }
             catch (Exception ex)
             {
@@ -93,17 +88,9 @@ namespace MobileApp.Models.Team
                 IsLoading = true;
                 ErrorMessage = string.Empty;
 
-                var duplicatedTeam = await _teamService.DuplicateTeamAsync(TeamId);
-
-                if (duplicatedTeam != null)
-                {
-                    // Navigate to edit view of the new duplicated team
-                    await Shell.Current.GoToAsync($"Team/Edit?teamId={duplicatedTeam.Id}");
-                }
-                else
-                {
-                    ErrorMessage = "Failed to duplicate team";
-                }
+                if (await _teamService.DuplicateTeamAsync(TeamId) is TeamBasicInfoDto duplicatedTeam)
+                    await _teamService.GoToAsync(AppRoutes.TeamEdit, new() { ["TeamId"] = duplicatedTeam.Id });
+                else ErrorMessage = "Failed to duplicate team";
             }
             catch (Exception ex)
             {
@@ -128,18 +115,13 @@ namespace MobileApp.Models.Team
                 IsLoading = true;
                 ErrorMessage = string.Empty;
 
-                bool success = await _teamService.DeleteTeamAsync(TeamId);
-
-                if (success)
+                if (await _teamService.DeleteTeamAsync(TeamId))
                 {
                     await Shell.Current.DisplayAlert("Success", "Team deleted successfully", "OK");
-                    // Navigate back to teams list
-                    await Shell.Current.GoToAsync("//Home");
+                    await _teamService.GoToHomeTabAsync();
                 }
                 else
-                {
                     ErrorMessage = "Failed to delete team";
-                }
             }
             catch (Exception ex)
             {

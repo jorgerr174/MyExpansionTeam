@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using METCore.DTOs.Player;
 using METCore.DTOs.Team;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
@@ -35,8 +36,7 @@ namespace MobileApp.Models.Team
 
             try
             {
-                var team = await _teamService.GetTeamDetailsAsync(id);
-                if (team != null)
+                if (await _teamService.GetTeamDetailsAsync(id) is TeamInfoDto team)
                 {
                     TeamName = $"{team.Location} {team.Mascot}";
                     RosterSettingsCap = team.RosterSettingsCap;
@@ -61,13 +61,11 @@ namespace MobileApp.Models.Team
             IsLoading = true;
             try
             {
-                var players = await _teamService.GetProtectablePlayersAsync(TeamId);
-                if (players != null)
+                if (await _teamService.GetProtectablePlayersAsync(TeamId) is IList<SelectableDto> players)
                 {
-                    var wrappedPlayers = players.Select(p =>
+                    IList<SelectablePlayerViewModel> wrappedPlayers = players.Select(p =>
                     {
-                        var wrapper = new SelectablePlayerViewModel(p);
-                        wrapper.IsSelected = RosterSettingsProtectedPlayersIds.Contains(p.Id);
+                        SelectablePlayerViewModel wrapper = new(p) { IsSelected = RosterSettingsProtectedPlayersIds.Contains(p.Id) };
                         return wrapper;
                     }).ToList();
 
@@ -88,7 +86,7 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         public void TogglePlayerSelection(SelectablePlayerViewModel playerWrapper)
         {
-            var selectedCount = ProtectablePlayers.Count(p => p.IsSelected);
+            int selectedCount = ProtectablePlayers.Count(p => p.IsSelected);
 
             if (!playerWrapper.IsSelected && selectedCount >= RosterSettingsProtectedPerTeam)
             {
@@ -97,18 +95,11 @@ namespace MobileApp.Models.Team
             }
 
             playerWrapper.IsSelected = !playerWrapper.IsSelected;
-
-            // Update the protected players IDs list
             RosterSettingsProtectedPlayersIds = [.. ProtectablePlayers.Where(p => p.IsSelected).Select(p => p.Id)];
-
             ErrorMessage = string.Empty;
         }
 
-        [RelayCommand]
-        public void HidePlayerSelection()
-        {
-            ShowPlayerSelection = false;
-        }
+        [RelayCommand] public void HidePlayerSelection() => ShowPlayerSelection = false;
 
         [RelayCommand]
         public async Task SaveRosterSettings()
@@ -118,24 +109,19 @@ namespace MobileApp.Models.Team
 
             try
             {
-                var teamDto = new TeamInfoDto(TeamId, "", "", "")
+                TeamInfoDto teamDto = new ()
                 {
+                    Id = TeamId,
                     RosterSettingsCap = RosterSettingsCap,
                     RosterSettingsMaxPerTeam = RosterSettingsMaxPerTeam,
                     RosterSettingsProtectedPerTeam = RosterSettingsProtectedPerTeam,
                     RosterSettingsProtectedPlayersIds = RosterSettingsProtectedPlayersIds
                 };
 
-                bool success = await _teamService.UpdateRosterSettingsAsync(teamDto);
-
-                if (success)
-                {
-                    await Shell.Current.GoToAsync("MyTeams");
-                }
+                if (await _teamService.UpdateRosterSettingsAsync(teamDto))
+                    await _teamService.GoToMyTeamsTabAsync();
                 else
-                {
                     ErrorMessage = "Failed to save roster settings";
-                }
             }
             catch (Exception ex)
             {

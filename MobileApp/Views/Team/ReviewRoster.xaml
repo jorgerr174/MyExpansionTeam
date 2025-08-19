@@ -20,46 +20,27 @@
             HorizontalOptions="Center" />
 
             <!-- Salary Cap Summary -->
-            <Frame BackgroundColor="LightBlue" Padding="15">
+            <Border BackgroundColor="LightBlue" Padding="15" Stroke="Blue"  StrokeThickness="1" StrokeShape="RoundRectangle 10">
                 <StackLayout>
-                    <Label Text="{Binding SalaryCapText}" 
-                    FontAttributes="Bold" 
-                    HorizontalOptions="Center" />
-                    <Label Text="{Binding AvailableCapText}" 
-                    FontSize="12" 
-                    HorizontalOptions="Center" />
-                    <Label Text="{Binding TotalPlayersCount, StringFormat='Total Players: {0}'}" 
-                    FontSize="12" 
-                    HorizontalOptions="Center" />
+                    <Label Text="{Binding SalaryCapText}" FontAttributes="Bold" HorizontalOptions="Center" />
+                    <Label Text="{Binding AvailableCapText}" FontSize="12" HorizontalOptions="Center" />
+                    <Label Text="{Binding TotalPlayersCount, StringFormat='Total Players: {0}'}" FontSize="12" HorizontalOptions="Center" />
                 </StackLayout>
-            </Frame>
+            </Border>
 
             <!-- Action Buttons -->
             <StackLayout Orientation="Horizontal" Spacing="10">
-                <Button Text="Add Players" 
-                Command="{Binding GoToBuildRosterCommand}"
-                BackgroundColor="Green"
-                TextColor="White"
-                HorizontalOptions="FillAndExpand" />
-
-                <Button Text="Clear All" 
-                Command="{Binding ClearAllRosterCommand}"
-                BackgroundColor="Red"
-                TextColor="White"
-                HorizontalOptions="FillAndExpand" />
+                <Button Text="Add Players" Command="{Binding GoToBuildRosterCommand}" BackgroundColor="Green" TextColor="White" HorizontalOptions="Center" />
+                <Button Text="Clear All" Command="{Binding ClearAllRosterCommand}" BackgroundColor="Red" TextColor="White" HorizontalOptions="Center" />
             </StackLayout>
 
-            <!-- Position Filter -->
             <StackLayout>
                 <Label Text="Filter by Position:" FontAttributes="Bold" />
 
-                <CollectionView ItemsSource="{Binding PositionFilters}"
-                        ItemsLayout="HorizontalList"
-                        HeightRequest="50">
+                <CollectionView ItemsSource="{Binding PositionFilters}" ItemsLayout="HorizontalList" HeightRequest="50">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Button Text="{Binding}" 
-                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FilterByPositionCommand}"
+                            <Button Text="{Binding}" Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FilterByPositionCommand}"
                             CommandParameter="{Binding}"
                             BackgroundColor="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedPositionFilter, Converter={StaticResource SelectedFilterColorConverter}, ConverterParameter={Binding}}"
                             TextColor="White"
@@ -79,7 +60,7 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Grid Padding="5" Margin="2">
-                                <Frame BackgroundColor="LightGreen" Padding="10">
+                                <Border BackgroundColor="LightGreen" Padding="10" Stroke="Green" StrokeThickness="1" StrokeShape="RoundRectangle 10">
                                     <Grid ColumnDefinitions="*,Auto">
 
                                         <StackLayout Grid.Column="0">
@@ -109,7 +90,7 @@
                                         VerticalOptions="Center" />
 
                                     </Grid>
-                                </Frame>
+                                </Border>
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
@@ -118,7 +99,7 @@
 
             <!-- Empty State -->
             <StackLayout IsVisible="{Binding FilteredPlayers.Count, Converter={StaticResource CountToInvertedBoolConverter}}">
-                <Frame BackgroundColor="LightGray" Padding="20">
+                <Border BackgroundColor="LightGray" Padding="20" Stroke="Gray" StrokeThickness="1" StrokeShape="RoundRectangle 10">
                     <StackLayout HorizontalOptions="Center">
                         <Label Text="No players in roster" 
                         FontSize="16" 
@@ -127,7 +108,7 @@
                         FontSize="12" 
                         HorizontalOptions="Center" />
                     </StackLayout>
-                </Frame>
+                </Border>
             </StackLayout>
 
             <!-- Error Message -->

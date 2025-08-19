@@ -4,5 +4,135 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Account"
              x:DataType="viewmodels:UpdateUserViewModel"
-             Title="UpdateUser">
+             Title="Edit Profile">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+
+            <!-- Header -->
+            <Border BackgroundColor="#1b6ec2" 
+                    Padding="15"
+                    Stroke="Transparent"
+                    StrokeShape="RoundRectangle 10">
+                <Label Text="Edit Profile Information" 
+                       FontSize="20" 
+                       FontAttributes="Bold" 
+                       TextColor="White"
+                       HorizontalOptions="Center" />
+            </Border>
+
+            <!-- First Name Row -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <StackLayout Grid.Column="0">
+                    <Label Text="Current First Name" FontAttributes="Bold" />
+                    <Border BackgroundColor="LightGray" 
+                            Padding="10"
+                            Stroke="Gray"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 5">
+                        <Label Text="{Binding CurrentFirstName}" />
+                    </Border>
+                </StackLayout>
+                <StackLayout Grid.Column="1">
+                    <Label Text="New First Name" FontAttributes="Bold" />
+                    <Entry Text="{Binding NewFirstName}" 
+                           Placeholder="Enter new first name"
+                           IsEnabled="{Binding IsFormEnabled}" />
+                </StackLayout>
+            </Grid>
+
+            <!-- Last Name Row -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <StackLayout Grid.Column="0">
+                    <Label Text="Current Last Name" FontAttributes="Bold" />
+                    <Border BackgroundColor="LightGray" 
+                            Padding="10"
+                            Stroke="Gray"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 5">
+                        <Label Text="{Binding CurrentLastName}" />
+                    </Border>
+                </StackLayout>
+                <StackLayout Grid.Column="1">
+                    <Label Text="New Last Name" FontAttributes="Bold" />
+                    <Entry Text="{Binding NewLastName}" 
+                           Placeholder="Enter new last name"
+                           IsEnabled="{Binding IsFormEnabled}" />
+                </StackLayout>
+            </Grid>
+
+            <!-- Email Row -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <StackLayout Grid.Column="0">
+                    <Label Text="Current Email" FontAttributes="Bold" />
+                    <Border BackgroundColor="LightGray" 
+                            Padding="10"
+                            Stroke="Gray"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 5">
+                        <Label Text="{Binding CurrentEmail}" />
+                    </Border>
+                </StackLayout>
+                <StackLayout Grid.Column="1">
+                    <Label Text="New Email" FontAttributes="Bold" />
+                    <Entry Text="{Binding NewEmail}" 
+                           Placeholder="Enter new email"
+                           Keyboard="Email"
+                           IsEnabled="{Binding IsFormEnabled}" />
+                </StackLayout>
+            </Grid>
+
+            <!-- Phone Row -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                <StackLayout Grid.Column="0">
+                    <Label Text="Current Phone" FontAttributes="Bold" />
+                    <Border BackgroundColor="LightGray" 
+                            Padding="10"
+                            Stroke="Gray"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 5">
+                        <Label Text="{Binding CurrentTlf}" />
+                    </Border>
+                </StackLayout>
+                <StackLayout Grid.Column="1">
+                    <Label Text="New Phone" FontAttributes="Bold" />
+                    <Entry Text="{Binding NewTlf}" 
+                           Placeholder="Enter new phone"
+                           Keyboard="Telephone"
+                           IsEnabled="{Binding IsFormEnabled}" />
+                </StackLayout>
+            </Grid>
+
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}" 
+                   TextColor="Red" 
+                   IsVisible="{Binding HasError}"
+                   HorizontalOptions="Center" />
+
+            <!-- Update Button -->
+            <Button Text="Update Information" 
+                    Command="{Binding UpdateUserCommand}"
+                    IsEnabled="{Binding IsFormEnabled}"
+                    BackgroundColor="#28a745"
+                    TextColor="White"
+                    FontSize="16"
+                    HeightRequest="50"
+                    CornerRadius="10" />
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                               IsVisible="{Binding IsLoading}"
+                               HorizontalOptions="Center" />
+
+            <!-- Go Back Button -->
+            <Button Text="Go Back" 
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="LightGray"
+                    TextColor="Black"
+                    FontSize="16"
+                    HeightRequest="50"
+                    CornerRadius="10" />
+
+        </StackLayout>
+    </ScrollView>
 </ContentPage>

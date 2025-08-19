@@ -47,7 +47,7 @@ namespace MobileApp.Models.Team
                     TeamName = $"{team.Location} {team.Mascot}";
 
                     // Load current roster
-                    var rosterPlayersList = team.Players.Select(p =>
+                    IList<SelectablePlayerViewModel> rosterPlayersList = team.Players.Select(p =>
                     {
                         var wrapper = new SelectablePlayerViewModel(new SelectableDto
                         {
@@ -83,10 +83,9 @@ namespace MobileApp.Models.Team
 
             try
             {
-                var players = await _teamService.GetSelectablePlayersAsync(franchise.Id);
-                if (players != null)
+                if (await _teamService.GetSelectablePlayersAsync(franchise.Id) is IList<SelectableDto> players)
                 {
-                    var wrappedPlayers = players.Select(p =>
+                    IList<SelectablePlayerViewModel> wrappedPlayers = players.Select(p =>
                     {
                         var wrapper = new SelectablePlayerViewModel(p);
                         // Check if player is already in roster
@@ -121,13 +120,11 @@ namespace MobileApp.Models.Team
             if (!player.IsSelected)
             {
                 // Adding player - check salary cap
-                if (decimal.TryParse(player.Player.PureAPY, out decimal playerSalary))
+                if (decimal.TryParse(player.Player.PureAPY, out decimal playerSalary) 
+                    && (CurrentSalaryCap + playerSalary) > BaseSalaryCap)
                 {
-                    if (CurrentSalaryCap + playerSalary > BaseSalaryCap)
-                    {
-                        ErrorMessage = $"Cannot add player. Would exceed salary cap by ${(CurrentSalaryCap + playerSalary - BaseSalaryCap):F1}M";
-                        return;
-                    }
+                    ErrorMessage = $"Cannot add player. Would exceed salary cap by ${(CurrentSalaryCap + playerSalary - BaseSalaryCap):F1}M";
+                    return;
                 }
 
                 player.IsSelected = true;
@@ -159,33 +156,25 @@ namespace MobileApp.Models.Team
 
             try
             {
-                var teamDto = new TeamDto();
-                teamDto.Id = TeamId;
+                TeamDto teamDto = new() { Id = TeamId };
 
-                // Convert selected players to RosteredDto
-                var rosteredPlayers = RosterPlayers.Select(p => new RosteredDto
+                IList<RosteredDto> rosteredPlayers = RosterPlayers.Select(p => new RosteredDto
                 {
                     Id = p.Id,
                     Name = p.Name,
                     Position = p.Position,
                     APY = p.APY,
                     PureAPY = p.Player.PureAPY,
-                    FranchiseId = 0 // This would need to be tracked or retrieved
+                    FranchiseId = 0
                 }).ToList();
 
                 teamDto.Players = rosteredPlayers;
                 teamDto.SelectedIds = RosterPlayers.Select(p => p.Id).ToList();
 
-                bool success = await _teamService.UpdateRosterAsync(teamDto);
-
-                if (success)
-                {
-                    await Shell.Current.GoToAsync("MyTeams");
-                }
+                if (await _teamService.UpdateRosterAsync(teamDto))
+                    await _teamService.GoToMyTeamsTabAsync();
                 else
-                {
                     ErrorMessage = "Failed to save roster";
-                }
             }
             catch (Exception ex)
             {
@@ -205,21 +194,15 @@ namespace MobileApp.Models.Team
 
             // Update available players selection state
             foreach (var player in AvailablePlayers.Where(p => !p.IsAlreadyRostered))
-            {
                 player.IsSelected = false;
-            }
         }
 
         private void UpdateSalaryCap()
         {
             CurrentSalaryCap = 0;
             foreach (var player in RosterPlayers)
-            {
                 if (decimal.TryParse(player.Player.PureAPY, out decimal salary))
-                {
                     CurrentSalaryCap += salary;
-                }
-            }
 
             SelectedPlayerCount = RosterPlayers.Count;
             OnPropertyChanged(nameof(AvailableCap));

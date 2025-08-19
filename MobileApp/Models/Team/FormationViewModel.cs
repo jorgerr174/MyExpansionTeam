@@ -126,33 +126,23 @@ namespace MobileApp.Models.Team
 
             try
             {
-                var teamDto = new TeamDto();
-                teamDto.Id = TeamId;
+                TeamDto teamDto = new()
+                {
+                    Id = TeamId
+                };
 
                 // Create lineup based on formation type
                 if (CurrentFormationType == "offense")
-                {
                     teamDto.OffLineup = CreateLineupFromStarters();
-                }
                 else if (CurrentFormationType == "defense")
-                {
                     teamDto.DefLineup = CreateLineupFromStarters();
-                }
                 else if (CurrentFormationType == "special")
-                {
                     teamDto.SPLineup = CreateSPLineupFromStarters();
-                }
 
-                bool success = await _teamService.UpdateRosterAsync(teamDto);
-
-                if (success)
-                {
-                    await Shell.Current.GoToAsync("MyTeams");
-                }
+                if (await _teamService.UpdateRosterAsync(teamDto))
+                    await _teamService.GoToMyTeamsTabAsync();
                 else
-                {
                     ErrorMessage = "Failed to save formation";
-                }
             }
             catch (Exception ex)
             {

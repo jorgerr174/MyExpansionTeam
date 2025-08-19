@@ -51,7 +51,7 @@
 
                 <!-- Action buttons -->
                 <Button Text="Mis equipos" 
-                    Command="{Binding MyTeamsCommand}"
+                    Command="{Binding GoToMyTeamsCommand}"
                     BackgroundColor="Blue"
                     TextColor="White" />
 
