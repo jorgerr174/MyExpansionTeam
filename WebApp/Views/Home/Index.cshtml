@@ -59,7 +59,7 @@
                         </div>
                         <div class="card-body p-0">
                             @{
-                                ViewData["myTeams"] = true;
+                                ViewData["myTeams"] = false;
                             }
                             @await Html.PartialAsync("~/Views/Shared/_TeamList.cshtml", Model, ViewData)
                         </div>

@@ -80,7 +80,7 @@ namespace WebApp.Controllers
         {
             return Id < 1
                 ? User?.Identity == null ? RedirectToAction("Index", "Home") : RedirectToAction("MyTeams")
-                : View("Details", await this.GetTeamInfo(Id));
+                : View("Details", await this.GetTeam(Id));
         }
         #endregion
 
