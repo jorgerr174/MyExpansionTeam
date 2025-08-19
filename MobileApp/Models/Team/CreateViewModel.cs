@@ -32,16 +32,10 @@ namespace MobileApp.Models.Team
 
             try
             {
-                int? teamId = await _teamService.CreateTeamAsync(Location, Abbreviation, Mascot);
-
-                if ((teamId ?? 0) > 0)
-                {
-                    await Shell.Current.GoToAsync($"RosterSettings?teamId={teamId}");
-                }
+                if (await _teamService.CreateTeamAsync(Location, Abbreviation, Mascot) is int teamId && teamId > 0)
+                    await _teamService.GoToAsync(AppRoutes.RosterSettings, new() { ["TeamId"] = teamId });
                 else
-                {
                     ErrorMessage = "Failed to create team";
-                }
             }
             catch (Exception ex)
             {

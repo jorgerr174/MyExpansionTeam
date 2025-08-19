@@ -7,11 +7,11 @@ namespace MobileApp.Models.Account
 {
     public partial class LogInViewModel : BaseViewModel
     {
-        private readonly AccountService _authService;
+        private readonly AccountService _accountService;
 
         public LogInViewModel(AccountService authService)
         {
-            _authService = authService;
+            _accountService = authService;
         }
 
         [ObservableProperty] private string identifier = string.Empty;
@@ -32,18 +32,10 @@ namespace MobileApp.Models.Account
 
             try
             {
-                // Same login call as your WebApp
-                bool success = await _authService.LogInAsync(Identifier, Password);
-
-                if (success)
-                {
-                    // Navigate to main page (equivalent of RedirectUrl in WebApp)
-                    await Shell.Current.GoToAsync("Home");
-                }
+                if (await _accountService.LogInAsync(Identifier, Password))
+                    await _accountService.GoToHomeTabAsync();
                 else
-                {
                     ErrorMessage = "Invalid credentials";
-                }
             }
             catch (Exception ex)
             {

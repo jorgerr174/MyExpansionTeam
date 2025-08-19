@@ -15,7 +15,6 @@ namespace MobileApp.Models.Admin
 
         public AssignRolesViewModel(AdminService adminService)
         {
-            base.backPath = "..";
             _adminService = adminService;
 
             // Set default page size to match web app
@@ -163,24 +162,22 @@ namespace MobileApp.Models.Admin
                     user.HasChanges = false;
 
                     // Update UI properties
-                    user.OnPropertyChanged(nameof(user.CanChangeRole));
-                    user.OnPropertyChanged(nameof(user.SelectedRoleIndex));
+                    OnPropertyChanged(nameof(user.CanChangeRole));
                 }
                 else
                 {
                     user.SelectedRole = user.CurrentRole; // Revert selection
-                    user.OnPropertyChanged(nameof(user.SelectedRoleIndex));
                     ErrorMessage = "Failed to update user role";
                 }
             }
             catch (Exception ex)
             {
                 user.SelectedRole = user.CurrentRole; // Revert selection
-                user.OnPropertyChanged(nameof(user.SelectedRoleIndex));
                 ErrorMessage = $"Error updating role: {ex.Message}";
             }
             finally
             {
+                OnPropertyChanged(nameof(user.SelectedRoleIndex));
                 IsLoading = false;
             }
         }

@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using METCore.DTOs.User;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
 
@@ -26,15 +27,14 @@ namespace MobileApp.Models.Account
             IsLoading = true;
             try
             {
-                var userDto = await _accountService.GetProfileAsync();
-                if (userDto != null)
+                if (await _accountService.GetProfileAsync() is UserDto userDto)
                 {
                     FirstName = userDto.FirstName;
                     LastName = userDto.LastName;
                     Email = userDto.Email;
-                    Tlf = userDto.Tlf;
+                    Tlf = userDto.Tlf ?? string.Empty;
                     Username = userDto.Username;
-                    IsAdmin = userDto.Role == METCore.Enums.Types.RoleEnum.Admin; // Add this line
+                    IsAdmin = userDto.Role == METCore.Enums.Types.RoleEnum.Admin;
                 }
             }
             catch (Exception ex)
@@ -47,24 +47,17 @@ namespace MobileApp.Models.Account
             }
         }
 
-        [RelayCommand]
-        public async Task GoToAdmin()
-        {
-            await Shell.Current.GoToAsync("Admin");
-        }
 
-        [RelayCommand]
-        public async Task EditProfile()
-        {
-            await Shell.Current.GoToAsync("EditProfile");
-        }
-
-        [RelayCommand]
-        public async Task LogOut()
+        private async Task GoToLogIn() => await _accountService.GoToAsync(AppRoutes.LogIn, null);
+        [RelayCommand] public async Task GoToAdmin() => await _accountService.GoToAsync(AppRoutes.Admin, null);
+        [RelayCommand] public async Task GoToEditProfile() => await _accountService.GoToAsync(AppRoutes.EditProfile, null);
+        [RelayCommand] public async Task LogOut()
         {
             AccountService.LogOutAsync();
-            await Shell.Current.GoToAsync("LogIn");
+            await GoToLogIn();
         }
+
+
 
         [RelayCommand]
         public async Task DeleteUser()
@@ -80,15 +73,8 @@ namespace MobileApp.Models.Account
 
             try
             {
-                bool success = await _accountService.DeleteUserAsync();
-                if (success)
-                {
-                    await Shell.Current.GoToAsync("LogIn");
-                }
-                else
-                {
-                    ErrorMessage = "Failed to delete account";
-                }
+                if (await _accountService.DeleteUserAsync()) await GoToLogIn();
+                else ErrorMessage = "Failed to delete account";
             }
             catch (Exception ex)
             {

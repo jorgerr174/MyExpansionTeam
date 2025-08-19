@@ -5,8 +5,6 @@ namespace MobileApp.Models.Shared
 {
     public abstract partial class BaseViewModel() : ObservableObject
     {
-        protected string backPath = "Home";
-
         [ObservableProperty]
         private bool isLoading = false;
 
@@ -26,12 +24,6 @@ namespace MobileApp.Models.Shared
         partial void OnIsLoadingChanged(bool value)
         {
             OnPropertyChanged(nameof(IsFormEnabled));
-        }
-
-        [RelayCommand]
-        public async Task GoBack()
-        {
-            await Shell.Current.GoToAsync(backPath);
         }
     }
 }

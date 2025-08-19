@@ -9,12 +9,9 @@
     <ScrollView>
         <StackLayout Padding="20" Spacing="20">
 
-            <Label Text="Admin actions" 
-                   FontSize="28" 
-                   FontAttributes="Bold" 
-                   HorizontalOptions="Center" />
+            <Label Text="Admin actions" FontSize="28" FontAttributes="Bold" HorizontalOptions="Center" />
 
-            <Frame BackgroundColor="LightGray" Padding="20" CornerRadius="10">
+            <Border BackgroundColor="LightGray" Padding="20" Stroke="Gray" StrokeThickness="1" StrokeShape="RoundRectangle 10">
                 <StackLayout Spacing="20">
 
                     <Button Text="Assign Roles" 
@@ -34,7 +31,7 @@
                             CornerRadius="10" />
 
                 </StackLayout>
-            </Frame>
+            </Border>
 
             <ActivityIndicator IsRunning="{Binding IsLoading}" 
                              IsVisible="{Binding IsLoading}" />

@@ -29,7 +29,7 @@
                    FontAttributes="Bold" />
 
             <!-- Import Type Selection -->
-            <Frame BackgroundColor="LightBlue" Padding="15" CornerRadius="10">
+            <Border BackgroundColor="LightBlue" Padding="15" Stroke="Blue"  StrokeThickness="1" StrokeShape="RoundRectangle 10">
                 <StackLayout>
                     <Label Text="Import Type" 
                            FontSize="16" 
@@ -40,13 +40,10 @@
                             ItemDisplayBinding="{Binding DisplayName}"
                             Title="Select import type" />
                 </StackLayout>
-            </Frame>
+            </Border>
 
             <!-- Year Selection (for Stats) -->
-            <Frame BackgroundColor="LightGreen" 
-                   Padding="15" 
-                   CornerRadius="10"
-                   IsVisible="{Binding ShowYearSelection}">
+            <Border BackgroundColor="LightGreen" Padding="15" Stroke="Green" StrokeThickness="1" StrokeShape="RoundRectangle 10" IsVisible="{Binding ShowYearSelection}">
                 <StackLayout>
                     <Label Text="Year" 
                            FontSize="16" 
@@ -59,13 +56,10 @@
                             SelectedItem="{Binding SelectedYear}"
                             Title="Select year" />
                 </StackLayout>
-            </Frame>
+            </Border>
 
             <!-- Stats Type Selection (for Stats) -->
-            <Frame BackgroundColor="LightYellow" 
-                   Padding="15" 
-                   CornerRadius="10"
-                   IsVisible="{Binding ShowStatsTypeSelection}">
+            <Border BackgroundColor="LightYellow" Padding="15" Stroke="Yellow" StrokeThickness="1" StrokeShape="RoundRectangle 10" IsVisible="{Binding ShowStatsTypeSelection}">
                 <StackLayout>
                     <Label Text="Stats Type" 
                            FontSize="16" 
@@ -79,10 +73,10 @@
                             ItemDisplayBinding="{Binding DisplayName}"
                             Title="Select stats type" />
                 </StackLayout>
-            </Frame>
+            </Border>
 
             <!-- File Selection -->
-            <Frame BackgroundColor="LightCoral" Padding="15" CornerRadius="10">
+            <Border BackgroundColor="LightCoral" Padding="15" Stroke="Coral" StrokeThickness="1" StrokeShape="RoundRectangle 10">
                 <StackLayout>
                     <Label Text="File Selection" 
                            FontSize="16" 
@@ -99,7 +93,7 @@
                            TextColor="Gray"
                            HorizontalOptions="Center" />
                 </StackLayout>
-            </Frame>
+            </Border>
 
             <!-- Import Button -->
             <Button Text="Upload CSV" 
@@ -121,10 +115,7 @@
             </StackLayout>
 
             <!-- Import Result -->
-            <Frame BackgroundColor="LightGreen" 
-                   Padding="15" 
-                   CornerRadius="10"
-                   IsVisible="{Binding HasImportResult}">
+            <Border BackgroundColor="LightGreen" Padding="15" Stroke="Green" StrokeThickness="1" StrokeShape="RoundRectangle 10" IsVisible="{Binding HasImportResult}">
                 <StackLayout>
                     <Label Text="{Binding ImportResult}" 
                            FontSize="14"
@@ -139,7 +130,7 @@
                             CornerRadius="5"
                             Margin="0,10,0,0" />
                 </StackLayout>
-            </Frame>
+            </Border>
 
             <!-- Back Button -->
             <Button Text="Back" 

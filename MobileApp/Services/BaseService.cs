@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.Shared;
 
 namespace MobileApp.Services
@@ -62,5 +63,82 @@ namespace MobileApp.Services
             return !string.IsNullOrEmpty(token);
         }
         #endregion GetResult
+
+
+        #region GoTo
+        public async Task GoBackAsync(Dictionary<string, object>? parameters) => await Shell.Current.GoToAsync("..", true, parameters);
+
+        public async Task GoToHomeTabAsync() => await Shell.Current.GoToAsync(AppRoutes.HomeTab);
+        public async Task GoToTeamsTabAsync() => await Shell.Current.GoToAsync(AppRoutes.TeamsTab);
+        public async Task GoToMyTeamsTabAsync() => await Shell.Current.GoToAsync(AppRoutes.MyTeamsTab);
+        public async Task GoToProfileTabAsync() => await Shell.Current.GoToAsync(AppRoutes.ProfileTab);
+
+        public async Task GoToAsync(string newRoute, Dictionary<string, object>? parameters)
+            => await Shell.Current.GoToAsync(AppRoutes.BuildRoute(Shell.Current?.GetType().Name ?? string.Empty, newRoute), true, parameters ?? []);
+        #endregion GoTo
+    }
+
+    public static class AppRoutes
+    {
+        // Tab routes
+        public const string HomeTab = "HomeTab";
+        public const string TeamsTab = "TeamsTab";
+        public const string MyTeamsTab = "MyTeamsTab";
+        public const string ProfileTab = "ProfileTab";
+
+        // Account routes
+        public const string EditProfile = "EditProfile";
+        public const string LogIn = "LogIn";
+        public const string SignUp = "SignUp";
+        public const string UpdateCredentials = "UpdateCredentials";
+        public const string UpdateUser = "UpdateUser";
+
+        // Admin routes  
+        public const string Admin = "Admin";
+        public const string AssignRoles = "AssignRoles";
+        public const string Import = "Import";
+
+        // Team routes
+        public const string CreateTeam = "CreateTeam";
+        public const string TeamDetails = "TeamDetails";
+        public const string DraftResults = "DraftResults";
+        public const string TeamEdit = "EditTeam";
+        public const string Formation = "Formation";
+        public const string ReviewRoster = "ReviewRoster";
+        public const string Roster = "Roster";
+        public const string RosterSettings = "RosterSettings";
+        public const string Trade = "Trade";
+        public const string Trades = "Trades";
+
+        // All valid routes for validation
+        private static readonly HashSet<string> ValidRoutes =
+        [
+            EditProfile, LogIn, SignUp, UpdateCredentials, UpdateUser,
+            Admin, AssignRoles, Import,
+            CreateTeam, TeamDetails, DraftResults, TeamEdit, Formation,
+            ReviewRoster, Roster, RosterSettings, Trade, Trades
+        ];
+
+        private static string GetParentTab(string route)
+        {
+            return route switch
+            {
+                Admin or AssignRoles or Import or
+                EditProfile or LogIn or SignUp or UpdateCredentials or UpdateUser => ProfileTab,
+
+                CreateTeam or TeamDetails or DraftResults or TeamEdit or Formation or
+                ReviewRoster or Roster or RosterSettings or Trade or Trades => MyTeamsTab,
+
+                _ => string.Empty
+            };
+        }
+
+        public static string BuildRoute(string currentRoute, string newRoute)
+        {
+            if (!ValidRoutes.Contains(newRoute)) throw new ArgumentException($"Invalid route: {newRoute}");
+
+            string newParent = GetParentTab(newRoute);
+            return GetParentTab(currentRoute) != newParent ? $"//{newParent}/{newRoute}" : newRoute;
+        }
     }
 }

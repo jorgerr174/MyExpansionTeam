@@ -14,7 +14,6 @@ namespace MobileApp.Models.Admin
 
         public ImportViewModel(AdminService adminService)
         {
-            base.backPath = "..";
             _adminService = adminService;
             InitializeData();
         }

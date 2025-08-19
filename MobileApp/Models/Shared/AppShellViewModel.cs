@@ -5,11 +5,11 @@ namespace MobileApp.Models.Shared
 {
     public partial class AppShellViewModel : BaseViewModel
     {
-        private readonly AccountService _authService;
+        private readonly AccountService _accountService;
 
         public AppShellViewModel(AccountService authService)
         {
-            _authService = authService;
+            _accountService = authService;
             checkLogIn();
         }
 
@@ -20,7 +20,7 @@ namespace MobileApp.Models.Shared
 
         private async void checkLogIn()
         {
-            IsLoggedIn = await _authService.TryAutoLogInAsync();
+            IsLoggedIn = await _accountService.TryAutoLogInAsync();
             OnPropertyChanged(nameof(isNotLoggedIn));
         }
     }
