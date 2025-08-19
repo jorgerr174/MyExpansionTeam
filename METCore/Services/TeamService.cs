@@ -178,7 +178,7 @@ namespace METCore.Services
         public async Task<IEnumerable<TeamInfoDto>?> ListTeams(bool mine, string? username)
         {
             User? user = await _userRepository.GetUserByUsername(username);
-            if (user == null) return null;
+            if (mine && user == null) return null;
 
             IEnumerable<Team> list = await _teamRepository.ListTeams(mine, user);
             return _mapper.Map<IEnumerable<TeamInfoDto>>(list);

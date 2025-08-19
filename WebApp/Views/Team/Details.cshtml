@@ -1,4 +1,4 @@
-﻿@model METCore.DTOs.Team.TeamInfoDto
+﻿@model METCore.DTOs.Team.TeamDto
 
 <div class="container-fluid">
     <div class="row">
@@ -65,8 +65,8 @@
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-muted">Salary Cap</label>
-                        <p class="mb-0 fw-bold text-success">$@Model.RosterSettingsCap.ToString("N0")</p>
+                        <label class="form-label fw-bold text-muted">Salary Cap %</label>
+                        <p class="mb-0">@Model.RosterSettingsCap.ToString("N0")</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold text-muted">Max Players Per Team</label>
@@ -94,11 +94,8 @@
                                 <a asp-controller="Team" asp-action="RosterSettings" asp-route-id="@Model.Id" class="btn btn-success btn-sm">
                                     <i class="fas fa-cog me-1"></i>Roster Settings
                                 </a>
-                                <a asp-controller="Team" asp-action="Roster" asp-route-id="@Model.Id" class="btn btn-info btn-sm">
+                                <a asp-controller="Team" asp-action="EditRoster" asp-route-id="@Model.Id" class="btn btn-info btn-sm">
                                     <i class="fas fa-users me-1"></i>Build Roster
-                                </a>
-                                <a asp-controller="Team" asp-action="Formation" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-tactics me-1"></i>Formation
                                 </a>
                             }
                         </div>
@@ -109,9 +106,998 @@
                 </div>
             </div>
         </div>
+
+        <!-- Team Roster Overview -->
+        <div class="col-12 mb-3">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users me-2"></i>Team Roster Overview
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Position Filters -->
+                    <div class="mb-3">
+                        <div class="btn-group" role="group" id="rosterPositionFilters">
+                            <button type="button" class="btn btn-outline-primary btn-sm active" data-position="all">All</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-position="QB">QB</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-position="HB">HB</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-position="WR">WR</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-position="TE">TE</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-position="OL">OL</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-position="DL">DL</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-position="LB">LB</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-position="DB">DB</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-position="P/K">P/K</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-position="PR/KR">PR/KR</button>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-position="LS">LS</button>
+                        </div>
+                    </div>
+
+                    <!-- Roster Display -->
+                    <div id="rosterDisplay" style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
+                        <div class="text-center text-muted p-4">
+                            <i class="fas fa-users fa-2x mb-3"></i>
+                            <p>Loading roster...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formation & Starters Overview -->
+        <div class="col-12 mb-3">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chess-board me-2"></i>Formation & Starters
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Formation Type Selector -->
+                    <div class="mb-3">
+                        <div class="btn-group" role="group" id="formationSelector">
+                            <button type="button" class="btn btn-outline-primary active" data-formation="offense">
+                                <i class="fas fa-football-ball me-1"></i>Offense
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" data-formation="defense">
+                                <i class="fas fa-shield-alt me-1"></i>Defense
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" data-formation="special">
+                                <i class="fas fa-star me-1"></i>Special Teams
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Formation Display -->
+                        <div class="col-md-8">
+                            <h6 class="mb-3">Current Formation: <span id="currentFormationName" class="text-primary">Loading...</span></h6>
+                            <div id="formationDisplay" style="position: relative; height: 400px; background: linear-gradient(to bottom, #228B22 0%, #32CD32 50%, #228B22 100%); border-radius: 8px;">
+                                <div class="text-center text-white p-5">
+                                    <i class="fas fa-football-ball fa-2x mb-3"></i>
+                                    <p>Loading formation...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bench Players -->
+                        <div class="col-md-4">
+                            <h6 class="mb-3">Bench Players</h6>
+                            <div id="benchDisplay" style="max-height: 400px; overflow-y: auto;" class="bg-light p-3 rounded">
+                                <div class="text-center text-muted p-3">
+                                    <i class="fas fa-clock fa-2x mb-3"></i>
+                                    <p>Loading bench players...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trade History -->
+        <div class="col-12 mb-3">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exchange-alt me-2"></i>Trade History
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="tradeHistoryDisplay" style="max-height: 400px; overflow-y: auto;">
+                        <div class="text-center text-muted p-4">
+                            <i class="fas fa-handshake fa-2x mb-3"></i>
+                            <p>Loading trade history...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Draft Results -->
+        <div class="col-12 mb-3">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-trophy me-2"></i>Draft Results
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="draftResultsDisplay" style="overflow-y: auto;">
+                        <div class="text-center text-muted p-4">
+                            <i class="fas fa-award fa-2x mb-3"></i>
+                            <p>Loading draft results...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     @Html.HiddenFor(m => m.Id)
     @Html.HiddenFor(m => m.Complete)
     @Html.HiddenFor(m => m.RosterSettingsProtectedPlayersIds)
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const teamId = @Model.Id;
+
+            // Position mapping for filters
+            const positionMappings = {
+                'QB': ['QB'],
+                'HB': ['RB', 'FB'],
+                'WR': ['WR'],
+                'TE': ['TE'],
+                'OL': ['OT', 'G', 'C'],
+                'DL': ['NT', 'DT', 'ED'],
+                'LB': ['OLB', 'MLB'],
+                'DB': ['DB', 'CB', 'S', 'SS', 'FS'],
+                'P/K': ['P', 'K'],
+                'PR/KR': ['PR', 'KR'],
+                'LS': ['LS']
+            };
+
+            // Load data from model - EXACTLY like in Roster view
+            const teamRosterData = @Html.Raw(Json.Serialize(Model.Players));
+
+            // EXACTLY like Roster view - load lineups from server data
+            const lineupsData = {
+                offense: @Html.Raw(Json.Serialize(Model.OffLineup)),
+                defense: @Html.Raw(Json.Serialize(Model.DefLineup)),
+                special: @Html.Raw(Json.Serialize(Model.SPLineup))
+            };
+
+            let currentPositionFilter = 'all';
+            let currentFormation = 'offense'; // offense, defense, special
+            let currentFormationType = 'Eleven'; // specific formation within category
+
+            // EXACTLY same formations object as Roster view
+            const formations = {
+                offense: {
+                    ZeroOne: {
+                        name: "ZeroOne (0RB-1TE-4WR)",
+                        positions: [
+                            { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                            { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                            { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                            { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                            { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                            { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                            { id: "LWRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                            { id: "RWRX", name: "X-WR", position: "WR", x: 90, y: 45},
+                            { id: "WRZ", name: "Z-WR", position: "WR", x: 82, y: 50},
+                            { id: "WRS", name: "Slot", position: "WR", x: 74, y: 55},
+                            { id: "TE", name: "TE", position: "TE", x: 25, y: 58}
+                        ]
+                    },
+                    ZeroTwo: {
+                        name: "ZeroTwo (0RB-2TE-3WR)",
+                        positions: [
+                            { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                            { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                            { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                            { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                            { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                            { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                            { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                            { id: "WRZ", name: "Z-WR", position: "WR", x: 90, y: 45},
+                            { id: "WRS", name: "Slot", position: "WR", x: 82, y: 55},
+                            { id: "LTE", name: "TE", position: "TE", x: 25, y: 58},
+                            { id: "RTE", name: "TE", position: "TE", x: 71, y: 50}
+                        ]
+                    },
+                    Ten: {
+                        name: "Ten (1RB-0TE-4WR)",
+                        positions: [
+                            { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                            { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                            { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                            { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                            { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                            { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                            { id: "LWRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                            { id: "RWRX", name: "X-WR", position: "WR", x: 90, y: 45},
+                            { id: "WRZ", name: "Z-WR", position: "WR", x: 20, y: 50},
+                            { id: "WRS", name: "Slot", position: "WR", x: 75, y: 50}
+                        ]
+                    },
+                    Eleven: {
+                        name: "Eleven (1RB-1TE-3WR)",
+                        positions: [
+                            { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                            { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                            { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                            { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                            { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                            { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                            { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                            { id: "WRZ", name: "Z-WR", position: "WR", x: 83, y: 45},
+                            { id: "WRS", name: "Slot", position: "WR", x: 73, y: 55},
+                            { id: "TE", name: "TE", position: "TE", x: 25, y: 58}
+                        ]
+                    },
+                    Twelve: {
+                        name: "Twelve (1RB-2TE-2WR)",
+                        positions: [
+                            { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                            { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                            { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                            { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                            { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                            { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                            { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                            { id: "WRZ", name: "Z-WR", position: "WR", x: 90, y: 45},
+                            { id: "LTE", name: "TE", position: "TE", x: 25, y: 58},
+                            { id: "RTE", name: "TE", position: "TE", x: 71, y: 50}
+                        ]
+                    },
+                    Thirteen: {
+                        name: "Thirteen (1RB-3TE-1WR)",
+                        positions: [
+                            { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                            { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                            { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                            { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                            { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                            { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                            { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                            { id: "LTE", name: "TE", position: "TE", x: 29, y: 50},
+                            { id: "RTE", name: "TE", position: "TE", x: 71, y: 45},
+                            { id: "YTE", name: "Y-TE", position: "TE", x: 83, y: 50}
+                        ]
+                    },
+                    Twenty: {
+                        name: "Twenty (2RB-0TE-3WR)",
+                        positions: [
+                            { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                            { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                            { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                            { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                            { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                            { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                            { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                            { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                            { id: "WRZ", name: "Z-WR", position: "WR", x: 85, y: 45},
+                            { id: "WRS", name: "Slot", position: "WR", x: 75, y: 50}
+                        ]
+                    },
+                    TwentyOne: {
+                        name: "TwentyOne (2RB-1TE-2WR)",
+                        positions: [
+                            { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                            { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                            { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                            { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                            { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                            { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                            { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                            { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                            { id: "WRZ", name: "Z-WR", position: "WR", x: 80, y: 45},
+                            { id: "TE", name: "TE", position: "TE", x: 25, y: 58}
+                        ]
+                    },
+                    TwentyTwo: {
+                        name: "TwentyOne (2RB-2TE-1WR)",
+                        positions: [
+                            { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                            { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                            { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                            { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                            { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                            { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                            { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                            { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                            { id: "LTE", name: "TE", position: "TE", x: 25, y: 58},
+                            { id: "RTE", name: "TE", position: "TE", x: 80, y: 45}
+                        ]
+                    },
+                    Jumbo: {
+                        name: "Jumbo (6OL-2RB-1TE-1WR)",
+                        positions: [
+                            { id: "EOL", name: "OL", position: "OL", x: 29, y: 45},
+                            { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                            { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                            { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                            { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                            { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                            { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
+                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                            { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                            { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                            { id: "TE", name: "TE", position: "TE", x: 71, y: 45},
+                        ]
+                    },
+                    TwoQB: {
+                        name: "TwoQB (2QB-1RB-1TE-2WR)",
+                        positions: [
+                            { id: "LT", name: "LT", position: "OL", x: 36, y: 45},
+                            { id: "LG", name: "LG", position: "OL", x: 43, y: 44},
+                            { id: "C", name: "C", position: "OL", x: 50, y: 43},
+                            { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
+                            { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
+                            { id: "LQB", name: "QB", position: "QB", x: 46, y: 72},
+                            { id: "RQB", name: "QB", position: "QB", x: 54, y: 72},
+                            { id: "RB", name: "RB", position: "RB", x: 62, y: 78},
+                            { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
+                            { id: "WRZ", name: "Z-WR", position: "WR", x: 90, y: 45},
+                            { id: "TE", name: "TE", position: "TE", x: 25, y: 58}
+                        ]
+                    }
+                },
+                defense: {
+                    Bear: {
+                        name: "Bear (5-2-4)",
+                        positions: [
+                            { id: "LE", name: "EDGE", position: "DL", x: 34, y: 70},
+                            { id: "LDE", name: "DE", position: "DL", x: 42, y: 70},
+                            { id: "NT", name: "NT", position: "DL", x: 50, y: 70},
+                            { id: "RDE", name: "DE", position: "DL", x: 58, y: 70},
+                            { id: "RE", name: "EDGE", position: "DL", x: 66, y: 70},
+                            { id: "LLB", name: "LB", position: "LB", x: 45, y: 40},
+                            { id: "RLB", name: "LB", position: "LB", x: 55, y: 40},
+                            { id: "LCB", name: "CB", position: "DB", x: 15, y: 55},
+                            { id: "RCB", name: "CB", position: "DB", x: 85, y: 55},
+                            { id: "FS", name: "FS", position: "DB", x: 35, y: 15},
+                            { id: "SS", name: "SS", position: "DB", x: 65, y: 15}
+                        ]
+                    },
+                    FourThree: {
+                        name: "4-3 Defense (4-3-4)",
+                        positions: [
+                            { id: "LE", name: "EDGE", position: "DL", x: 35, y: 70},
+                            { id: "LDT", name: "DT", position: "DL", x: 46, y: 70},
+                            { id: "RDT", name: "DT", position: "DL", x: 54, y: 70},
+                            { id: "RE", name: "EDGE", position: "DL", x: 65, y: 70},
+                            { id: "WILL", name: "WILL", position: "LB", x: 30, y: 43},
+                            { id: "MIKE", name: "MIKE", position: "LB", x: 50, y: 40},
+                            { id: "SAM", name: "SAM", position: "LB", x: 70, y: 43},
+                            { id: "LCB", name: "CB", position: "DB", x: 15, y: 55},
+                            { id: "RCB", name: "CB", position: "DB", x: 85, y: 55},
+                            { id: "FS", name: "FS", position: "DB", x: 35, y: 15},
+                            { id: "SS", name: "SS", position: "DB", x: 65, y: 15}
+                        ]
+                    },
+                    ThreeFour: {
+                        name: "3-4 Defense (3-4-4)",
+                        positions: [
+                            { id: "LDE", name: "DE", position: "DL", x: 40, y: 70},
+                            { id: "DT", name: "DT", position: "DL", x: 50, y: 70},
+                            { id: "RDE", name: "DE", position: "DL", x: 60, y: 70},
+                            { id: "ROLB", name: "OLB", position: "LB", x: 30, y: 50},
+                            { id: "RMLB", name: "MLB", position: "LB", x: 70, y: 50},
+                            { id: "LMLB", name: "MLB", position: "LB", x: 45, y: 40},
+                            { id: "LOLB", name: "OLB", position: "LB", x: 55, y: 40},
+                            { id: "LCB", name: "CB", position: "DB", x: 15, y: 55},
+                            { id: "RCB", name: "CB", position: "DB", x: 85, y: 55},
+                            { id: "FS", name: "FS", position: "DB", x: 35, y: 15},
+                            { id: "SS", name: "SS", position: "DB", x: 65, y: 15}
+                        ]
+                    },
+                    Nickel: {
+                        name: "Nickel (4-2-5)",
+                        positions: [
+                            { id: "LE", name: "EDGE", position: "DL", x: 35, y: 70},
+                            { id: "LDT", name: "DT", position: "DL", x: 46, y: 70},
+                            { id: "RDT", name: "DT", position: "DL", x: 54, y: 70},
+                            { id: "RE", name: "EDGE", position: "DL", x: 65, y: 70},
+                            { id: "LLB", name: "LB", position: "LB", x: 45, y: 40},
+                            { id: "RLB", name: "LB", position: "LB", x: 55, y: 40},
+                            { id: "LCB", name: "CB", position: "DB", x: 15, y: 55},
+                            { id: "RCB", name: "CB", position: "DB", x: 85, y: 55},
+                            { id: "NCB", name: "NCB", position: "DB", x: 25, y: 65},
+                            { id: "FS", name: "FS", position: "DB", x: 35, y: 15},
+                            { id: "SS", name: "SS", position: "DB", x: 65, y: 15}
+                        ]
+                    },
+                    Dime: {
+                        name: "Dime (3-2-6)",
+                        positions: [
+                            { id: "LDE", name: "DE", position: "DL", x: 40, y: 70},
+                            { id: "DT", name: "DT", position: "DL", x: 50, y: 70},
+                            { id: "RDE", name: "DE", position: "DL", x: 60, y: 70},
+                            { id: "LLB", name: "LB", position: "LB", x: 45, y: 40},
+                            { id: "RLB", name: "LB", position: "LB", x: 55, y: 40},
+                            { id: "LCB", name: "CB", position: "DB", x: 15, y: 55},
+                            { id: "RCB", name: "CB", position: "DB", x: 85, y: 55},
+                            { id: "NCB", name: "NCB", position: "DB", x: 25, y: 65},
+                            { id: "DCB", name: "DCB", position: "DB", x: 70, y: 53},
+                            { id: "FS", name: "FS", position: "DB", x: 35, y: 15},
+                            { id: "SS", name: "SS", position: "DB", x: 65, y: 15}
+                        ]
+                    }
+                },
+                special: {
+                    SpecialTeams: {
+                        name: "Special Teams",
+                        positions: [
+                            { id: "K", name: "K", position: "K", x: 40, y: 75},
+                            { id: "P", name: "P", position: "P", x: 60, y: 75},
+                            { id: "LS", name: "LS", position: "LS", x: 50, y: 45},
+                            { id: "KR", name: "KR", position: "ATH", x: 25, y: 55},
+                            { id: "PR", name: "PR", position: "ATH", x: 75, y: 55}
+                        ]
+                    }
+                }
+            };
+
+
+            // Get current lineups configurations exactly like Roster view
+            let offenseStartersConfiguration = {};
+            let defenseStartersConfiguration = {};
+            let specialStartersConfiguration = {};
+
+            // Load starters from lineups data
+            if (lineupsData.offense && lineupsData.offense.formation) {
+                currentFormationType = lineupsData.offense.formation;
+                // Load assigned players for offense
+                const offenseFormation = formations.offense[currentFormationType];
+                if (offenseFormation) {
+                    offenseFormation.positions.forEach((pos, index) => {
+                        const playerData = lineupsData.offense[`player${index + 1}`];
+                        if (playerData && playerData > 0) {
+                            const player = teamRosterData.find(p => p.id === playerData);
+                            if (player) {
+                                offenseStartersConfiguration[pos.id] = player;
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Initialize displays
+            displayRoster();
+            displayFormation();
+            loadTradeHistory();
+            loadDraftResults();
+
+            // Position filter event handler for roster
+            document.getElementById('rosterPositionFilters').addEventListener('click', function(e) {
+                if (e.target.tagName === 'BUTTON') {
+                    this.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+
+                    currentPositionFilter = e.target.getAttribute('data-position');
+                    displayRoster();
+                }
+            });
+
+            // Formation selector event handler - EXACTLY like Roster view
+            document.getElementById('formationSelector').addEventListener('click', function(e) {
+                if (e.target.tagName === 'BUTTON') {
+                    this.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+
+                    currentFormation = e.target.getAttribute('data-formation');
+                    displayFormation();
+                }
+            });
+
+            // EXACTLY same roster display as Roster view - Review tab
+            function displayRoster() {
+                const container = document.getElementById('rosterDisplay');
+
+                if (!teamRosterData || teamRosterData.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center text-muted p-5">
+                            <i class="fas fa-users fa-2x mb-3"></i>
+                            <p>No players selected yet.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const playersByPosition = {};
+                teamRosterData.forEach(player => {
+                    if (!playersByPosition[player.position]) {
+                        playersByPosition[player.position] = [];
+                    }
+                    playersByPosition[player.position].push(player);
+                });
+
+                container.innerHTML = '';
+
+                // Add roster summary - EXACTLY like Roster view
+                const summaryDiv = document.createElement('div');
+                summaryDiv.className = 'alert alert-secondary mb-4';
+                summaryDiv.innerHTML = `
+                    <h6 class="mb-2">Roster Summary</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Total Players:</strong> ${teamRosterData.length}<br>
+                            <strong>Total Cap Used:</strong> ${teamRosterData.reduce((sum, p) => sum + parseFloat(p.pureAPY || 0), 0).toFixed(1)}M
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Positions:</strong> ${Object.keys(playersByPosition).map(pos => `${pos} (${playersByPosition[pos].length})`).join(', ')}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(summaryDiv);
+
+                Object.keys(playersByPosition).forEach(position => {
+                    let shouldShow = false;
+
+                    if (currentPositionFilter === 'all') {
+                        shouldShow = true;
+                    } else if (positionMappings[currentPositionFilter]) {
+                        shouldShow = positionMappings[currentPositionFilter].includes(position);
+                    } else {
+                        shouldShow = position === currentPositionFilter;
+                    }
+
+                    if (!shouldShow) return;
+
+                    const positionSection = document.createElement('div');
+                    positionSection.className = 'mb-4 position-group';
+                    positionSection.setAttribute('data-position', position);
+
+                    positionSection.innerHTML = `<h6 class="fw-bold text-primary mb-3">${position} (${playersByPosition[position].length})</h6>`;
+
+                    const rowContainer = document.createElement('div');
+                    rowContainer.className = 'row';
+
+                    playersByPosition[position].forEach(player => {
+                        const playerDiv = document.createElement('div');
+                        playerDiv.className = 'col-md-6 col-lg-4 mb-3';
+
+                        // EXACTLY same structure as Roster view - but WITHOUT remove button
+                        playerDiv.innerHTML = `
+                            <div class="card h-100">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="flex-grow-1">
+                                            <h6 class="card-title mb-1">${player.name}</h6>
+                                            <p class="card-text mb-1">
+                                                <small class="text-muted">${player.college}</small>
+                                            </p>
+                                            <p class="card-text mb-0">
+                                                <span class="badge bg-primary">${player.position}</span>
+                                            </p>
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-success fw-bold">$${parseFloat(player.pureAPY || 0).toFixed(1)}M</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        rowContainer.appendChild(playerDiv);
+                    });
+
+                    positionSection.appendChild(rowContainer);
+                    container.appendChild(positionSection);
+                });
+            }
+
+            // EXACTLY same formation display as Roster view
+            function displayFormation() {
+                updateFormationDisplay();
+                updateBenchPlayers();
+            }
+
+            function updateFormationDisplay() {
+                const fieldDisplay = document.getElementById('formationDisplay');
+                const formationTypes = formations[currentFormation];
+
+                if (!formationTypes) {
+                    fieldDisplay.innerHTML = '<div class="text-center p-5"><p>Formation category not found</p></div>';
+                    return;
+                }
+
+                // Get the first available formation type for this category
+                const formationTypeKeys = Object.keys(formationTypes);
+                if (formationTypeKeys.length === 0) {
+                    fieldDisplay.innerHTML = '<div class="text-center p-5"><p>No formations available</p></div>';
+                    return;
+                }
+
+                currentFormationType = formationTypeKeys[0];
+                const formation = formationTypes[currentFormationType];
+
+                // Update formation name display
+                document.getElementById('currentFormationName').textContent = formation.name;
+
+                // EXACTLY same field display as Roster view
+                fieldDisplay.innerHTML = `
+                    <div class="field-lines">
+                        <div class="yard-line FirstDown-YardLine"></div>
+                        <div class="scrimmage-line"></div>
+                    </div>
+                    <div class="formation-positions"></div>
+                `;
+
+                const positionsContainer = fieldDisplay.querySelector('.formation-positions');
+                fieldDisplay.className = `football-field ${currentFormation}`;
+
+                // Get the appropriate starters configuration
+                let startersConfig = {};
+                switch(currentFormation) {
+                    case 'offense':
+                        startersConfig = offenseStartersConfiguration;
+                        break;
+                    case 'defense':
+                        startersConfig = defenseStartersConfiguration;
+                        break;
+                    case 'special':
+                        startersConfig = specialStartersConfiguration;
+                        break;
+                }
+
+                formation.positions.forEach((position, index) => {
+                    const positionDiv = document.createElement('div');
+                    positionDiv.className = 'formation-position';
+                    positionDiv.style.position = 'absolute';
+                    positionDiv.style.left = position.x + '%';
+                    positionDiv.style.top = position.y + '%';
+                    positionDiv.style.transform = 'translate(-50%, -50%)';
+
+                    const assignedPlayer = startersConfig[position.id];
+
+                    positionDiv.innerHTML = `
+                        <div class="position-circle">
+                            <div class="position-label">${position.name}</div>
+                            ${assignedPlayer ? `<div class="player-name">${assignedPlayer.name}</div>` : '<div class="player-name empty">Empty</div>'}
+                        </div>
+                    `;
+
+                    positionsContainer.appendChild(positionDiv);
+                });
+            }
+
+            function updateBenchPlayers() {
+                const benchContainer = document.getElementById('benchDisplay');
+
+                // Get assigned player IDs
+                let assignedPlayerIds = [];
+                switch(currentFormation) {
+                    case 'offense':
+                        assignedPlayerIds = Object.values(offenseStartersConfiguration).filter(p => p).map(p => p.id);
+                        break;
+                    case 'defense':
+                        assignedPlayerIds = Object.values(defenseStartersConfiguration).filter(p => p).map(p => p.id);
+                        break;
+                    case 'special':
+                        assignedPlayerIds = Object.values(specialStartersConfiguration).filter(p => p).map(p => p.id);
+                        break;
+                }
+
+                // Filter players for this formation type
+                let relevantPositions = [];
+                switch(currentFormation) {
+                    case 'offense':
+                        relevantPositions = ['QB', 'RB', 'FB', 'WR', 'TE', 'OL', 'OT', 'G', 'C'];
+                        break;
+                    case 'defense':
+                        relevantPositions = ['DL', 'NT', 'DT', 'ED', 'LB', 'OLB', 'MLB', 'DB', 'CB', 'S', 'SS', 'FS'];
+                        break;
+                    case 'special':
+                        relevantPositions = ['P', 'K', 'PR', 'KR', 'LS'];
+                        break;
+                }
+
+                const availablePlayers = teamRosterData.filter(player =>
+                    !assignedPlayerIds.includes(player.id) &&
+                    relevantPositions.includes(player.position)
+                );
+
+                if (availablePlayers.length === 0) {
+                    benchContainer.innerHTML = `
+                        <div class="text-center text-muted p-4">
+                            <i class="fas fa-users-slash fa-2x mb-3"></i>
+                            <p>No players available for this formation</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                availablePlayers.forEach(player => {
+                    html += `
+                        <div class="card mb-2">
+                            <div class="card-body p-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>${player.name}</strong>
+                                        <br><small class="text-muted">${player.position}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <strong class="text-success">$${parseFloat(player.pureAPY || 0).toFixed(1)}M</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                benchContainer.innerHTML = html;
+            }
+
+            // EXACTLY same trade loading as Roster view
+            function loadTradeHistory() {
+                const tradesDisplay = document.getElementById('tradeHistoryDisplay');
+
+                fetch('/Team/GetTeamTrades?TeamId='+teamId)
+                .then(response => {
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            throw new Error('ENDPOINT_NOT_IMPLEMENTED');
+                        }
+                        throw new Error('API_ERROR');
+                    }
+                    return response.json();
+                })
+                .then(trades => {
+                    displayTrades(trades);
+                })
+                .catch(error => {
+                    console.error('Error loading trades:', error);
+                    if (error.message === 'ENDPOINT_NOT_IMPLEMENTED') {
+                        tradesDisplay.innerHTML = `
+                            <div class="text-center text-muted p-5">
+                                <i class="fas fa-exchange-alt fa-2x mb-3"></i>
+                                <p>No trades completed yet.</p>
+                            </div>
+                        `;
+                    } else {
+                        tradesDisplay.innerHTML = `
+                            <div class="text-center text-muted p-5">
+                                <i class="fas fa-exclamation-triangle fa-2x mb-3 text-warning"></i>
+                                <p>Error loading trade history. Please try again.</p>
+                            </div>
+                        `;
+                    }
+                });
+            }
+
+            // EXACTLY same trade display as Roster view
+            function displayTrades(trades) {
+                const tradesDisplay = document.getElementById('tradeHistoryDisplay');
+
+                if (!trades || trades.length === 0) {
+                    tradesDisplay.innerHTML = `
+                        <div class="text-center text-muted p-5">
+                            <i class="fas fa-exchange-alt fa-2x mb-3"></i>
+                            <p>No trades completed yet.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let tradesHtml = '<div class="row justify-content-between" style="margin-right: 0;">';
+                trades.forEach((trade, index) => {
+                    tradesHtml += `
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0">Trade #${index + 1}</h6>
+                                    <small>Date: ${new Date(trade.date).toLocaleDateString()}</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <h6 class="text-success">Received:</h6>
+                                            <ul class="list-unstyled small">
+                                                ${trade.teamPlayers ? trade.teamPlayers.map(p => `<li><i class="fas fa-user me-1"></i>${p.name}</li>`).join('') : ''}
+                                                ${trade.teamPicks ? trade.teamPicks.map(p => `<li><i class="fas fa-trophy me-1"></i>Pick ${p}</li>`).join('') : ''}
+                                            </ul>
+                                        </div>
+                                        <div class="col-6">
+                                            <h6 class="text-danger">Sent:</h6>
+                                            <ul class="list-unstyled small">
+                                                ${trade.franchisePlayers ? trade.franchisePlayers.map(p => `<li><i class="fas fa-user me-1"></i>${p.name}</li>`).join('') : ''}
+                                                ${trade.franchisePicks ? trade.franchisePicks.map(p => `<li><i class="fas fa-trophy me-1"></i>Pick ${p}</li>`).join('') : ''}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                tradesHtml += '</div>';
+
+                tradesDisplay.innerHTML = tradesHtml;
+            }
+
+            // EXACTLY same draft loading as Roster view
+            function loadDraftResults() {
+                const draftDisplay = document.getElementById('draftResultsDisplay');
+
+                fetch(`/Team/GetTeamDraft?TeamId=${teamId}`)
+                .then(response => {return response.json();})
+                .then(draftData => {
+                    const prospects = draftData.prospects || [];
+                    const selections = draftData.selections || [];
+
+                    displayDraftResults(prospects, selections);
+                })
+                .catch(error => {
+                    console.error('Error loading draft results:', error);
+                    draftDisplay.innerHTML = `
+                        <div class="text-center text-muted p-5">
+                            <i class="fas fa-exclamation-triangle fa-2x mb-3 text-warning"></i>
+                            <p>Error loading draft results. Please try again.</p>
+                        </div>
+                    `;
+                });
+            }
+
+            // EXACTLY same draft display as Roster view
+            function displayDraftResults(prospects, selections) {
+                const draftDisplay = document.getElementById('draftResultsDisplay');
+
+                if (!prospects || prospects.length === 0) {
+                    draftDisplay.innerHTML = `
+                        <div class="text-center text-muted p-5">
+                            <i class="fas fa-trophy fa-2x mb-3"></i>
+                            <p>No draft picks made yet.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let draftHtml = '<div class="row justify-content-between" style="margin-right: 0;">';
+                prospects.forEach((prospect, index) => {
+                    draftHtml += `
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card h-100 border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0">Round ${prospect.round}, Pick ${prospect.pick}</h6>
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="card-title">${prospect.name}</h6>
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <small class="text-muted">Position</small>
+                                            <div><span class="badge bg-primary">${prospect.position}</span></div>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted">College</small>
+                                            <div>${prospect.college}</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted">Consensus</small>
+                                            <div>#${prospect.consensus || 'N/A'}</div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-info" style="width: ${(prospect.athScore || 0)}%"></div>
+                                        </div>
+                                        <small class="text-muted">Athletic Score: ${prospect.athScore || 0}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                draftHtml += '</div>';
+
+                draftDisplay.innerHTML = draftHtml;
+            }
+        });
+    </script>
+
+    <style>
+        /* EXACTLY same CSS as Roster view for formation display */
+        .football-field {
+            position: relative;
+            background: linear-gradient(to bottom, #228B22 0%, #32CD32 50%, #228B22 100%);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .field-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .yard-line, .scrimmage-line {
+            position: absolute;
+            left: 1%;
+            right: 1%;
+            height: 2px;
+            background: white;
+            opacity: 0.7;
+        }
+
+        .FirstDown-YardLine {
+            bottom: 90%;
+            background-color: red;
+        }
+            .football-field.defense .FirstDown-YardLine {
+                bottom: 50%;
+            }
+
+        .scrimmage-line {
+            bottom: 65%;
+            height: 3px;
+            opacity: 0.8;
+            background-color: yellow;
+        }
+            .football-field.defense .scrimmage-line {
+                bottom: 20%;
+            }
+
+        .formation-position {
+            z-index: 10;
+        }
+
+        .position-circle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #007bff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            position: relative;
+        }
+
+        .player-name {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+        }
+
+            .player-name.empty {
+                background: rgba(108,117,125,0.8);
+                font-size: 9px;
+            }
+
+        .position-group {
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-group .btn.active {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+            color: white;
+        }
+    </style>
 </div>

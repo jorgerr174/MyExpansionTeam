@@ -170,15 +170,16 @@
                                             <div class="btn-group" role="group" id="positionFilters">
                                                 <button type="button" class="btn btn-outline-primary btn-sm active" data-position="all">All</button>
                                                 <button type="button" class="btn btn-outline-primary btn-sm" data-position="QB">QB</button>
-                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="RB">RB</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="HB">HB</button>
                                                 <button type="button" class="btn btn-outline-primary btn-sm" data-position="WR">WR</button>
                                                 <button type="button" class="btn btn-outline-primary btn-sm" data-position="TE">TE</button>
                                                 <button type="button" class="btn btn-outline-primary btn-sm" data-position="OL">OL</button>
                                                 <button type="button" class="btn btn-outline-primary btn-sm" data-position="DL">DL</button>
                                                 <button type="button" class="btn btn-outline-primary btn-sm" data-position="LB">LB</button>
                                                 <button type="button" class="btn btn-outline-primary btn-sm" data-position="DB">DB</button>
-                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="K">K</button>
-                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="P">P</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="P/K">P/K</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="PR/KR">PR/KR</button>
+                                                <button type="button" class="btn btn-outline-primary btn-sm" data-position="LS">LS</button>
                                             </div>
                                         </div>
                                         
@@ -229,15 +230,16 @@
                                                     <select class="form-select form-select-sm w-auto" id="benchPositionFilter">
                                                         <option value="all">All Positions</option>
                                                         <option value="QB">QB</option>
-                                                        <option value="RB">RB</option>
+                                                        <option value="HB">HB</option>
                                                         <option value="WR">WR</option>
                                                         <option value="TE">TE</option>
                                                         <option value="OL">OL</option>
                                                         <option value="DL">DL</option>
                                                         <option value="LB">LB</option>
                                                         <option value="DB">DB</option>
-                                                        <option value="K">K</option>
-                                                        <option value="P">P</option>
+                                                        <option value="P/K">P/K</option>
+                                                        <option value="PR/KR">PR/KR</option>
+                                                        <option value="LS">LS</option>
                                                     </select>
                                                 </div>
                                                 <div class="card-body">
@@ -685,6 +687,22 @@
                 }
             }
         };
+
+        const positionMappings = {
+            'QB': ['QB'],
+            'HB': ['RB', 'FB'],
+            'WR': ['WR'],
+            'TE': ['TE'],
+            'OL': ['OT', 'G', 'C'],
+            'DL': ['NT', 'DT', 'ED'],
+            'LB': ['OLB', 'MLB'],
+            'DB': ['DB', 'CB', 'S', 'SS', 'FS'],
+            'P/K': ['P', 'K'],
+            'PR/KR': ['PR', 'KR'],
+            'LS': ['LS']
+        };
+
+
 
         // ===== CORE ROSTER MANAGEMENT FUNCTIONS =====
         // Functions that handle basic roster operations and data management
@@ -1260,7 +1278,7 @@
                                     <small class="text-success">${player.apy}</small><br>
                                     <small class="text-info">Cap: ${player.apy || '0M'}</small>
                                 </p>
-                                <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeFromRoster(${player.id})">
+                                <button type="button" ${player.franchiseId == 0 ? 'hidden' : ''} class="btn btn-sm btn-outline-danger w-100" onclick="removeFromRoster(${player.id})">
                                     <i class="fas fa-times me-1"></i>Remove
                                 </button>
                             </div>
@@ -1277,12 +1295,22 @@
         // Filter roster display by position (triggered by position filter buttons)
         function filterRosterByPosition(position) {
             const positionGroups = document.querySelectorAll('.position-group');
+            
             positionGroups.forEach(group => {
-                if (position === 'all' || group.getAttribute('data-position') === position) {
-                    group.style.display = 'block';
+                const groupPosition = group.getAttribute('data-position');
+                let shouldShow = false;
+
+                if (position === 'all') {
+                    shouldShow = true;
+                } else if (positionMappings[position]) {
+                    // Check if the group's position is included in the selected category
+                    shouldShow = positionMappings[position].includes(groupPosition);
                 } else {
-                    group.style.display = 'none';
+                    // Fallback to exact match for any unmapped positions
+                    shouldShow = groupPosition === position;
                 }
+
+                group.style.display = shouldShow ? 'block' : 'none';
             });
         }
 
@@ -1761,7 +1789,7 @@
                 .filter(player => {
                     if (!player) return false;
                     if (assignedPlayerIds.includes(player.id)) return false;
-                    if (currentPositionFilter !== 'all' && player.position !== currentPositionFilter) return false;
+                    if (currentPositionFilter !== 'all' && !positionMappings[currentPositionFilter].includes(player.position)) return false;
                     return true;
                 });
         }
