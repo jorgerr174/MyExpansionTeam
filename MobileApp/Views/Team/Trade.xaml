@@ -27,7 +27,7 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Grid Padding="5" Margin="2">
-                                <Frame BackgroundColor="LightGray" Padding="15">
+                                <Border BackgroundColor="LightGray" Padding="15" Stroke="Gray" StrokeThickness="1" StrokeShape="RoundRectangle 10">
                                     <StackLayout>
                                         <StackLayout.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectFranchiseCommand}"
@@ -43,7 +43,7 @@
                                                    Margin="10,0,0,0" />
                                         </StackLayout>
                                     </StackLayout>
-                                </Frame>
+                                </Border>
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
@@ -54,7 +54,7 @@
             <StackLayout IsVisible="{Binding ShowTradeBuilder}">
                 
                 <!-- Trade Header -->
-                <Frame BackgroundColor="LightBlue" Padding="15">
+                <Border BackgroundColor="LightBlue" Padding="15" Stroke="Blue"  StrokeThickness="1" StrokeShape="RoundRectangle 10">
                     <StackLayout>
                         <Label Text="{Binding SelectedFranchise.Name, StringFormat='Trading with: {0}'}" 
                                FontAttributes="Bold" 
@@ -63,7 +63,7 @@
                                FontSize="12" 
                                HorizontalOptions="Center" />
                     </StackLayout>
-                </Frame>
+                </Border>
 
                 <!-- Action Buttons Row -->
                 <StackLayout Orientation="Horizontal" Spacing="10">
@@ -71,13 +71,13 @@
                             Command="{Binding BackToFranchiseSelectionCommand}"
                             BackgroundColor="Gray"
                             TextColor="White"
-                            HorizontalOptions="FillAndExpand" />
+                            HorizontalOptions="Fill" />
                     
                     <Button Text="Cancel" 
                             Command="{Binding CancelTradeCommand}"
                             BackgroundColor="Red"
                             TextColor="White"
-                            HorizontalOptions="FillAndExpand" />
+                            HorizontalOptions="Fill" />
                 </StackLayout>
 
                 <!-- Your Team Section -->
@@ -91,7 +91,7 @@
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="2">
-                                    <Frame BackgroundColor="{Binding Id, Converter={StaticResource PlayerSelectionColorConverter}, ConverterParameter={Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedTeamPlayers}}" 
+                                    <Border BackgroundColor="{Binding Id, Converter={StaticResource PlayerSelectionColorConverter}, ConverterParameter={Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedTeamPlayers}}" 
                                            Padding="10">
                                         <StackLayout>
                                             <StackLayout.GestureRecognizers>
@@ -105,7 +105,7 @@
                                             </StackLayout>
                                             <Label Text="{Binding APY}" FontSize="12" />
                                         </StackLayout>
-                                    </Frame>
+                                    </Border>
                                 </Grid>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
@@ -120,12 +120,12 @@
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="2">
-                                    <Frame BackgroundColor="{Binding Id, Converter={StaticResource PlayerSelectionColorConverter}, ConverterParameter={Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedTeamPlayers}}" 
+                                    <Border BackgroundColor="{Binding Id, Converter={StaticResource PlayerSelectionColorConverter}, ConverterParameter={Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedTeamPlayers}}" 
                                         Padding="10">
-                                        <Frame.GestureRecognizers>
+                                        <Border.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleTeamPlayerCommand}"
                                                 CommandParameter="{Binding}" />
-                                        </Frame.GestureRecognizers>
+                                        </Border.GestureRecognizers>
 
                                         <StackLayout>
                                             <StackLayout Orientation="Horizontal">
@@ -134,7 +134,7 @@
                                             </StackLayout>
                                             <Label Text="{Binding APY}" FontSize="12" />
                                         </StackLayout>
-                                    </Frame>
+                                    </Border>
                                 </Grid>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
@@ -152,7 +152,7 @@
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="2">
-                                    <Frame BackgroundColor="{Binding Id, Converter={StaticResource PlayerSelectionColorConverter}, ConverterParameter={Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedFranchisePlayers}}" 
+                                    <Border BackgroundColor="{Binding Id, Converter={StaticResource PlayerSelectionColorConverter}, ConverterParameter={Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedFranchisePlayers}}" 
                                            Padding="10">
                                         <StackLayout>
                                             <StackLayout.GestureRecognizers>
@@ -166,7 +166,7 @@
                                             </StackLayout>
                                             <Label Text="{Binding APY}" FontSize="12" />
                                         </StackLayout>
-                                    </Frame>
+                                    </Border>
                                 </Grid>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
@@ -181,15 +181,15 @@
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Padding="2">
-                                    <Frame BackgroundColor="{Binding ., Converter={StaticResource PickSelectionColorConverter}, ConverterParameter={Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedTeamPicks}}" 
+                                    <Border BackgroundColor="{Binding ., Converter={StaticResource PickSelectionColorConverter}, ConverterParameter={Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedTeamPicks}}" 
                                         Padding="10">
-                                        <Frame.GestureRecognizers>
+                                        <Border.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleTeamPickCommand}"
                                                 CommandParameter="{Binding}" />
-                                        </Frame.GestureRecognizers>
+                                        </Border.GestureRecognizers>
 
                                         <Label Text="{Binding}" FontAttributes="Bold" />
-                                    </Frame>
+                                    </Border>
                                 </Grid>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
@@ -203,14 +203,14 @@
                             IsEnabled="{Binding HasSelectedItems}"
                             BackgroundColor="Blue"
                             TextColor="White"
-                            HorizontalOptions="FillAndExpand" />
+                            HorizontalOptions="Fill" />
                     
                     <Button Text="Force Trade" 
                             Command="{Binding ForceTradeCommand}"
                             IsEnabled="{Binding HasSelectedItems}"
                             BackgroundColor="Orange"
                             TextColor="White"
-                            HorizontalOptions="FillAndExpand" />
+                            HorizontalOptions="Fill" />
                 </StackLayout>
 
             </StackLayout>

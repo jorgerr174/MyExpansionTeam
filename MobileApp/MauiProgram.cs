@@ -42,46 +42,39 @@ namespace MobileApp
 
 
             #region Routing
+            #region Tabs
+            Routing.RegisterRoute(AppRoutes.HomeTab, typeof(Views.Home.Index));
+            Routing.RegisterRoute(AppRoutes.TeamsTab, typeof(Views.Team.List));
+            Routing.RegisterRoute(AppRoutes.MyTeamsTab, typeof(Views.Team.MyTeams));
+            Routing.RegisterRoute(AppRoutes.ProfileTab, typeof(Views.Account.Profile));
+            #endregion Tabs
+
             #region Views.Account
-            Routing.RegisterRoute("EditProfile", typeof(Views.Account.EditProfile));
-            Routing.RegisterRoute("LogIn", typeof(Views.Account.LogIn));
-            Routing.RegisterRoute("Profile", typeof(Views.Account.Profile));
-            //builder.Services.AddTransient<Views.Account.SignUp>();
-            //builder.Services.AddTransient<Views.Account.UpdateCredentials>();
-            //builder.Services.AddTransient<Views.Account.UpdateUser>();
+            Routing.RegisterRoute(AppRoutes.EditProfile, typeof(Views.Account.EditProfile));
+            Routing.RegisterRoute(AppRoutes.LogIn, typeof(Views.Account.LogIn));
+            Routing.RegisterRoute(AppRoutes.SignUp, typeof(Views.Account.SignUp));
+            Routing.RegisterRoute(AppRoutes.UpdateCredentials, typeof(Views.Account.UpdateCredentials));
+            Routing.RegisterRoute(AppRoutes.UpdateUser, typeof(Views.Account.UpdateUser));
             #endregion Views.Account
 
             #region Views.Admin
-            Routing.RegisterRoute("Admin", typeof(Views.Admin.Admin));
-            Routing.RegisterRoute("AssignRoles", typeof(Views.Admin.AssignRoles));
-            Routing.RegisterRoute("Import", typeof(Views.Admin.Import));
+            Routing.RegisterRoute(AppRoutes.Admin, typeof(Views.Admin.Admin));
+            Routing.RegisterRoute(AppRoutes.AssignRoles, typeof(Views.Admin.AssignRoles));
+            Routing.RegisterRoute(AppRoutes.Import, typeof(Views.Admin.Import));
             #endregion Views.Admin
 
-            #region Views.Home
-            Routing.RegisterRoute("Home", typeof(Views.Home.Index));
-            #endregion Views.Home
-
-            //#region Views.Shared
-            //builder.Services.AddSingleton<Views.Shared.AppShell>();
-            //builder.Services.AddSingleton<Views.Shared.Error>();
-            //#endregion Views.Shared
-
-            //#region Views.Team
-            Routing.RegisterRoute("TeamCreate", typeof(Views.Team.Create));
-            Routing.RegisterRoute("TeamDetails", typeof(Views.Team.Details));
-            //builder.Services.AddTransient<Views.Team.Draft>();
-            Routing.RegisterRoute("DraftResults", typeof(Views.Team.DraftResults));
-            Routing.RegisterRoute("TeamEdit", typeof(Views.Team.Edit));
-            Routing.RegisterRoute("Formation", typeof(Views.Team.Formation));
-            Routing.RegisterRoute("List", typeof(Views.Team.List));
-            Routing.RegisterRoute("MyTeams", typeof(Views.Team.MyTeams));
-            Routing.RegisterRoute("ReviewRoster", typeof(Views.Team.ReviewRoster));
-            Routing.RegisterRoute("Roster", typeof(Views.Team.Roster));
-            Routing.RegisterRoute("RosterSettings", typeof(Views.Team.RosterSettings));
-            Routing.RegisterRoute("Trades", typeof(Views.Team.Trades));
-            Routing.RegisterRoute("Trade", typeof(Views.Team.Trade));
-            //builder.Services.AddTransient<Views.Team.TradeError>();
-            //#endregion Views.Team
+            #region Views.Team
+            Routing.RegisterRoute(AppRoutes.CreateTeam, typeof(Views.Team.Create));
+            Routing.RegisterRoute(AppRoutes.TeamDetails, typeof(Views.Team.Details));
+            Routing.RegisterRoute(AppRoutes.DraftResults, typeof(Views.Team.DraftResults));
+            Routing.RegisterRoute(AppRoutes.TeamEdit, typeof(Views.Team.Edit));
+            Routing.RegisterRoute(AppRoutes.Formation, typeof(Views.Team.Formation));
+            Routing.RegisterRoute(AppRoutes.ReviewRoster, typeof(Views.Team.ReviewRoster));
+            Routing.RegisterRoute(AppRoutes.Roster, typeof(Views.Team.Roster));
+            Routing.RegisterRoute(AppRoutes.RosterSettings, typeof(Views.Team.RosterSettings));
+            Routing.RegisterRoute(AppRoutes.Trade, typeof(Views.Team.Trade));
+            Routing.RegisterRoute(AppRoutes.Trades, typeof(Views.Team.Trades));
+            #endregion Views.Team
             #endregion Routing
 
 
@@ -89,7 +82,7 @@ namespace MobileApp
             builder.Services.AddSingleton<AccountService>();
             builder.Services.AddSingleton<AdminService>();
             builder.Services.AddSingleton<HomeService>();
-            builder.Services.AddTransient<TeamService>();
+            builder.Services.AddSingleton<TeamService>();
             #endregion Services
 
 

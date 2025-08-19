@@ -45,12 +45,9 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private decimal teamCurrentCap = 0;
         [ObservableProperty] private bool isValidTrade = false;
 
-        public bool HasSelectedItems =>
-            SelectedTeamPlayers.Any() || SelectedTeamPicks.Any() ||
-            SelectedFranchisePlayers.Any() || SelectedFranchisePicks.Any();
+        public bool HasSelectedItems => SelectedTeamPlayers.Any() || SelectedTeamPicks.Any() || SelectedFranchisePlayers.Any() || SelectedFranchisePicks.Any();
 
-        public string TradeValueComparison =>
-            $"Your Value: {TeamTradeValue:F1} | Their Value: {FranchiseTradeValue:F1}";
+        public string TradeValueComparison => $"Your Value: {TeamTradeValue:F1} | Their Value: {FranchiseTradeValue:F1}";
 
         [RelayCommand]
         public async Task LoadTradeData()
@@ -59,8 +56,6 @@ namespace MobileApp.Models.Team
 
             try
             {
-                // For now, just enable franchise selection
-                // Team name will be loaded when franchise is selected
                 ShowFranchiseSelection = true;
                 ShowTradeBuilder = false;
             }
@@ -83,8 +78,6 @@ namespace MobileApp.Models.Team
 
             try
             {
-                // For now, just enable franchise selection
-                // Team name will be loaded when franchise is selected
                 ShowFranchiseSelection = true;
                 ShowTradeBuilder = false;
             }
@@ -106,28 +99,23 @@ namespace MobileApp.Models.Team
 
             try
             {
-                var tradeData = await _teamService.GetTradeDataAsync(TeamId, franchise.Id);
-                if (tradeData != null)
+                if (await _teamService.GetTradeDataAsync(TeamId, franchise.Id) is TradeDto tradeData)
                 {
-                    TeamName = $"{tradeData.TeamPlayers.FirstOrDefault()?.Name ?? "Your Team"}"; // Will need proper team name
+                    TeamName = $"{tradeData.TeamPlayers.FirstOrDefault()?.Name ?? "Your Team"}";
 
-                    // Load available items
                     AvailableTeamPlayers = tradeData.TeamPlayers;
                     AvailableFranchisePlayers = tradeData.FranchisePlayers;
                     AvailableTeamPicks = tradeData.TeamPicks.Select(p => FormatPickAsString(p)).ToList();
                     AvailableFranchisePicks = tradeData.FranchisePicks.Select(p => FormatPickAsString(p)).ToList();
                     TeamCurrentCap = tradeData.TeamCurrentCap;
 
-                    // Clear selections
                     ClearSelections();
 
                     ShowFranchiseSelection = false;
                     ShowTradeBuilder = true;
                 }
                 else
-                {
                     ErrorMessage = "Failed to load trade data";
-                }
             }
             catch (Exception ex)
             {
@@ -143,13 +131,10 @@ namespace MobileApp.Models.Team
         public void ToggleTeamPlayer(SelectableDto player)
         {
             if (SelectedTeamPlayers.Contains(player))
-            {
-                SelectedTeamPlayers = SelectedTeamPlayers.Where(p => p.Id != player.Id).ToList();
-            }
+                SelectedTeamPlayers.Remove(player);
             else
-            {
                 SelectedTeamPlayers = SelectedTeamPlayers.Append(player).ToList();
-            }
+
             CalculateTradeValues();
         }
 
@@ -157,41 +142,28 @@ namespace MobileApp.Models.Team
         public void ToggleFranchisePlayer(SelectableDto player)
         {
             if (SelectedFranchisePlayers.Contains(player))
-            {
-                SelectedFranchisePlayers = SelectedFranchisePlayers.Where(p => p.Id != player.Id).ToList();
-            }
+                SelectedFranchisePlayers.Remove(player);
             else
-            {
                 SelectedFranchisePlayers = SelectedFranchisePlayers.Append(player).ToList();
-            }
+
             CalculateTradeValues();
         }
 
         [RelayCommand]
         public void ToggleTeamPick(string pick)
         {
-            if (SelectedTeamPicks.Contains(pick))
-            {
-                SelectedTeamPicks = SelectedTeamPicks.Where(p => p != pick).ToList();
-            }
-            else
-            {
-                SelectedTeamPicks = SelectedTeamPicks.Append(pick).ToList();
-            }
+            if (SelectedTeamPicks.Contains(pick)) SelectedTeamPicks.Remove(pick);
+            else SelectedTeamPicks = SelectedTeamPicks.Append(pick).ToList();
+
             CalculateTradeValues();
         }
 
         [RelayCommand]
         public void ToggleFranchisePick(string pick)
         {
-            if (SelectedFranchisePicks.Contains(pick))
-            {
-                SelectedFranchisePicks = SelectedFranchisePicks.Where(p => p != pick).ToList();
-            }
-            else
-            {
-                SelectedFranchisePicks = SelectedFranchisePicks.Append(pick).ToList();
-            }
+            if (SelectedFranchisePicks.Contains(pick)) SelectedFranchisePicks.Remove(pick);
+            else SelectedFranchisePicks = SelectedFranchisePicks.Append(pick).ToList();
+
             CalculateTradeValues();
         }
 
@@ -204,23 +176,9 @@ namespace MobileApp.Models.Team
             ClearSelections();
         }
 
-        [RelayCommand]
-        public async Task RequestTrade()
-        {
-            await SubmitTrade(false);
-        }
-
-        [RelayCommand]
-        public async Task ForceTrade()
-        {
-            await SubmitTrade(true);
-        }
-
-        [RelayCommand]
-        public async Task CancelTrade()
-        {
-            await GoBackToCaller();
-        }
+        [RelayCommand] public async Task RequestTrade() => await SubmitTrade(false);
+        [RelayCommand] public async Task ForceTrade() => await SubmitTrade(true);
+        [RelayCommand] public async Task CancelTrade() => await GoBackToCaller();
 
         private async Task SubmitTrade(bool force)
         {
@@ -235,7 +193,7 @@ namespace MobileApp.Models.Team
 
             try
             {
-                var tradeDto = new TradeDto(TeamId, SelectedFranchise!.Id)
+                TradeDto tradeDto = new(TeamId, SelectedFranchise!.Id)
                 {
                     Force = force,
                     TeamCurrentCap = TeamCurrentCap,
@@ -245,16 +203,10 @@ namespace MobileApp.Models.Team
                     FranchisePicks = SelectedFranchisePicks.Select(ParsePickFromString).ToList()
                 };
 
-                bool success = await _teamService.SaveTradeAsync(tradeDto);
-
-                if (success)
-                {
+                if (await _teamService.SaveTradeAsync(tradeDto))
                     await HandleTradeSuccess(tradeDto);
-                }
                 else
-                {
                     ErrorMessage = force ? "Failed to force trade" : "Trade was rejected";
-                }
             }
             catch (Exception ex)
             {
@@ -279,28 +231,16 @@ namespace MobileApp.Models.Team
                     FranchiseId = tradeDto.FranchiseId
                 };
 
-                await Shell.Current.GoToAsync("..", new Dictionary<string, object>
-                {
-                    ["tradeResult"] = tradeResult
-                });
+                await _teamService.GoBackAsync(new Dictionary<string, object> { ["tradeResult"] = tradeResult });
             }
             else
-            {
-                // Return to roster/team details (will reload)
-                await Shell.Current.GoToAsync("MyTeams");
-            }
+                await _teamService.GoToMyTeamsTabAsync();
         }
 
         private async Task GoBackToCaller()
         {
-            if (TradeContext == "draft")
-            {
-                await Shell.Current.GoToAsync("..");
-            }
-            else
-            {
-                await Shell.Current.GoToAsync("MyTeams");
-            }
+            if (TradeContext == "draft") await _teamService.GoBackAsync(null);
+            else await _teamService.GoToMyTeamsTabAsync();
         }
 
         private void ClearSelections()
@@ -315,45 +255,29 @@ namespace MobileApp.Models.Team
 
         private void CalculateTradeValues()
         {
-            // Basic trade value calculation
-            // TODO: Implement proper value calculation using DraftPicks.GetPickValue()
-            // For now, use simple approximation
-
             TeamTradeValue = 0;
             FranchiseTradeValue = 0;
 
-            // Calculate pick values (simplified)
             foreach (var pick in SelectedTeamPicks)
-            {
                 TeamTradeValue += GetSimplePickValue(pick);
-            }
 
             foreach (var pick in SelectedFranchisePicks)
-            {
                 FranchiseTradeValue += GetSimplePickValue(pick);
-            }
 
-            // Player values (use APY as rough estimate)
             foreach (var player in SelectedTeamPlayers)
-            {
                 if (decimal.TryParse(player.PureAPY, out decimal value))
-                    TeamTradeValue += value * 10; // Rough conversion
-            }
+                    TeamTradeValue += value * 10;
 
             foreach (var player in SelectedFranchisePlayers)
-            {
                 if (decimal.TryParse(player.PureAPY, out decimal value))
-                    FranchiseTradeValue += value * 10; // Rough conversion
-            }
+                    FranchiseTradeValue += value * 10;
 
-            // Update UI properties
             OnPropertyChanged(nameof(TradeValueComparison));
             OnPropertyChanged(nameof(HasSelectedItems));
         }
 
         private decimal GetSimplePickValue(string pick)
         {
-            // Simple pick value calculation - replace with proper DraftPicks.GetPickValue()
             if (pick.StartsWith("r1")) return 1000;
             if (pick.StartsWith("r2")) return 500;
             if (pick.StartsWith("r3")) return 250;
@@ -364,22 +288,15 @@ namespace MobileApp.Models.Team
             return 0;
         }
 
-        private string FormatPickAsString(int pick)
-        {
-            // Convert pick number to "r1p1" format
-            int round = ((pick - 1) / 32) + 1;
-            int pickInRound = ((pick - 1) % 32) + 1;
-            return $"r{round}p{pickInRound}";
-        }
+        private string FormatPickAsString(int pick) => $"r{((pick - 1) / 32) + 1}p{((pick - 1) % 32) + 1}";
 
         private int ParsePickFromString(string pick)
         {
             // Convert "r1p1" format to pick number
             var parts = pick.Replace("r", "").Split('p');
             if (parts.Length == 2 && int.TryParse(parts[0], out int round) && int.TryParse(parts[1], out int pickInRound))
-            {
                 return ((round - 1) * 32) + pickInRound;
-            }
+
             return 0;
         }
     }

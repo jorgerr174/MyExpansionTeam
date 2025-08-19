@@ -6,27 +6,64 @@
              x:DataType="viewmodels:CreateViewModel"
              Title="Create">
 
-    <!-- Location -->
-    <StackLayout>
-        <Label Text="Location *" />
-        <Entry Text="{Binding Location}" 
-           Placeholder="Enter team location"
-           IsEnabled="{Binding IsFormEnabled}" />
-    </StackLayout>
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
 
-    <!-- Abbreviation -->
-    <StackLayout>
-        <Label Text="Abbreviation *" />
-        <Entry Text="{Binding Abbreviation}" 
-           Placeholder="Enter team abbreviation (e.g. NYY)"
-           IsEnabled="{Binding IsFormEnabled}" />
-    </StackLayout>
+            <!-- Location -->
+            <StackLayout>
+                <Label Text="Location *" FontAttributes="Bold" />
+                <Entry Text="{Binding Location}" 
+                       Placeholder="Enter team location"
+                       IsEnabled="{Binding IsFormEnabled}" />
+            </StackLayout>
 
-    <!-- Mascot -->
-    <StackLayout>
-        <Label Text="Mascot *" />
-        <Entry Text="{Binding Mascot}" 
-           Placeholder="Enter team mascot"
-           IsEnabled="{Binding IsFormEnabled}" />
-    </StackLayout>
+            <!-- Abbreviation -->
+            <StackLayout>
+                <Label Text="Abbreviation *" FontAttributes="Bold" />
+                <Entry Text="{Binding Abbreviation}" 
+                       Placeholder="Enter team abbreviation (e.g. NYY)"
+                       IsEnabled="{Binding IsFormEnabled}" />
+            </StackLayout>
+
+            <!-- Mascot -->
+            <StackLayout>
+                <Label Text="Mascot *" FontAttributes="Bold" />
+                <Entry Text="{Binding Mascot}" 
+                       Placeholder="Enter team mascot"
+                       IsEnabled="{Binding IsFormEnabled}" />
+            </StackLayout>
+
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}" 
+                   TextColor="Red" 
+                   IsVisible="{Binding HasError}"
+                   HorizontalOptions="Center" />
+
+            <!-- Create Button -->
+            <Button Text="Create Team" 
+                    Command="{Binding CreateTeamCommand}"
+                    IsEnabled="{Binding IsFormEnabled}"
+                    BackgroundColor="Green"
+                    TextColor="White"
+                    FontSize="16"
+                    HeightRequest="50"
+                    CornerRadius="10" />
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                               IsVisible="{Binding IsLoading}"
+                               HorizontalOptions="Center" />
+
+            <!-- Go Back Button -->
+            <Button Text="Go Back" 
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="Gray"
+                    TextColor="White"
+                    FontSize="16"
+                    HeightRequest="50"
+                    CornerRadius="10" />
+
+        </StackLayout>
+    </ScrollView>
+
 </ContentPage>

@@ -54,7 +54,7 @@
 
             <!-- Protected Players Selection (shown when ShowPlayerSelection is true) -->
             <StackLayout IsVisible="{Binding ShowPlayerSelection}">
-                <Frame BackgroundColor="LightYellow" Padding="10">
+                <Border BackgroundColor="LightYellow" Padding="10" Stroke="Yellow" StrokeThickness="1" StrokeShape="RoundRectangle 10">
                     <StackLayout>
                         <Label Text="Select Protected Players" 
                             FontAttributes="Bold" />
@@ -89,7 +89,7 @@
                             BackgroundColor="Green"
                             TextColor="White" />
                     </StackLayout>
-                </Frame>
+                </Border>
             </StackLayout>
 
             <!-- Error Message -->

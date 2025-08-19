@@ -25,10 +25,10 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private string selectedPositionFilter = "All";
         [ObservableProperty] private decimal currentSalaryCap = 0m;
 
-        public List<string> PositionFilters { get; } = new()
-        {
+        public List<string> PositionFilters { get; } =
+        [
             "All", "QB", "RB", "WR", "TE", "OL", "DL", "LB", "DB", "K", "P"
-        };
+        ];
 
         public decimal AvailableCap => BaseSalaryCap - CurrentSalaryCap;
         public string SalaryCapText => $"Salary Cap: ${CurrentSalaryCap:F1}M / ${BaseSalaryCap}M";
@@ -101,7 +101,7 @@ namespace MobileApp.Models.Team
 
             if (confirm)
             {
-                AllRosterPlayers = new List<SelectablePlayerViewModel>();
+                AllRosterPlayers = [];
                 ApplyPositionFilter();
                 UpdateSalaryCap();
             }
@@ -115,8 +115,7 @@ namespace MobileApp.Models.Team
 
             try
             {
-                var teamDto = new TeamDto();
-                teamDto.Id = TeamId;
+                TeamDto teamDto = new() { Id = TeamId };
 
                 var rosteredPlayers = AllRosterPlayers.Select(p => new RosteredDto
                 {
@@ -129,18 +128,12 @@ namespace MobileApp.Models.Team
                 }).ToList();
 
                 teamDto.Players = rosteredPlayers;
-                teamDto.SelectedIds = AllRosterPlayers.Select(p => p.Id).ToList();
+                teamDto.SelectedIds = [.. AllRosterPlayers.Select(p => p.Id)];
 
-                bool success = await _teamService.UpdateRosterAsync(teamDto);
-
-                if (success)
-                {
-                    await Shell.Current.GoToAsync("MyTeams");
-                }
+                if (await _teamService.UpdateRosterAsync(teamDto))
+                    await _teamService.GoToMyTeamsTabAsync();
                 else
-                {
                     ErrorMessage = "Failed to save roster";
-                }
             }
             catch (Exception ex)
             {
@@ -152,34 +145,18 @@ namespace MobileApp.Models.Team
             }
         }
 
-        [RelayCommand]
-        public async Task GoToBuildRoster()
-        {
-            await Shell.Current.GoToAsync($"Roster?teamId={TeamId}");
-        }
+        [RelayCommand] public async Task GoToRoster() => await _teamService.GoToAsync(AppRoutes.Roster, new() { ["TeamId"] = TeamId });
 
-        private void ApplyPositionFilter()
-        {
-            if (SelectedPositionFilter == "All")
-            {
-                FilteredPlayers = AllRosterPlayers;
-            }
-            else
-            {
-                FilteredPlayers = AllRosterPlayers.Where(p => p.Position == SelectedPositionFilter).ToList();
-            }
-        }
+        private void ApplyPositionFilter() => FilteredPlayers = SelectedPositionFilter == "All" 
+                ? AllRosterPlayers
+                : [.. AllRosterPlayers.Where(p => p.Position == SelectedPositionFilter)];
 
         private void UpdateSalaryCap()
         {
             CurrentSalaryCap = 0;
             foreach (var player in AllRosterPlayers)
-            {
                 if (decimal.TryParse(player.Player.PureAPY, out decimal salary))
-                {
                     CurrentSalaryCap += salary;
-                }
-            }
 
             OnPropertyChanged(nameof(AvailableCap));
             OnPropertyChanged(nameof(SalaryCapText));

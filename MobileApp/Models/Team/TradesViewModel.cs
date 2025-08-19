@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.Player;
+using METCore.DTOs.Team;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
 
@@ -22,7 +23,7 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private string selectedYearFilter = "All";
         [ObservableProperty] private bool hasNoTrades = false;
 
-        public List<string> YearFilters { get; private set; } = new() { "All" };
+        public List<string> YearFilters { get; private set; } = ["All"];
 
         [RelayCommand]
         public async Task LoadTrades(int id)
@@ -32,15 +33,14 @@ namespace MobileApp.Models.Team
 
             try
             {
-                var teamTrades = await _teamService.GetTeamTradesAsync(id);
-                if (teamTrades != null)
+                if (await _teamService.GetTeamTradesAsync(id) is IList<TradeDto> teamTrades)
                 {
-                    var tradeDisplayList = teamTrades.Select(trade => new TradeDisplayInfo
+                    IList<TradeDisplayInfo> tradeDisplayList = teamTrades.Select(trade => new TradeDisplayInfo
                     {
                         Id = trade.Id,
                         Date = trade.Date,
                         FranchiseId = trade.FranchiseId,
-                        FranchiseName = GetFranchiseName(trade.FranchiseId),
+                        FranchiseName = TradesViewModel.GetFranchiseName(trade.FranchiseId),
                         TeamPlayers = trade.TeamPlayers,
                         TeamPicks = trade.TeamPicks,
                         FranchisePlayers = trade.FranchisePlayers,
@@ -53,7 +53,7 @@ namespace MobileApp.Models.Team
 
                     // Generate year filters
                     var years = tradeDisplayList.Select(t => t.Date.Year.ToString()).Distinct().OrderByDescending(y => y).ToList();
-                    YearFilters = new List<string> { "All" }.Concat(years).ToList();
+                    YearFilters = ["All", .. years];
                     OnPropertyChanged(nameof(YearFilters));
 
                     ApplyYearFilter();
@@ -83,42 +83,17 @@ namespace MobileApp.Models.Team
             ApplyYearFilter();
         }
 
-        [RelayCommand]
-        public async Task ViewTradeDetails(TradeDisplayInfo trade)
-        {
-            // Show detailed trade information
-            var tradeDetails = CreateTradeDetailsText(trade);
-            await Shell.Current.DisplayAlert("Trade Details", tradeDetails, "OK");
-        }
+        [RelayCommand]  public async Task ViewTradeDetails(TradeDisplayInfo trade) => await Shell.Current.DisplayAlert("Trade Details", CreateTradeDetailsText(trade), "OK");
 
-        [RelayCommand]
-        public async Task GoToNewTrade()
-        {
-            await Shell.Current.GoToAsync($"Trade?teamId={TeamId}");
-        }
+        [RelayCommand] public async Task GoToTrade() => await _teamService.GoToAsync(AppRoutes.Trade, new() { ["TeamId"] = TeamId });
 
-        private void ApplyYearFilter()
-        {
-            if (SelectedYearFilter == "All")
-            {
-                FilteredTrades = Trades;
-            }
-            else
-            {
-                if (int.TryParse(SelectedYearFilter, out int year))
-                {
-                    FilteredTrades = Trades.Where(t => t.Date.Year == year).ToList();
-                }
-                else
-                {
-                    FilteredTrades = Trades;
-                }
-            }
-        }
+        private void ApplyYearFilter() 
+            => FilteredTrades = SelectedYearFilter == "All" ? Trades
+                : int.TryParse(SelectedYearFilter, out int year) ? [.. Trades.Where(t => t.Date.Year == year)] : Trades;
 
-        private string GetFranchiseName(int franchiseId)
+        private static string GetFranchiseName(int franchiseId)
         {
-            var franchise = FranchiseInfo.GetAllFranchises().FirstOrDefault(f => f.Id == franchiseId);
+            var franchise = FranchiseInfo.GetAllFranchises()[franchiseId-1];
             return franchise?.Name ?? $"Franchise {franchiseId}";
         }
 
@@ -136,19 +111,15 @@ namespace MobileApp.Models.Team
             if (trade.TeamPlayers.Any())
             {
                 details += "Players:\n";
-                foreach (var player in trade.TeamPlayers)
-                {
+                foreach (SelectableDto player in trade.TeamPlayers)
                     details += $"• {player.Name} ({player.Position}) - {player.APY}\n";
-                }
             }
 
             if (trade.TeamPicks.Any())
             {
                 details += "Draft Picks:\n";
-                foreach (var pick in trade.TeamPicks)
-                {
+                foreach (int pick in trade.TeamPicks)
                     details += $"• Pick #{pick}\n";
-                }
             }
 
             details += "\n--- Your Team Received ---\n";
@@ -156,19 +127,15 @@ namespace MobileApp.Models.Team
             if (trade.FranchisePlayers.Any())
             {
                 details += "Players:\n";
-                foreach (var player in trade.FranchisePlayers)
-                {
+                foreach (SelectableDto player in trade.FranchisePlayers)
                     details += $"• {player.Name} ({player.Position}) - {player.APY}\n";
-                }
             }
 
             if (trade.FranchisePicks.Any())
             {
                 details += "Draft Picks:\n";
-                foreach (var pick in trade.FranchisePicks)
-                {
+                foreach (int pick in trade.FranchisePicks)
                     details += $"• Pick #{pick}\n";
-                }
             }
 
             return details;

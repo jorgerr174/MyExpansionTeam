@@ -10,18 +10,14 @@
     <Grid RowDefinitions="Auto,Auto,*,Auto">
 
         <!-- Header -->
-        <Frame Grid.Row="0"
-               BackgroundColor="{StaticResource Primary}"
-               HasShadow="True"
-               CornerRadius="0"
-               Margin="0">
+        <Border Grid.Row="0" BackgroundColor="{StaticResource Primary}" Shadow="True" Margin="0">
             <Label Text="Select Your Draft Pick"
                    FontSize="20"
                    FontAttributes="Bold"
                    TextColor="White"
                    HorizontalOptions="Center"
                    VerticalOptions="Center" />
-        </Frame>
+        </Border>
 
         <!-- Search and Filters -->
         <StackLayout Grid.Row="1" Padding="16" Spacing="12">
@@ -54,11 +50,8 @@
             <StackLayout Spacing="16" Padding="16,0">
 
                 <!-- Selected Prospect Preview -->
-                <Frame IsVisible="{Binding IsSelectedProspectVisible}"
-                       BackgroundColor="{AppThemeBinding Light=#e8f5e8, Dark=#1a2e1a}"
-                       HasShadow="True"
-                       CornerRadius="10"
-                       BorderColor="{StaticResource Primary}">
+                <Border IsVisible="{Binding IsSelectedProspectVisible}" BackgroundColor="{AppThemeBinding Light=#e8f5e8, Dark=#1a2e1a}" Shadow="True" StrokeShape="RoundRectangle 10" 
+                        Stroke="{StaticResource Primary}">
                     <StackLayout Spacing="8">
                         <Label Text="Selected Prospect"
                                FontSize="16"
@@ -95,7 +88,7 @@
                                TextColor="{AppThemeBinding Light=#666, Dark=#ccc}"
                                IsVisible="{Binding SelectedProspectCombineStats, Converter={StaticResource StringToVisibilityConverter}}" />
                     </StackLayout>
-                </Frame>
+                </Border>
 
                 <!-- Prospects Collection -->
                 <CollectionView ItemsSource="{Binding FilteredProspects}"
@@ -104,11 +97,7 @@
                                 HeightRequest="400">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Frame BackgroundColor="{AppThemeBinding Light=White, Dark=#2d2d30}"
-                                   HasShadow="True"
-                                   CornerRadius="8"
-                                   Margin="0,4"
-                                   Padding="12">
+                            <Border BackgroundColor="White" Shadow="True" Padding="12" Stroke="#2d2d30" Margin="0,4" StrokeThickness="1" StrokeShape="RoundRectangle 8">
 
                                 <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,Auto">
 
@@ -157,7 +146,7 @@
                                                IsVisible="{Binding AthScore, Converter={StaticResource IntToBoolConverter}}" />
                                     </StackLayout>
                                 </Grid>
-                            </Frame>
+                            </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>

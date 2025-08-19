@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.Input;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
 
@@ -5,11 +6,15 @@ namespace MobileApp.Models.Account
 {
     public partial class EditProfileViewModel : BaseViewModel
     {
-        private readonly AccountService _authService;
+        private readonly AccountService _accountService;
 
-        public EditProfileViewModel(AccountService authService)
+        public EditProfileViewModel(AccountService accountService)
         {
-            _authService = authService;
+            _accountService = accountService;
         }
+
+        [RelayCommand] public async Task GoToUpdateUser() => await _accountService.GoToAsync(AppRoutes.UpdateUser, null);
+        [RelayCommand] public async Task GoToUpdateCredentials() => await _accountService.GoToAsync(AppRoutes.UpdateCredentials, null);
+        [RelayCommand] public async Task GoBack() => await _accountService.GoBackAsync(null);
     }
 }

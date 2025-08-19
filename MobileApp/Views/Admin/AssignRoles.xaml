@@ -16,7 +16,7 @@
                    HorizontalOptions="Center" />
 
             <!-- Search Section -->
-            <Frame BackgroundColor="LightGray" Padding="15" CornerRadius="10">
+            <Border BackgroundColor="LightGray" Padding="15" Stroke="Gray"  StrokeThickness="1" StrokeShape="RoundRectangle 10">
                 <StackLayout Spacing="10">
                     <Label Text="Search Users" FontAttributes="Bold" />
 
@@ -34,10 +34,10 @@
                                 WidthRequest="80" />
                     </Grid>
                 </StackLayout>
-            </Frame>
+            </Border>
 
             <!-- Pagination Controls -->
-            <Frame BackgroundColor="LightBlue" Padding="15" CornerRadius="10">
+            <Border BackgroundColor="LightBlue" Padding="15" Stroke="Blue"  StrokeThickness="1" StrokeShape="RoundRectangle 10">
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
                     <Label Grid.Column="0" 
                            Text="Show:" 
@@ -52,7 +52,7 @@
                             HorizontalOptions="Start"
                             WidthRequest="80" />
                 </Grid>
-            </Frame>
+            </Border>
 
             <!-- Results Info -->
             <Label Text="{Binding ResultsInfo}" 
@@ -76,11 +76,7 @@
                            IsVisible="{Binding HasUsers}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="viewmodels:UserItem">
-                        <Frame BackgroundColor="White" 
-                               Padding="15" 
-                               Margin="0,5"
-                               CornerRadius="8"
-                               HasShadow="True">
+                        <Border BackgroundColor="White" Padding="15" Margin="0,5" Shadow="10" Stroke="LightGrey" StrokeThickness="1" StrokeShape="RoundRectangle 10">
                             <StackLayout Spacing="8">
 
                                 <!-- Username with conditional red color for inactive users -->
@@ -134,21 +130,19 @@
                                            HeightRequest="35" />
                                 </Grid>
                             </StackLayout>
-                        </Frame>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
             <!-- No Results Message -->
-            <Frame BackgroundColor="LightGray" 
-                   Padding="20" 
-                   IsVisible="{Binding HasUsers, Converter={StaticResource InvertedBoolConverter}}"
-                   CornerRadius="8">
+            <Border BackgroundColor="LightGray" Padding="20" Stroke="Gray"  StrokeThickness="1" StrokeShape="RoundRectangle 10"
+                   IsVisible="{Binding HasUsers, Converter={StaticResource InvertedBoolConverter}}">
                 <Label Text="No users found." 
                        HorizontalOptions="Center"
                        TextColor="Gray"
                        FontSize="16" />
-            </Frame>
+            </Border>
 
             <!-- Pagination -->
             <StackLayout IsVisible="{Binding ShowPagination}" 

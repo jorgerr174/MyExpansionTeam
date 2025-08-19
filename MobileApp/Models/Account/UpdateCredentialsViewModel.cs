@@ -45,15 +45,13 @@ namespace MobileApp.Models.Account
 
             try
             {
-                bool success = await _accountService.UpdateCredentialsAsync(CurrentPassword, NewUsername, NewPassword);
-                if (success)
+                if (await _accountService.UpdateCredentialsAsync(CurrentPassword, NewUsername, NewPassword))
                 {
-                    await Shell.Current.GoToAsync("Profile");
+                    AccountService.LogOutAsync();
+                    await _accountService.GoToAsync(AppRoutes.LogIn, null);
                 }
                 else
-                {
                     ErrorMessage = "Failed to update credentials";
-                }
             }
             catch (Exception ex)
             {
@@ -64,5 +62,7 @@ namespace MobileApp.Models.Account
                 IsLoading = false;
             }
         }
+
+        [RelayCommand] public async Task GoBack() => await _accountService.GoBackAsync(null);
     }
 }

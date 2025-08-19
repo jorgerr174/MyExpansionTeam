@@ -20,7 +20,7 @@
                    HorizontalOptions="Center" />
 
             <!-- Draft Summary -->
-            <Frame BackgroundColor="LightGreen" Padding="15" IsVisible="{Binding HasDraftData}">
+            <Border BackgroundColor="LightGreen" Padding="15" Stroke="Green" StrokeThickness="1" StrokeShape="RoundRectangle 10" IsVisible="{Binding HasDraftData}">
                 <StackLayout>
                     <Label Text="{Binding DraftRounds, StringFormat='Draft: {0} Rounds'}" 
                            FontAttributes="Bold" 
@@ -35,21 +35,12 @@
                            HorizontalOptions="Center"
                            IsVisible="{Binding IsDraftComplete}" />
                 </StackLayout>
-            </Frame>
+            </Border>
 
             <!-- Action Buttons -->
             <StackLayout Orientation="Horizontal" Spacing="10" IsVisible="{Binding HasDraftData}">
-                <Button Text="Go to Draft" 
-                        Command="{Binding GoToDraftCommand}"
-                        BackgroundColor="Blue"
-                        TextColor="White"
-                        HorizontalOptions="FillAndExpand" />
-
-                <Button Text="Clear Filters" 
-                        Command="{Binding ClearFiltersCommand}"
-                        BackgroundColor="Gray"
-                        TextColor="White"
-                        HorizontalOptions="FillAndExpand" />
+                <Button Text="Go to Draft" Command="{Binding GoToDraftCommand}" BackgroundColor="Blue" TextColor="White" HorizontalOptions="Center" />
+                <Button Text="Clear Filters" Command="{Binding ClearFiltersCommand}" TextColor="White" HorizontalOptions="Center" />
             </StackLayout>
 
             <!-- Filters -->
@@ -58,13 +49,10 @@
                 <StackLayout>
                     <Label Text="Filter by Round:" FontAttributes="Bold" />
 
-                    <CollectionView ItemsSource="{Binding RoundFilters}"
-                                  ItemsLayout="HorizontalList"
-                                  HeightRequest="50">
+                    <CollectionView ItemsSource="{Binding RoundFilters}" ItemsLayout="HorizontalList" HeightRequest="50">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <Button Text="{Binding}" 
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FilterByRoundCommand}"
+                                <Button Text="{Binding}" Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.FilterByRoundCommand}"
                                         CommandParameter="{Binding}"
                                         BackgroundColor="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectedRoundFilter, Converter={StaticResource SelectedFilterColorConverter}, ConverterParameter={Binding}}"
                                         TextColor="White"
@@ -105,7 +93,7 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Grid Padding="5" Margin="2">
-                                <Frame BackgroundColor="LightBlue" Padding="15">
+                                <Border BackgroundColor="LightBlue" Padding="15" Stroke="Blue"  StrokeThickness="1" StrokeShape="RoundRectangle 10">
                                     <StackLayout>
                                         <StackLayout.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ViewProspectDetailsCommand}"
@@ -114,30 +102,16 @@
 
                                         <!-- Player Header -->
                                         <StackLayout Orientation="Horizontal">
-                                            <Label Text="{Binding Player}" 
-                                                   FontAttributes="Bold" 
-                                                   FontSize="16"
-                                                   VerticalOptions="Center"
-                                                   HorizontalOptions="StartAndExpand" />
-
-                                            <Label Text="{Binding Position}" 
-                                                   BackgroundColor="Blue"
-                                                   TextColor="White"
-                                                   Padding="5,2"
-                                                   VerticalOptions="Center" />
+                                            <Label Text="{Binding Player}" FontAttributes="Bold" FontSize="16" VerticalOptions="Center" HorizontalOptions="Center" />
+                                            <Label Text="{Binding Position}" BackgroundColor="Blue" TextColor="White" Padding="5,2" VerticalOptions="Center" />
                                         </StackLayout>
 
                                         <!-- College and Measurements -->
-                                        <Label Text="{Binding College}" 
-                                               FontSize="14"
-                                               TextColor="Gray" />
+                                        <Label Text="{Binding College}" FontSize="14" TextColor="Gray" />
 
                                         <StackLayout Orientation="Horizontal">
-                                            <Label Text="{Binding Height, Converter={StaticResource HeightConverter}}" 
-                                                   FontSize="12" />
-                                            <Label Text="{Binding Weight, StringFormat='{0} lbs'}" 
-                                                   FontSize="12"
-                                                   Margin="10,0,0,0" />
+                                            <Label Text="{Binding Height, Converter={StaticResource HeightConverter}}" FontSize="12" />
+                                            <Label Text="{Binding Weight, StringFormat='{0} lbs'}" FontSize="12" Margin="10,0,0,0" />
                                         </StackLayout>
 
                                         <!-- Draft Info -->
@@ -168,7 +142,7 @@
                                                HorizontalOptions="End"
                                                Margin="0,5,0,0" />
                                     </StackLayout>
-                                </Frame>
+                                </Border>
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
@@ -184,7 +158,7 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Grid Padding="3" Margin="1">
-                                <Frame BackgroundColor="{Binding StatusColor}" Padding="10">
+                                <Border BackgroundColor="{Binding StatusColor}" Padding="10">
                                     <StackLayout>
                                         <Label Text="{Binding PickDisplayText}" 
                                                FontAttributes="Bold" 
@@ -197,7 +171,7 @@
                                                TextColor="White"
                                                FontAttributes="Italic" />
                                     </StackLayout>
-                                </Frame>
+                                </Border>
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
@@ -206,7 +180,7 @@
 
             <!-- No Draft Data State -->
             <StackLayout IsVisible="{Binding HasDraftData, Converter={StaticResource InvertedBoolConverter}}">
-                <Frame BackgroundColor="LightGray" Padding="30">
+                <Border BackgroundColor="LightGray" Padding="30" Stroke="Gray"  StrokeThickness="1" StrokeShape="RoundRectangle 10">
                     <StackLayout HorizontalOptions="Center">
                         <Label Text="🏈" 
                                FontSize="48" 
@@ -225,13 +199,13 @@
                                 TextColor="White"
                                 Margin="0,15,0,0" />
                     </StackLayout>
-                </Frame>
+                </Border>
             </StackLayout>
 
             <!-- Empty Filter Results -->
             <StackLayout IsVisible="{Binding FilteredProspects.Count, Converter={StaticResource CountToInvertedBoolConverter}}"
                         Margin="0,10,0,0">
-                <Frame BackgroundColor="LightYellow" Padding="20">
+                <Border BackgroundColor="LightYellow" Padding="20" Stroke="Yellow" StrokeThickness="1" StrokeShape="RoundRectangle 10">
                     <StackLayout HorizontalOptions="Center">
                         <Label Text="No players match the current filters" 
                                FontSize="16" 
@@ -242,7 +216,7 @@
                                 TextColor="White"
                                 Margin="0,10,0,0" />
                     </StackLayout>
-                </Frame>
+                </Border>
             </StackLayout>
 
             <!-- Error Message -->
