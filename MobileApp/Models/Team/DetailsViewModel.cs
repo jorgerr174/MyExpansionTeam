@@ -9,158 +9,119 @@ namespace MobileApp.Models.Team
     public partial class DetailsViewModel : BaseViewModel
     {
         private readonly TeamService _teamService;
-        private readonly AccountService _accountService;
 
-        public DetailsViewModel(TeamService teamService, AccountService accountService)
+        public DetailsViewModel(TeamService teamService)
         {
             _teamService = teamService;
-            _accountService = accountService;
         }
 
-
         [ObservableProperty] private TeamInfoDto? team;
-        [ObservableProperty] private bool isOwner = false;
+        [ObservableProperty] private bool hasLoadError = false;
+        [ObservableProperty] private string loadErrorMessage = string.Empty;
+
+        // Computed properties for UI states
+        public bool ShowLoadingState => IsLoading;
+        public bool ShowErrorState => HasLoadError && !IsLoading;
+        public bool ShowContent => Team != null && !IsLoading && !HasLoadError;
 
         [RelayCommand]
-        public async Task LoadTeam(int teamId)
+        public async Task LoadTeamDetails(int teamId)
         {
             IsLoading = true;
+            HasLoadError = false;
+            LoadErrorMessage = string.Empty;
+            Team = null;
+
             try
             {
                 Team = await _teamService.GetTeamDetailsAsync(teamId);
-                if (Team != null)
+
+                if (Team == null)
                 {
-                    var currentUser = await AccountService.GetUsernameAsync();
-                    IsOwner = Team.UserUsername == currentUser;
+                    HasLoadError = true;
+                    LoadErrorMessage = "Team not found";
                 }
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Failed to load team: {ex.Message}";
+                HasLoadError = true;
+                LoadErrorMessage = $"Failed to load team: {ex.Message}";
             }
             finally
             {
                 IsLoading = false;
+
+                // Notify UI state changes
+                OnPropertyChanged(nameof(ShowLoadingState));
+                OnPropertyChanged(nameof(ShowErrorState));
+                OnPropertyChanged(nameof(ShowContent));
             }
         }
 
-        [RelayCommand]
-        public async Task EditTeam()
-        {
-            if (Team != null)
-                await Shell.Current.GoToAsync($"TeamEdit?teamId={Team.Id}");
-        }
+        [RelayCommand] public async Task GoBack() => await _teamService.GoBackAsync(null);
+        [RelayCommand] public async Task GoToEditTeam() => await _teamService.GoToAsync(AppRoutes.TeamEdit, new() { ["TeamId"] = Team.Id });
+        [RelayCommand] public async Task GoToRosterSettings() => await _teamService.GoToAsync(AppRoutes.RosterSettings, new() { ["TeamId"] = Team.Id });
 
-        [RelayCommand]
-        public async Task RosterSettings()
-        {
-            if (Team != null)
-                await Shell.Current.GoToAsync($"RosterSettings?teamId={Team.Id}");
-        }
+        [RelayCommand] public async Task GoToRoster() => await _teamService.GoToAsync(AppRoutes.Roster, new() { ["TeamId"] = Team.Id });
+        [RelayCommand] public async Task GoToReviewRoster() => await _teamService.GoToAsync(AppRoutes.ReviewRoster, new() { ["TeamId"] = Team.Id });
+        [RelayCommand] public async Task GoToFormation() => await _teamService.GoToAsync(AppRoutes.Formation, new() { ["TeamId"] = Team.Id });
+        [RelayCommand] public async Task GoToTrades() => await _teamService.GoToAsync(AppRoutes.Trades, new() { ["TeamId"] = Team.Id });
+        [RelayCommand] public async Task GoToDraftResults() => await _teamService.GoToAsync(AppRoutes.DraftResults, new() { ["TeamId"] = Team.Id });
 
-        [RelayCommand]
-        public async Task BuildRoster()
-        {
-            if (Team != null)
-                await Shell.Current.GoToAsync($"Roster?teamId={Team.Id}");
-        }
-
-        [RelayCommand]
-        public async Task ReviewRoster()
-        {
-            if (Team != null)
-                await Shell.Current.GoToAsync($"ReviewRoster?teamId={Team.Id}");
-        }
-
-        [RelayCommand]
-        public async Task SetFormation()
-        {
-            if (Team != null)
-                await Shell.Current.GoToAsync($"Formation?teamId={Team.Id}");
-        }
-
-        [RelayCommand]
-        public async Task ViewTrades()
-        {
-            if (Team != null)
-                await Shell.Current.GoToAsync($"Trades?teamId={Team.Id}");
-        }
-
-        [RelayCommand]
-        public async Task ViewDraftResults()
-        {
-            if (Team != null)
-                await Shell.Current.GoToAsync($"DraftResults?teamId={Team.Id}");
-        }
 
         [RelayCommand]
         public async Task DuplicateTeam()
         {
-            try
+            if (Team != null)
             {
-                bool confirm = await Shell.Current.DisplayAlert("Confirm Duplicate",
-                    "¿Está seguro de que desea duplicar este equipo?", "Yes", "No");
-
-                if (!confirm) return;
-
                 IsLoading = true;
-                ErrorMessage = string.Empty;
-
-                var duplicatedTeam = await _teamService.DuplicateTeamAsync(team.Id);
-
-                if (duplicatedTeam != null)
+                try
                 {
-                    // Navigate to edit view of the new duplicated team
-                    await Shell.Current.GoToAsync($"Team/Edit?teamId={duplicatedTeam.Id}");
+                    if (await _teamService.DuplicateTeamAsync(Team.Id) is TeamBasicInfoDto newTeam)
+                        await _teamService.GoToAsync(AppRoutes.TeamDetails, new() { ["TeamId"] = Team.Id });
+                    else
+                        ErrorMessage = "Failed to duplicate team";
                 }
-                else
+                catch (Exception ex)
                 {
-                    ErrorMessage = "Failed to duplicate team";
+                    ErrorMessage = $"Duplicate failed: {ex.Message}";
                 }
-            }
-            catch (Exception ex)
-            {
-                ErrorMessage = $"Duplicate failed: {ex.Message}";
-            }
-            finally
-            {
-                IsLoading = false;
+                finally
+                {
+                    IsLoading = false;
+                }
             }
         }
 
         [RelayCommand]
         public async Task DeleteTeam()
         {
-            try
+            if (Team != null)
             {
-                bool confirm = await Shell.Current.DisplayAlert("Confirm Delete",
-                    "¿Está seguro de que desea eliminar este equipo?", "Yes", "No");
+                bool confirm = await Shell.Current.DisplayAlert(
+                    "Delete Team",
+                    $"Are you sure you want to delete {Team.Location} {Team.Mascot}?",
+                    "Yes", "No");
 
-                if (!confirm) return;
-
-                IsLoading = true;
-                ErrorMessage = string.Empty;
-
-                bool success = await _teamService.DeleteTeamAsync(team.Id);
-
-                if (success)
+                if (confirm)
                 {
-                    await Shell.Current.DisplayAlert("Success", "Team deleted successfully", "OK");
-                    // Navigate back to teams list
-                    await Shell.Current.GoToAsync("//Home");
+                    IsLoading = true;
+                    try
+                    {
+                        if (await _teamService.DeleteTeamAsync(Team.Id))
+                            await _teamService.GoToMyTeamsTabAsync();
+                        else
+                            ErrorMessage = "Failed to delete team";
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorMessage = $"Delete failed: {ex.Message}";
+                    }
+                    finally
+                    {
+                        IsLoading = false;
+                    }
                 }
-                else
-                {
-                    ErrorMessage = "Failed to delete team";
-                }
-            }
-            catch (Exception ex)
-            {
-                ErrorMessage = $"Delete failed: {ex.Message}";
-            }
-            finally
-            {
-                IsLoading = false;
             }
         }
     }

@@ -17,8 +17,8 @@ namespace MobileApp.Models.Team
         public ProspectSelectionViewModel(List<ProspectDto> prospects)
         {
             _allProspects = prospects;
-            FilteredProspects = new ObservableCollection<ProspectDto>();
-            Positions = new ObservableCollection<string>();
+            FilteredProspects = [];
+            Positions = [];
 
             SelectCommand = new Command<ProspectDto>(OnProspectSelected);
             ConfirmSelectionCommand = new Command(OnConfirmSelection, () => IsSelectEnabled);
@@ -119,8 +119,8 @@ namespace MobileApp.Models.Team
             {
                 // Search filter
                 bool matchesSearch = string.IsNullOrEmpty(searchText) ||
-                    (p.Name?.ToLowerInvariant().Contains(searchText) == true) ||
-                    (p.College?.ToLowerInvariant().Contains(searchText) == true);
+                    (p.Name?.ToLowerInvariant().Contains(searchText, StringComparison.InvariantCultureIgnoreCase) == true) ||
+                    (p.College?.ToLowerInvariant().Contains(searchText, StringComparison.InvariantCultureIgnoreCase) == true);
 
                 // Position filter
                 bool matchesPosition = SelectedPosition == "All Positions" ||

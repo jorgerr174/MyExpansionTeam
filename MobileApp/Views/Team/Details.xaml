@@ -4,125 +4,83 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
              x:DataType="viewmodels:DetailsViewModel"
-             Title="Details">
+             Title="Team Details">
 
     <ScrollView>
         <StackLayout Padding="20" Spacing="15">
 
-            <!-- Team Info -->
-            <Label Text="{Binding Team.Location}" 
-               FontSize="24" 
-               FontAttributes="Bold" 
-               HorizontalOptions="Center" />
+            <Grid IsVisible="{Binding ShowLoadingState}" RowDefinitions="*,Auto,Auto,Auto,*">
+                <ActivityIndicator Grid.Row="1" IsRunning="True" HorizontalOptions="Center" />
+                <Label Grid.Row="2" Text="Loading team details..." HorizontalOptions="Center" FontSize="16" />
+                <Button Grid.Row="3" Text="Go Back" Command="{Binding GoBackCommand}" HorizontalOptions="Center" BackgroundColor="Gray" TextColor="White" />
+            </Grid>
 
-            <Label Text="{Binding Team.Mascot}" 
-               FontSize="20" 
-               HorizontalOptions="Center" />
+            <Grid IsVisible="{Binding ShowErrorState}" RowDefinitions="*,Auto,Auto,Auto,Auto,*">
+                <Label Grid.Row="1" Text="⚠️" HorizontalOptions="Center" FontSize="48" />
+                <Label Grid.Row="2" Text="{Binding LoadErrorMessage}" HorizontalOptions="Center" FontSize="16" TextColor="Red" />
+                <Button Grid.Row="3" Text="Go Back" Command="{Binding GoBackCommand}" HorizontalOptions="Center" BackgroundColor="Gray" TextColor="White" />
+                <Button Grid.Row="4" Text="Try Again" Command="{Binding LoadTeamDetailsCommand}" CommandParameter="{Binding Team.Id}" HorizontalOptions="Center" BackgroundColor="Blue" TextColor="White" />
+            </Grid>
 
-            <Frame BackgroundColor="LightGray" Padding="15">
-                <StackLayout>
-                    <Label Text="{Binding Team.Abb}" FontSize="16" />
-                    <Label Text="{Binding Team.UserUsername}" FontSize="14" />
-                    <Label Text="{Binding Team.Date, StringFormat='{0:yyyy-MM-dd}'}" FontSize="12" />
-                </StackLayout>
-            </Frame>
+            <!-- Content State -->
+            <StackLayout IsVisible="{Binding ShowContent}" Spacing="15">
 
-            <!-- Owner-only buttons -->
-            <StackLayout IsVisible="{Binding IsOwner}">
-                <Button Text="Build Roster" 
-                    Command="{Binding BuildRosterCommand}"
-                    BackgroundColor="Green"
-                    TextColor="White" />
+                <!-- Team Info -->
+                <Label Text="{Binding Team.Location}" 
+                   FontSize="24" 
+                   FontAttributes="Bold" />
 
-                <Button Text="Review Roster" 
-                    Command="{Binding ReviewRosterCommand}"
-                    BackgroundColor="Blue"
-                    TextColor="White" />
+                <Label Text="{Binding Team.Mascot}" 
+                   FontSize="20" />
 
-                <Button Text="Set Formation" 
-                    Command="{Binding SetFormationCommand}"
-                    BackgroundColor="Purple"
-                    TextColor="White" />
-                
-                <Button Text="Past Trades" 
-                    Command="{Binding ViewTradesCommand}"
-                    BackgroundColor="Orange"
-                    TextColor="White" />
+                <Label Text="{Binding Team.Abb}" 
+                   FontSize="16" 
+                   TextColor="Gray" />
 
-                <Button Text="Draft Results" 
+                <!-- Navigation Buttons -->
+                <Button Text="View Draft Results" 
                     Command="{Binding ViewDraftResultsCommand}"
-                    BackgroundColor="Navy"
-                    TextColor="White" />
+                    BackgroundColor="Green" TextColor="White" />
 
                 <Button Text="Edit Team" 
                     Command="{Binding EditTeamCommand}"
-                    BackgroundColor="Gray"
-                    TextColor="White" />
+                    BackgroundColor="Blue" TextColor="White" />
+
+                <Button Text="View Roster" 
+                    Command="{Binding ViewRosterCommand}"
+                    BackgroundColor="Orange" TextColor="White" />
+
+                <Button Text="View Formation" 
+                    Command="{Binding ViewFormationCommand}"
+                    BackgroundColor="Purple" TextColor="White" />
+
+                <Button Text="View Trades" 
+                    Command="{Binding ViewTradesCommand}"
+                    BackgroundColor="Teal" TextColor="White" />
 
                 <Button Text="Roster Settings" 
-                    Command="{Binding RosterSettingsCommand}"
-                    BackgroundColor="Brown"
-                    TextColor="White" />
-            </StackLayout>
+                    Command="{Binding ViewRosterSettingsCommand}"
+                    BackgroundColor="Navy" TextColor="White" />
 
-            <!-- Error Message -->
-            <Label Text="{Binding ErrorMessage}" 
-               TextColor="Red" 
-               IsVisible="{Binding HasError}" />
+                <Button Text="Review Roster" 
+                    Command="{Binding ReviewRosterCommand}"
+                    BackgroundColor="Maroon" TextColor="White" />
 
-            <!-- Action Buttons -->
-            <StackLayout Spacing="10">
-                <!-- Primary Actions -->
-                <StackLayout Orientation="Horizontal" Spacing="5">
-                    <Button Text="Edit Team" 
-                        Command="{Binding EditTeamCommand}"
-                        BackgroundColor="Blue"
-                        TextColor="White"
-                        CornerRadius="10"
-                        HeightRequest="50"
-                        HorizontalOptions="FillAndExpand" />
+                <!-- Team Actions -->
+                <Button Text="Duplicate Team" 
+                    Command="{Binding DuplicateTeamCommand}"
+                    BackgroundColor="Gray" TextColor="White" />
 
-                    <Button Text="View Draft" 
-                        Command="{Binding ViewDraftCommand}"
-                        BackgroundColor="Green"
-                        TextColor="White"
-                        CornerRadius="10"
-                        HeightRequest="50"
-                        HorizontalOptions="FillAndExpand" />
-                </StackLayout>
+                <Button Text="Delete Team" 
+                    Command="{Binding DeleteTeamCommand}"
+                    BackgroundColor="Red" TextColor="White" />
 
-                <!-- Secondary Actions -->
-                <StackLayout Orientation="Horizontal" Spacing="5">
-                    <Button Text="Duplicate Team" 
-                        Command="{Binding DuplicateTeamCommand}"
-                        BackgroundColor="Transparent"
-                        TextColor="Blue"
-                        BorderColor="Blue"
-                        BorderWidth="1"
-                        CornerRadius="10"
-                        HeightRequest="45"
-                        HorizontalOptions="FillAndExpand" />
-
-                    <Button Text="Delete Team" 
-                        Command="{Binding DeleteTeamCommand}"
-                        BackgroundColor="Red"
-                        TextColor="White"
-                        CornerRadius="10"
-                        HeightRequest="45"
-                        HorizontalOptions="FillAndExpand" />
-                </StackLayout>
+                <!-- Go Back Button -->
+                <Button Text="Go Back" 
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="LightGray" TextColor="Black" />
             </StackLayout>
             
-            <!-- Loading Indicator -->
-            <ActivityIndicator IsRunning="{Binding IsLoading}" 
-                         IsVisible="{Binding IsLoading}" />
-
-            <!-- Go Back Button -->
-            <Button Text="Go Back" 
-                Command="{Binding GoBackCommand}"
-                BackgroundColor="Transparent"
-                TextColor="Blue" />
-
         </StackLayout>
     </ScrollView>
 </ContentPage>

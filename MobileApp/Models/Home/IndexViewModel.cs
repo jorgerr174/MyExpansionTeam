@@ -28,9 +28,7 @@ namespace MobileApp.Models.Home
         [RelayCommand]
         public async Task LoadData()
         {
-            IsAuthenticated = await _accountService.IsAuthenticatedAsync();
-
-            if (IsAuthenticated)
+            if (await _accountService.IsAuthenticatedAsync())
             {
                 Username = await AccountService.GetUsernameAsync() ?? "User";
                 Teams = await _homeService.GetMyTeamsAsync() ?? [];
@@ -41,34 +39,10 @@ namespace MobileApp.Models.Home
             OnPropertyChanged(nameof(IsNotAuthenticated));
         }
 
-        [RelayCommand]
-        public async Task GoToLogIn()
-        {
-            await Shell.Current.GoToAsync("LogIn");
-        }
-
-        [RelayCommand]
-        public async Task GoToAdmin()
-        {
-            await Shell.Current.GoToAsync("Admin");
-        }
-
-        [RelayCommand]
-        public async Task MyTeams()
-        {
-            await Shell.Current.GoToAsync("MyTeams");
-        }
-
-        [RelayCommand]
-        public async Task CreateTeam()
-        {
-            await Shell.Current.GoToAsync("TeamCreate");
-        }
-
-        [RelayCommand]
-        public async Task ViewTeam(int teamId)
-        {
-            await Shell.Current.GoToAsync($"TeamDetails?teamId={teamId}");
-        }
+        [RelayCommand] public async Task GoToLogIn() => await _homeService.GoToAsync(AppRoutes.LogIn, null);
+        [RelayCommand] public async Task GoToAdmin() => await _homeService.GoToAsync(AppRoutes.Admin, null);
+        [RelayCommand] public async Task GoToMyTeams() => await _homeService.GoToMyTeamsTabAsync();
+        [RelayCommand] public async Task GoToTeamCreate() => await _homeService.GoToAsync(AppRoutes.CreateTeam, null);
+        [RelayCommand] public async Task GoToTeamDetails(int teamId) => await _homeService.GoToAsync(AppRoutes.TeamDetails, new() { ["TeamId"] = teamId });
     }
 }

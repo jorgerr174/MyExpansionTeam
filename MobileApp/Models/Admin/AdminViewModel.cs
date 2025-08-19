@@ -1,25 +1,19 @@
 using CommunityToolkit.Mvvm.Input;
 using MobileApp.Models.Shared;
+using MobileApp.Services;
 
 namespace MobileApp.Models.Admin
 {
     public partial class AdminViewModel : BaseViewModel
     {
-        public AdminViewModel()
+        private readonly AdminService _adminService;
+        public AdminViewModel(AdminService adminService)
         {
-            base.backPath = "..";
+            this._adminService = adminService;
         }
 
-        [RelayCommand]
-        public async Task GoToImport()
-        {
-            await Shell.Current.GoToAsync("Import");
-        }
-
-        [RelayCommand]
-        public async Task GoToAssignRoles()
-        {
-            await Shell.Current.GoToAsync("AssignRoles");
-        }
+        [RelayCommand] public async Task GoToImport() => await _adminService.GoToAsync(AppRoutes.Import, null);
+        [RelayCommand] public async Task GoToAssignRoles() => await _adminService.GoToAsync(AppRoutes.AssignRoles, null);
+        [RelayCommand] public async Task GoBack() => await _adminService.GoBackAsync(null);
     }
 }

@@ -19,7 +19,7 @@ namespace MobileApp.Models.Team
             _teamService = teamService;
             TeamId = teamId;
 
-            DraftResults = new ObservableCollection<DraftResultInfo>();
+            DraftResults = [];
 
             LoadDraftResultsCommand = new Command(async () => await LoadDraftResultsAsync());
             BackCommand = new Command(async () => await BackAsync());
@@ -44,7 +44,6 @@ namespace MobileApp.Models.Team
         public ICommand LoadDraftResultsCommand { get; }
         public ICommand BackCommand { get; }
 
-        // Events
         public event Func<Task> NavigateBackRequested;
         public event Func<string, string, string, Task> ShowAlertRequested;
 
@@ -100,18 +99,13 @@ namespace MobileApp.Models.Team
 
         private int GetPickNumberForProspect(ProspectDto prospect, DraftDto draftData)
         {
-            // Try to find the pick number from selections
             if (draftData.Selections != null && prospect.Id.HasValue)
             {
                 var selection = draftData.Selections.FirstOrDefault(s => s.Value == prospect.Id.Value);
                 if (selection.Key != 0)
-                {
                     return selection.Key;
-                }
             }
 
-            // If not found in selections, estimate based on consensus ranking
-            // This is a fallback - in a real scenario you'd have better tracking
             var teamPicks = draftData.Picks?[0] ?? new List<int>();
             if (teamPicks.Any())
             {
@@ -122,18 +116,13 @@ namespace MobileApp.Models.Team
                 }
             }
 
-            return 101; // Default to Round 1, Pick 1 if can't determine
+            return 101;
         }
 
-        private async Task BackAsync()
-        {
-            await NavigateBackRequested?.Invoke();
-        }
+        private async Task BackAsync() => await _teamService.GoBackAsync(null);
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         protected bool SetProperty<T>(ref T backingStore, T value, [CallerMemberName] string propertyName = "")
         {

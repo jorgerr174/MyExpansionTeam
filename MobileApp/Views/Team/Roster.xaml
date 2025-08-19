@@ -20,7 +20,7 @@
                 HorizontalOptions="Center" />
 
             <!-- Salary Cap Display -->
-            <Frame BackgroundColor="LightBlue" Padding="15">
+            <Border BackgroundColor="LightBlue" Padding="15" Stroke="Blue"  StrokeThickness="1" StrokeShape="RoundRectangle 10">
                 <StackLayout>
                     <Label Text="{Binding SalaryCapText}" 
                         FontAttributes="Bold" 
@@ -32,7 +32,7 @@
                         FontSize="12" 
                         HorizontalOptions="Center" />
                 </StackLayout>
-            </Frame>
+            </Border>
 
             <!-- Franchise Selection -->
             <StackLayout IsVisible="{Binding ShowPlayerSelection, Converter={StaticResource InvertedBoolConverter}}">
@@ -70,7 +70,7 @@
                         Command="{Binding HidePlayerSelectionCommand}"
                         BackgroundColor="Gray"
                         TextColor="White"
-                        HorizontalOptions="EndAndExpand" />
+                        HorizontalOptions="End" />
                 </StackLayout>
 
                 <CollectionView ItemsSource="{Binding AvailablePlayers}"
@@ -78,8 +78,8 @@
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Grid Padding="5" Margin="2">
-                                <Frame BackgroundColor="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}}"
-                                    Opacity="{Binding CanBeToggled, Converter={StaticResource BoolToOpacityConverter}}">
+                                <Border BackgroundColor="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}}" 
+                                       Opacity="{Binding CanBeToggled, Converter={StaticResource BoolToOpacityConverter}}">
                                     <StackLayout>
                                         <StackLayout.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.TogglePlayerSelectionCommand}"
@@ -105,7 +105,7 @@
                                                 IsVisible="{Binding IsAlreadyRostered}" />
                                         </StackLayout>
                                     </StackLayout>
-                                </Frame>
+                                </Border>
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
@@ -113,7 +113,7 @@
             </StackLayout>
 
             <!-- Current Roster Summary -->
-            <Frame BackgroundColor="LightGreen" Padding="15">
+            <Border BackgroundColor="LightGreen" Padding="15" Stroke="Green" StrokeThickness="1" StrokeShape="RoundRectangle 10">
                 <StackLayout>
                     <Label Text="Current Roster" FontAttributes="Bold" />
                     <Label Text="{Binding RosterPlayers.Count, StringFormat='Players: {0}'}" />
@@ -124,7 +124,7 @@
                         TextColor="White"
                         IsVisible="{Binding RosterPlayers.Count, Converter={StaticResource CountToBoolConverter}}" />
                 </StackLayout>
-            </Frame>
+            </Border>
 
             <!-- Error Message -->
             <Label Text="{Binding ErrorMessage}" 

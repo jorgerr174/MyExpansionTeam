@@ -4,5 +4,50 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Account"
              x:DataType="viewmodels:EditProfileViewModel"
-             Title="EditProfile">
+             Title="Edit Profile">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+
+            <!-- Header -->
+            <Border BackgroundColor="#1b6ec2" 
+                    Padding="15"
+                    Stroke="Transparent"
+                    StrokeShape="RoundRectangle 10">
+                <Label Text="Edit Profile Options" 
+                       FontSize="20" 
+                       FontAttributes="Bold" 
+                       TextColor="White"
+                       HorizontalOptions="Center" />
+            </Border>
+
+            <!-- Edit Profile Button -->
+            <Button Text="Edit Profile Information" 
+                    Command="{Binding GoToUpdateUserCommand}"
+                    BackgroundColor="#28a745"
+                    TextColor="White"
+                    FontSize="16"
+                    HeightRequest="60"
+                    CornerRadius="10" />
+
+            <!-- Edit Credentials Button -->
+            <Button Text="Edit Credentials" 
+                    Command="{Binding GoToUpdateCredentialsCommand}"
+                    BackgroundColor="#ffc107"
+                    TextColor="Black"
+                    FontSize="16"
+                    HeightRequest="60"
+                    CornerRadius="10" />
+
+            <!-- Go Back Button -->
+            <Button Text="Go Back" 
+                    Command="{Binding GoBackCommand}"
+                    BackgroundColor="LightGray"
+                    TextColor="Black"
+                    FontSize="16"
+                    HeightRequest="50"
+                    CornerRadius="10" />
+
+        </StackLayout>
+    </ScrollView>
 </ContentPage>
