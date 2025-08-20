@@ -3,64 +3,131 @@
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Home"
-             xmlns:shared="clr-namespace:MobileApp.Views.Shared"
+             xmlns:metcore="clr-namespace:METCore.DTOs.Team;assembly=METCore"
              x:DataType="viewmodels:IndexViewModel"
              Title="Home">
 
     <ScrollView>
-        <StackLayout Padding="20" Spacing="15">
+        <StackLayout Padding="20" Spacing="20">
 
-            <Label Text="Bienvenid@s" 
-                   FontSize="24" 
-                   FontAttributes="Bold" 
-                   HorizontalOptions="Center" />
+            <!-- Welcome Section -->
+            <Border BackgroundColor="#1b6ec2" 
+                    Padding="15"
+                    Stroke="Transparent"
+                    StrokeShape="RoundRectangle 10">
+                <StackLayout>
+                    <Label Text="Welcome to MyExpansionTeam" 
+                           FontSize="24" 
+                           FontAttributes="Bold" 
+                           TextColor="White"
+                           HorizontalOptions="Center" />
 
-            <!-- Show when NOT logged in -->
+                    <!-- User greeting when authenticated -->
+                    <Label Text="{Binding Username, StringFormat='Hello, {0}!'}" 
+                           FontSize="16" 
+                           TextColor="White"
+                           HorizontalOptions="Center"
+                           IsVisible="{Binding IsAuthenticated}" />
+                </StackLayout>
+            </Border>
+
+            <!-- Authentication Section -->
             <StackLayout IsVisible="{Binding IsNotAuthenticated}">
-                <Label Text="Please log in to continue" 
-                    HorizontalOptions="Center" />
-                <Button Text="Go to LogIn" 
-                    Command="{Binding GoToLogInCommand}" />
+                <Label Text="Please log in to access all features" 
+                       FontSize="16" 
+                       HorizontalOptions="Center" />
+                <Button Text="Log In" 
+                        Command="{Binding GoToLogInCommand}"
+                        BackgroundColor="Blue"
+                        TextColor="White" />
             </StackLayout>
 
+            <!-- Quick Actions for authenticated users -->
+            <StackLayout IsVisible="{Binding IsAuthenticated}" Spacing="10">
+                <Label Text="Quick Actions" 
+                       FontSize="18" 
+                       FontAttributes="Bold" />
 
-            <StackLayout IsVisible="{Binding IsAuthenticated}">
-
-                <!-- Username display -->
-                <Label Text="{Binding Username}" 
-                   FontSize="18" 
-                   FontAttributes="Bold" />
-
-                <!-- Admin button (only if admin) -->
-                <Button Text="Admin Control Center" 
-                    Command="{Binding GoToAdminCommand}"
-                    IsVisible="{Binding IsAdmin}"
-                    BackgroundColor="Red"
-                    TextColor="White"
-                    FontSize="16"
-                    HeightRequest="50"
-                    CornerRadius="10" />
-
-                <!-- Teams section -->
-                <Label Text="Your Teams:" 
-                   FontSize="16" 
-                   FontAttributes="Bold" />
-
-                <!-- Teams list -->
-                <shared:_TeamList BindingContext="{Binding}" />
-
-                <!-- Action buttons -->
-                <Button Text="Mis equipos" 
-                    Command="{Binding GoToMyTeamsCommand}"
-                    BackgroundColor="Blue"
-                    TextColor="White" />
-
-                <Button Text="Nuevo equipo" 
-                    Command="{Binding GoToCreateTeamCommand}"
-                    BackgroundColor="Green"
-                    TextColor="White" />
-
+                <Button Text="Create New Team" 
+                        Command="{Binding GoToCreateTeamCommand}"
+                        BackgroundColor="Green"
+                        TextColor="White" />
             </StackLayout>
+
+            <!-- All Teams Section -->
+            <StackLayout Spacing="15">
+                <Label Text="All Teams" 
+                       FontSize="18" 
+                       FontAttributes="Bold" />
+
+                <!-- Teams List -->
+                <CollectionView ItemsSource="{Binding AllTeams}"
+                               BackgroundColor="Transparent">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="metcore:TeamInfoDto">
+                            <Border BackgroundColor="White" 
+                                    Padding="15" 
+                                    Margin="0,5"
+                                    Stroke="LightGray" 
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 8">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, 
+                                        Path=BindingContext.GoToTeamDetailsCommand}" CommandParameter="{Binding Id}" />
+                                </Border.GestureRecognizers>
+
+                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+                                    <!-- Team Name -->
+                                    <Label Grid.Row="0" Grid.Column="0"
+                                           Text="{Binding Location, StringFormat='{0}'}"
+                                           FontSize="16"
+                                           FontAttributes="Bold" />
+
+                                    <!-- Mascot -->
+                                    <Label Grid.Row="0" Grid.Column="1"
+                                           Text="{Binding Mascot}"
+                                           FontSize="16"
+                                           FontAttributes="Bold" />
+
+                                    <!-- Owner -->
+                                    <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                           Text="{Binding UserUsername, StringFormat='Owner: {0}'}"
+                                           FontSize="14"
+                                           TextColor="Gray" />
+
+                                    <!-- Additional Info -->
+                                    <StackLayout Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" 
+                                               Orientation="Horizontal" 
+                                               Spacing="10">
+                                        <Label Text="{Binding Date, StringFormat='Date: {0}'}"
+                                               FontSize="12"
+                                               TextColor="Gray" />
+                                        <Label Text="{Binding RosterSettingsCap, StringFormat='Cap: ${0:N0}'}"
+                                               FontSize="12"
+                                               TextColor="Green" />
+                                    </StackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Empty state -->
+                <Label Text="No teams available" 
+                       IsVisible="{Binding HasNoTeams}"
+                       HorizontalOptions="Center"
+                       TextColor="Gray"
+                       FontSize="16" />
+            </StackLayout>
+
+            <!-- Loading and Error -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                             IsVisible="{Binding IsLoading}" />
+
+            <Label Text="{Binding ErrorMessage}" 
+                   TextColor="Red" 
+                   IsVisible="{Binding HasError}" />
+
         </StackLayout>
     </ScrollView>
 </ContentPage>

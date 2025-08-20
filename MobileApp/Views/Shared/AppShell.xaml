@@ -9,24 +9,16 @@
        xmlns:account="clr-namespace:MobileApp.Views.Account">
 
     <TabBar>
-        <!-- Home Tab with its own navigation stack -->
         <Tab Title="Home" Icon="home.png" Route="HomeTab">
             <ShellContent Route="HomeMain" ContentTemplate="{DataTemplate home:Index}" />
         </Tab>
 
-        <!-- Teams Tab with its own navigation stack -->
-        <Tab Title="Teams" Icon="teams.png" Route="TeamsTab">
-            <ShellContent Route="TeamsList" ContentTemplate="{DataTemplate team:List}" />
-        </Tab>
-
-        <!-- My Teams Tab with its own navigation stack -->
         <Tab Title="My Teams" Icon="myteams.png" Route="MyTeamsTab">
             <ShellContent Route="MyTeamsList" ContentTemplate="{DataTemplate team:MyTeams}" />
         </Tab>
 
-        <!-- Profile Tab with its own navigation stack -->
-        <Tab Title="Profile" Icon="profile.png" Route="ProfileTab" IsVisible="{Binding isLoggedIn}">
-            <ShellContent Route="ProfileMain" ContentTemplate="{DataTemplate account:Profile}" />
+        <Tab Title="Profile" Icon="profile.png" Route="ProfileTab">
+            <ShellContent Route="ProfileMain" ContentTemplate="{DataTemplate account:ProfileTab}" />
         </Tab>
     </TabBar>
 </Shell>

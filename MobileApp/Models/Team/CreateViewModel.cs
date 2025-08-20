@@ -14,9 +14,6 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private string mascot = string.Empty;
 
 
-        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
-
-
         [RelayCommand]
         public async Task CreateTeam()
         {
