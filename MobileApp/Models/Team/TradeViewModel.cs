@@ -7,15 +7,9 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Team
 {
-    public partial class TradeViewModel : BaseViewModel
+    public partial class TradeViewModel(TeamService teamService) : BaseViewModel
     {
-        private readonly TeamService _teamService;
-
-        public TradeViewModel(TeamService teamService)
-        {
-            _teamService = teamService;
-        }
-
+        private readonly TeamService _teamService = teamService;
         [ObservableProperty] private int teamId;
         [ObservableProperty] private string teamName = string.Empty;
         [ObservableProperty] private string tradeContext = "roster"; // "roster" or "draft"
@@ -28,16 +22,16 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private bool showTradeBuilder = false;
 
         // Available items for trade
-        [ObservableProperty] private IList<SelectableDto> availableTeamPlayers = new List<SelectableDto>();
-        [ObservableProperty] private IList<SelectableDto> availableFranchisePlayers = new List<SelectableDto>();
-        [ObservableProperty] private IList<string> availableTeamPicks = new List<string>();
-        [ObservableProperty] private IList<string> availableFranchisePicks = new List<string>();
+        [ObservableProperty] private IList<SelectableDto> availableTeamPlayers = [];
+        [ObservableProperty] private IList<SelectableDto> availableFranchisePlayers = [];
+        [ObservableProperty] private IList<string> availableTeamPicks = [];
+        [ObservableProperty] private IList<string> availableFranchisePicks = [];
 
         // Selected items for trade
-        [ObservableProperty] private IList<SelectableDto> selectedTeamPlayers = new List<SelectableDto>();
-        [ObservableProperty] private IList<SelectableDto> selectedFranchisePlayers = new List<SelectableDto>();
-        [ObservableProperty] private IList<string> selectedTeamPicks = new List<string>();
-        [ObservableProperty] private IList<string> selectedFranchisePicks = new List<string>();
+        [ObservableProperty] private IList<SelectableDto> selectedTeamPlayers = [];
+        [ObservableProperty] private IList<SelectableDto> selectedFranchisePlayers = [];
+        [ObservableProperty] private IList<string> selectedTeamPicks = [];
+        [ObservableProperty] private IList<string> selectedFranchisePicks = [];
 
         // Trade values and validation
         [ObservableProperty] private decimal teamTradeValue = 0;
@@ -105,8 +99,8 @@ namespace MobileApp.Models.Team
 
                     AvailableTeamPlayers = tradeData.TeamPlayers;
                     AvailableFranchisePlayers = tradeData.FranchisePlayers;
-                    AvailableTeamPicks = tradeData.TeamPicks.Select(p => FormatPickAsString(p)).ToList();
-                    AvailableFranchisePicks = tradeData.FranchisePicks.Select(p => FormatPickAsString(p)).ToList();
+                    AvailableTeamPicks = [.. tradeData.TeamPicks.Select(p => FormatPickAsString(p))];
+                    AvailableFranchisePicks = [.. tradeData.FranchisePicks.Select(p => FormatPickAsString(p))];
                     TeamCurrentCap = tradeData.TeamCurrentCap;
 
                     ClearSelections();
@@ -133,7 +127,7 @@ namespace MobileApp.Models.Team
             if (SelectedTeamPlayers.Contains(player))
                 SelectedTeamPlayers.Remove(player);
             else
-                SelectedTeamPlayers = SelectedTeamPlayers.Append(player).ToList();
+                SelectedTeamPlayers = [.. SelectedTeamPlayers, player];
 
             CalculateTradeValues();
         }
@@ -144,7 +138,7 @@ namespace MobileApp.Models.Team
             if (SelectedFranchisePlayers.Contains(player))
                 SelectedFranchisePlayers.Remove(player);
             else
-                SelectedFranchisePlayers = SelectedFranchisePlayers.Append(player).ToList();
+                SelectedFranchisePlayers = [.. SelectedFranchisePlayers, player];
 
             CalculateTradeValues();
         }
@@ -153,7 +147,7 @@ namespace MobileApp.Models.Team
         public void ToggleTeamPick(string pick)
         {
             if (SelectedTeamPicks.Contains(pick)) SelectedTeamPicks.Remove(pick);
-            else SelectedTeamPicks = SelectedTeamPicks.Append(pick).ToList();
+            else SelectedTeamPicks = [.. SelectedTeamPicks, pick];
 
             CalculateTradeValues();
         }
@@ -162,7 +156,7 @@ namespace MobileApp.Models.Team
         public void ToggleFranchisePick(string pick)
         {
             if (SelectedFranchisePicks.Contains(pick)) SelectedFranchisePicks.Remove(pick);
-            else SelectedFranchisePicks = SelectedFranchisePicks.Append(pick).ToList();
+            else SelectedFranchisePicks = [.. SelectedFranchisePicks, pick];
 
             CalculateTradeValues();
         }
@@ -199,8 +193,8 @@ namespace MobileApp.Models.Team
                     TeamCurrentCap = TeamCurrentCap,
                     TeamPlayers = SelectedTeamPlayers,
                     FranchisePlayers = SelectedFranchisePlayers,
-                    TeamPicks = SelectedTeamPicks.Select(ParsePickFromString).ToList(),
-                    FranchisePicks = SelectedFranchisePicks.Select(ParsePickFromString).ToList()
+                    TeamPicks = [.. SelectedTeamPicks.Select(ParsePickFromString)],
+                    FranchisePicks = [.. SelectedFranchisePicks.Select(ParsePickFromString)]
                 };
 
                 if (await _teamService.SaveTradeAsync(tradeDto))
@@ -245,10 +239,10 @@ namespace MobileApp.Models.Team
 
         private void ClearSelections()
         {
-            SelectedTeamPlayers = new List<SelectableDto>();
-            SelectedFranchisePlayers = new List<SelectableDto>();
-            SelectedTeamPicks = new List<string>();
-            SelectedFranchisePicks = new List<string>();
+            SelectedTeamPlayers = [];
+            SelectedFranchisePlayers = [];
+            SelectedTeamPicks = [];
+            SelectedFranchisePicks = [];
             TeamTradeValue = 0;
             FranchiseTradeValue = 0;
         }

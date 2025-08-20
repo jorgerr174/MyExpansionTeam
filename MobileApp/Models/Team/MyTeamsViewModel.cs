@@ -6,15 +6,9 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Team
 {
-    public partial class MyTeamsViewModel : BaseViewModel
+    public partial class MyTeamsViewModel(TeamService teamService) : BaseViewModel
     {
-        private readonly TeamService _teamService;
-
-        public MyTeamsViewModel(TeamService teamService)
-        {
-            _teamService = teamService;
-        }
-
+        private readonly TeamService _teamService = teamService;
         [ObservableProperty] private IEnumerable<TeamInfoDto> teams = [];
 
 

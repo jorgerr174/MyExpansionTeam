@@ -6,21 +6,14 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Home
 {
-    public partial class IndexViewModel : BaseViewModel
+    public partial class IndexViewModel(HomeService homeService, AccountService accountService) : BaseViewModel
     {
-        private readonly HomeService _homeService;
-        private readonly AccountService _accountService;
-
-        public IndexViewModel(HomeService homeService, AccountService accountService)
-        {
-            _homeService = homeService;
-            _accountService = accountService;
-        }
-
+        private readonly HomeService _homeService = homeService;
+        private readonly AccountService _accountService = accountService;
         [ObservableProperty] private bool isAuthenticated = false;
         [ObservableProperty] private string username = string.Empty;
         [ObservableProperty] private bool isAdmin = false;
-        [ObservableProperty] private IEnumerable<TeamInfoDto> teams = new List<TeamInfoDto>();
+        [ObservableProperty] private IEnumerable<TeamInfoDto> teams = [];
 
         public bool IsNotAuthenticated => !IsAuthenticated;
         public bool ShowDeleteButton => true; // Show delete for MyTeams

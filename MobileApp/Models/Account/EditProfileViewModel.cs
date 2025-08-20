@@ -4,14 +4,9 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Account
 {
-    public partial class EditProfileViewModel : BaseViewModel
+    public partial class EditProfileViewModel(AccountService accountService) : BaseViewModel
     {
-        private readonly AccountService _accountService;
-
-        public EditProfileViewModel(AccountService accountService)
-        {
-            _accountService = accountService;
-        }
+        private readonly AccountService _accountService = accountService;
 
         [RelayCommand] public async Task GoToUpdateUser() => await _accountService.GoToAsync(AppRoutes.UpdateUser, null);
         [RelayCommand] public async Task GoToUpdateCredentials() => await _accountService.GoToAsync(AppRoutes.UpdateCredentials, null);
