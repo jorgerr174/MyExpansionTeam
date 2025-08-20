@@ -8,10 +8,15 @@ namespace MobileApp.Models.Account
     public partial class UpdateCredentialsViewModel(AccountService accountService) : BaseViewModel
     {
         private readonly AccountService _accountService = accountService;
+
         [ObservableProperty] private string currentPassword = string.Empty;
         [ObservableProperty] private string newUsername = string.Empty;
         [ObservableProperty] private string newPassword = string.Empty;
         [ObservableProperty] private string confirmPassword = string.Empty;
+
+
+        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
+
 
         [RelayCommand]
         public async Task UpdateCredentials()
@@ -42,7 +47,7 @@ namespace MobileApp.Models.Account
                 if (await _accountService.UpdateCredentialsAsync(CurrentPassword, NewUsername, NewPassword))
                 {
                     AccountService.LogOutAsync();
-                    await _accountService.GoToAsync(AppRoutes.LogIn, null);
+                    await BaseService.GoToAsync(AppRoutes.LogIn, null);
                 }
                 else
                     ErrorMessage = "Failed to update credentials";
@@ -56,7 +61,5 @@ namespace MobileApp.Models.Account
                 IsLoading = false;
             }
         }
-
-        [RelayCommand] public async Task GoBack() => await _accountService.GoBackAsync(null);
     }
 }

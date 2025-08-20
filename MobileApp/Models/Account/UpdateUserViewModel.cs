@@ -10,17 +10,19 @@ namespace MobileApp.Models.Account
     {
         private readonly AccountService _accountService = accountService;
 
-        // Current user data (for display)
         [ObservableProperty] private string currentFirstName = string.Empty;
         [ObservableProperty] private string currentLastName = string.Empty;
         [ObservableProperty] private string currentEmail = string.Empty;
         [ObservableProperty] private string currentTlf = string.Empty;
 
-        // New user data (for update)
         [ObservableProperty] private string newFirstName = string.Empty;
         [ObservableProperty] private string newLastName = string.Empty;
         [ObservableProperty] private string newEmail = string.Empty;
         [ObservableProperty] private string newTlf = string.Empty;
+
+
+        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
+
 
         [RelayCommand]
         public async Task LoadProfile()
@@ -75,7 +77,7 @@ namespace MobileApp.Models.Account
                 string tlf = string.IsNullOrWhiteSpace(NewTlf) ? CurrentTlf : NewTlf;
 
                 if (await _accountService.UpdateUserAsync(firstName, lastName, email, tlf))
-                    await _accountService.GoToProfileTabAsync();
+                    await BaseService.GoToProfileTabAsync();
                 else
                     ErrorMessage = "Failed to update profile";
             }
@@ -88,7 +90,5 @@ namespace MobileApp.Models.Account
                 IsLoading = false;
             }
         }
-
-        [RelayCommand] public async Task GoBack() => await _accountService.GoBackAsync(null);
     }
 }

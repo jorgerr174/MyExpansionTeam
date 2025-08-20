@@ -83,7 +83,7 @@ namespace MobileApp.Models.Team
         public string SelectedProspectPosition => SelectedProspect?.Position ?? "";
         public string SelectedProspectCollege => SelectedProspect?.College ?? "";
         public string SelectedProspectRanking => SelectedProspect != null ? $"Consensus Rank: #{SelectedProspect.Consensus}" : "";
-        public string SelectedProspectCombineStats => GetCombineStats(SelectedProspect);
+        public string SelectedProspectCombineStats => ProspectSelectionViewModel.GetCombineStats(SelectedProspect);
 
         // Commands
         public ICommand SelectCommand { get; }
@@ -159,7 +159,7 @@ namespace MobileApp.Models.Team
             await ShowProspectDetailsRequested?.Invoke(prospect);
         }
 
-        private string GetCombineStats(ProspectDto prospect)
+        private static string GetCombineStats(ProspectDto prospect)
         {
             if (prospect == null) return "";
 
@@ -180,7 +180,7 @@ namespace MobileApp.Models.Team
             return string.Join(" | ", stats);
         }
 
-        public string GetProspectDetails(ProspectDto prospect)
+        public static string GetProspectDetails(ProspectDto prospect)
         {
             var details = new List<string>
             {
