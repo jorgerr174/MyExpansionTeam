@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("METDAL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d5c7a83a1152316b075d52a580026a7a61e52f9c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f511862e89f8d106f2d12e1a9534c5f770995672")]
 [assembly: System.Reflection.AssemblyProductAttribute("METDAL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("METDAL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
