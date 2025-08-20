@@ -1,4 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using MobileApp.Services;
 
 namespace MobileApp.Models.Shared
 {
@@ -10,6 +12,8 @@ namespace MobileApp.Models.Shared
         [ObservableProperty]
         private string errorMessage = string.Empty;
 
+
+        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
 
         public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 

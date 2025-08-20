@@ -13,8 +13,6 @@ namespace MobileApp.Views.Home
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-
-            // Load data when page appears (equivalent to controller action)
             if (BindingContext is IndexViewModel viewModel)
             {
                 await viewModel.LoadDataCommand.ExecuteAsync(null);

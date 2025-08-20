@@ -24,13 +24,6 @@ namespace MobileApp
             {
                 client.BaseAddress = new Uri(MauiSettings.apiURL);
                 client.Timeout = TimeSpan.FromMinutes(3);
-            }).ConfigurePrimaryHttpMessageHandler(() =>
-            {
-#if DEBUG && ANDROID
-                return new HttpClientHandler() { ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true };
-#else
-                return new HttpClientHandler();
-#endif
             });
             builder.Services.AddHttpClient("_importClient", client =>
             {
@@ -42,14 +35,12 @@ namespace MobileApp
             #region Routing
             #region Tabs
             Routing.RegisterRoute(AppRoutes.HomeTab, typeof(Views.Home.Index));
-            Routing.RegisterRoute(AppRoutes.TeamsTab, typeof(Views.Team.List));
             Routing.RegisterRoute(AppRoutes.MyTeamsTab, typeof(Views.Team.MyTeams));
-            Routing.RegisterRoute(AppRoutes.ProfileTab, typeof(Views.Account.Profile));
+            Routing.RegisterRoute(AppRoutes.ProfileTab, typeof(Views.Account.ProfileTab));
             #endregion Tabs
 
             #region Views.Account
             Routing.RegisterRoute(AppRoutes.EditProfile, typeof(Views.Account.EditProfile));
-            Routing.RegisterRoute(AppRoutes.LogIn, typeof(Views.Account.LogIn));
             Routing.RegisterRoute(AppRoutes.SignUp, typeof(Views.Account.SignUp));
             Routing.RegisterRoute(AppRoutes.UpdateCredentials, typeof(Views.Account.UpdateCredentials));
             Routing.RegisterRoute(AppRoutes.UpdateUser, typeof(Views.Account.UpdateUser));
@@ -85,10 +76,10 @@ namespace MobileApp
 
 
             #region Views
+            builder.Services.AddTransient<Views.Account.ProfileTab>();
+
             #region Views.Account
             builder.Services.AddTransient<Views.Account.EditProfile>();
-            builder.Services.AddTransient<Views.Account.LogIn>();
-            builder.Services.AddTransient<Views.Account.Profile>();
             builder.Services.AddTransient<Views.Account.SignUp>();
             builder.Services.AddTransient<Views.Account.UpdateCredentials>();
             builder.Services.AddTransient<Views.Account.UpdateUser>();
@@ -96,7 +87,7 @@ namespace MobileApp
 
             #region Views.Admin
             builder.Services.AddTransient<Views.Admin.Admin>();
-            builder.Services.AddTransient<Models.Admin.AssignRolesViewModel>();
+            builder.Services.AddTransient<Views.Admin.AssignRoles>();
             builder.Services.AddTransient<Views.Admin.Import>();
             #endregion Views.Admin
 
@@ -113,26 +104,34 @@ namespace MobileApp
             builder.Services.AddTransient<Views.Team.Create>();
             builder.Services.AddTransient<Views.Team.Details>();
             builder.Services.AddTransient<Views.Team.Draft>();
+            builder.Services.AddTransient<Views.Team.DraftResults>();
             builder.Services.AddTransient<Views.Team.Edit>();
-            builder.Services.AddTransient<Views.Team.List>();
+            //builder.Services.AddTransient<Views.Team.List>();
             builder.Services.AddTransient<Views.Team.MyTeams>();
             builder.Services.AddTransient<Views.Team.Roster>();
             builder.Services.AddTransient<Views.Team.RosterSettings>();
             builder.Services.AddTransient<Views.Team.Trade>();
             builder.Services.AddTransient<Views.Team.TradeError>();
+            builder.Services.AddTransient<Views.Team.Trades>();
             #endregion Views.Team
             #endregion Views
 
 
             #region Models
+            builder.Services.AddTransient<Models.Account.ProfileTabViewModel>();
+
             #region Models.Account
             builder.Services.AddTransient<Models.Account.EditProfileViewModel>();
-            builder.Services.AddTransient<Models.Account.LogInViewModel>();
-            builder.Services.AddTransient<Models.Account.ProfileViewModel>();
             builder.Services.AddTransient<Models.Account.SignUpViewModel>();
             builder.Services.AddTransient<Models.Account.UpdateCredentialsViewModel>();
             builder.Services.AddTransient<Models.Account.UpdateUserViewModel>();
             #endregion Models.Account
+
+            #region Models.Admin
+            builder.Services.AddTransient<Models.Admin.AdminViewModel>();
+            builder.Services.AddTransient<Models.Admin.AssignRolesViewModel>();
+            builder.Services.AddTransient<Models.Admin.ImportViewModel>();
+            #endregion Models.Admin
 
             #region Models.Home
             builder.Services.AddTransient<Models.Home.IndexViewModel>();
@@ -141,22 +140,18 @@ namespace MobileApp
             #region Models.Shared
             builder.Services.AddSingleton<Models.Shared.AppShellViewModel>();
             builder.Services.AddSingleton<Models.Shared.ErrorViewModel>();
-            builder.Services.AddTransient<Models.Shared.SelectablePlayerViewModel>();
             #endregion Models.Shared
 
             #region Models.Team
             builder.Services.AddTransient<Models.Team.CreateViewModel>();
             builder.Services.AddTransient<Models.Team.DetailsViewModel>();
-            builder.Services.AddTransient<Models.Team.DraftViewModel>(
-                provider => new Models.Team.DraftViewModel(
-                    provider.GetRequiredService<TeamService>()
-                ));
+            builder.Services.AddTransient<Models.Team.DraftViewModel>();
             builder.Services.AddTransient<Models.Team.DraftResultsViewModel>();
             builder.Services.AddTransient<Models.Team.EditViewModel>();
             builder.Services.AddTransient<Models.Team.FormationViewModel>();
-            builder.Services.AddTransient<Models.Team.ListViewModel>();
+            //builder.Services.AddTransient<Models.Team.ListViewModel>();
             builder.Services.AddTransient<Models.Team.MyTeamsViewModel>();
-            builder.Services.AddTransient<Models.Team.ReviewRosterViewModel>();
+            //builder.Services.AddTransient<Models.Team.ReviewRosterViewModel>();
             builder.Services.AddTransient<Models.Team.RosterViewModel>();
             builder.Services.AddTransient<Models.Team.RosterSettingsViewModel>();
             builder.Services.AddTransient<Models.Team.TradeViewModel>();
@@ -173,7 +168,7 @@ namespace MobileApp
     public static class MauiSettings
     {
 #if ANDROID
-        public static string apiURL = "http://10.0.2.2:5088/api/"; // Android emulator
+        public static string apiURL = "https://10.0.2.2:7087/api/"; // Android emulator
 #elif IOS
         public static string apiURL = "https://localhost:7087/api/"; // iOS simulator
 #else

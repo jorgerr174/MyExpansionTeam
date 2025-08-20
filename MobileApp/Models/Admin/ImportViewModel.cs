@@ -143,7 +143,7 @@ namespace MobileApp.Models.Admin
                 ErrorMessage = string.Empty;
 
                 // Create ImportDto
-                ImportDto importDto = new() 
+                ImportDto importDto = new()
                 {
                     Type = SelectedImportType.Type,
                     StatsType = SelectedStatsType?.Type ?? Types.StatsEnum.PassStats,

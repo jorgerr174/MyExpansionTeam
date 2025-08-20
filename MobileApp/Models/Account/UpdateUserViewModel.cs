@@ -21,9 +21,6 @@ namespace MobileApp.Models.Account
         [ObservableProperty] private string newTlf = string.Empty;
 
 
-        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
-
-
         [RelayCommand]
         public async Task LoadProfile()
         {
