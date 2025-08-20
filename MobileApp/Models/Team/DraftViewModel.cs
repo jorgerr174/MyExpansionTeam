@@ -44,9 +44,6 @@ namespace MobileApp.Models.Team
         public bool CanConfigureFranchises => SelectedDraftMethod == "multiple";
 
 
-        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
-
-
         [RelayCommand]
         public async Task LoadDraftAsync()
         {

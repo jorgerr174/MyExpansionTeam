@@ -74,6 +74,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Views\Account\ProfileTab.xaml.cs">
+	    <DependentUpon>ProfileTab.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\Account\UpdateUser.xaml.cs">
 	    <DependentUpon>UpdateUser.xaml</DependentUpon>
 	  </Compile>
@@ -83,14 +86,8 @@
 	  <Compile Update="Views\Account\SignUp.xaml.cs">
 	    <DependentUpon>SignUp.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views\Account\Profile.xaml.cs">
-	    <DependentUpon>Profile.xaml</DependentUpon>
-	  </Compile>
 	  <Compile Update="Views\Account\EditProfile.xaml.cs">
 	    <DependentUpon>EditProfile.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\Account\LogIn.xaml.cs">
-	    <DependentUpon>LogIn.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\Admin\AssignRoles.xaml.cs">
 	    <DependentUpon>AssignRoles.xaml</DependentUpon>
@@ -167,6 +164,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\Account\ProfileTab.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\Account\UpdateUser.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -176,13 +176,7 @@
 	  <MauiXaml Update="Views\Account\SignUp.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\Account\Profile.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
 	  <MauiXaml Update="Views\Account\EditProfile.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Account\LogIn.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Admin\AssignRoles.xaml">

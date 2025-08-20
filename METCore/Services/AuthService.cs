@@ -119,11 +119,11 @@ namespace METCore.Services
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? ""));
             var creds = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
-            var Token = new JwtSecurityToken(
+            JwtSecurityToken Token = new(
                 issuer: jwtSettings["Issuer"],
                 audience: jwtSettings["Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(30),
+                expires: DateTime.Now.AddHours(2),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(Token);

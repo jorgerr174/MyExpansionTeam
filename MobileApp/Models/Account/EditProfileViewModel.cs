@@ -9,7 +9,6 @@ namespace MobileApp.Models.Account
         private readonly AccountService _accountService = accountService;
 
 
-        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
         [RelayCommand] public static async Task GoToUpdateUser() => await BaseService.GoToAsync(AppRoutes.UpdateUser, null);
         [RelayCommand] public static async Task GoToUpdateCredentials() => await BaseService.GoToAsync(AppRoutes.UpdateCredentials, null);
     }

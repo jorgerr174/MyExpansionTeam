@@ -280,6 +280,9 @@ namespace METCore.Enums
             public static int[] TotalPerRound => [33, 33, 39, 37, 39, 41, 42];
             public static int[] TotalAtRound => [0, 33, 66, 105, 142, 181, 222];
 
+            public static int GetPickOverall(int pick) { try { return TotalAtRound[(pick / 100) - 1] + (pick % 100); } catch { return 0; } }
+            public static (int, int, int) GetPickRoundPosOverall(int pick){ try { return (pick / 100, pick % 100, GetPickOverall(pick)); } catch { return (0,0,0); } }
+
             public static int[] PickValues =>
                 // 20 en 20
 
@@ -312,8 +315,7 @@ namespace METCore.Enums
                 260,258,255,253,251,249,246,244,242,240,238,235,233,231,229,227,225,223,220,218,
                 216,214,212,210,208,206,204,202,200,198,196,194,192,190,188,186,184,182,180,178,
                 176,174];
-
-
+            public static int GetPickValue(int pick) { try { return PickValues[GetPickOverall(pick) - 1]; } catch { return 0; } }
             public static int[] PickAPYs =>
                 // 10 en 10
 
@@ -360,19 +362,15 @@ namespace METCore.Enums
                 1078460,1078175,1077883,1077592,1077372,1077135,1076912,1076693,1076357,1076110,
                 1075756,1075417,1075417,1075417,1075417,1075417,1075417,1075417,1075417,1075417,
                 1075417,1075417];
-
-
-            public static int GetPickOverall(int pick) { try { return TotalAtRound[(pick / 100) - 1] + (pick % 100); } catch { return 0; } }
-
-            public static IList<int> GetFranchisePicks(FranchiseEnum franchise) => GetAllPicks()[(int)franchise];
-            public static IList<int> GetFranchisePicks(int franchise) => franchise < 1 || franchise > 32 ? [] : GetAllPicks()[franchise];
+            public static int GetPickAPY(int pick) { try { return PickAPYs[pick - 1]; } catch { return 0; } }
 
             public static IList<IList<int>> GetAllPicks() =>
                 [Team, ARI, ATL, BAL, BUF, CAR, CHI, CIN, CLE, DAL, DEN, DET, GB, HOU, IND, JAX, KC, LV, LAC, LAR, MIA, MIN, NE, NO, NYG, NYJ, PHI, PIT, SF, SEA, TB, TEN, WSH];
 
-            public static int GetPickValue(int pick) { try { return PickValues[GetPickOverall(pick) - 1]; } catch { return 0; } }
+            public static IList<int> GetFranchisePicks(FranchiseEnum franchise) => GetAllPicks()[(int)franchise];
+            public static IList<int> GetFranchisePicks(int franchise) => franchise < 1 || franchise > 32 ? [] : GetAllPicks()[franchise];
 
-            public static int GetPickAPY(int pick) { try { return PickAPYs[pick - 1]; } catch { return 0; } }
+
 
 
             public static int GetPlayerValue(Player player)
@@ -412,7 +410,6 @@ namespace METCore.Enums
                 15.0, 20.5, 19.8, 14.1, 12.3, 14.7, 16.2, 13.7, 13.5, 14.1,
                 3.0, 5.8, 7.2, 7.1, 2.3];
 
-            // Keep the other methods unchanged
             private static double GetPositionMultiplier(PositionEnum pos)
             {
                 return pos switch

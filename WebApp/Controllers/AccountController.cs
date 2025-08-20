@@ -40,7 +40,7 @@ namespace WebApp.Controllers
                     new AuthenticationProperties
                     {
                         IsPersistent = true,
-                        ExpiresUtc = DateTime.UtcNow.AddMinutes(30)
+                        ExpiresUtc = DateTime.UtcNow.AddHours(2)
                     });
 
                 Response.Cookies.Append("jwt", result.Message, new CookieOptions { HttpOnly = true });
