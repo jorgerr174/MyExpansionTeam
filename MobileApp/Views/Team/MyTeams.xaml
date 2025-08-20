@@ -15,7 +15,7 @@
                FontAttributes="Bold" 
                HorizontalOptions="Center" />
 
-            <shared:_TeamList BindingContext="{Binding Teams}" />
+            <shared:_TeamList BindingContext="{Binding}" />
 
             <Label Text="{Binding ErrorMessage}" 
                TextColor="Red" 
