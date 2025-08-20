@@ -6,15 +6,9 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Team
 {
-    public partial class EditViewModel : BaseViewModel
+    public partial class EditViewModel(TeamService teamService) : BaseViewModel
     {
-        private readonly TeamService _teamService;
-
-        public EditViewModel(TeamService teamService)
-        {
-            _teamService = teamService;
-        }
-
+        private readonly TeamService _teamService = teamService;
         [ObservableProperty] private int teamId;
         [ObservableProperty] private string location = string.Empty;
         [ObservableProperty] private string abbreviation = string.Empty;

@@ -7,7 +7,7 @@ namespace MobileApp.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
             => value is string stringValue && parameter is string parameterValue && stringValue.Equals(parameterValue, StringComparison.OrdinalIgnoreCase);
         public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            => value is bool isChecked && isChecked && parameter is string parameterValue 
+            => value is bool isChecked && isChecked && parameter is string parameterValue
                 ? parameterValue : null;
     }
 

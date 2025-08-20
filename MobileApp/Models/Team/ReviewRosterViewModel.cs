@@ -7,21 +7,15 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Team
 {
-    public partial class ReviewRosterViewModel : BaseViewModel
+    public partial class ReviewRosterViewModel(TeamService teamService) : BaseViewModel
     {
-        private readonly TeamService _teamService;
-
-        public ReviewRosterViewModel(TeamService teamService)
-        {
-            _teamService = teamService;
-        }
-
+        private readonly TeamService _teamService = teamService;
         private const decimal BaseSalaryCap = 224m;
 
         [ObservableProperty] private int teamId;
         [ObservableProperty] private string teamName = string.Empty;
-        [ObservableProperty] private IList<SelectablePlayerViewModel> allRosterPlayers = new List<SelectablePlayerViewModel>();
-        [ObservableProperty] private IList<SelectablePlayerViewModel> filteredPlayers = new List<SelectablePlayerViewModel>();
+        [ObservableProperty] private IList<SelectablePlayerViewModel> allRosterPlayers = [];
+        [ObservableProperty] private IList<SelectablePlayerViewModel> filteredPlayers = [];
         [ObservableProperty] private string selectedPositionFilter = "All";
         [ObservableProperty] private decimal currentSalaryCap = 0m;
 
@@ -43,24 +37,22 @@ namespace MobileApp.Models.Team
 
             try
             {
-                var team = await _teamService.GetTeamRosterAsync(id);
-                if (team != null)
+                if (await _teamService.GetTeamRosterAsync(id) is TeamDto team)
                 {
                     TeamName = $"{team.Location} {team.Mascot}";
 
-                    var rosterPlayersList = team.Players.Select(p =>
+                    IList<SelectablePlayerViewModel> rosterPlayersList = [.. team.Players.Select(p =>
                     {
-                        var wrapper = new SelectablePlayerViewModel(new SelectableDto
+                        SelectablePlayerViewModel wrapper = new(new SelectableDto
                         {
                             Id = p.Id,
                             Name = p.Name,
                             Position = p.Position,
                             APY = p.APY,
                             PureAPY = p.PureAPY
-                        });
-                        wrapper.IsSelected = true;
+                        }) { IsSelected = true };
                         return wrapper;
-                    }).ToList();
+                    })];
 
                     AllRosterPlayers = rosterPlayersList;
                     ApplyPositionFilter();
@@ -87,7 +79,7 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         public void RemovePlayer(SelectablePlayerViewModel player)
         {
-            AllRosterPlayers = AllRosterPlayers.Where(p => p.Id != player.Id).ToList();
+            AllRosterPlayers = [.. AllRosterPlayers.Where(p => p.Id != player.Id)];
             ApplyPositionFilter();
             UpdateSalaryCap();
         }
@@ -147,7 +139,7 @@ namespace MobileApp.Models.Team
 
         [RelayCommand] public async Task GoToRoster() => await _teamService.GoToAsync(AppRoutes.Roster, new() { ["TeamId"] = TeamId });
 
-        private void ApplyPositionFilter() => FilteredPlayers = SelectedPositionFilter == "All" 
+        private void ApplyPositionFilter() => FilteredPlayers = SelectedPositionFilter == "All"
                 ? AllRosterPlayers
                 : [.. AllRosterPlayers.Where(p => p.Position == SelectedPositionFilter)];
 

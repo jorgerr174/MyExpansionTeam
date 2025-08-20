@@ -7,19 +7,13 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Team
 {
-    public partial class TradesViewModel : BaseViewModel
+    public partial class TradesViewModel(TeamService teamService) : BaseViewModel
     {
-        private readonly TeamService _teamService;
-
-        public TradesViewModel(TeamService teamService)
-        {
-            _teamService = teamService;
-        }
-
+        private readonly TeamService _teamService = teamService;
         [ObservableProperty] private int teamId;
         [ObservableProperty] private string teamName = string.Empty;
-        [ObservableProperty] private IList<TradeDisplayInfo> trades = new List<TradeDisplayInfo>();
-        [ObservableProperty] private IList<TradeDisplayInfo> filteredTrades = new List<TradeDisplayInfo>();
+        [ObservableProperty] private IList<TradeDisplayInfo> trades = [];
+        [ObservableProperty] private IList<TradeDisplayInfo> filteredTrades = [];
         [ObservableProperty] private string selectedYearFilter = "All";
         [ObservableProperty] private bool hasNoTrades = false;
 
@@ -35,7 +29,7 @@ namespace MobileApp.Models.Team
             {
                 if (await _teamService.GetTeamTradesAsync(id) is IList<TradeDto> teamTrades)
                 {
-                    IList<TradeDisplayInfo> tradeDisplayList = teamTrades.Select(trade => new TradeDisplayInfo
+                    IList<TradeDisplayInfo> tradeDisplayList = [.. teamTrades.Select(trade => new TradeDisplayInfo
                     {
                         Id = trade.Id,
                         Date = trade.Date,
@@ -47,7 +41,7 @@ namespace MobileApp.Models.Team
                         FranchisePicks = trade.FranchisePicks,
                         TeamCurrentCap = trade.TeamCurrentCap,
                         IsForced = trade.Force
-                    }).OrderByDescending(t => t.Date).ToList();
+                    }).OrderByDescending(t => t.Date)];
 
                     Trades = tradeDisplayList;
 
@@ -61,7 +55,7 @@ namespace MobileApp.Models.Team
                 }
                 else
                 {
-                    Trades = new List<TradeDisplayInfo>();
+                    Trades = [];
                     HasNoTrades = true;
                 }
             }
@@ -83,23 +77,23 @@ namespace MobileApp.Models.Team
             ApplyYearFilter();
         }
 
-        [RelayCommand]  public async Task ViewTradeDetails(TradeDisplayInfo trade) => await Shell.Current.DisplayAlert("Trade Details", CreateTradeDetailsText(trade), "OK");
+        [RelayCommand] public async Task ViewTradeDetails(TradeDisplayInfo trade) => await Shell.Current.DisplayAlert("Trade Details", CreateTradeDetailsText(trade), "OK");
 
         [RelayCommand] public async Task GoToTrade() => await _teamService.GoToAsync(AppRoutes.Trade, new() { ["TeamId"] = TeamId });
 
-        private void ApplyYearFilter() 
+        private void ApplyYearFilter()
             => FilteredTrades = SelectedYearFilter == "All" ? Trades
                 : int.TryParse(SelectedYearFilter, out int year) ? [.. Trades.Where(t => t.Date.Year == year)] : Trades;
 
         private static string GetFranchiseName(int franchiseId)
         {
-            var franchise = FranchiseInfo.GetAllFranchises()[franchiseId-1];
+            var franchise = FranchiseInfo.GetAllFranchises()[franchiseId - 1];
             return franchise?.Name ?? $"Franchise {franchiseId}";
         }
 
         private string CreateTradeDetailsText(TradeDisplayInfo trade)
         {
-            var details = $"Trade with {trade.FranchiseName}\n";
+            string details = $"Trade with {trade.FranchiseName}\n";
             details += $"Date: {trade.Date:yyyy-MM-dd}\n";
             details += $"Salary Cap Impact: ${trade.TeamCurrentCap:F1}M\n";
 
@@ -148,10 +142,10 @@ namespace MobileApp.Models.Team
         public DateOnly Date { get; set; }
         public int FranchiseId { get; set; }
         public string FranchiseName { get; set; } = string.Empty;
-        public IList<SelectableDto> TeamPlayers { get; set; } = new List<SelectableDto>();
-        public IList<int> TeamPicks { get; set; } = new List<int>();
-        public IList<SelectableDto> FranchisePlayers { get; set; } = new List<SelectableDto>();
-        public IList<int> FranchisePicks { get; set; } = new List<int>();
+        public IList<SelectableDto> TeamPlayers { get; set; } = [];
+        public IList<int> TeamPicks { get; set; } = [];
+        public IList<SelectableDto> FranchisePlayers { get; set; } = [];
+        public IList<int> FranchisePicks { get; set; } = [];
         public decimal TeamCurrentCap { get; set; }
         public bool IsForced { get; set; }
 

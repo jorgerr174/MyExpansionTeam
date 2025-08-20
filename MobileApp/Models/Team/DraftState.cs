@@ -9,11 +9,11 @@ namespace MobileApp.Models.Team
         public DraftDto OriginalDraftData { get; set; }
         public string DraftMethod { get; set; } = "full";
         public int ManualRounds { get; set; } = 0;
-        public HashSet<int> SelectedFranchises { get; set; } = new();
+        public HashSet<int> SelectedFranchises { get; set; } = [];
         public int CurrentPickIndex { get; set; } = 0;
-        public List<DraftPickInfo> DraftOrder { get; set; } = new();
-        public Dictionary<int, int> AllSelections { get; set; } = new();
-        public List<ProspectDto> AvailableProspects { get; set; } = new();
+        public List<DraftPickInfo> DraftOrder { get; set; } = [];
+        public Dictionary<int, int> AllSelections { get; set; } = [];
+        public List<ProspectDto> AvailableProspects { get; set; } = [];
         public bool IsPaused { get; set; } = true;
         public bool IsComplete { get; set; } = false;
         public bool HasUnsavedProgress => AllSelections.Count > 0;
@@ -41,42 +41,28 @@ namespace MobileApp.Models.Team
         }
 
         public bool IsPickUserControlled(DraftPickInfo pick)
-        {
-            if (DraftMethod == "full") return false;
-            if (pick.Round > ManualRounds && ManualRounds > 0) return false;
-
-            if (DraftMethod == "myteam")
-                return pick.IsUserTeam;
-
-            if (DraftMethod == "multiple")
-                return pick.IsUserTeam || SelectedFranchises.Contains(pick.TeamId);
-
-            return false;
-        }
+            => DraftMethod != "full"
+                && pick.Round <= ManualRounds && ManualRounds != 0
+                && (pick.IsUserTeam
+                    || DraftMethod == "multiple" && SelectedFranchises.Contains(pick.TeamId));
 
         public void BuildDraftOrder()
         {
             DraftOrder.Clear();
-            var allPicks = new List<DraftPickInfo>();
+            IList<DraftPickInfo> allPicks = [];
 
             for (int entityIndex = 0; entityIndex < OriginalDraftData.Picks.Count; entityIndex++)
-            {
-                var picks = OriginalDraftData.Picks[entityIndex];
-                foreach (var pickNum in picks)
-                {
-                    var pickInfo = ConvertRppToPickInfo(pickNum, entityIndex);
-                    allPicks.Add(pickInfo);
-                }
-            }
+                foreach (var pickNum in OriginalDraftData.Picks[entityIndex])
+                    allPicks.Add(ConvertRppToPickInfo(pickNum, entityIndex));
 
-            DraftOrder = allPicks.OrderBy(p => p.Overall).ToList();
+            DraftOrder = [.. allPicks.OrderBy(p => p.Overall)];
         }
 
         private DraftPickInfo ConvertRppToPickInfo(int rppFormat, int entityIndex)
         {
-            var round = rppFormat / 100;
-            var pickInRound = rppFormat % 100;
-            var overall = ((round - 1) * 32) + pickInRound;
+            int round = rppFormat / 100;
+            int pickInRound = rppFormat % 100;
+            int overall = ((round - 1) * 32) + pickInRound;
 
             return new DraftPickInfo
             {
@@ -92,28 +78,21 @@ namespace MobileApp.Models.Team
         }
 
         private string GetTeamName(int entityIndex)
-        {
-            if (entityIndex == 0)
-                return $"{OriginalDraftData.Location} {OriginalDraftData.Mascot}";
-
-            return FranchiseHelper.GetFranchiseName(entityIndex);
-        }
+            => entityIndex == 0
+            ? $"{OriginalDraftData.Location} {OriginalDraftData.Mascot}"
+            : FranchiseHelper.GetFranchiseName(entityIndex);
 
         private string GetTeamAbbreviation(int entityIndex)
-        {
-            if (entityIndex == 0)
-                return OriginalDraftData.Abb;
-
-            return FranchiseHelper.GetFranchiseAbbreviation(entityIndex);
-        }
+            => entityIndex == 0
+            ? OriginalDraftData.Abb
+            : FranchiseHelper.GetFranchiseAbbreviation(entityIndex);
 
         public DraftDto CreateDraftDto()
         {
-            var updatedSelections = new Dictionary<int, int>(OriginalDraftData.Selections);
+            IDictionary<int, int> updatedSelections = OriginalDraftData.Selections;
+
             foreach (var selection in AllSelections)
-            {
                 updatedSelections[selection.Key] = selection.Value;
-            }
 
             return new DraftDto(
                 OriginalDraftData.Id,

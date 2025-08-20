@@ -27,9 +27,7 @@ namespace MobileApp
             }).ConfigurePrimaryHttpMessageHandler(() =>
             {
 #if DEBUG && ANDROID
-                var handler = new HttpClientHandler();
-                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
-                return handler;
+                return new HttpClientHandler() { ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true };
 #else
                 return new HttpClientHandler();
 #endif

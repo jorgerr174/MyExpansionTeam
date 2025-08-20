@@ -6,14 +6,9 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Account
 {
-    public partial class ProfileViewModel : BaseViewModel
+    public partial class ProfileViewModel(AccountService accountService) : BaseViewModel
     {
-        private readonly AccountService _accountService;
-        public ProfileViewModel(AccountService accountService)
-        {
-            _accountService = accountService;
-        }
-
+        private readonly AccountService _accountService = accountService;
         [ObservableProperty] private string firstName = string.Empty;
         [ObservableProperty] private string lastName = string.Empty;
         [ObservableProperty] private string email = string.Empty;
@@ -51,7 +46,8 @@ namespace MobileApp.Models.Account
         private async Task GoToLogIn() => await _accountService.GoToAsync(AppRoutes.LogIn, null);
         [RelayCommand] public async Task GoToAdmin() => await _accountService.GoToAsync(AppRoutes.Admin, null);
         [RelayCommand] public async Task GoToEditProfile() => await _accountService.GoToAsync(AppRoutes.EditProfile, null);
-        [RelayCommand] public async Task LogOut()
+        [RelayCommand]
+        public async Task LogOut()
         {
             AccountService.LogOutAsync();
             await GoToLogIn();

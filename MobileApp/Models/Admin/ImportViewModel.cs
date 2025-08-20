@@ -31,9 +31,9 @@ namespace MobileApp.Models.Admin
         [ObservableProperty] private byte[]? errorFileContent;
         [ObservableProperty] private string errorFileName = string.Empty;
 
-        public ObservableCollection<ImportTypeItem> ImportTypes { get; } = new();
-        public ObservableCollection<StatsTypeItem> StatsTypes { get; } = new();
-        public ObservableCollection<int> AvailableYears { get; } = new();
+        public ObservableCollection<ImportTypeItem> ImportTypes { get; } = [];
+        public ObservableCollection<StatsTypeItem> StatsTypes { get; } = [];
+        public ObservableCollection<int> AvailableYears { get; } = [];
 
         private void InitializeData()
         {
@@ -71,7 +71,7 @@ namespace MobileApp.Models.Admin
         {
             try
             {
-                var customFileType = new FilePickerFileType(
+                FilePickerFileType customFileType = new(
                     new Dictionary<DevicePlatform, IEnumerable<string>>
                     {
                         { DevicePlatform.iOS, new[] { "public.comma-separated-values-text" } },
@@ -81,14 +81,13 @@ namespace MobileApp.Models.Admin
                         { DevicePlatform.macOS, new[] { "csv" } },
                     });
 
-                var options = new PickOptions()
+                PickOptions options = new()
                 {
                     PickerTitle = "Please select a CSV file",
                     FileTypes = customFileType,
                 };
 
-                var result = await FilePicker.Default.PickAsync(options);
-                if (result != null)
+                if (await FilePicker.Default.PickAsync(options) is FileResult result)
                 {
                     SelectedFile = result;
                     SelectedFileName = result.FileName;
@@ -178,9 +177,7 @@ namespace MobileApp.Models.Admin
                     HasImportResult = true;
                 }
                 else
-                {
                     ErrorMessage = "Import failed. Please check your file and try again.";
-                }
             }
             catch (Exception ex)
             {
@@ -234,7 +231,7 @@ namespace MobileApp.Models.Admin
 #else
                 // For other platforms, just show content
                 await Shell.Current.DisplayAlert("Error File Content",
-                    $"File: {fileName}\n\nContent:\n{content.Substring(0, Math.Min(content.Length, 1000))}...",
+                    $"File: {fileName}\n\nContent:\n{content[..Math.Min(content.Length, 1000)]}...",
                     "OK");
 #endif
             }
