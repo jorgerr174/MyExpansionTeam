@@ -9,10 +9,12 @@ namespace MobileApp.Models.Team
     public partial class EditViewModel(TeamService teamService) : BaseViewModel
     {
         private readonly TeamService _teamService = teamService;
+
         [ObservableProperty] private int teamId;
         [ObservableProperty] private string location = string.Empty;
         [ObservableProperty] private string abbreviation = string.Empty;
         [ObservableProperty] private string mascot = string.Empty;
+
 
         [RelayCommand]
         public async Task LoadTeam(int id)
@@ -55,7 +57,7 @@ namespace MobileApp.Models.Team
             try
             {
                 if (await _teamService.UpdateTeamAsync(TeamId, Location, Abbreviation, Mascot))
-                    await _teamService.GoToMyTeamsTabAsync();
+                    await BaseService.GoToMyTeamsTabAsync();
                 else
                     ErrorMessage = "Failed to update team";
             }
@@ -83,7 +85,7 @@ namespace MobileApp.Models.Team
                 ErrorMessage = string.Empty;
 
                 if (await _teamService.DuplicateTeamAsync(TeamId) is TeamBasicInfoDto duplicatedTeam)
-                    await _teamService.GoToAsync(AppRoutes.TeamEdit, new() { ["TeamId"] = duplicatedTeam.Id });
+                    await BaseService.GoToAsync(AppRoutes.EditTeam, new() { ["TeamId"] = duplicatedTeam.Id });
                 else ErrorMessage = "Failed to duplicate team";
             }
             catch (Exception ex)
@@ -112,7 +114,7 @@ namespace MobileApp.Models.Team
                 if (await _teamService.DeleteTeamAsync(TeamId))
                 {
                     await Shell.Current.DisplayAlert("Success", "Team deleted successfully", "OK");
-                    await _teamService.GoToHomeTabAsync();
+                    await BaseService.GoToHomeTabAsync();
                 }
                 else
                     ErrorMessage = "Failed to delete team";

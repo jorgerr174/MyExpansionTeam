@@ -39,31 +39,31 @@
 
                 <!-- Navigation Buttons -->
                 <Button Text="View Draft Results" 
-                    Command="{Binding ViewDraftResultsCommand}"
+                    Command="{Binding GoToDraftResultsCommand}"
                     BackgroundColor="Green" TextColor="White" />
 
                 <Button Text="Edit Team" 
-                    Command="{Binding EditTeamCommand}"
+                    Command="{Binding GoToEditTeamCommand}"
                     BackgroundColor="Blue" TextColor="White" />
 
                 <Button Text="View Roster" 
-                    Command="{Binding ViewRosterCommand}"
+                    Command="{Binding GoToRosterCommand}"
                     BackgroundColor="Orange" TextColor="White" />
 
                 <Button Text="View Formation" 
-                    Command="{Binding ViewFormationCommand}"
+                    Command="{Binding GoToFormationCommand}"
                     BackgroundColor="Purple" TextColor="White" />
 
                 <Button Text="View Trades" 
-                    Command="{Binding ViewTradesCommand}"
+                    Command="{Binding GoToTradesCommand}"
                     BackgroundColor="Teal" TextColor="White" />
 
                 <Button Text="Roster Settings" 
-                    Command="{Binding ViewRosterSettingsCommand}"
+                    Command="{Binding GoToRosterSettingsCommand}"
                     BackgroundColor="Navy" TextColor="White" />
 
                 <Button Text="Review Roster" 
-                    Command="{Binding ReviewRosterCommand}"
+                    Command="{Binding GoToReviewRosterCommand}"
                     BackgroundColor="Maroon" TextColor="White" />
 
                 <!-- Team Actions -->

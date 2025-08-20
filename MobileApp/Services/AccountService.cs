@@ -6,7 +6,7 @@ namespace MobileApp.Services
     public class AccountService(IHttpClientFactory httpClientFactory) : BaseService(httpClientFactory)
     {
         #region TryAutoLogIn
-        public async Task<bool> TryAutoLogInAsync()
+        public static async Task<bool> TryAutoLogInAsync()
         {
             var token = await SecureStorage.GetAsync("jwt_token");
             return !string.IsNullOrEmpty(token);

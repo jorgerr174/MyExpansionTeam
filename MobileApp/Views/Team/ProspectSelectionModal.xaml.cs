@@ -42,7 +42,7 @@ namespace MobileApp.Views.Team
 
         private async Task OnShowProspectDetailsRequested(ProspectDto prospect)
         {
-            var details = _viewModel.GetProspectDetails(prospect);
+            var details = ProspectSelectionViewModel.GetProspectDetails(prospect);
             await DisplayAlert($"{prospect.Name} - Details", details, "OK");
         }
 

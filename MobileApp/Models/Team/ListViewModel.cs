@@ -9,9 +9,13 @@ namespace MobileApp.Models.Team
     public partial class ListViewModel(TeamService teamService) : BaseViewModel
     {
         private readonly TeamService _teamService = teamService;
+       
         [ObservableProperty] private IEnumerable<TeamInfoDto> teams = [];
 
 
+        [RelayCommand] public static async Task GoToTeamDetails(int teamId) => await BaseService.GoToAsync(AppRoutes.TeamDetails, new() { ["TeamId"] = teamId });
+
+     
         [RelayCommand]
         public async Task LoadTeams()
         {
@@ -29,7 +33,5 @@ namespace MobileApp.Models.Team
                 IsLoading = false;
             }
         }
-
-        [RelayCommand] public async Task GoToTeamDetails(int teamId) => await _teamService.GoToAsync(AppRoutes.TeamDetails, new() { ["TeamId"] = teamId });
     }
 }

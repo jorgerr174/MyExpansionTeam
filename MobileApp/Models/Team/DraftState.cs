@@ -27,11 +27,8 @@ namespace MobileApp.Models.Team
         public void RecordPick(int pickNumber, int playerId)
         {
             AllSelections[pickNumber] = playerId;
-            var prospect = AvailableProspects.FirstOrDefault(p => p.Id == playerId);
-            if (prospect != null)
-            {
+            if (AvailableProspects.FirstOrDefault(p => p.Id == playerId) is ProspectDto prospect)
                 AvailableProspects.Remove(prospect);
-            }
         }
 
         public void AdvanceToNextPick()

@@ -11,6 +11,7 @@ namespace MobileApp.Models.Team
     {
         private readonly TeamService _teamService = teamService;
         private readonly AccountService _accountService = accountService;
+
         [ObservableProperty] private int teamId;
         [ObservableProperty] private string teamName = string.Empty;
         [ObservableProperty] private int rosterSettingsCap = 80;
@@ -19,6 +20,7 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private List<int> rosterSettingsProtectedPlayersIds = [];
         [ObservableProperty] private IList<SelectablePlayerViewModel> protectablePlayers = [];
         [ObservableProperty] private bool showPlayerSelection = false;
+
 
         [RelayCommand]
         public async Task LoadRosterSettings(int id)
@@ -112,7 +114,7 @@ namespace MobileApp.Models.Team
                 };
 
                 if (await _teamService.UpdateRosterSettingsAsync(teamDto))
-                    await _teamService.GoToMyTeamsTabAsync();
+                    await BaseService.GoToMyTeamsTabAsync();
                 else
                     ErrorMessage = "Failed to save roster settings";
             }

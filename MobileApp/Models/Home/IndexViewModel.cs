@@ -10,18 +10,27 @@ namespace MobileApp.Models.Home
     {
         private readonly HomeService _homeService = homeService;
         private readonly AccountService _accountService = accountService;
+
         [ObservableProperty] private bool isAuthenticated = false;
         [ObservableProperty] private string username = string.Empty;
         [ObservableProperty] private bool isAdmin = false;
         [ObservableProperty] private IEnumerable<TeamInfoDto> teams = [];
 
         public bool IsNotAuthenticated => !IsAuthenticated;
-        public bool ShowDeleteButton => true; // Show delete for MyTeams
+        public static bool ShowDeleteButton => true; // Show delete for MyTeams
+
+
+        [RelayCommand] public static async Task GoToMyTeams() => await BaseService.GoToMyTeamsTabAsync();
+        [RelayCommand] public static async Task GoToLogIn() => await BaseService.GoToAsync(AppRoutes.LogIn, null);
+        [RelayCommand] public static async Task GoToAdmin() => await BaseService.GoToAsync(AppRoutes.Admin, null);
+        [RelayCommand] public static async Task GoToCreateTeam() => await BaseService.GoToAsync(AppRoutes.CreateTeam, null);
+        [RelayCommand] public static async Task GoToTeamDetails(int teamId) => await BaseService.GoToAsync(AppRoutes.TeamDetails, new() { ["TeamId"] = teamId });
+
 
         [RelayCommand]
         public async Task LoadData()
         {
-            if (await _accountService.IsAuthenticatedAsync())
+            if (await BaseService.IsAuthenticatedAsync())
             {
                 Username = await AccountService.GetUsernameAsync() ?? "User";
                 Teams = await _homeService.GetMyTeamsAsync() ?? [];
@@ -31,11 +40,5 @@ namespace MobileApp.Models.Home
 
             OnPropertyChanged(nameof(IsNotAuthenticated));
         }
-
-        [RelayCommand] public async Task GoToLogIn() => await _homeService.GoToAsync(AppRoutes.LogIn, null);
-        [RelayCommand] public async Task GoToAdmin() => await _homeService.GoToAsync(AppRoutes.Admin, null);
-        [RelayCommand] public async Task GoToMyTeams() => await _homeService.GoToMyTeamsTabAsync();
-        [RelayCommand] public async Task GoToTeamCreate() => await _homeService.GoToAsync(AppRoutes.CreateTeam, null);
-        [RelayCommand] public async Task GoToTeamDetails(int teamId) => await _homeService.GoToAsync(AppRoutes.TeamDetails, new() { ["TeamId"] = teamId });
     }
 }

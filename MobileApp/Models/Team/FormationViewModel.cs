@@ -36,21 +36,23 @@ namespace MobileApp.Models.Team
                     TeamName = $"{team.Location} {team.Mascot}";
 
                     // Load roster players
-                    var rosterPlayersList = team.Players.Select(p =>
-                        new SelectablePlayerViewModel(new SelectableDto
-                        {
-                            Id = p.Id,
-                            Name = p.Name,
-                            Position = p.Position,
-                            APY = p.APY,
-                            PureAPY = p.PureAPY
-                        })).ToList();
+                    IList<SelectablePlayerViewModel> rosterPlayersList =
+                        [.. team.Players.Select(p =>
+                            new SelectablePlayerViewModel(new SelectableDto
+                            {
+                                Id = p.Id,
+                                Name = p.Name,
+                                Position = p.Position,
+                                APY = p.APY,
+                                PureAPY = p.PureAPY
+                            })
+                        )];
 
                     RosterPlayers = rosterPlayersList;
                     BenchPlayers = rosterPlayersList;
 
                     // Load existing lineups
-                    LoadExistingLineups(team);
+                    FormationViewModel.LoadExistingLineups(team);
 
                     // Initialize formation type
                     ChangeFormationType("offense");
@@ -140,7 +142,7 @@ namespace MobileApp.Models.Team
                     teamDto.SPLineup = CreateSPLineupFromStarters();
 
                 if (await _teamService.UpdateRosterAsync(teamDto))
-                    await _teamService.GoToMyTeamsTabAsync();
+                    await BaseService.GoToMyTeamsTabAsync();
                 else
                     ErrorMessage = "Failed to save formation";
             }
@@ -156,23 +158,18 @@ namespace MobileApp.Models.Team
 
         private void LoadFormationsForType(string formationType)
         {
-            var formations = FormationData.GetFormationsForType(formationType);
-            AvailableFormations = formations;
+            AvailableFormations = FormationData.GetFormationsForType(formationType);
 
-            if (formations.Any())
-            {
-                SelectFormation(formations.First());
-            }
+            if (AvailableFormations.Count != 0)
+                SelectFormation(AvailableFormations.First());
         }
 
         private void InitializePositions(FormationInfo formation)
         {
             StarterPositions = [];
 
-            foreach (var position in formation.Positions)
-            {
+            foreach (FormationPosition position in formation.Positions)
                 StarterPositions[position.Id] = null;
-            }
 
             UpdateBenchPlayers();
         }
@@ -183,7 +180,7 @@ namespace MobileApp.Models.Team
             BenchPlayers = [.. RosterPlayers.Except(assignedPlayers)];
         }
 
-        private void LoadExistingLineups(TeamDto team)
+        private static void LoadExistingLineups(TeamDto team)
         {
             // TODO: Load existing lineup assignments from team.OffLineup, team.DefLineup, team.SPLineup
         }

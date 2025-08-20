@@ -23,6 +23,6 @@ namespace MobileApp.Models.Shared
         public string APY => Player.APY;
         public string Height => Player.Height;
         public string Weight => Player.Weight;
-        public string TeamName => ""; // This would need to be populated from somewhere
+        public static string TeamName => ""; // This would need to be populated from somewhere
     }
 }

@@ -9,12 +9,19 @@ namespace MobileApp.Models.Account
     public partial class ProfileViewModel(AccountService accountService) : BaseViewModel
     {
         private readonly AccountService _accountService = accountService;
+
         [ObservableProperty] private string firstName = string.Empty;
         [ObservableProperty] private string lastName = string.Empty;
         [ObservableProperty] private string email = string.Empty;
         [ObservableProperty] private string tlf = string.Empty;
         [ObservableProperty] private string username = string.Empty;
         [ObservableProperty] private bool isAdmin = false;
+
+
+        private static async Task GoToLogIn() => await BaseService.GoToAsync(AppRoutes.LogIn, null);
+        [RelayCommand] public static async Task GoToAdmin() => await BaseService.GoToAsync(AppRoutes.Admin, null);
+        [RelayCommand] public static async Task GoToEditProfile() => await BaseService.GoToAsync(AppRoutes.EditProfile, null);
+
 
         [RelayCommand]
         public async Task LoadProfile()
@@ -42,18 +49,12 @@ namespace MobileApp.Models.Account
             }
         }
 
-
-        private async Task GoToLogIn() => await _accountService.GoToAsync(AppRoutes.LogIn, null);
-        [RelayCommand] public async Task GoToAdmin() => await _accountService.GoToAsync(AppRoutes.Admin, null);
-        [RelayCommand] public async Task GoToEditProfile() => await _accountService.GoToAsync(AppRoutes.EditProfile, null);
-        [RelayCommand]
-        public async Task LogOut()
+        [RelayCommand] 
+        public static async Task LogOut()
         {
             AccountService.LogOutAsync();
-            await GoToLogIn();
+            await ProfileViewModel.GoToLogIn();
         }
-
-
 
         [RelayCommand]
         public async Task DeleteUser()
@@ -69,7 +70,7 @@ namespace MobileApp.Models.Account
 
             try
             {
-                if (await _accountService.DeleteUserAsync()) await GoToLogIn();
+                if (await _accountService.DeleteUserAsync()) await ProfileViewModel.GoToLogIn();
                 else ErrorMessage = "Failed to delete account";
             }
             catch (Exception ex)

@@ -9,14 +9,26 @@ namespace MobileApp.Models.Team
     public partial class DetailsViewModel(TeamService teamService) : BaseViewModel
     {
         private readonly TeamService _teamService = teamService;
+
         [ObservableProperty] private TeamInfoDto? team;
         [ObservableProperty] private bool hasLoadError = false;
         [ObservableProperty] private string loadErrorMessage = string.Empty;
 
-        // Computed properties for UI states
         public bool ShowLoadingState => IsLoading;
         public bool ShowErrorState => HasLoadError && !IsLoading;
         public bool ShowContent => Team != null && !IsLoading && !HasLoadError;
+
+
+        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
+        [RelayCommand] public async Task GoToEditTeam() => await BaseService.GoToAsync(AppRoutes.EditTeam, new() { ["TeamId"] = Team.Id });
+        [RelayCommand] public async Task GoToRosterSettings() => await BaseService.GoToAsync(AppRoutes.RosterSettings, new() { ["TeamId"] = Team.Id });
+
+        [RelayCommand] public async Task GoToRoster() => await BaseService.GoToAsync(AppRoutes.Roster, new() { ["TeamId"] = Team.Id });
+        [RelayCommand] public async Task GoToReviewRoster() => await BaseService.GoToAsync(AppRoutes.ReviewRoster, new() { ["TeamId"] = Team.Id });
+        [RelayCommand] public async Task GoToFormation() => await BaseService.GoToAsync(AppRoutes.Formation, new() { ["TeamId"] = Team.Id });
+        [RelayCommand] public async Task GoToTrades() => await BaseService.GoToAsync(AppRoutes.Trades, new() { ["TeamId"] = Team.Id });
+        [RelayCommand] public async Task GoToDraftResults() => await BaseService.GoToAsync(AppRoutes.DraftResults, new() { ["TeamId"] = Team.Id });
+
 
         [RelayCommand]
         public async Task LoadTeamDetails(int teamId)
@@ -52,17 +64,6 @@ namespace MobileApp.Models.Team
             }
         }
 
-        [RelayCommand] public async Task GoBack() => await _teamService.GoBackAsync(null);
-        [RelayCommand] public async Task GoToEditTeam() => await _teamService.GoToAsync(AppRoutes.TeamEdit, new() { ["TeamId"] = Team.Id });
-        [RelayCommand] public async Task GoToRosterSettings() => await _teamService.GoToAsync(AppRoutes.RosterSettings, new() { ["TeamId"] = Team.Id });
-
-        [RelayCommand] public async Task GoToRoster() => await _teamService.GoToAsync(AppRoutes.Roster, new() { ["TeamId"] = Team.Id });
-        [RelayCommand] public async Task GoToReviewRoster() => await _teamService.GoToAsync(AppRoutes.ReviewRoster, new() { ["TeamId"] = Team.Id });
-        [RelayCommand] public async Task GoToFormation() => await _teamService.GoToAsync(AppRoutes.Formation, new() { ["TeamId"] = Team.Id });
-        [RelayCommand] public async Task GoToTrades() => await _teamService.GoToAsync(AppRoutes.Trades, new() { ["TeamId"] = Team.Id });
-        [RelayCommand] public async Task GoToDraftResults() => await _teamService.GoToAsync(AppRoutes.DraftResults, new() { ["TeamId"] = Team.Id });
-
-
         [RelayCommand]
         public async Task DuplicateTeam()
         {
@@ -72,7 +73,7 @@ namespace MobileApp.Models.Team
                 try
                 {
                     if (await _teamService.DuplicateTeamAsync(Team.Id) is TeamBasicInfoDto newTeam)
-                        await _teamService.GoToAsync(AppRoutes.TeamDetails, new() { ["TeamId"] = Team.Id });
+                        await BaseService.GoToAsync(AppRoutes.TeamDetails, new() { ["TeamId"] = Team.Id });
                     else
                         ErrorMessage = "Failed to duplicate team";
                 }
@@ -103,7 +104,7 @@ namespace MobileApp.Models.Team
                     try
                     {
                         if (await _teamService.DeleteTeamAsync(Team.Id))
-                            await _teamService.GoToMyTeamsTabAsync();
+                            await BaseService.GoToMyTeamsTabAsync();
                         else
                             ErrorMessage = "Failed to delete team";
                     }

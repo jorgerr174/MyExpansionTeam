@@ -38,7 +38,7 @@ public partial class App : Application
             var accountService = Handler?.MauiContext?.Services.GetService<AccountService>();
             if (accountService != null)
             {
-                bool isAuthenticated = await accountService.IsAuthenticatedAsync();
+                bool isAuthenticated = await BaseService.IsAuthenticatedAsync();
 
                 // If token expired, user will see login prompts in UI
                 // No need to force navigation - let each page handle its own auth state
