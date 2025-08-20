@@ -8,10 +8,10 @@ namespace METCore.DTOs.Admin
         public RoleEnum Role { get; set; }
 
 
-        public AssignRoleDto() : base() 
+        public AssignRoleDto() : base()
         {
             this.Username = string.Empty;
-        
+
         }
 
         public AssignRoleDto(string Username, RoleEnum Role)

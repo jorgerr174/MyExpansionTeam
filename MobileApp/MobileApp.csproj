@@ -70,7 +70,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\METCore\METCore.csproj" />		
-		<ProjectReference Include="..\METDAL\METDAL.csproj" />		
 	</ItemGroup>
 
 	<ItemGroup>

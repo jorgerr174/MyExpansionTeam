@@ -25,18 +25,18 @@ namespace MobileApp.Models.Team
                 IsLoading = true;
                 DraftResults.Clear();
 
-                if (await _teamService.GetTeamDraftAsync(teamId) is DraftDto draftData 
-                    && draftData.Prospects.Any() && (draftData.Selections?.Any() ?? false) 
+                if (await _teamService.GetTeamDraftAsync(teamId) is DraftDto draftData
+                    && draftData.Prospects.Any() && (draftData.Selections?.Any() ?? false)
                     && draftData.Prospects.Count != draftData.Selections.Count)
                 {
                     foreach (KeyValuePair<int, int> selection in draftData.Selections)
                     {
-                        if(draftData.Prospects.First(p => p.Id == selection.Value) is not ProspectDto prospect) break;
+                        if (draftData.Prospects.First(p => p.Id == selection.Value) is not ProspectDto prospect) break;
 
                         DraftResults.Add(new DraftResultInfo
                         {
-                            Round = selection.Key/100,
-                            PickNumber = selection.Key%100,
+                            Round = selection.Key / 100,
+                            PickNumber = selection.Key % 100,
                             OverallPick = DraftPicks.GetPickOverall(selection.Key),
                             SelectedProspect = prospect,
                             IsUserPick = true
