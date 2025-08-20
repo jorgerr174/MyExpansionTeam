@@ -15,9 +15,6 @@ namespace MobileApp.Models.Account
         [ObservableProperty] private string confirmPassword = string.Empty;
 
 
-        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
-
-
         [RelayCommand]
         public async Task UpdateCredentials()
         {
@@ -47,7 +44,7 @@ namespace MobileApp.Models.Account
                 if (await _accountService.UpdateCredentialsAsync(CurrentPassword, NewUsername, NewPassword))
                 {
                     AccountService.LogOutAsync();
-                    await BaseService.GoToAsync(AppRoutes.LogIn, null);
+                    await BaseService.GoToProfileTabAsync();
                 }
                 else
                     ErrorMessage = "Failed to update credentials";

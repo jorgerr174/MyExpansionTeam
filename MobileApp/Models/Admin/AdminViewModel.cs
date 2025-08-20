@@ -8,7 +8,6 @@ namespace MobileApp.Models.Admin
     {
         private readonly AdminService _adminService = adminService;
 
-        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
         [RelayCommand] public static async Task GoToImport() => await BaseService.GoToAsync(AppRoutes.Import, null);
         [RelayCommand] public static async Task GoToAssignRoles() => await BaseService.GoToAsync(AppRoutes.AssignRoles, null);
     }

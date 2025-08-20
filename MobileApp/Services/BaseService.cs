@@ -18,16 +18,27 @@ namespace MobileApp.Services
 
 
         #region SendRequest
-        protected async Task<HttpResponseMessage> SendRequest(HttpMethod method, string controller, string function, object? obj = null)
+        private static string ObjectToQueryString(object obj)
         {
-            HttpRequestMessage request = new HttpRequestMessage(method, $"{controller}/{function}");
+            var properties = obj.GetType().GetProperties()
+                .Where(p => p.GetValue(obj) != null)
+                .Select(p => $"{p.Name}={Uri.EscapeDataString(p.GetValue(obj)?.ToString() ?? "")}");
+            return string.Join("&", properties);
+        }
+
+        protected async Task<HttpResponseMessage> SendRequest(HttpMethod method, string controller, string function, Object? obj = null)
+        {
+            string url = $"{controller}/{function}";
+
+            HttpRequestMessage request = new(method, url);
 
             // Get JWT token from secure storage instead of cookies
             string? token = await SecureStorage.GetAsync("jwt_token");
             if (!string.IsNullOrEmpty(token))
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            if (obj != null) request.Content = JsonContent.Create(obj);
+            if (obj != null) 
+                request.Content = JsonContent.Create(obj);
             return await _httpClient.SendAsync(request);
         }
         #endregion SendRequest
@@ -70,25 +81,22 @@ namespace MobileApp.Services
         public static async Task GoBackAsync(Dictionary<string, object>? parameters) => await GoTo("..", parameters);
 
         public static async Task GoToHomeTabAsync() => await GoTo(AppRoutes.HomeTab, null);
-        public static async Task GoToTeamsTabAsync() => await GoTo(AppRoutes.TeamsTab, null);
         public static async Task GoToMyTeamsTabAsync() => await GoTo(AppRoutes.MyTeamsTab, null);
         public static async Task GoToProfileTabAsync() => await GoTo(AppRoutes.ProfileTab, null);
 
         public static async Task GoToAsync(string newRoute, Dictionary<string, object>? parameters)
-            => await GoTo(AppRoutes.BuildRoute(Shell.Current?.GetType().Name ?? string.Empty, newRoute), parameters ?? []);
+            => await GoTo(AppRoutes.BuildRoute(Shell.Current?.CurrentPage?.Title ?? string.Empty, newRoute), parameters ?? []);
         #endregion GoTo
     }
 
     public static class AppRoutes
     {
         public const string HomeTab = "HomeTab";
-        public const string TeamsTab = "TeamsTab";
         public const string MyTeamsTab = "MyTeamsTab";
         public const string ProfileTab = "ProfileTab";
 
 
         public const string EditProfile = "EditProfile";
-        public const string LogIn = "LogIn";
         public const string SignUp = "SignUp";
         public const string UpdateCredentials = "UpdateCredentials";
         public const string UpdateUser = "UpdateUser";
@@ -99,6 +107,7 @@ namespace MobileApp.Services
 
         public const string CreateTeam = "CreateTeam";
         public const string TeamDetails = "TeamDetails";
+        public const string Draft = "Draft";
         public const string DraftResults = "DraftResults";
         public const string EditTeam = "EditTeam";
         public const string Formation = "Formation";
@@ -110,7 +119,7 @@ namespace MobileApp.Services
 
         private static readonly HashSet<string> ValidRoutes =
         [
-            EditProfile, LogIn, SignUp, UpdateCredentials, UpdateUser,
+            EditProfile, SignUp, UpdateCredentials, UpdateUser,
             Admin, AssignRoles, Import,
 
             CreateTeam, TeamDetails, DraftResults, EditTeam, Formation, ReviewRoster, Roster, RosterSettings, Trade, Trades
@@ -121,7 +130,7 @@ namespace MobileApp.Services
             return route switch
             {
                 Admin or AssignRoles or Import or
-                EditProfile or LogIn or SignUp or UpdateCredentials or UpdateUser => ProfileTab,
+                EditProfile or SignUp or UpdateCredentials or UpdateUser => ProfileTab,
 
                 CreateTeam or TeamDetails or DraftResults or EditTeam or Formation or
                 ReviewRoster or Roster or RosterSettings or Trade or Trades => MyTeamsTab,

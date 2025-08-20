@@ -27,7 +27,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Get, "User", "Profile");
+                var response = await SendRequest(HttpMethod.Get, "Users", "Profile");
                 return response.IsSuccessStatusCode ? await GetResult<UserDto>(response) : null;
             }
             catch { return null; }

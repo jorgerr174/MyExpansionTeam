@@ -13,7 +13,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Get, "Teams", "Details", new IdDto(teamId));
+                var response = await SendRequest(HttpMethod.Get, "Teams", "Team", new IdDto(teamId));
                 return response.IsSuccessStatusCode ? await GetResult<TeamInfoDto>(response) : null;
             }
             catch { return null; }

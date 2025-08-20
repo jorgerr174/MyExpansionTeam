@@ -6,20 +6,16 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Team
 {
-    public partial class DetailsViewModel(TeamService teamService) : BaseViewModel
+    public partial class DetailsViewModel(TeamService teamService) : TeamBaseViewModel
     {
         private readonly TeamService _teamService = teamService;
 
         [ObservableProperty] private TeamInfoDto? team;
-        [ObservableProperty] private bool hasLoadError = false;
-        [ObservableProperty] private string loadErrorMessage = string.Empty;
 
         public bool ShowLoadingState => IsLoading;
         public bool ShowErrorState => HasLoadError && !IsLoading;
         public bool ShowContent => Team != null && !IsLoading && !HasLoadError;
 
-
-        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
         [RelayCommand] public async Task GoToEditTeam() => await BaseService.GoToAsync(AppRoutes.EditTeam, new() { ["TeamId"] = Team.Id });
         [RelayCommand] public async Task GoToRosterSettings() => await BaseService.GoToAsync(AppRoutes.RosterSettings, new() { ["TeamId"] = Team.Id });
 
@@ -31,7 +27,7 @@ namespace MobileApp.Models.Team
 
 
         [RelayCommand]
-        public async Task LoadTeamDetails(int teamId)
+        public override async Task LoadViewAsync(int teamId)
         {
             IsLoading = true;
             HasLoadError = false;

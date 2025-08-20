@@ -17,9 +17,6 @@ namespace MobileApp.Models.Account
         [ObservableProperty] private string tlf = string.Empty;
 
 
-        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
-
-
         [RelayCommand]
         public async Task SignUpAsync()
         {
@@ -42,7 +39,7 @@ namespace MobileApp.Models.Account
             try
             {
                 if (await _accountService.SignUpAsync(Username, Password, ConfirmPassword, FirstName, LastName, Email, Tlf))
-                    await BaseService.GoToAsync(AppRoutes.LogIn, null);
+                    await BaseService.GoToProfileTabAsync();
                 else
                     ErrorMessage = "Sign up failed";
             }

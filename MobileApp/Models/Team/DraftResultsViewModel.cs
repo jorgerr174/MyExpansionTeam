@@ -1,85 +1,49 @@
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.Player;
 using METCore.DTOs.Team;
 using MobileApp.Services;
+using static METCore.Enums.Types;
 
 namespace MobileApp.Models.Team
 {
-    public partial class DraftResultsViewModel : INotifyPropertyChanged
+    public partial class DraftResultsViewModel(TeamService teamService) : TeamBaseViewModel
     {
-        private readonly TeamService _teamService;
-        private bool _isLoading;
-        private bool _hasDraftResults;
+        private readonly TeamService _teamService = teamService;
+        private int teamId = 0;
+        [ObservableProperty] private bool hasDraftResults = false;
 
-        public DraftResultsViewModel(TeamService teamService, int teamId)
-        {
-            _teamService = teamService;
-            TeamId = teamId;
+        public ObservableCollection<DraftResultInfo> DraftResults { get; } = [];
 
-            DraftResults = [];
+        [RelayCommand] public async Task GoToDraft() => await BaseService.GoToAsync(AppRoutes.Draft, new() { ["TeamId"] = teamId });
 
-            LoadDraftResultsCommand = new Command(async () => await LoadDraftResultsAsync());
-            BackCommand = new Command(async () => await DraftResultsViewModel.BackAsync());
-        }
-
-        public int TeamId { get; }
-
-        public bool IsLoading
-        {
-            get => _isLoading;
-            set => SetProperty(ref _isLoading, value);
-        }
-
-        public bool HasDraftResults
-        {
-            get => _hasDraftResults;
-            set => SetProperty(ref _hasDraftResults, value);
-        }
-
-        public ObservableCollection<DraftResultInfo> DraftResults { get; }
-
-        public ICommand LoadDraftResultsCommand { get; }
-        public ICommand BackCommand { get; }
-
-        public event Func<Task> NavigateBackRequested;
-        public event Func<string, string, string, Task> ShowAlertRequested;
-
-        public async Task LoadDraftResultsAsync()
+        public override async Task LoadViewAsync(int teamId)
         {
             try
             {
                 IsLoading = true;
-
-                // Get draft results from service
-                var draftData = await _teamService.GetTeamDraftAsync(TeamId);
-
                 DraftResults.Clear();
 
-                if (draftData?.Prospects != null && draftData.Prospects.Any())
+                if (await _teamService.GetTeamDraftAsync(teamId) is DraftDto draftData 
+                    && draftData.Prospects.Any() && (draftData.Selections?.Any() ?? false) 
+                    && draftData.Prospects.Count != draftData.Selections.Count)
                 {
-                    // Convert prospects to draft results
-                    foreach (var prospect in draftData.Prospects.OrderBy(p => p.Consensus))
+                    foreach (KeyValuePair<int, int> selection in draftData.Selections)
                     {
-                        // Calculate pick information
-                        var pickNumber = DraftResultsViewModel.GetPickNumberForProspect(prospect, draftData);
-                        var round = Math.Floor(pickNumber / 100.0);
-                        var pickInRound = pickNumber % 100;
-                        var overallPick = (int)((round - 1) * 32 + pickInRound);
+                        if(draftData.Prospects.First(p => p.Id == selection.Value) is not ProspectDto prospect) break;
 
                         DraftResults.Add(new DraftResultInfo
                         {
-                            Round = (int)round,
-                            PickNumber = (int)pickInRound,
-                            OverallPick = overallPick,
+                            Round = selection.Key/100,
+                            PickNumber = selection.Key%100,
+                            OverallPick = DraftPicks.GetPickOverall(selection.Key),
                             SelectedProspect = prospect,
-                            IsUserPick = true // All prospects in team's draft are user picks
+                            IsUserPick = true
                         });
                     }
 
-                    HasDraftResults = true;
+                    HasDraftResults = DraftResults.Count > 0;
                 }
                 else
                 {
@@ -88,7 +52,7 @@ namespace MobileApp.Models.Team
             }
             catch (Exception ex)
             {
-                await ShowAlertRequested?.Invoke("Error", $"Failed to load draft results: {ex.Message}", "OK");
+                LoadErrorMessage = $"Failed to load draft results: {ex.Message}";
                 HasDraftResults = false;
             }
             finally
@@ -96,44 +60,5 @@ namespace MobileApp.Models.Team
                 IsLoading = false;
             }
         }
-
-        private static int GetPickNumberForProspect(ProspectDto prospect, DraftDto draftData)
-        {
-            if (draftData.Selections != null && prospect.Id.HasValue)
-            {
-                var selection = draftData.Selections.FirstOrDefault(s => s.Value == prospect.Id.Value);
-                if (selection.Key != 0)
-                    return selection.Key;
-            }
-
-            var teamPicks = draftData.Picks?[0] ?? [];
-            if (teamPicks.Any())
-            {
-                var prospectIndex = draftData.Prospects.ToList().IndexOf(prospect);
-                if (prospectIndex >= 0 && prospectIndex < teamPicks.Count)
-                {
-                    return teamPicks.OrderBy(p => p).ToList()[prospectIndex];
-                }
-            }
-
-            return 101;
-        }
-
-        private static async Task BackAsync() => await BaseService.GoBackAsync(null);
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-        protected bool SetProperty<T>(ref T backingStore, T value, [CallerMemberName] string propertyName = "")
-        {
-            if (EqualityComparer<T>.Default.Equals(backingStore, value))
-                return false;
-
-            backingStore = value;
-            OnPropertyChanged(propertyName);
-            return true;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

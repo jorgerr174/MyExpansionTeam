@@ -19,7 +19,7 @@
                 <Label Grid.Row="1" Text="⚠️" HorizontalOptions="Center" FontSize="48" />
                 <Label Grid.Row="2" Text="{Binding LoadErrorMessage}" HorizontalOptions="Center" FontSize="16" TextColor="Red" />
                 <Button Grid.Row="3" Text="Go Back" Command="{Binding GoBackCommand}" HorizontalOptions="Center" BackgroundColor="Gray" TextColor="White" />
-                <Button Grid.Row="4" Text="Try Again" Command="{Binding LoadTeamDetailsCommand}" CommandParameter="{Binding Team.Id}" HorizontalOptions="Center" BackgroundColor="Blue" TextColor="White" />
+                <Button Grid.Row="4" Text="Try Again" Command="{Binding LoadViewCommand}" CommandParameter="{Binding Team.Id}" HorizontalOptions="Center" BackgroundColor="Blue" TextColor="White" />
             </Grid>
 
             <!-- Content State -->

@@ -2,9 +2,9 @@
 
 namespace MobileApp.Views.Account
 {
-    public partial class Profile : ContentPage
+    public partial class ProfileTab : ContentPage
     {
-        public Profile(ProfileViewModel viewModel)
+        public ProfileTab(ProfileTabViewModel viewModel)
         {
             InitializeComponent();
             BindingContext = viewModel;
@@ -13,9 +13,9 @@ namespace MobileApp.Views.Account
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            if (BindingContext is ProfileViewModel viewModel)
+            if (BindingContext is ProfileTabViewModel viewModel)
             {
-                await viewModel.LoadProfileCommand.ExecuteAsync(null);
+                await viewModel.LoadAuthStateCommand.ExecuteAsync(null);
             }
         }
     }
