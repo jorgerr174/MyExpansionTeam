@@ -65,7 +65,7 @@ namespace MobileApp
             Routing.RegisterRoute(AppRoutes.CreateTeam, typeof(Views.Team.Create));
             Routing.RegisterRoute(AppRoutes.TeamDetails, typeof(Views.Team.Details));
             Routing.RegisterRoute(AppRoutes.DraftResults, typeof(Views.Team.DraftResults));
-            Routing.RegisterRoute(AppRoutes.TeamEdit, typeof(Views.Team.Edit));
+            Routing.RegisterRoute(AppRoutes.EditTeam, typeof(Views.Team.Edit));
             Routing.RegisterRoute(AppRoutes.Formation, typeof(Views.Team.Formation));
             Routing.RegisterRoute(AppRoutes.ReviewRoster, typeof(Views.Team.ReviewRoster));
             Routing.RegisterRoute(AppRoutes.Roster, typeof(Views.Team.Roster));

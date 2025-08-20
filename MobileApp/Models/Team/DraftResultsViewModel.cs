@@ -22,7 +22,7 @@ namespace MobileApp.Models.Team
             DraftResults = [];
 
             LoadDraftResultsCommand = new Command(async () => await LoadDraftResultsAsync());
-            BackCommand = new Command(async () => await BackAsync());
+            BackCommand = new Command(async () => await DraftResultsViewModel.BackAsync());
         }
 
         public int TeamId { get; }
@@ -64,7 +64,7 @@ namespace MobileApp.Models.Team
                     foreach (var prospect in draftData.Prospects.OrderBy(p => p.Consensus))
                     {
                         // Calculate pick information
-                        var pickNumber = GetPickNumberForProspect(prospect, draftData);
+                        var pickNumber = DraftResultsViewModel.GetPickNumberForProspect(prospect, draftData);
                         var round = Math.Floor(pickNumber / 100.0);
                         var pickInRound = pickNumber % 100;
                         var overallPick = (int)((round - 1) * 32 + pickInRound);
@@ -97,7 +97,7 @@ namespace MobileApp.Models.Team
             }
         }
 
-        private int GetPickNumberForProspect(ProspectDto prospect, DraftDto draftData)
+        private static int GetPickNumberForProspect(ProspectDto prospect, DraftDto draftData)
         {
             if (draftData.Selections != null && prospect.Id.HasValue)
             {
@@ -119,7 +119,7 @@ namespace MobileApp.Models.Team
             return 101;
         }
 
-        private async Task BackAsync() => await _teamService.GoBackAsync(null);
+        private static async Task BackAsync() => await BaseService.GoBackAsync(null);
 
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

@@ -143,7 +143,7 @@ namespace MobileApp.Models.Admin
                 ErrorMessage = string.Empty;
 
                 // Create ImportDto
-                var importDto = new ImportDto
+                ImportDto importDto = new() 
                 {
                     Type = SelectedImportType.Type,
                     StatsType = SelectedStatsType?.Type ?? Types.StatsEnum.PassStats,
@@ -151,14 +151,12 @@ namespace MobileApp.Models.Admin
                 };
 
                 // Read file content
-                using var stream = await SelectedFile.OpenReadAsync();
-                using var memoryStream = new MemoryStream();
+                using Stream stream = await SelectedFile.OpenReadAsync();
+                using MemoryStream memoryStream = new();
                 await stream.CopyToAsync(memoryStream);
-                var fileContent = memoryStream.ToArray();
+                byte[] fileContent = memoryStream.ToArray();
 
-                var result = await _adminService.ImportDataAsync(importDto, fileContent, SelectedFile.FileName);
-
-                if (result != null)
+                if (await _adminService.ImportDataAsync(importDto, fileContent, SelectedFile.FileName) is ResultImportDto result)
                 {
                     if (result.Content?.Length > 0)
                     {

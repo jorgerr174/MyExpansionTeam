@@ -56,7 +56,7 @@
                     TextColor="White" />
 
                 <Button Text="Nuevo equipo" 
-                    Command="{Binding CreateTeamCommand}"
+                    Command="{Binding GoToCreateTeamCommand}"
                     BackgroundColor="Green"
                     TextColor="White" />
 

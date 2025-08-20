@@ -29,6 +29,10 @@ namespace MobileApp.Models.Team
         public string AvailableCapText => $"Available: ${AvailableCap:F1}M";
         public int TotalPlayersCount => AllRosterPlayers.Count;
 
+
+        [RelayCommand] public async Task GoToRoster() => await BaseService.GoToAsync(AppRoutes.Roster, new() { ["TeamId"] = TeamId });
+
+
         [RelayCommand]
         public async Task LoadRoster(int id)
         {
@@ -123,7 +127,7 @@ namespace MobileApp.Models.Team
                 teamDto.SelectedIds = [.. AllRosterPlayers.Select(p => p.Id)];
 
                 if (await _teamService.UpdateRosterAsync(teamDto))
-                    await _teamService.GoToMyTeamsTabAsync();
+                    await BaseService.GoToMyTeamsTabAsync();
                 else
                     ErrorMessage = "Failed to save roster";
             }
@@ -136,8 +140,6 @@ namespace MobileApp.Models.Team
                 IsLoading = false;
             }
         }
-
-        [RelayCommand] public async Task GoToRoster() => await _teamService.GoToAsync(AppRoutes.Roster, new() { ["TeamId"] = TeamId });
 
         private void ApplyPositionFilter() => FilteredPlayers = SelectedPositionFilter == "All"
                 ? AllRosterPlayers

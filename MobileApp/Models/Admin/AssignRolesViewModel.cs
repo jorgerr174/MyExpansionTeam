@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.Admin;
 using METCore.DTOs.Shared;
+using METCore.DTOs.User;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
 using static METCore.Enums.Types;
@@ -17,23 +18,22 @@ namespace MobileApp.Models.Admin
         {
             _adminService = adminService;
 
-            // Set default page size to match web app
             SelectedPageSize = PageSizeOptions.First(x => x.Value == 25);
             PageSize = 25;
 
-            _ = LoadUsers(); // Initial load
+            _ = LoadUsers();
         }
 
+        [ObservableProperty] private PageSizeOption selectedPageSize;
+        [ObservableProperty] private int pageSize = 25;
         [ObservableProperty] private string searchFilter = string.Empty;
         [ObservableProperty] private ObservableCollection<UserItem> users = [];
         [ObservableProperty] private int currentPage = 1;
-        [ObservableProperty] private int pageSize = 25;
         [ObservableProperty] private int totalUsers = 0;
         [ObservableProperty] private int totalPages = 0;
         [ObservableProperty] private bool hasUsers = false;
         [ObservableProperty] private bool showPagination = false;
         [ObservableProperty] private string resultsInfo = string.Empty;
-        [ObservableProperty] private PageSizeOption selectedPageSize;
 
         public List<PageSizeOption> PageSizeOptions { get; } =
         [
@@ -42,7 +42,6 @@ namespace MobileApp.Models.Admin
             new PageSizeOption { Value = 50, Display = "50" }
         ];
 
-        // Pagination properties
         public string PageInfo => TotalPages > 0 ? $"Page {CurrentPage} of {TotalPages}" : "";
         public int PreviousPage => CurrentPage - 1;
         public int NextPage => CurrentPage + 1;
@@ -64,21 +63,20 @@ namespace MobileApp.Models.Admin
 
             try
             {
-                var searchDto = new SearchDto
+                SearchDto searchDto = new()
                 {
                     Filter = SearchFilter,
                     Page = CurrentPage,
                     PageSize = PageSize
                 };
 
-                var result = await _adminService.GetUsersAsync(searchDto);
-                if (result != null)
+                if (await _adminService.GetUsersAsync(searchDto) is SearchResultDto<UserDto> result)
                 {
                     TotalUsers = result.Total;
                     TotalPages = (int)Math.Ceiling((double)TotalUsers / PageSize);
 
                     Users.Clear();
-                    foreach (var user in result.List)
+                    foreach (UserDto user in result.List)
                     {
                         Users.Add(new UserItem
                         {
@@ -182,7 +180,7 @@ namespace MobileApp.Models.Admin
             }
         }
 
-        public void OnRoleChanged(UserItem user, RoleEnum newRole)
+        public static void OnRoleChanged(UserItem user, RoleEnum newRole)
         {
             user.SelectedRole = newRole;
             user.HasChanges = user.CurrentRole != user.SelectedRole;
