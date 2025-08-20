@@ -103,6 +103,26 @@ namespace MobileApp.Services
         #endregion CU004 UpdateCredentials
 
 
+        #region UpdateUser
+        public async Task<bool> UpdateUserAsync(string firstName, string lastName, string email, string tlf)
+        {
+            try
+            {
+                return (await SendRequest(HttpMethod.Put, "User", "UpdateUser",
+                    new UserDto()
+                    {
+                        FirstName = firstName,
+                        LastName = lastName,
+                        Email = email,
+                        Tlf = tlf
+                    })
+                    ).IsSuccessStatusCode;
+            }
+            catch { return false; }
+        }
+        #endregion UpdateUser
+
+
         #region CU005 DeleteUser
         public async Task<bool> DeleteUserAsync()
         {

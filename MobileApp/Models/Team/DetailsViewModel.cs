@@ -6,15 +6,9 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Team
 {
-    public partial class DetailsViewModel : BaseViewModel
+    public partial class DetailsViewModel(TeamService teamService) : BaseViewModel
     {
-        private readonly TeamService _teamService;
-
-        public DetailsViewModel(TeamService teamService)
-        {
-            _teamService = teamService;
-        }
-
+        private readonly TeamService _teamService = teamService;
         [ObservableProperty] private TeamInfoDto? team;
         [ObservableProperty] private bool hasLoadError = false;
         [ObservableProperty] private string loadErrorMessage = string.Empty;

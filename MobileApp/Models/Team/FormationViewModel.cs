@@ -15,12 +15,12 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private string teamName = string.Empty;
         [ObservableProperty] private string currentFormationType = "offense";
         [ObservableProperty] private string selectedFormation = "";
-        [ObservableProperty] private IList<SelectablePlayerViewModel> rosterPlayers = new List<SelectablePlayerViewModel>();
-        [ObservableProperty] private IList<SelectablePlayerViewModel> benchPlayers = new List<SelectablePlayerViewModel>();
-        [ObservableProperty] private Dictionary<string, SelectablePlayerViewModel?> starterPositions = new();
-        [ObservableProperty] private List<FormationInfo> availableFormations = new();
+        [ObservableProperty] private IList<SelectablePlayerViewModel> rosterPlayers = [];
+        [ObservableProperty] private IList<SelectablePlayerViewModel> benchPlayers = [];
+        [ObservableProperty] private Dictionary<string, SelectablePlayerViewModel?> starterPositions = [];
+        [ObservableProperty] private List<FormationInfo> availableFormations = [];
 
-        public List<string> FormationTypes { get; } = new() { "offense", "defense", "special" };
+        public List<string> FormationTypes { get; } = ["offense", "defense", "special"];
 
         [RelayCommand]
         public async Task LoadFormation(int id)
@@ -73,7 +73,7 @@ namespace MobileApp.Models.Team
             LoadFormationsForType(formationType);
 
             // Reset starters when changing formation type
-            StarterPositions = new Dictionary<string, SelectablePlayerViewModel?>();
+            StarterPositions = [];
             UpdateBenchPlayers();
         }
 
@@ -167,7 +167,7 @@ namespace MobileApp.Models.Team
 
         private void InitializePositions(FormationInfo formation)
         {
-            StarterPositions = new Dictionary<string, SelectablePlayerViewModel?>();
+            StarterPositions = [];
 
             foreach (var position in formation.Positions)
             {
@@ -180,7 +180,7 @@ namespace MobileApp.Models.Team
         private void UpdateBenchPlayers()
         {
             var assignedPlayers = StarterPositions.Values.Where(p => p != null).ToList();
-            BenchPlayers = RosterPlayers.Except(assignedPlayers).ToList();
+            BenchPlayers = [.. RosterPlayers.Except(assignedPlayers)];
         }
 
         private void LoadExistingLineups(TeamDto team)
@@ -190,8 +190,10 @@ namespace MobileApp.Models.Team
 
         private LineupDto CreateLineupFromStarters()
         {
-            var lineup = new LineupDto();
-            lineup.Formation = SelectedFormation;
+            LineupDto lineup = new()
+            {
+                Formation = SelectedFormation
+            };
 
             var positionIds = StarterPositions.Keys.OrderBy(k => k).ToList();
 
@@ -212,10 +214,12 @@ namespace MobileApp.Models.Team
 
         private SPLineupDto CreateSPLineupFromStarters()
         {
-            var lineup = new SPLineupDto();
-            lineup.Formation = SelectedFormation;
+            SPLineupDto lineup = new()
+            {
+                Formation = SelectedFormation
+            };
 
-            var positionIds = StarterPositions.Keys.OrderBy(k => k).ToList();
+            IList<string>? positionIds = [.. StarterPositions.Keys.OrderBy(k => k)];
 
             if (positionIds.Count > 0 && StarterPositions[positionIds[0]] != null) lineup.Player1 = StarterPositions[positionIds[0]]!.Id;
             if (positionIds.Count > 1 && StarterPositions[positionIds[1]] != null) lineup.Player2 = StarterPositions[positionIds[1]]!.Id;

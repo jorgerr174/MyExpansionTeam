@@ -3,13 +3,8 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Team
 {
-    public partial class TradeErrorViewModel : BaseViewModel
+    public partial class TradeErrorViewModel(TeamService teamService) : BaseViewModel
     {
-        private readonly TeamService _teamService;
-
-        public TradeErrorViewModel(TeamService teamService)
-        {
-            _teamService = teamService;
-        }
+        private readonly TeamService _teamService = teamService;
     }
 }

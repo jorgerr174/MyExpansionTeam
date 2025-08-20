@@ -7,17 +7,10 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Team
 {
-    public partial class RosterSettingsViewModel : BaseViewModel
+    public partial class RosterSettingsViewModel(TeamService teamService, AccountService accountService) : BaseViewModel
     {
-        private readonly TeamService _teamService;
-        private readonly AccountService _accountService;
-
-        public RosterSettingsViewModel(TeamService teamService, AccountService accountService)
-        {
-            _teamService = teamService;
-            _accountService = accountService;
-        }
-
+        private readonly TeamService _teamService = teamService;
+        private readonly AccountService _accountService = accountService;
         [ObservableProperty] private int teamId;
         [ObservableProperty] private string teamName = string.Empty;
         [ObservableProperty] private int rosterSettingsCap = 80;
@@ -42,7 +35,7 @@ namespace MobileApp.Models.Team
                     RosterSettingsCap = team.RosterSettingsCap;
                     RosterSettingsMaxPerTeam = team.RosterSettingsMaxPerTeam;
                     RosterSettingsProtectedPerTeam = team.RosterSettingsProtectedPerTeam;
-                    RosterSettingsProtectedPlayersIds = team.RosterSettingsProtectedPlayersIds.ToList();
+                    RosterSettingsProtectedPlayersIds = [.. team.RosterSettingsProtectedPlayersIds];
                 }
             }
             catch (Exception ex)
@@ -63,11 +56,11 @@ namespace MobileApp.Models.Team
             {
                 if (await _teamService.GetProtectablePlayersAsync(TeamId) is IList<SelectableDto> players)
                 {
-                    IList<SelectablePlayerViewModel> wrappedPlayers = players.Select(p =>
+                    IList<SelectablePlayerViewModel> wrappedPlayers = [.. players.Select(p =>
                     {
                         SelectablePlayerViewModel wrapper = new(p) { IsSelected = RosterSettingsProtectedPlayersIds.Contains(p.Id) };
                         return wrapper;
-                    }).ToList();
+                    })];
 
                     ProtectablePlayers = wrappedPlayers;
                     ShowPlayerSelection = true;
@@ -109,7 +102,7 @@ namespace MobileApp.Models.Team
 
             try
             {
-                TeamInfoDto teamDto = new ()
+                TeamInfoDto teamDto = new()
                 {
                     Id = TeamId,
                     RosterSettingsCap = RosterSettingsCap,

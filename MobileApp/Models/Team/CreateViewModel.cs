@@ -5,15 +5,9 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Team
 {
-    public partial class CreateViewModel : BaseViewModel
+    public partial class CreateViewModel(TeamService teamService) : BaseViewModel
     {
-        private readonly TeamService _teamService;
-
-        public CreateViewModel(TeamService teamService)
-        {
-            _teamService = teamService;
-        }
-
+        private readonly TeamService _teamService = teamService;
         [ObservableProperty] private string location = string.Empty;
         [ObservableProperty] private string abbreviation = string.Empty;
         [ObservableProperty] private string mascot = string.Empty;

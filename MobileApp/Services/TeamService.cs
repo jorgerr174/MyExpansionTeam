@@ -250,9 +250,9 @@ namespace MobileApp.Services
             {
                 if (year == 0) year = DateTime.Now.Year;
                 var response = await SendRequest(HttpMethod.Get, "Players", "GetDraftProspects", new IdDto(year));
-                return response.IsSuccessStatusCode ? await GetResult<IEnumerable<ProspectDto>>(response) : new List<ProspectDto>();
+                return response.IsSuccessStatusCode ? await GetResult<IEnumerable<ProspectDto>>(response) : [];
             }
-            catch { return new List<ProspectDto>(); }
+            catch { return []; }
         }
 
         public async Task<bool> SaveDraftAsync(DraftDto draftDto)
