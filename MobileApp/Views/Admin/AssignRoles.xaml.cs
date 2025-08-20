@@ -27,7 +27,7 @@ namespace MobileApp.Views.Admin
                 picker.BindingContext is UserItem user)
             {
                 var newRole = (RoleEnum)picker.SelectedIndex;
-                ViewModel.OnRoleChanged(user, newRole);
+                AssignRolesViewModel.OnRoleChanged(user, newRole);
             }
         }
     }

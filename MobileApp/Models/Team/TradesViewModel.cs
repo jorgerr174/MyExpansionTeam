@@ -10,6 +10,7 @@ namespace MobileApp.Models.Team
     public partial class TradesViewModel(TeamService teamService) : BaseViewModel
     {
         private readonly TeamService _teamService = teamService;
+
         [ObservableProperty] private int teamId;
         [ObservableProperty] private string teamName = string.Empty;
         [ObservableProperty] private IList<TradeDisplayInfo> trades = [];
@@ -18,6 +19,10 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private bool hasNoTrades = false;
 
         public List<string> YearFilters { get; private set; } = ["All"];
+
+
+        [RelayCommand] public async Task GoToTrade() => await BaseService.GoToAsync(AppRoutes.Trade, new() { ["TeamId"] = TeamId });
+
 
         [RelayCommand]
         public async Task LoadTrades(int id)
@@ -77,9 +82,7 @@ namespace MobileApp.Models.Team
             ApplyYearFilter();
         }
 
-        [RelayCommand] public async Task ViewTradeDetails(TradeDisplayInfo trade) => await Shell.Current.DisplayAlert("Trade Details", CreateTradeDetailsText(trade), "OK");
-
-        [RelayCommand] public async Task GoToTrade() => await _teamService.GoToAsync(AppRoutes.Trade, new() { ["TeamId"] = TeamId });
+        [RelayCommand] public static async Task ViewTradeDetails(TradeDisplayInfo trade) => await Shell.Current.DisplayAlert("Trade Details", TradesViewModel.CreateTradeDetailsText(trade), "OK");
 
         private void ApplyYearFilter()
             => FilteredTrades = SelectedYearFilter == "All" ? Trades
@@ -91,7 +94,7 @@ namespace MobileApp.Models.Team
             return franchise?.Name ?? $"Franchise {franchiseId}";
         }
 
-        private string CreateTradeDetailsText(TradeDisplayInfo trade)
+        private static string CreateTradeDetailsText(TradeDisplayInfo trade)
         {
             string details = $"Trade with {trade.FranchiseName}\n";
             details += $"Date: {trade.Date:yyyy-MM-dd}\n";

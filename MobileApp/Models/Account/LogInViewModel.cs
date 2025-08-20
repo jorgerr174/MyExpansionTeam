@@ -5,11 +5,15 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Account
 {
-    public partial class LogInViewModel(AccountService authService) : BaseViewModel
+    public partial class LogInViewModel(AccountService accountService) : BaseViewModel
     {
-        private readonly AccountService _accountService = authService;
+        private readonly AccountService _accountService = accountService;
+
         [ObservableProperty] private string identifier = string.Empty;
         [ObservableProperty] private string password = string.Empty;
+
+
+        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
 
 
         [RelayCommand]
@@ -27,7 +31,7 @@ namespace MobileApp.Models.Account
             try
             {
                 if (await _accountService.LogInAsync(Identifier, Password))
-                    await _accountService.GoToHomeTabAsync();
+                    await BaseService.GoToHomeTabAsync();
                 else
                     ErrorMessage = "Invalid credentials";
             }

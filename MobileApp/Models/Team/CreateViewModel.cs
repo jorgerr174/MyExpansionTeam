@@ -8,9 +8,14 @@ namespace MobileApp.Models.Team
     public partial class CreateViewModel(TeamService teamService) : BaseViewModel
     {
         private readonly TeamService _teamService = teamService;
+
         [ObservableProperty] private string location = string.Empty;
         [ObservableProperty] private string abbreviation = string.Empty;
         [ObservableProperty] private string mascot = string.Empty;
+
+
+        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
+
 
         [RelayCommand]
         public async Task CreateTeam()
@@ -27,7 +32,7 @@ namespace MobileApp.Models.Team
             try
             {
                 if (await _teamService.CreateTeamAsync(Location, Abbreviation, Mascot) is int teamId && teamId > 0)
-                    await _teamService.GoToAsync(AppRoutes.RosterSettings, new() { ["TeamId"] = teamId });
+                    await BaseService.GoToAsync(AppRoutes.RosterSettings, new() { ["TeamId"] = teamId });
                 else
                     ErrorMessage = "Failed to create team";
             }

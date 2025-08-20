@@ -10,30 +10,27 @@ namespace MobileApp.Models.Team
     public partial class TradeViewModel(TeamService teamService) : BaseViewModel
     {
         private readonly TeamService _teamService = teamService;
+
         [ObservableProperty] private int teamId;
         [ObservableProperty] private string teamName = string.Empty;
         [ObservableProperty] private string tradeContext = "roster"; // "roster" or "draft"
         [ObservableProperty] private int currentPick = -1;
 
-        // Franchise selection
         [ObservableProperty] private List<FranchiseInfo> franchises = FranchiseInfo.GetAllFranchises();
         [ObservableProperty] private FranchiseInfo? selectedFranchise;
         [ObservableProperty] private bool showFranchiseSelection = true;
         [ObservableProperty] private bool showTradeBuilder = false;
 
-        // Available items for trade
         [ObservableProperty] private IList<SelectableDto> availableTeamPlayers = [];
         [ObservableProperty] private IList<SelectableDto> availableFranchisePlayers = [];
         [ObservableProperty] private IList<string> availableTeamPicks = [];
         [ObservableProperty] private IList<string> availableFranchisePicks = [];
 
-        // Selected items for trade
         [ObservableProperty] private IList<SelectableDto> selectedTeamPlayers = [];
         [ObservableProperty] private IList<SelectableDto> selectedFranchisePlayers = [];
         [ObservableProperty] private IList<string> selectedTeamPicks = [];
         [ObservableProperty] private IList<string> selectedFranchisePicks = [];
 
-        // Trade values and validation
         [ObservableProperty] private decimal teamTradeValue = 0;
         [ObservableProperty] private decimal franchiseTradeValue = 0;
         [ObservableProperty] private decimal teamCurrentCap = 0;
@@ -99,8 +96,8 @@ namespace MobileApp.Models.Team
 
                     AvailableTeamPlayers = tradeData.TeamPlayers;
                     AvailableFranchisePlayers = tradeData.FranchisePlayers;
-                    AvailableTeamPicks = [.. tradeData.TeamPicks.Select(p => FormatPickAsString(p))];
-                    AvailableFranchisePicks = [.. tradeData.FranchisePicks.Select(p => FormatPickAsString(p))];
+                    AvailableTeamPicks = [.. tradeData.TeamPicks.Select(p => TradeViewModel.FormatPickAsString(p))];
+                    AvailableFranchisePicks = [.. tradeData.FranchisePicks.Select(p => TradeViewModel.FormatPickAsString(p))];
                     TeamCurrentCap = tradeData.TeamCurrentCap;
 
                     ClearSelections();
@@ -124,9 +121,7 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         public void ToggleTeamPlayer(SelectableDto player)
         {
-            if (SelectedTeamPlayers.Contains(player))
-                SelectedTeamPlayers.Remove(player);
-            else
+            if (!SelectedTeamPlayers.Remove(player))
                 SelectedTeamPlayers = [.. SelectedTeamPlayers, player];
 
             CalculateTradeValues();
@@ -135,9 +130,7 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         public void ToggleFranchisePlayer(SelectableDto player)
         {
-            if (SelectedFranchisePlayers.Contains(player))
-                SelectedFranchisePlayers.Remove(player);
-            else
+            if (!SelectedFranchisePlayers.Remove(player))
                 SelectedFranchisePlayers = [.. SelectedFranchisePlayers, player];
 
             CalculateTradeValues();
@@ -146,8 +139,7 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         public void ToggleTeamPick(string pick)
         {
-            if (SelectedTeamPicks.Contains(pick)) SelectedTeamPicks.Remove(pick);
-            else SelectedTeamPicks = [.. SelectedTeamPicks, pick];
+            if (!SelectedTeamPicks.Remove(pick)) SelectedTeamPicks = [.. SelectedTeamPicks, pick];
 
             CalculateTradeValues();
         }
@@ -155,8 +147,7 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         public void ToggleFranchisePick(string pick)
         {
-            if (SelectedFranchisePicks.Contains(pick)) SelectedFranchisePicks.Remove(pick);
-            else SelectedFranchisePicks = [.. SelectedFranchisePicks, pick];
+            if (!SelectedFranchisePicks.Remove(pick)) SelectedFranchisePicks = [.. SelectedFranchisePicks, pick];
 
             CalculateTradeValues();
         }
@@ -225,16 +216,16 @@ namespace MobileApp.Models.Team
                     FranchiseId = tradeDto.FranchiseId
                 };
 
-                await _teamService.GoBackAsync(new Dictionary<string, object> { ["tradeResult"] = tradeResult });
+                await BaseService.GoBackAsync(new Dictionary<string, object> { ["tradeResult"] = tradeResult });
             }
             else
-                await _teamService.GoToMyTeamsTabAsync();
+                await BaseService.GoToMyTeamsTabAsync();
         }
 
         private async Task GoBackToCaller()
         {
-            if (TradeContext == "draft") await _teamService.GoBackAsync(null);
-            else await _teamService.GoToMyTeamsTabAsync();
+            if (TradeContext == "draft") await BaseService.GoBackAsync(null);
+            else await BaseService.GoToMyTeamsTabAsync();
         }
 
         private void ClearSelections()
@@ -253,10 +244,10 @@ namespace MobileApp.Models.Team
             FranchiseTradeValue = 0;
 
             foreach (var pick in SelectedTeamPicks)
-                TeamTradeValue += GetSimplePickValue(pick);
+                TeamTradeValue += TradeViewModel.GetSimplePickValue(pick);
 
             foreach (var pick in SelectedFranchisePicks)
-                FranchiseTradeValue += GetSimplePickValue(pick);
+                FranchiseTradeValue += TradeViewModel.GetSimplePickValue(pick);
 
             foreach (var player in SelectedTeamPlayers)
                 if (decimal.TryParse(player.PureAPY, out decimal value))
@@ -270,7 +261,7 @@ namespace MobileApp.Models.Team
             OnPropertyChanged(nameof(HasSelectedItems));
         }
 
-        private decimal GetSimplePickValue(string pick)
+        private static decimal GetSimplePickValue(string pick)
         {
             if (pick.StartsWith("r1")) return 1000;
             if (pick.StartsWith("r2")) return 500;
@@ -282,7 +273,7 @@ namespace MobileApp.Models.Team
             return 0;
         }
 
-        private string FormatPickAsString(int pick) => $"r{((pick - 1) / 32) + 1}p{((pick - 1) % 32) + 1}";
+        private static string FormatPickAsString(int pick) => $"r{((pick - 1) / 32) + 1}p{((pick - 1) % 32) + 1}";
 
         private int ParsePickFromString(string pick)
         {

@@ -10,7 +10,7 @@ namespace MobileApp.Models.Team
     public partial class RosterViewModel(TeamService teamService) : BaseViewModel
     {
         private readonly TeamService _teamService = teamService;
-        private const decimal BaseSalaryCap = 224m; // NFL salary cap in millions
+        private const decimal BaseSalaryCap = 224m;
 
         [ObservableProperty] private int teamId;
         [ObservableProperty] private string teamName = string.Empty;
@@ -22,10 +22,11 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private decimal currentSalaryCap = 0m;
         [ObservableProperty] private int selectedPlayerCount = 0;
 
-        // Salary cap properties
+
         public decimal AvailableCap => BaseSalaryCap - CurrentSalaryCap;
         public string SalaryCapText => $"Cap: ${CurrentSalaryCap:F1}M / ${BaseSalaryCap}M";
         public string AvailableCapText => $"Available: ${AvailableCap:F1}M";
+
 
         [RelayCommand]
         public async Task LoadRoster(int id)
@@ -164,7 +165,7 @@ namespace MobileApp.Models.Team
                 teamDto.SelectedIds = [.. RosterPlayers.Select(p => p.Id)];
 
                 if (await _teamService.UpdateRosterAsync(teamDto))
-                    await _teamService.GoToMyTeamsTabAsync();
+                    await BaseService.GoToMyTeamsTabAsync();
                 else
                     ErrorMessage = "Failed to save roster";
             }

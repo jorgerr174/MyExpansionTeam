@@ -14,37 +14,38 @@ namespace MobileApp.Models.Team
     {
         private readonly TeamService _teamService = teamService;
         private readonly DraftState _draftState = new();
+
         [ObservableProperty] private int teamId;
         [ObservableProperty] private string teamName = string.Empty;
         [ObservableProperty] private bool isDraftActive = false;
         [ObservableProperty] private bool showDraftSettings = true;
 
-        // Draft Settings
         [ObservableProperty] private string selectedDraftMethod = "full";
         [ObservableProperty] private int manualRounds = 0;
         [ObservableProperty] private bool showFranchiseSelection = false;
 
-        // Draft State
         [ObservableProperty] private bool isPaused = true;
         [ObservableProperty] private string currentPickText = "Draft not started";
         [ObservableProperty] private string teamPicksText = "Your Draft Picks: 0";
         [ObservableProperty] private string nextPickText = "Next Pick: No picks available";
         [ObservableProperty] private string pauseResumeText = "Resume";
 
-        // Collections
         public ObservableCollection<DraftPickInfo> DraftOrder { get; } = [];
         public ObservableCollection<ProspectDto> AvailableProspects { get; } = [];
         public ObservableCollection<FranchiseSelectionItem> SelectedFranchises { get; } = [];
 
-        // Current pick info
         public DraftPickInfo? CurrentPick => _draftState.CurrentPick;
         public bool CanMakePick => IsDraftActive && !IsPaused && _draftState.IsCurrentPickUserControlled;
         public bool CanSimulatePick => IsDraftActive && !IsPaused && !_draftState.IsCurrentPickUserControlled;
         public bool CanPauseResume => IsDraftActive && !_draftState.IsComplete;
 
-        public List<string> DraftMethods => ["full", "myteam", "multiple"];
-        public List<int> RoundOptions => [.. Enumerable.Range(0, 8)];
+        public static List<string> DraftMethods => ["full", "myteam", "multiple"];
+        public static List<int> RoundOptions => [.. Enumerable.Range(0, 8)];
         public bool CanConfigureFranchises => SelectedDraftMethod == "multiple";
+
+
+        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
+
 
         [RelayCommand]
         public async Task LoadDraftAsync()
@@ -193,8 +194,6 @@ namespace MobileApp.Models.Team
                 IsLoading = false;
             }
         }
-
-        [RelayCommand] public async Task GoBackAsync() => _teamService.GoBackAsync(null);
 
         private async Task<IEnumerable<ProspectDto>> GetDraftProspectsAsync()
             => await _teamService.GetDraftProspectsAsync(DateTime.Now.Year);

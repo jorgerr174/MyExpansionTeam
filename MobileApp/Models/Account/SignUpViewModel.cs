@@ -5,9 +5,9 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Account
 {
-    public partial class SignUpViewModel(AccountService authService) : BaseViewModel
+    public partial class SignUpViewModel(AccountService accountService) : BaseViewModel
     {
-        private readonly AccountService _accountService = authService;
+        private readonly AccountService _accountService = accountService;
         [ObservableProperty] private string username = string.Empty;
         [ObservableProperty] private string password = string.Empty;
         [ObservableProperty] private string confirmPassword = string.Empty;
@@ -15,6 +15,10 @@ namespace MobileApp.Models.Account
         [ObservableProperty] private string lastName = string.Empty;
         [ObservableProperty] private string email = string.Empty;
         [ObservableProperty] private string tlf = string.Empty;
+
+
+        [RelayCommand] public static async Task GoBack() => await BaseService.GoBackAsync(null);
+
 
         [RelayCommand]
         public async Task SignUpAsync()
@@ -38,7 +42,7 @@ namespace MobileApp.Models.Account
             try
             {
                 if (await _accountService.SignUpAsync(Username, Password, ConfirmPassword, FirstName, LastName, Email, Tlf))
-                    await _accountService.GoToAsync(AppRoutes.LogIn, null);
+                    await BaseService.GoToAsync(AppRoutes.LogIn, null);
                 else
                     ErrorMessage = "Sign up failed";
             }
@@ -51,7 +55,5 @@ namespace MobileApp.Models.Account
                 IsLoading = false;
             }
         }
-
-        [RelayCommand] public async Task GoBack() => await _accountService.GoBackAsync(null);
     }
 }

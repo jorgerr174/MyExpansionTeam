@@ -16,7 +16,7 @@ namespace MobileApp.Views.Team
 
             if (BindingContext is DetailsViewModel viewModel)
             {
-                if (GetTeamIdFromParameters() is int teamId && teamId > 0)
+                if (Details.GetTeamIdFromParameters() is int teamId && teamId > 0)
                     await viewModel.LoadTeamDetailsCommand.ExecuteAsync(teamId);
                 else
                 {
@@ -26,7 +26,7 @@ namespace MobileApp.Views.Team
             }
         }
 
-        private int GetTeamIdFromParameters()
+        private static int GetTeamIdFromParameters()
         {
             var query = Shell.Current.CurrentState.Location.Query;
             return 1;
