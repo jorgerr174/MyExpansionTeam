@@ -5,15 +5,9 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Account
 {
-    public partial class UpdateCredentialsViewModel : BaseViewModel
+    public partial class UpdateCredentialsViewModel(AccountService accountService) : BaseViewModel
     {
-        private readonly AccountService _accountService;
-
-        public UpdateCredentialsViewModel(AccountService accountService)
-        {
-            _accountService = accountService;
-        }
-
+        private readonly AccountService _accountService = accountService;
         [ObservableProperty] private string currentPassword = string.Empty;
         [ObservableProperty] private string newUsername = string.Empty;
         [ObservableProperty] private string newPassword = string.Empty;

@@ -1,18 +1,14 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using METCore.DTOs.User;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
 
 namespace MobileApp.Models.Account
 {
-    public partial class UpdateUserViewModel : BaseViewModel
+    public partial class UpdateUserViewModel(AccountService accountService) : BaseViewModel
     {
-        private readonly AccountService _accountService;
-
-        public UpdateUserViewModel(AccountService accountService)
-        {
-            _accountService = accountService;
-        }
+        private readonly AccountService _accountService = accountService;
 
         // Current user data (for display)
         [ObservableProperty] private string currentFirstName = string.Empty;
@@ -34,13 +30,12 @@ namespace MobileApp.Models.Account
 
             try
             {
-                var profile = await _accountService.GetProfileAsync();
-                if (profile != null)
+                if (await _accountService.GetProfileAsync() is UserDto profile)
                 {
                     CurrentFirstName = profile.FirstName;
                     CurrentLastName = profile.LastName;
                     CurrentEmail = profile.Email;
-                    CurrentTlf = profile.Tlf;
+                    CurrentTlf = profile.Tlf ?? string.Empty;
                 }
                 else
                 {
@@ -61,10 +56,8 @@ namespace MobileApp.Models.Account
         public async Task UpdateUser()
         {
             // Only update if at least one field has new data
-            if (string.IsNullOrWhiteSpace(NewFirstName) &&
-                string.IsNullOrWhiteSpace(NewLastName) &&
-                string.IsNullOrWhiteSpace(NewEmail) &&
-                string.IsNullOrWhiteSpace(NewTlf))
+            if (string.IsNullOrWhiteSpace(NewFirstName) && string.IsNullOrWhiteSpace(NewLastName) &&
+                string.IsNullOrWhiteSpace(NewEmail) && string.IsNullOrWhiteSpace(NewTlf))
             {
                 ErrorMessage = "Please enter at least one field to update";
                 return;
@@ -81,15 +74,10 @@ namespace MobileApp.Models.Account
                 string email = string.IsNullOrWhiteSpace(NewEmail) ? CurrentEmail : NewEmail;
                 string tlf = string.IsNullOrWhiteSpace(NewTlf) ? CurrentTlf : NewTlf;
 
-                bool success = await _accountService.UpdateUserAsync(firstName, lastName, email, tlf);
-                if (success)
-                {
-                    await _accountService.GoToAsync(AppRoutes.Profile);
-                }
+                if (await _accountService.UpdateUserAsync(firstName, lastName, email, tlf))
+                    await _accountService.GoToProfileTabAsync();
                 else
-                {
                     ErrorMessage = "Failed to update profile";
-                }
             }
             catch (Exception ex)
             {
@@ -101,10 +89,6 @@ namespace MobileApp.Models.Account
             }
         }
 
-        [RelayCommand]
-        public async Task GoBack()
-        {
-            await _accountService.GoToAsync(AppRoutes.Profile);
-        }
+        [RelayCommand] public async Task GoBack() => await _accountService.GoBackAsync(null);
     }
 }

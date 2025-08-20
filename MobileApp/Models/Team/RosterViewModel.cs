@@ -7,23 +7,17 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Team
 {
-    public partial class RosterViewModel : BaseViewModel
+    public partial class RosterViewModel(TeamService teamService) : BaseViewModel
     {
-        private readonly TeamService _teamService;
-
-        public RosterViewModel(TeamService teamService)
-        {
-            _teamService = teamService;
-        }
-
+        private readonly TeamService _teamService = teamService;
         private const decimal BaseSalaryCap = 224m; // NFL salary cap in millions
 
         [ObservableProperty] private int teamId;
         [ObservableProperty] private string teamName = string.Empty;
         [ObservableProperty] private List<FranchiseInfo> franchises = FranchiseInfo.GetAllFranchises();
         [ObservableProperty] private FranchiseInfo? selectedFranchise;
-        [ObservableProperty] private IList<SelectablePlayerViewModel> availablePlayers = new List<SelectablePlayerViewModel>();
-        [ObservableProperty] private IList<SelectablePlayerViewModel> rosterPlayers = new List<SelectablePlayerViewModel>();
+        [ObservableProperty] private IList<SelectablePlayerViewModel> availablePlayers = [];
+        [ObservableProperty] private IList<SelectablePlayerViewModel> rosterPlayers = [];
         [ObservableProperty] private bool showPlayerSelection = false;
         [ObservableProperty] private decimal currentSalaryCap = 0m;
         [ObservableProperty] private int selectedPlayerCount = 0;
@@ -41,25 +35,23 @@ namespace MobileApp.Models.Team
 
             try
             {
-                var team = await _teamService.GetTeamRosterAsync(id);
-                if (team != null)
+                if (await _teamService.GetTeamRosterAsync(id) is TeamDto team)
                 {
                     TeamName = $"{team.Location} {team.Mascot}";
 
                     // Load current roster
-                    IList<SelectablePlayerViewModel> rosterPlayersList = team.Players.Select(p =>
+                    IList<SelectablePlayerViewModel> rosterPlayersList = [.. team.Players.Select(p =>
                     {
-                        var wrapper = new SelectablePlayerViewModel(new SelectableDto
+                        SelectablePlayerViewModel wrapper = new(new SelectableDto
                         {
                             Id = p.Id,
                             Name = p.Name,
                             Position = p.Position,
                             APY = p.APY,
                             PureAPY = p.PureAPY
-                        });
-                        wrapper.IsSelected = true;
+                        }) { IsSelected = true };
                         return wrapper;
-                    }).ToList();
+                    })];
 
                     RosterPlayers = rosterPlayersList;
                     UpdateSalaryCap();
@@ -85,14 +77,14 @@ namespace MobileApp.Models.Team
             {
                 if (await _teamService.GetSelectablePlayersAsync(franchise.Id) is IList<SelectableDto> players)
                 {
-                    IList<SelectablePlayerViewModel> wrappedPlayers = players.Select(p =>
+                    IList<SelectablePlayerViewModel> wrappedPlayers = [.. players.Select(p =>
                     {
-                        var wrapper = new SelectablePlayerViewModel(p);
-                        // Check if player is already in roster
-                        wrapper.IsSelected = RosterPlayers.Any(rp => rp.Id == p.Id);
+                        SelectablePlayerViewModel wrapper = new(p) {
+                            // Check if player is already in roster
+                        IsSelected = RosterPlayers.Any(rp => rp.Id == p.Id) };
                         wrapper.IsAlreadyRostered = wrapper.IsSelected;
                         return wrapper;
-                    }).ToList();
+                    })];
 
                     AvailablePlayers = wrappedPlayers;
                     ShowPlayerSelection = true;
@@ -120,7 +112,7 @@ namespace MobileApp.Models.Team
             if (!player.IsSelected)
             {
                 // Adding player - check salary cap
-                if (decimal.TryParse(player.Player.PureAPY, out decimal playerSalary) 
+                if (decimal.TryParse(player.Player.PureAPY, out decimal playerSalary)
                     && (CurrentSalaryCap + playerSalary) > BaseSalaryCap)
                 {
                     ErrorMessage = $"Cannot add player. Would exceed salary cap by ${(CurrentSalaryCap + playerSalary - BaseSalaryCap):F1}M";
@@ -128,13 +120,13 @@ namespace MobileApp.Models.Team
                 }
 
                 player.IsSelected = true;
-                RosterPlayers = RosterPlayers.Append(player).ToList();
+                RosterPlayers = [.. RosterPlayers, player];
             }
             else
             {
                 // Removing player
                 player.IsSelected = false;
-                RosterPlayers = RosterPlayers.Where(p => p.Id != player.Id).ToList();
+                RosterPlayers = [.. RosterPlayers.Where(p => p.Id != player.Id)];
             }
 
             UpdateSalaryCap();
@@ -158,7 +150,7 @@ namespace MobileApp.Models.Team
             {
                 TeamDto teamDto = new() { Id = TeamId };
 
-                IList<RosteredDto> rosteredPlayers = RosterPlayers.Select(p => new RosteredDto
+                IList<RosteredDto> rosteredPlayers = [.. RosterPlayers.Select(p => new RosteredDto
                 {
                     Id = p.Id,
                     Name = p.Name,
@@ -166,10 +158,10 @@ namespace MobileApp.Models.Team
                     APY = p.APY,
                     PureAPY = p.Player.PureAPY,
                     FranchiseId = 0
-                }).ToList();
+                })];
 
                 teamDto.Players = rosteredPlayers;
-                teamDto.SelectedIds = RosterPlayers.Select(p => p.Id).ToList();
+                teamDto.SelectedIds = [.. RosterPlayers.Select(p => p.Id)];
 
                 if (await _teamService.UpdateRosterAsync(teamDto))
                     await _teamService.GoToMyTeamsTabAsync();
@@ -189,7 +181,7 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         public void ClearRoster()
         {
-            RosterPlayers = new List<SelectablePlayerViewModel>();
+            RosterPlayers = [];
             UpdateSalaryCap();
 
             // Update available players selection state

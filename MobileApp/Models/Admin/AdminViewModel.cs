@@ -4,13 +4,9 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Admin
 {
-    public partial class AdminViewModel : BaseViewModel
+    public partial class AdminViewModel(AdminService adminService) : BaseViewModel
     {
-        private readonly AdminService _adminService;
-        public AdminViewModel(AdminService adminService)
-        {
-            this._adminService = adminService;
-        }
+        private readonly AdminService _adminService = adminService;
 
         [RelayCommand] public async Task GoToImport() => await _adminService.GoToAsync(AppRoutes.Import, null);
         [RelayCommand] public async Task GoToAssignRoles() => await _adminService.GoToAsync(AppRoutes.AssignRoles, null);

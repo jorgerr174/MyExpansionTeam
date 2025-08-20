@@ -1,35 +1,19 @@
 namespace MobileApp.Models.Shared
 {
-    public class FormationPosition
+    public class FormationPosition(string id, string name, string position, int x, int y)
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string Position { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
-
-        public FormationPosition(string id, string name, string position, int x, int y)
-        {
-            Id = id;
-            Name = name;
-            Position = position;
-            X = x;
-            Y = y;
-        }
+        public string Id { get; set; } = id;
+        public string Name { get; set; } = name;
+        public string Position { get; set; } = position;
+        public int X { get; set; } = x;
+        public int Y { get; set; } = y;
     }
 
-    public class FormationInfo
+    public class FormationInfo(string key, string name, List<FormationPosition> positions)
     {
-        public string Key { get; set; }
-        public string Name { get; set; }
-        public List<FormationPosition> Positions { get; set; }
-
-        public FormationInfo(string key, string name, List<FormationPosition> positions)
-        {
-            Key = key;
-            Name = name;
-            Positions = positions;
-        }
+        public string Key { get; set; } = key;
+        public string Name { get; set; } = name;
+        public List<FormationPosition> Positions { get; set; } = positions;
     }
 
     public static class FormationData
@@ -41,16 +25,16 @@ namespace MobileApp.Models.Shared
                 "offense" => GetOffenseFormations(),
                 "defense" => GetDefenseFormations(),
                 "special" => GetSpecialTeamsFormations(),
-                _ => new List<FormationInfo>()
+                _ => []
             };
         }
 
         private static List<FormationInfo> GetOffenseFormations()
         {
-            return new List<FormationInfo>
-            {
-                new("Eleven", "Eleven (1RB-1TE-3WR)", new List<FormationPosition>
-                {
+            return
+            [
+                new("Eleven", "Eleven (1RB-1TE-3WR)",
+                [
                     new("LT", "LT", "OL", 36, 45),
                     new("LG", "LG", "OL", 43, 44),
                     new("C", "C", "OL", 50, 43),
@@ -62,9 +46,9 @@ namespace MobileApp.Models.Shared
                     new("WRZ", "Z-WR", "WR", 83, 45),
                     new("WRS", "Slot", "WR", 73, 55),
                     new("TE", "TE", "TE", 25, 58)
-                }),
-                new("Twelve", "Twelve (1RB-2TE-2WR)", new List<FormationPosition>
-                {
+                ]),
+                new("Twelve", "Twelve (1RB-2TE-2WR)",
+                [
                     new("LT", "LT", "OL", 36, 45),
                     new("LG", "LG", "OL", 43, 44),
                     new("C", "C", "OL", 50, 43),
@@ -76,9 +60,9 @@ namespace MobileApp.Models.Shared
                     new("WRZ", "Z-WR", "WR", 90, 45),
                     new("LTE", "TE", "TE", 25, 58),
                     new("RTE", "TE", "TE", 71, 50)
-                }),
-                new("Twenty", "Twenty (2RB-0TE-3WR)", new List<FormationPosition>
-                {
+                ]),
+                new("Twenty", "Twenty (2RB-0TE-3WR)",
+                [
                     new("LT", "LT", "OL", 36, 45),
                     new("LG", "LG", "OL", 43, 44),
                     new("C", "C", "OL", 50, 43),
@@ -90,16 +74,16 @@ namespace MobileApp.Models.Shared
                     new("WRX", "X-WR", "WR", 10, 45),
                     new("WRZ", "Z-WR", "WR", 85, 45),
                     new("WRS", "Slot", "WR", 75, 50)
-                })
-            };
+                ])
+            ];
         }
 
         private static List<FormationInfo> GetDefenseFormations()
         {
-            return new List<FormationInfo>
-            {
-                new("FourThree", "4-3 Defense (4-3-4)", new List<FormationPosition>
-                {
+            return
+            [
+                new("FourThree", "4-3 Defense (4-3-4)",
+                [
                     new("LE", "EDGE", "DL", 35, 70),
                     new("LDT", "DT", "DL", 46, 70),
                     new("RDT", "DT", "DL", 54, 70),
@@ -111,9 +95,9 @@ namespace MobileApp.Models.Shared
                     new("RCB", "CB", "DB", 85, 55),
                     new("FS", "FS", "DB", 35, 15),
                     new("SS", "SS", "DB", 65, 15)
-                }),
-                new("Nickel", "Nickel (4-2-5)", new List<FormationPosition>
-                {
+                ]),
+                new("Nickel", "Nickel (4-2-5)",
+                [
                     new("LE", "EDGE", "DL", 35, 70),
                     new("LDT", "DT", "DL", 46, 70),
                     new("RDT", "DT", "DL", 54, 70),
@@ -125,23 +109,23 @@ namespace MobileApp.Models.Shared
                     new("NCB", "NCB", "DB", 25, 65),
                     new("FS", "FS", "DB", 35, 15),
                     new("SS", "SS", "DB", 65, 15)
-                })
-            };
+                ])
+            ];
         }
 
         private static List<FormationInfo> GetSpecialTeamsFormations()
         {
-            return new List<FormationInfo>
-            {
-                new("SpecialTeams", "Special Teams", new List<FormationPosition>
-                {
+            return
+            [
+                new("SpecialTeams", "Special Teams",
+                [
                     new("K", "K", "K", 40, 75),
                     new("P", "P", "P", 60, 75),
                     new("LS", "LS", "LS", 50, 45),
                     new("KR", "KR", "ATH", 25, 55),
                     new("PR", "PR", "ATH", 75, 55)
-                })
-            };
+                ])
+            ];
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using UIKit;
 
-namespace MobileApp
+namespace MobileApp.Platforms.iOS
 {
     public class Program
     {

@@ -25,7 +25,7 @@ namespace MobileApp.Models.Admin
         }
 
         [ObservableProperty] private string searchFilter = string.Empty;
-        [ObservableProperty] private ObservableCollection<UserItem> users = new();
+        [ObservableProperty] private ObservableCollection<UserItem> users = [];
         [ObservableProperty] private int currentPage = 1;
         [ObservableProperty] private int pageSize = 25;
         [ObservableProperty] private int totalUsers = 0;
@@ -35,12 +35,12 @@ namespace MobileApp.Models.Admin
         [ObservableProperty] private string resultsInfo = string.Empty;
         [ObservableProperty] private PageSizeOption selectedPageSize;
 
-        public List<PageSizeOption> PageSizeOptions { get; } = new()
-        {
+        public List<PageSizeOption> PageSizeOptions { get; } =
+        [
             new PageSizeOption { Value = 10, Display = "10" },
             new PageSizeOption { Value = 25, Display = "25" },
             new PageSizeOption { Value = 50, Display = "50" }
-        };
+        ];
 
         // Pagination properties
         public string PageInfo => TotalPages > 0 ? $"Page {CurrentPage} of {TotalPages}" : "";

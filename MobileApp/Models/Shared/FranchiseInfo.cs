@@ -1,17 +1,10 @@
 namespace MobileApp.Models.Shared
 {
-    public class FranchiseInfo
+    public class FranchiseInfo(int id, string name, string abbreviation)
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Abbreviation { get; set; }
-
-        public FranchiseInfo(int id, string name, string abbreviation)
-        {
-            Id = id;
-            Name = name;
-            Abbreviation = abbreviation;
-        }
+        public int Id { get; set; } = id;
+        public string Name { get; set; } = name;
+        public string Abbreviation { get; set; } = abbreviation;
 
         public static List<FranchiseInfo> GetAllFranchises()
         {

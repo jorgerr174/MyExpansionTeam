@@ -106,7 +106,7 @@ namespace MobileApp.Models.Team
                     return selection.Key;
             }
 
-            var teamPicks = draftData.Picks?[0] ?? new List<int>();
+            var teamPicks = draftData.Picks?[0] ?? [];
             if (teamPicks.Any())
             {
                 var prospectIndex = draftData.Prospects.ToList().IndexOf(prospect);

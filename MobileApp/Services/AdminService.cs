@@ -4,12 +4,8 @@ using METCore.DTOs.User;
 
 namespace MobileApp.Services
 {
-    public class AdminService : BaseService
+    public class AdminService(IHttpClientFactory httpClientFactory) : BaseService(httpClientFactory)
     {
-        public AdminService(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
-        {
-        }
-
         public async Task<ResultImportDto?> ImportDataAsync(ImportDto importDto, byte[] fileContent, string fileName)
         {
             try

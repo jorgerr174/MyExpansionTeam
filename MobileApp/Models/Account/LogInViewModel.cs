@@ -5,15 +5,9 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Account
 {
-    public partial class LogInViewModel : BaseViewModel
+    public partial class LogInViewModel(AccountService authService) : BaseViewModel
     {
-        private readonly AccountService _accountService;
-
-        public LogInViewModel(AccountService authService)
-        {
-            _accountService = authService;
-        }
-
+        private readonly AccountService _accountService = authService;
         [ObservableProperty] private string identifier = string.Empty;
         [ObservableProperty] private string password = string.Empty;
 

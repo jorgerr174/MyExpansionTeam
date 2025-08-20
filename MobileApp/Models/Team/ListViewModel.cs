@@ -6,16 +6,10 @@ using MobileApp.Services;
 
 namespace MobileApp.Models.Team
 {
-    public partial class ListViewModel : BaseViewModel
+    public partial class ListViewModel(TeamService teamService) : BaseViewModel
     {
-        private readonly TeamService _teamService;
-
-        public ListViewModel(TeamService teamService)
-        {
-            _teamService = teamService;
-        }
-
-        [ObservableProperty] private IEnumerable<TeamInfoDto> teams = new List<TeamInfoDto>();
+        private readonly TeamService _teamService = teamService;
+        [ObservableProperty] private IEnumerable<TeamInfoDto> teams = [];
 
 
         [RelayCommand]
@@ -24,7 +18,7 @@ namespace MobileApp.Models.Team
             IsLoading = true;
             try
             {
-                Teams = await _teamService.GetAllTeamsAsync() ?? new List<TeamInfoDto>();
+                Teams = await _teamService.GetAllTeamsAsync() ?? [];
             }
             catch (Exception ex)
             {

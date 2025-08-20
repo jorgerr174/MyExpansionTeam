@@ -4,24 +4,16 @@ using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.Player;
+using METCore.DTOs.Team;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
 
 namespace MobileApp.Models.Team
 {
-    public partial class DraftViewModel : BaseViewModel
+    public partial class DraftViewModel(TeamService teamService) : BaseViewModel
     {
-        private readonly TeamService _teamService;
+        private readonly TeamService _teamService = teamService;
         private readonly DraftState _draftState = new();
-
-        public DraftViewModel(TeamService teamService)
-        {
-            _teamService = teamService;
-            DraftOrder = new ObservableCollection<DraftPickInfo>();
-            AvailableProspects = new ObservableCollection<ProspectDto>();
-            SelectedFranchises = new ObservableCollection<FranchiseSelectionItem>();
-        }
-
         [ObservableProperty] private int teamId;
         [ObservableProperty] private string teamName = string.Empty;
         [ObservableProperty] private bool isDraftActive = false;
@@ -40,9 +32,9 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private string pauseResumeText = "Resume";
 
         // Collections
-        public ObservableCollection<DraftPickInfo> DraftOrder { get; }
-        public ObservableCollection<ProspectDto> AvailableProspects { get; }
-        public ObservableCollection<FranchiseSelectionItem> SelectedFranchises { get; }
+        public ObservableCollection<DraftPickInfo> DraftOrder { get; } = [];
+        public ObservableCollection<ProspectDto> AvailableProspects { get; } = [];
+        public ObservableCollection<FranchiseSelectionItem> SelectedFranchises { get; } = [];
 
         // Current pick info
         public DraftPickInfo? CurrentPick => _draftState.CurrentPick;
@@ -50,8 +42,8 @@ namespace MobileApp.Models.Team
         public bool CanSimulatePick => IsDraftActive && !IsPaused && !_draftState.IsCurrentPickUserControlled;
         public bool CanPauseResume => IsDraftActive && !_draftState.IsComplete;
 
-        public List<string> DraftMethods => new() { "full", "myteam", "multiple" };
-        public List<int> RoundOptions => Enumerable.Range(0, 8).ToList();
+        public List<string> DraftMethods => ["full", "myteam", "multiple"];
+        public List<int> RoundOptions => [.. Enumerable.Range(0, 8)];
         public bool CanConfigureFranchises => SelectedDraftMethod == "multiple";
 
         [RelayCommand]
@@ -60,9 +52,7 @@ namespace MobileApp.Models.Team
             try
             {
                 IsLoading = true;
-                var draftData = await _teamService.GetTeamDraftAsync(TeamId);
-
-                if (draftData != null)
+                if (await _teamService.GetTeamDraftAsync(TeamId) is DraftDto draftData)
                 {
                     _draftState.TeamId = TeamId;
                     _draftState.OriginalDraftData = draftData;
@@ -70,7 +60,7 @@ namespace MobileApp.Models.Team
 
                     // Load available prospects
                     var prospects = await GetDraftProspectsAsync();
-                    _draftState.AvailableProspects = prospects.ToList();
+                    _draftState.AvailableProspects = [.. prospects];
 
                     // Update UI
                     UpdateAvailableProspects();
@@ -79,9 +69,7 @@ namespace MobileApp.Models.Team
 
                     // If draft was previously started, restore state
                     if (draftData.Selections.Any())
-                    {
                         RestoreDraftProgress(draftData.Selections);
-                    }
                 }
             }
             catch (Exception ex)
@@ -106,9 +94,7 @@ namespace MobileApp.Models.Team
                 // Configure draft state
                 _draftState.DraftMethod = SelectedDraftMethod;
                 _draftState.ManualRounds = ManualRounds;
-                _draftState.SelectedFranchises = new HashSet<int>(
-                    SelectedFranchises.Where(f => f.IsSelected).Select(f => f.FranchiseId)
-                );
+                _draftState.SelectedFranchises = [.. SelectedFranchises.Where(f => f.IsSelected).Select(f => f.FranchiseId)];
 
                 // Build draft order
                 _draftState.BuildDraftOrder();
@@ -126,9 +112,7 @@ namespace MobileApp.Models.Team
 
                 // Begin simulation if not paused
                 if (!IsPaused)
-                {
                     await ProcessNextPickAsync();
-                }
             }
             catch (Exception ex)
             {
@@ -147,11 +131,8 @@ namespace MobileApp.Models.Team
             {
                 if (!CanMakePick) return;
 
-                var selectedProspect = await ProspectSelectionRequested?.Invoke();
-                if (selectedProspect != null)
-                {
+                if (await ProspectSelectionRequested?.Invoke() is ProspectDto selectedProspect)
                     await ProcessPickSelectionAsync(selectedProspect);
-                }
             }
             catch (Exception ex)
             {
@@ -166,11 +147,8 @@ namespace MobileApp.Models.Team
             {
                 if (!CanSimulatePick) return;
 
-                var bestProspect = SelectBestAvailableProspect();
-                if (bestProspect != null)
-                {
+                if (SelectBestAvailableProspect() is ProspectDto bestProspect)
                     await ProcessPickSelectionAsync(bestProspect);
-                }
             }
             catch (Exception ex)
             {
@@ -185,9 +163,7 @@ namespace MobileApp.Models.Team
             PauseResumeText = IsPaused ? "Resume" : "Pause";
 
             if (!IsPaused && SelectedDraftMethod == "full")
-            {
                 await ProcessNextPickAsync();
-            }
         }
 
         public void OnDraftMethodChanged()
@@ -202,17 +178,11 @@ namespace MobileApp.Models.Team
             try
             {
                 IsLoading = true;
-                var draftDto = _draftState.CreateDraftDto();
-                bool saved = await _teamService.SaveDraftAsync(draftDto);
 
-                if (saved)
-                {
+                if (await _teamService.SaveDraftAsync(_draftState.CreateDraftDto()))
                     await ShowAlertRequested?.Invoke("Draft Saved", "Your draft progress has been saved successfully.", "OK");
-                }
                 else
-                {
                     await ShowAlertRequested?.Invoke("Error", "Failed to save draft", "OK");
-                }
             }
             catch (Exception ex)
             {
@@ -224,16 +194,10 @@ namespace MobileApp.Models.Team
             }
         }
 
-        [RelayCommand]
-        public async Task BackAsync()
-        {
-            await NavigateBackRequested?.Invoke();
-        }
+        [RelayCommand] public async Task GoBackAsync() => _teamService.GoBackAsync(null);
 
         private async Task<IEnumerable<ProspectDto>> GetDraftProspectsAsync()
-        {
-            return await _teamService.GetDraftProspectsAsync(DateTime.Now.Year);
-        }
+            => await _teamService.GetDraftProspectsAsync(DateTime.Now.Year);
 
         private bool ValidateSettings()
         {
@@ -265,10 +229,7 @@ namespace MobileApp.Models.Team
 
             // Show confirmation for user picks
             if (_draftState.IsCurrentPickUserControlled)
-            {
-                await ShowAlertRequested?.Invoke("Pick Made",
-                    $"Selected {prospect.Name} ({prospect.Position}) with pick #{CurrentPick.Overall}", "OK");
-            }
+                await ShowAlertRequested?.Invoke("Pick Made", $"Selected {prospect.Name} ({prospect.Position}) with pick #{CurrentPick.Overall}", "OK");
 
             // Move to next pick
             _draftState.AdvanceToNextPick();
@@ -332,25 +293,19 @@ namespace MobileApp.Models.Team
         {
             DraftOrder.Clear();
             foreach (var pick in _draftState.DraftOrder)
-            {
                 DraftOrder.Add(pick);
-            }
         }
 
         private void UpdateAvailableProspects()
         {
             AvailableProspects.Clear();
             foreach (var prospect in _draftState.AvailableProspects)
-            {
                 AvailableProspects.Add(prospect);
-            }
         }
 
         private void UpdateDraftInfo()
         {
-            CurrentPickText = CurrentPick != null
-                ? $"Pick #{CurrentPick.Overall} - {CurrentPick.TeamAbbr}"
-                : "Draft Complete";
+            CurrentPickText = CurrentPick != null ? $"Pick #{CurrentPick.Overall} - {CurrentPick.TeamAbbr}" : "Draft Complete";
 
             TeamPicksText = GetTeamPicksText();
             NextPickText = GetNextPickText();
@@ -362,14 +317,9 @@ namespace MobileApp.Models.Team
         }
 
         private string GetTeamPicksText()
-        {
-            if (_draftState.OriginalDraftData?.Picks != null && _draftState.OriginalDraftData.Picks.Count > 0)
-            {
-                var teamPicksCount = _draftState.OriginalDraftData.Picks[0]?.Count ?? 0;
-                return $"Your Draft Picks: {teamPicksCount}";
-            }
-            return "Your Draft Picks: 0";
-        }
+            => _draftState.OriginalDraftData?.Picks != null && _draftState.OriginalDraftData.Picks.Count > 0
+                ? $"Your Draft Picks: {_draftState.OriginalDraftData.Picks[0]?.Count ?? 0}"
+                : "Your Draft Picks: 0";
 
         private string GetNextPickText()
         {
@@ -380,9 +330,7 @@ namespace MobileApp.Models.Team
                     .FirstOrDefault(p => _draftState.IsPickUserControlled(p));
 
                 if (nextUserPick != null)
-                {
                     return $"Next Pick: Pick {nextUserPick.Overall} (Round {nextUserPick.Round})";
-                }
             }
 
             return "Next Pick: No user picks remaining";
@@ -391,10 +339,8 @@ namespace MobileApp.Models.Team
         private void InitializeFranchiseSelection()
         {
             SelectedFranchises.Clear();
-            var franchises = FranchiseHelper.GetAllFranchises();
 
-            foreach (var franchise in franchises)
-            {
+            foreach (var franchise in FranchiseHelper.GetAllFranchises())
                 SelectedFranchises.Add(new FranchiseSelectionItem
                 {
                     FranchiseId = franchise.Key,
@@ -402,7 +348,6 @@ namespace MobileApp.Models.Team
                     Abbreviation = franchise.Value.Abbreviation,
                     IsSelected = false
                 });
-            }
         }
 
         private void RestoreDraftProgress(IDictionary<int, int> selections)
