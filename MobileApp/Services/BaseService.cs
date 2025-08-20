@@ -37,7 +37,7 @@ namespace MobileApp.Services
             if (!string.IsNullOrEmpty(token))
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            if (obj != null) 
+            if (obj != null)
                 request.Content = JsonContent.Create(obj);
             return await _httpClient.SendAsync(request);
         }
