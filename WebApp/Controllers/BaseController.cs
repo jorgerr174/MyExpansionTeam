@@ -26,9 +26,11 @@ namespace WebApp.Controllers
         #region SendRequest
         protected async Task<HttpResponseMessage> SendRequest(HttpMethod method, string controller, string function, Object? obj = null)
         {
-            var request = new HttpRequestMessage(method, controller + "/" + function);
+            string url = $"{controller}/{function}";
+
+            HttpRequestMessage request = new(method, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["jwt"]);
-            return (obj is FileDto fileDto && fileDto.File is not null) ? await SendImportRequest(request, fileDto) : await SendNormalRequest(request, obj);
+            return (obj is FileDto fileDto && fileDto.File is not null) ? await SendImportRequest(request, fileDto) : await SendNormalRequest(request, url, obj);
         }
 
         private async Task<HttpResponseMessage> SendImportRequest(HttpRequestMessage request, FileDto fileDto)
@@ -43,9 +45,13 @@ namespace WebApp.Controllers
             return await _importClient.SendAsync(request);
         }
 
-        private async Task<HttpResponseMessage> SendNormalRequest(HttpRequestMessage request, Object? obj = null)
+        private async Task<HttpResponseMessage> SendNormalRequest(HttpRequestMessage request, string ogUrl, Object? obj = null)
         {
-            if (obj != null) request.Content = JsonContent.Create(obj);
+            if (obj != null)
+                if (request.Method == HttpMethod.Get && obj is string[] stringList)
+                    request.RequestUri = new Uri(_httpClient.BaseAddress, $"{ogUrl}?{String.Join('&', stringList)}");
+                else
+                    request.Content = JsonContent.Create(obj);
             return await _httpClient.SendAsync(request);
         }
         #endregion SendRequest

@@ -254,11 +254,11 @@ namespace MobileApp.Models.Team
             NflTeams = new ObservableCollection<NflTeamViewModel>(teams);
         }
 
-        private async void LoadTeamPlayers(int teamId)
+        private async void LoadTeamPlayers(int franchiseId)
         {
             try
             {
-                var players = await _teamService.GetProtectablePlayersAsync(teamId);
+                var players = await _teamService.GetProtectablePlayersAsync(franchiseId);
                 if (players != null)
                 {
                     var playerViewModels = players.Select(p => new ProtectedPlayerViewModel(p)

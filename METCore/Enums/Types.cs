@@ -282,6 +282,18 @@ namespace METCore.Enums
 
             public static int GetPickOverall(int pick) { try { return TotalAtRound[(pick / 100) - 1] + (pick % 100); } catch { return 0; } }
             public static (int, int, int) GetPickRoundPosOverall(int pick) { try { return (pick / 100, pick % 100, GetPickOverall(pick)); } catch { return (0, 0, 0); } }
+            public static (int, int) GetPickRoundPosFromOverall(int ovl)
+            {
+                if (ovl < 1 || ovl > 264) return (0, 0);
+                int round = 0;
+                int pos = 0;
+                while (round < TotalAtRound.Length)
+                {
+                    if (ovl <= TotalAtRound[round]) break;
+                    round++;
+                }
+                return (round, ovl - TotalAtRound[round - 1]);
+            }
 
             public static int[] PickValues =>
                 // 20 en 20

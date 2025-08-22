@@ -11,22 +11,17 @@ namespace WebApp.Controllers
         #region Privates
         private async Task<TeamDto?> GetTeam(int Id)
         {
-            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "Team", new IdDto(Id));
+            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "Team", new string[] { $"TeamId={Id}" });
             return !response.IsSuccessStatusCode ? null : await GetResult<TeamDto>(response);
         }
         private async Task<TeamInfoDto?> GetTeamInfo(int Id)
         {
-            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "TeamInfo", new IdDto(Id));
+            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "TeamInfo", new string[] { $"TeamId={Id}" });
             return !response.IsSuccessStatusCode ? null : await GetResult<TeamInfoDto>(response);
-        }
-        private async Task<DraftDto?> GetDraft(int Id)
-        {
-            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "TeamDraft", new IdDto(Id));
-            return !response.IsSuccessStatusCode ? null : await GetResult<DraftDto>(response);
         }
         private async Task<TeamBasicInfoDto?> GetBasicTeam(int Id)
         {
-            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "TeamBasicInfo", new IdDto(Id));
+            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "TeamBasicInfo", new string[] { $"TeamId={Id}" });
             return !response.IsSuccessStatusCode ? null : await GetResult<TeamBasicInfoDto>(response);
         }
 
@@ -59,7 +54,7 @@ namespace WebApp.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var response = await SendRequest(HttpMethod.Post, "Teams", "Create", model);
+            HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "Create", model);
 
             if (response.IsSuccessStatusCode) return RedirectToAction("RosterSettings", await GetResult<TeamInfoDto>(response));
 
@@ -103,7 +98,7 @@ namespace WebApp.Controllers
         [HttpGet]
         public async Task<Object> GetProtectablePlayers(int FranchiseId)
         {
-            var response = await SendRequest(HttpMethod.Get, "Franchises", "GetProtectablePlayers", new IdDto(FranchiseId));
+            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Franchises", "GetProtectablePlayers", new string[] { $"FranchiseId={FranchiseId}" });
 
             return response.IsSuccessStatusCode ? await GetResult<IList<ProtectableDto>>(response) : await GetResult<MessageDto>(response);
         }
@@ -111,7 +106,7 @@ namespace WebApp.Controllers
         [HttpGet]
         public async Task<Object> GetSelectablePlayers(int FranchiseId)
         {
-            var response = await SendRequest(HttpMethod.Get, "Franchises", "GetSelectablePlayers", new IdDto(FranchiseId));
+            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Franchises", "GetSelectablePlayers", new string[] { $"FranchiseId={FranchiseId}" });
 
             return response.IsSuccessStatusCode ? await GetResult<IList<SelectableDto>>(response) : await GetResult<MessageDto>(response);
         }
@@ -131,7 +126,7 @@ namespace WebApp.Controllers
         [Authorize]
         public async Task<IActionResult> EditTeam(TeamBasicInfoDto model)
         {
-            var response = await SendRequest(HttpMethod.Post, "Teams", "UpdateTeam", model);
+            HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "UpdateTeam", model);
             if (response.IsSuccessStatusCode) return RedirectToAction("Details", model.Id);
 
             MessageDto result = await GetResult<MessageDto>(response);
@@ -175,7 +170,7 @@ namespace WebApp.Controllers
                 return View("RosterSettings", dto);
             }
 
-            var response = await SendRequest(HttpMethod.Post, "Teams", "UpdateRosterSettings", dto);
+            HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "UpdateRosterSettings", dto);
             if (response.IsSuccessStatusCode) return RedirectToAction("EditRoster", new { dto.Id });
 
             MessageDto result = await GetResult<MessageDto>(response);
@@ -210,7 +205,7 @@ namespace WebApp.Controllers
             if (!ModelState.IsValid)
                 return View("Roster", dto);
 
-            var response = await SendRequest(HttpMethod.Post, "Teams", "UpdateRoster", dto);
+            HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "UpdateRoster", dto);
             if (response.IsSuccessStatusCode)
                 return !next.HasValue ? RedirectToAction("Roster", dto.Id) : !next.Value ? RedirectToAction("Draft", new { dto.Id }) : RedirectToAction("MyTeams");
 
@@ -228,7 +223,7 @@ namespace WebApp.Controllers
         [Authorize]
         public async Task<IActionResult> Draft(int Id)
         {
-            return Id > 0 && await this.GetDraft(Id) is DraftDto dto
+            return Id > 0 && await this.GetTeamDraft(Id) is DraftDto dto
                 ? View(dto) : RedirectToAction("MyTeams");
         }
 
@@ -236,7 +231,7 @@ namespace WebApp.Controllers
         [Authorize]
         public async Task<IActionResult> Draft(DraftDto dto)
         {
-            var response = await SendRequest(HttpMethod.Post, "Teams", "SaveDraft", dto);
+            HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "SaveDraft", dto);
             return RedirectToAction("EditRoster", new { Id = dto.Id, unsuccessfulDraft = !response.IsSuccessStatusCode });
         }
 
@@ -244,7 +239,7 @@ namespace WebApp.Controllers
         [HttpGet]
         public async Task<Object> GetDraftProspects()
         {
-            var response = await SendRequest(HttpMethod.Get, "Players", "GetDraftProspects", new IdDto(DateTime.Now.Year));
+            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Players", "GetDraftProspects", new string[] { $"Year={DateTime.Now.Year}" });
             return response.IsSuccessStatusCode ? await GetResult<IList<ProspectDto>>(response) : await GetResult<MessageDto>(response);
         }
         #endregion Draft
@@ -254,31 +249,21 @@ namespace WebApp.Controllers
         [HttpGet]
         public async Task<IList<TradeDto>> GetTeamTrades(int TeamId)
         {
-            var response = await SendRequest(HttpMethod.Get, "Teams", "GetTeamTrades", new IdDto(TeamId));
+            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "GetTeamTrades", new string[] { $"TeamId={TeamId}" });
             return !response.IsSuccessStatusCode ? [] : await GetResult<IList<TradeDto>>(response);
         }
 
         [HttpGet]
         public async Task<DraftDto?> GetTeamDraft(int TeamId)
         {
-            var response = await SendRequest(HttpMethod.Get, "Teams", "TeamDraft", new IdDto(TeamId));
+            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "TeamDraft", new string[] { $"TeamId={TeamId}" });
             return !response.IsSuccessStatusCode ? null : await GetResult<DraftDto>(response);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetTradePartial(int TeamId, int FranchiseId)
-        {
-            var response = await SendRequest(HttpMethod.Get, "Teams", "GetTradeDto", new TradeDto(TeamId, FranchiseId));
-
-            return response.IsSuccessStatusCode
-                ? View("Trade", await GetResult<TradeDto>(response))
-                : View("TradeError", await GetResult<MessageDto>(response));
         }
 
         [HttpGet]
         public async Task<IActionResult> GetTradePartialAsString(int TeamId, int FranchiseId, int CurrentPick)
         {
-            var response = await SendRequest(HttpMethod.Get, "Teams", "GetTradeDto", new TradeDto(TeamId, FranchiseId));
+            HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "GetTradeDto", new TradeDto(TeamId, FranchiseId));
 
             ResultDto<string> result;
             if (response.IsSuccessStatusCode)
@@ -290,15 +275,6 @@ namespace WebApp.Controllers
                 result = new ResultDto<string>((await GetResult<MessageDto>(response)).Message);
 
             return Json(result);
-        }
-
-        [HttpGet]
-        public async Task<object> GetTradeModel(int TeamId, int FranchiseId)
-        {
-            var response = await SendRequest(HttpMethod.Get, "Teams", "GetTradeDto", new TradeDto(TeamId, FranchiseId));
-            return response.IsSuccessStatusCode
-                ? await GetResult<TradeDto>(response)
-                : await GetResult<MessageDto>(response);
         }
 
         [HttpPost]
@@ -314,7 +290,7 @@ namespace WebApp.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteTeam(int TeamId)
         {
-            var response = await SendRequest(HttpMethod.Delete, "Teams", "DeleteTeam", new IdDto(TeamId));
+            HttpResponseMessage response = await SendRequest(HttpMethod.Delete, "Teams", "DeleteTeam", new IdDto(TeamId));
             if (response.IsSuccessStatusCode) return RedirectToAction("MyTeams");
 
             ResultDto<TeamBasicInfoDto> result = await GetResult<ResultDto<TeamBasicInfoDto>>(response);
@@ -331,7 +307,7 @@ namespace WebApp.Controllers
         [Authorize]
         public async Task<IActionResult> DuplicateTeam(TeamBasicInfoDto Team)
         {
-            var response = await SendRequest(HttpMethod.Post, "Teams", "DuplicateTeam", new IdDto(Team.Id));
+            HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "DuplicateTeam", new IdDto(Team.Id));
 
             ResultDto<TeamBasicInfoDto> result = await GetResult<ResultDto<TeamBasicInfoDto>>(response);
             if (response.IsSuccessStatusCode && String.IsNullOrWhiteSpace(result.Message)) return View("Edit", result.Value);

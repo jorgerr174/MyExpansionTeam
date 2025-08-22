@@ -37,8 +37,15 @@ namespace MobileApp.Services
             if (!string.IsNullOrEmpty(token))
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+            //if (obj != null)
+            //    request.Content = JsonContent.Create(obj);
+
             if (obj != null)
-                request.Content = JsonContent.Create(obj);
+                if (method == HttpMethod.Get && obj is string[] stringList)
+                    request.RequestUri = new Uri(_httpClient.BaseAddress, $"{url}?{String.Join('&', stringList)}");
+                else
+                    request.Content = JsonContent.Create(obj);
+
             return await _httpClient.SendAsync(request);
         }
         #endregion SendRequest

@@ -2,31 +2,17 @@ using METCore.DTOs.Admin;
 using METCore.DTOs.Player;
 using METCore.DTOs.Shared;
 using METCore.DTOs.Team;
-using METCore.DTOs.User;
 
 namespace MobileApp.Services
 {
     public class TeamService(IHttpClientFactory httpClientFactory) : BaseService(httpClientFactory)
     {
-        #region GetTeamDetails
-        public async Task<TeamInfoDto?> GetTeamDetailsAsync(int teamId)
-        {
-            try
-            {
-                var response = await SendRequest(HttpMethod.Get, "Teams", "TeamInfo", new IdDto(teamId));
-                return response.IsSuccessStatusCode ? await GetResult<TeamInfoDto>(response) : null;
-            }
-            catch { return null; }
-        }
-        #endregion GetTeamDetails
-
-
         #region GetTeamRoster
         public async Task<TeamDto?> GetTeamAsync(int teamId)
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Get, "Teams", "Team", new IdDto(teamId));
+                HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "Team", new string[] { $"TeamId={teamId}" });
                 return response.IsSuccessStatusCode ? await GetResult<TeamDto>(response) : null;
             }
             catch { return null; }
@@ -34,12 +20,25 @@ namespace MobileApp.Services
         #endregion GetTeamRoster
 
 
+        #region GetTeamDetails
+        public async Task<TeamInfoDto?> GetTeamDetailsAsync(int teamId)
+        {
+            try
+            {
+                HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "TeamInfo", new string[] { $"TeamId={teamId}" });
+                return response.IsSuccessStatusCode ? await GetResult<TeamInfoDto>(response) : null;
+            }
+            catch { return null; }
+        }
+        #endregion GetTeamDetails
+
+
         #region GetMyTeams
         public async Task<IEnumerable<TeamInfoDto>?> GetMyTeamsAsync()
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Get, "Teams", "MyTeams");
+                HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "MyTeams");
                 return response.IsSuccessStatusCode ? await GetResult<IEnumerable<TeamInfoDto>>(response) : null;
             }
             catch { return null; }
@@ -52,7 +51,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Get, "Teams", "List");
+                HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "List");
                 return response.IsSuccessStatusCode ? await GetResult<IEnumerable<TeamInfoDto>>(response) : null;
             }
             catch { return null; }
@@ -61,12 +60,12 @@ namespace MobileApp.Services
 
 
         #region GetProtectablePlayers
-        public async Task<IList<SelectableDto>?> GetProtectablePlayersAsync(int teamId)
+        public async Task<IList<ProtectableDto>?> GetProtectablePlayersAsync(int FranchiseId)
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Get, "Teams", "GetProtectablePlayers", new IdDto(teamId));
-                return response.IsSuccessStatusCode ? await GetResult<IList<SelectableDto>>(response) : null;
+                HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Franchises", "GetProtectablePlayers", new string[] { $"FranchiseId={FranchiseId}" });
+                return response.IsSuccessStatusCode ? await GetResult<IList<ProtectableDto>>(response) : null;
             }
             catch { return null; }
         }
@@ -74,11 +73,11 @@ namespace MobileApp.Services
 
 
         #region GetSelectablePlayersAsync
-        public async Task<IList<SelectableDto>?> GetSelectablePlayersAsync(int teamId)
+        public async Task<IList<SelectableDto>?> GetSelectablePlayersAsync(int FranchiseId)
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Get, "Teams", "GetSelectablePlayers", new IdDto(teamId));
+                HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Franchises", "GetSelectablePlayers", new string[] { $"FranchiseId={FranchiseId}" });
                 return response.IsSuccessStatusCode ? await GetResult<IList<SelectableDto>>(response) : null;
             }
             catch { return null; }
@@ -91,7 +90,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Post, "Teams", "Create", dto);
+                HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "Create", dto);
                 return response.IsSuccessStatusCode ? await GetResult<TeamInfoDto>(response) : null;
             }
             catch { return null; }
@@ -104,7 +103,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Post, "Teams", "UpdateTeam", dto);
+                HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "UpdateTeam", dto);
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
@@ -117,7 +116,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Post, "Teams", "DuplicateTeam", new IdDto(teamId));
+                HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "DuplicateTeam", new IdDto(teamId));
                 return response.IsSuccessStatusCode ? await GetResult<ResultDto<TeamBasicInfoDto>>(response) : null;
             }
             catch { return null; }
@@ -130,7 +129,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Delete, "Teams", "DeleteTeam", new IdDto(teamId));
+                HttpResponseMessage response = await SendRequest(HttpMethod.Delete, "Teams", "DeleteTeam", new IdDto(teamId));
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
@@ -138,25 +137,12 @@ namespace MobileApp.Services
         #endregion CU009 DeleteTeam
 
 
-        #region GetRosterSettingsAsync
-        public async Task<TeamInfoDto?> GetRosterSettingsAsync(int teamId)
-        {
-            try
-            {
-                var response = await SendRequest(HttpMethod.Get, "Teams", "TeamInfo", new IdDto(teamId));
-                return response.IsSuccessStatusCode ? await GetResult<TeamInfoDto>(response) : null;
-            }
-            catch { return null; }
-        }
-        #endregion GetRosterSettingsAsync
-
-
         #region CU010 UpdateRosterSettings
         public async Task<bool> UpdateRosterSettingsAsync(TeamInfoDto settings)
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Put, "Teams", "UpdateRosterSettings", settings);
+                HttpResponseMessage response = await SendRequest(HttpMethod.Put, "Teams", "UpdateRosterSettings", settings);
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
@@ -169,7 +155,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Put, "Teams", "UpdateRoster", teamDto);
+                HttpResponseMessage response = await SendRequest(HttpMethod.Put, "Teams", "UpdateRoster", teamDto);
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
@@ -182,7 +168,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Get, "Teams", "GetTeamTrades", new IdDto(teamId));
+                HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "GetTeamTrades", new string[] { $"TeamId={teamId}" });
                 return response.IsSuccessStatusCode ? await GetResult<IList<TradeDto>>(response) : null;
             }
             catch { return null; }
@@ -195,7 +181,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Get, "Teams", "TeamDraft", new IdDto(teamId));
+                HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "TeamDraft", new string[] { $"TeamId={teamId}" });
                 return response.IsSuccessStatusCode ? await GetResult<DraftDto>(response) : null;
             }
             catch { return null; }
@@ -208,7 +194,7 @@ namespace MobileApp.Services
             try
             {
                 var tradeDto = new TradeDto(teamId, franchiseId);
-                var response = await SendRequest(HttpMethod.Post, "Teams", "GetTradeDto", tradeDto);
+                HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "GetTradeDto", tradeDto);
                 return response.IsSuccessStatusCode ? await GetResult<TradeDto>(response) : null;
             }
             catch { return null; }
@@ -218,7 +204,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Post, "Teams", "SaveTrade", tradeDto);
+                HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "SaveTrade", tradeDto);
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
@@ -228,7 +214,7 @@ namespace MobileApp.Services
 
         public async Task SaveDraftProgressAsync(DraftDto draftData)
         {
-            var response = await SendRequest(HttpMethod.Post, "Teams", "SaveDraftProgress", draftData);
+            HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "SaveDraftProgress", draftData);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -242,7 +228,7 @@ namespace MobileApp.Services
             try
             {
                 if (year == 0) year = DateTime.Now.Year;
-                var response = await SendRequest(HttpMethod.Get, "Players", "GetDraftProspects", new IdDto(year));
+                HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Players", "GetDraftProspects", new string[] { $"Year={year}" });
                 return response.IsSuccessStatusCode ? await GetResult<IEnumerable<ProspectDto>>(response) : [];
             }
             catch { return []; }
@@ -252,27 +238,17 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Post, "Teams", "SaveDraft", draftDto);
+                HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "SaveDraft", draftDto);
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
-        }
-
-        public async Task<SearchResultDto<UserDto>?> GetUsersAsync(SearchDto searchDto)
-        {
-            try
-            {
-                var response = await SendRequest(HttpMethod.Get, "Users", "List", searchDto);
-                return response.IsSuccessStatusCode ? await GetResult<SearchResultDto<UserDto>>(response) : null;
-            }
-            catch { return null; }
         }
 
         public async Task<bool> AssignRoleAsync(AssignRoleDto assignRoleDto)
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Post, "Auth", "AssignRole", assignRoleDto);
+                HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Auth", "AssignRole", assignRoleDto);
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
