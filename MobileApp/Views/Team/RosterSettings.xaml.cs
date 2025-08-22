@@ -2,12 +2,22 @@
 
 namespace MobileApp.Views.Team
 {
-    public partial class RosterSettings : ContentPage
+    [QueryProperty(nameof(TeamId), "teamId")]
+    public partial class RosterSettings : ContentPage, ITeamBase<RosterSettingsViewModel>
     {
+        public int TeamId { get; set; }
+
         public RosterSettings(RosterSettingsViewModel viewModel)
         {
             InitializeComponent();
             BindingContext = viewModel;
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            if (BindingContext is RosterSettingsViewModel viewModel)
+                await viewModel.LoadViewAsync(TeamId);
         }
     }
 }

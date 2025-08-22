@@ -13,7 +13,7 @@ namespace WebApp.Controllers
             if (User.Identity == null)
                 return View();
 
-            var response = await SendRequest(HttpMethod.Get, "Teams", "List");
+            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "List");
             return !response.IsSuccessStatusCode ? View() : View(await GetResult<IEnumerable<TeamInfoDto>>(response));
         }
         #endregion Index

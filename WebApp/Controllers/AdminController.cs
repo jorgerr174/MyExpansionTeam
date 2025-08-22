@@ -41,7 +41,7 @@ namespace WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> UserList([FromBody] SearchDto dto)
         {
-            return Json(await GetResult<SearchResultDto<UserDto>>(await SendRequest(HttpMethod.Get, "Users", "List", dto)));
+            return Json(await GetResult<SearchResultDto<UserDto>>(await SendRequest(HttpMethod.Post, "Users", "List", dto)));
         }
         #endregion UserList
 
@@ -94,7 +94,7 @@ namespace WebApp.Controllers
             }
 
             string ogFileName = model.File?.FileName ?? string.Empty;
-            var response = await SendRequest(HttpMethod.Post, "Import", "Import", model);
+            HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Import", "Import", model);
             if (!response.IsSuccessStatusCode)
             {
                 ModelState.AddModelError("File", (await GetResult<MessageDto>(response)).Message);

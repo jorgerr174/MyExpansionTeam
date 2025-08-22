@@ -4,6 +4,7 @@ using METCore.DTOs.Player;
 using METCore.DTOs.Shared;
 using METCore.DTOs.Team;
 using MobileApp.Services;
+using static METCore.Enums.Types;
 
 namespace MobileApp.Models.Team
 {
@@ -42,12 +43,16 @@ namespace MobileApp.Models.Team
 
             try
             {
-                Team = await _teamService.GetTeamAsync(teamId);
+                var teamTask = _teamService.GetTeamAsync(teamId);
+                var tradesTask = _teamService.GetTeamTradesAsync(teamId);
+                var draftTask = _teamService.GetTeamDraftAsync(teamId);
 
-                if (Team is TeamDto)
+                Team = await teamTask;
+
+                if (Team is not null)
                 {
-                    TradeHistory = await _teamService.GetTeamTradesAsync(teamId);
-                    Draft = await _teamService.GetTeamDraftAsync(teamId);
+                    TradeHistory = await tradesTask;
+                    Draft = await draftTask;
                     IsOwner = Team.UserUsername == (await AccountService.GetUsernameAsync() ?? string.Empty);
                     HasLoadError = false;
                     LoadErrorMessage = string.Empty;
@@ -83,8 +88,8 @@ namespace MobileApp.Models.Team
 
             if (Team?.Players?.Any() ?? false)
             {
-                PositionGroup positionGroup = new();
                 string prevPosition = Team.Players.First().Position;
+                PositionGroup positionGroup = new() { PositionName = prevPosition };
 
                 foreach (RosteredDto player in Team.Players)
                 {
@@ -92,10 +97,11 @@ namespace MobileApp.Models.Team
                     {
                         RosterByPosition.Add(positionGroup);
                         prevPosition = player.Position;
-                        positionGroup = new() { PositionName = player.Position };
+                        positionGroup = new() { PositionName = prevPosition };
                     }
-                    else positionGroup.Players.Add(player);
+                    positionGroup.Players.Add(player);
                 }
+                RosterByPosition.Add(positionGroup);
                 foreach (PositionGroup group in RosterByPosition)
                     PositionBreakdown += $"{group.PositionName} ({group.Players.Count}), ";
             }
@@ -103,7 +109,10 @@ namespace MobileApp.Models.Team
             if (Draft is DraftDto && (Draft.Selections?.Any() ?? false))
                 foreach (KeyValuePair<int, int> selection in Draft.Selections)
                     if (Draft.Prospects.FirstOrDefault(p => p.Id == selection.Value) is ProspectDto prospect)
-                        DraftResults.Add(new DraftSelection() { Pick = $"Round: {selection.Key / 100}, Pick: {selection.Key / 100}", Player = prospect });
+                    {
+                        (int round, int pos) = DraftPicks.GetPickRoundPosFromOverall(selection.Key);
+                        DraftResults.Add(new DraftSelection() { Pick = $"Round: {round}, Pick: {pos}", Player = prospect });
+                    }
 
             ShowErrorState = HasLoadError && !IsLoading;
             ShowContent = HasTeam;

@@ -53,10 +53,10 @@ namespace METAPI.Controllers
         /// TeamDto (Con los valores del Team encontrado).
         /// </returns>
         [HttpGet("Team")]
-        public async Task<IActionResult> Team(IdDto dto)
+        public async Task<IActionResult> Team(int TeamId)
         {
-            if (dto.Id < 1) return BadRequest();
-            TeamDto? team = await _teamService.GetDtoById(dto.Id);
+            if (TeamId < 1) return BadRequest();
+            TeamDto? team = await _teamService.GetDtoById(TeamId);
             return team == null ? BadRequest() : Ok(team);
         }
 
@@ -66,10 +66,10 @@ namespace METAPI.Controllers
         /// TeamDto (Con los valores del Team encontrado).
         /// </returns>
         [HttpGet("TeamInfo")]
-        public async Task<IActionResult> TeamInfo(IdDto dto)
+        public async Task<IActionResult> TeamInfo(int TeamId)
         {
-            if (dto.Id < 1) return BadRequest();
-            TeamInfoDto? team = await _teamService.GetInfoDtoById(dto.Id);
+            if (TeamId < 1) return BadRequest();
+            TeamInfoDto? team = await _teamService.GetInfoDtoById(TeamId);
             return team == null ? BadRequest() : Ok(team);
         }
 
@@ -79,10 +79,10 @@ namespace METAPI.Controllers
         /// TeamDto (Con los valores del Team encontrado).
         /// </returns>
         [HttpGet("TeamDraft")]
-        public async Task<IActionResult> TeamDraft(IdDto dto)
+        public async Task<IActionResult> TeamDraft(int TeamId)
         {
-            if (dto.Id < 1) return BadRequest();
-            DraftDto? team = await _teamService.GetTeamDraftDtoById(dto.Id);
+            if (TeamId < 1) return BadRequest();
+            DraftDto? team = await _teamService.GetTeamDraftDtoById(TeamId);
             return team == null ? BadRequest() : Ok(team);
         }
 
@@ -92,10 +92,10 @@ namespace METAPI.Controllers
         /// TeamDto (Con los valores del Team encontrado).
         /// </returns>
         [HttpGet("TeamBasicInfo")]
-        public async Task<IActionResult> TeamBasicInfo(IdDto dto)
+        public async Task<IActionResult> TeamBasicInfo(int TeamId)
         {
-            if (dto.Id < 1) return BadRequest();
-            TeamBasicInfoDto? team = await _teamService.GetBasicInfoDtoById(dto.Id);
+            if (TeamId < 1) return BadRequest();
+            TeamBasicInfoDto? team = await _teamService.GetBasicInfoDtoById(TeamId);
             return team == null ? BadRequest() : Ok(team);
         }
 
@@ -186,7 +186,7 @@ namespace METAPI.Controllers
         /// Error (No se guardaron los cambios en la BBDD).
         /// Nada (Todo bien).
         /// </returns>
-        [HttpGet("GetTradeDto")]
+        [HttpPost("GetTradeDto")]
         [Authorize]
         public async Task<IActionResult> GetTradeDto([FromBody] TradeDto dto)
         {
@@ -213,9 +213,9 @@ namespace METAPI.Controllers
         }
 
         [HttpGet("GetTeamTrades")]
-        public async Task<IActionResult> GetTeamTrades(IdDto dto)
+        public async Task<IActionResult> GetTeamTrades(int TeamId)
         {
-            ResultDto<IList<TradeDto>> result = await _teamService.GetTeamTrades(dto.Id);
+            ResultDto<IList<TradeDto>> result = await _teamService.GetTeamTrades(TeamId);
 
             return !String.IsNullOrWhiteSpace(result.Message)
                 ? BadRequest(new MessageDto(result.Message))

@@ -5,7 +5,6 @@ namespace MobileApp.Views.Team
     [QueryProperty(nameof(TeamId), "teamId")]
     [QueryProperty(nameof(Context), "context")]
     [QueryProperty(nameof(CurrentPick), "currentPick")]
-
     public partial class Trade : ContentPage
     {
         public int TeamId { get; set; }
