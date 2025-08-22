@@ -101,21 +101,19 @@ namespace METCore.Services
                     }
                 }
             dto.TradedPlayers = [.. dto.TradedPlayers.Concat(_mapper.Map<IList<PlayerBasicDto>>(await _playerRepository.GetManyTByIds(tradedPlayersIds)))];
-            if ((team.PlayersIds?.Count ?? 0) > 0) dto.Players = [.. _mapper.Map<IList<RosteredDto>>(await _playerRepository.GetManyTByIds(teamPlayersIds))];
-
-            if ((team.Selections?.Count ?? 0) > 0)
+            if (teamPlayersIds.Count > 0)
             {
-                foreach (KeyValuePair<int, int> selection in team.Selections)
-                {
-                    RosteredDto rookie = _mapper.Map<RosteredDto>(await _playerRepository.GetTById(selection.Value));
+                if (team.Selections?.Any() ?? false) teamPlayersIds = [.. teamPlayersIds.Concat(team.Selections?.Values ?? [])];
+                IList<Player> auxPlayers = await _playerRepository.GetManyTByIds(teamPlayersIds);
+                dto.Players = [.. _mapper.Map<IList<RosteredDto>>(auxPlayers.OrderBy(p => p.Position).ToList())];
+            }
 
-                    int pickAPY = DraftPicks.GetPickAPY(selection.Key);
-                    rookie.PureAPY = Math.Round(pickAPY / 1000000.0, 2).ToString();
-                    rookie.APY = "$" + rookie.PureAPY + "M";
-                    rookie.PureAPY = rookie.PureAPY.Replace(',', '.');
-
-                    dto.Players.Add(rookie);
-                }
+            foreach (RosteredDto rookie in dto.Players.Where(p => String.IsNullOrWhiteSpace(p.APY)))
+            {
+                int pickAPY = DraftPicks.GetPickAPY(team.Selections?.FirstOrDefault(s => s.Value == rookie.Id).Key ?? 0);
+                rookie.PureAPY = Math.Round(pickAPY / 1000000.0, 2).ToString();
+                rookie.APY = "$" + rookie.PureAPY + "M";
+                rookie.PureAPY = rookie.PureAPY.Replace(',', '.');
             }
 
             return dto;

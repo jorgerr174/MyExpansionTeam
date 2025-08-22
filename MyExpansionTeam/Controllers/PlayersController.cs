@@ -1,5 +1,4 @@
-﻿using METCore.DTOs.Shared;
-using METCore.Services;
+﻿using METCore.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace METAPI.Controllers
@@ -18,9 +17,9 @@ namespace METAPI.Controllers
         /// IEnumerable<TeamDto>? (Con los valores de los Teams encontrados).
         /// </returns>
         [HttpGet("GetDraftProspects")]
-        public async Task<IActionResult> GetDraftProspects(IdDto dto)
+        public async Task<IActionResult> GetDraftProspects(int Year)
         {
-            return Ok(await _playerService.GetDraftProspects(dto.Id));
+            return Ok(await _playerService.GetDraftProspects(Year));
         }
         #endregion Get
     }

@@ -21,7 +21,7 @@ namespace WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> LogIn(LogInViewModel model)
         {
-            var response = await SendRequest(HttpMethod.Post, "Auth", "LogIn", model);
+            HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Auth", "LogIn", model);
 
             if (response.IsSuccessStatusCode)
             {
@@ -77,7 +77,7 @@ namespace WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> SignUp(SignUpViewModel model)
         {
-            var response = await SendRequest(HttpMethod.Post, "Auth", "SignUp", model);
+            HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Auth", "SignUp", model);
             if (response.IsSuccessStatusCode)
                 return RedirectToAction("LogIn");
 
@@ -99,13 +99,13 @@ namespace WebApp.Controllers
         public async Task<IActionResult> GetUserProfile(string username)
         {
             if ((User?.Identity?.Name ?? string.Empty) == username) return RedirectToAction("Profile");
-            var response = await SendRequest(HttpMethod.Get, "Users", "Profile", new MessageDto(username));
+            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Users", "Profile", new MessageDto(username));
             return !response.IsSuccessStatusCode ? RedirectToAction("Index", "Home") : View(await GetResult<UserViewModel>(response));
         }
 
         private async Task<UserViewModel?> GetProfile()
         {
-            var response = await SendRequest(HttpMethod.Get, "Users", "Profile");
+            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Users", "Profile");
             return !response.IsSuccessStatusCode ? null : await GetResult<UserViewModel>(response);
         }
 
@@ -141,7 +141,7 @@ namespace WebApp.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateUser(UserViewModel userModel)
         {
-            var response = await SendRequest(HttpMethod.Put, "Users", "UpdateUser", userModel);
+            HttpResponseMessage response = await SendRequest(HttpMethod.Put, "Users", "UpdateUser", userModel);
             if (response.IsSuccessStatusCode)
                 return RedirectToAction("Profile");
 
@@ -160,7 +160,7 @@ namespace WebApp.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateCredentials(CredentialsViewModel credentialModel)
         {
-            var response = await SendRequest(HttpMethod.Put, "Auth", "UpdateCredentials", credentialModel);
+            HttpResponseMessage response = await SendRequest(HttpMethod.Put, "Auth", "UpdateCredentials", credentialModel);
             if (response.IsSuccessStatusCode) return RedirectToAction("LogOut", new RouteValueDictionary(new { ReturnUrl = Url.Action("Profile") }));
             // se indica que al cambiar las credenciales correctamente se cerrará la sesión.
 
@@ -187,7 +187,7 @@ namespace WebApp.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteUser()
         {
-            var response = await SendRequest(HttpMethod.Delete, "Auth", "DeleteUser");
+            HttpResponseMessage response = await SendRequest(HttpMethod.Delete, "Auth", "DeleteUser");
             if (response.IsSuccessStatusCode)
                 return RedirectToAction("LogOut");
 
