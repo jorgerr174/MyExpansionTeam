@@ -12,8 +12,13 @@ namespace MobileApp.Models.Team
 
         [ObservableProperty] private IEnumerable<TeamInfoDto> teams = [];
 
+        public bool HasTeams => !IsLoading && Teams.Any();
+        public bool HasNoTeams => !IsLoading && !Teams.Any();
 
+
+        [RelayCommand] public static async Task GoToCreateTeam() => await BaseService.GoToAsync(AppRoutes.CreateTeam, null);
         [RelayCommand] public static async Task GoToTeamDetails(int teamId) => await BaseService.GoToAsync(AppRoutes.TeamDetails, new() { ["TeamId"] = teamId });
+        [RelayCommand] public static async Task GoToEditTeam(int teamId) => await BaseService.GoToAsync(AppRoutes.EditTeam, new() { ["TeamId"] = teamId });
 
 
         [RelayCommand]
@@ -32,6 +37,8 @@ namespace MobileApp.Models.Team
             {
                 IsLoading = false;
             }
+            OnPropertyChanged(nameof(HasTeams));
+            OnPropertyChanged(nameof(HasNoTeams));
         }
     }
 }

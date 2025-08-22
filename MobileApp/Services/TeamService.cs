@@ -13,7 +13,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Get, "Teams", "Team", new IdDto(teamId));
+                var response = await SendRequest(HttpMethod.Get, "Teams", "TeamInfo", new IdDto(teamId));
                 return response.IsSuccessStatusCode ? await GetResult<TeamInfoDto>(response) : null;
             }
             catch { return null; }
@@ -22,11 +22,11 @@ namespace MobileApp.Services
 
 
         #region GetTeamRoster
-        public async Task<TeamDto?> GetTeamRosterAsync(int teamId)
+        public async Task<TeamDto?> GetTeamAsync(int teamId)
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Get, "Teams", "Roster", new IdDto(teamId));
+                var response = await SendRequest(HttpMethod.Get, "Teams", "Team", new IdDto(teamId));
                 return response.IsSuccessStatusCode ? await GetResult<TeamDto>(response) : null;
             }
             catch { return null; }
@@ -87,13 +87,12 @@ namespace MobileApp.Services
 
 
         #region CU006 CreateTeam
-        public async Task<int?> CreateTeamAsync(string location, string abb, string mascot)
+        public async Task<TeamInfoDto?> CreateTeamAsync(TeamBasicInfoDto dto)
         {
             try
             {
-                var teamDto = new TeamBasicInfoDto(0, location, abb, mascot, "", DateTime.Now, null);
-                var response = await SendRequest(HttpMethod.Post, "Teams", "Create", teamDto);
-                return response.IsSuccessStatusCode ? (await GetResult<TeamInfoDto>(response)).Id : null;
+                var response = await SendRequest(HttpMethod.Post, "Teams", "Create", dto);
+                return response.IsSuccessStatusCode ? await GetResult<TeamInfoDto>(response) : null;
             }
             catch { return null; }
         }
@@ -101,12 +100,11 @@ namespace MobileApp.Services
 
 
         #region CU007 UpdateTeam
-        public async Task<bool> UpdateTeamAsync(int teamId, string location, string abb, string mascot)
+        public async Task<bool> EditAsync(TeamBasicInfoDto dto)
         {
             try
             {
-                var teamDto = new TeamBasicInfoDto(teamId, location, abb, mascot, "", DateTime.Now, null);
-                var response = await SendRequest(HttpMethod.Put, "Teams", "Edit", teamDto);
+                var response = await SendRequest(HttpMethod.Post, "Teams", "UpdateTeam", dto);
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
@@ -115,17 +113,12 @@ namespace MobileApp.Services
 
 
         #region CU008 DuplicateTeam
-        public async Task<TeamBasicInfoDto?> DuplicateTeamAsync(int teamId)
+        public async Task<ResultDto<TeamBasicInfoDto>?> DuplicateTeamAsync(int teamId)
         {
             try
             {
                 var response = await SendRequest(HttpMethod.Post, "Teams", "DuplicateTeam", new IdDto(teamId));
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await GetResult<ResultDto<TeamBasicInfoDto>>(response);
-                    return result.Value;
-                }
-                return null;
+                return response.IsSuccessStatusCode ? await GetResult<ResultDto<TeamBasicInfoDto>>(response) : null;
             }
             catch { return null; }
         }

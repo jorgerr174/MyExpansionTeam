@@ -23,4 +23,24 @@ namespace MobileApp.Converters
             => value is bool isUserTeam && isUserTeam ? Colors.LightGreen : Colors.LightBlue;
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
+
+    public class BoolToStatusColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            => Color.FromArgb(value is bool isComplete
+                ? (isComplete ? "#28a745" : "#ffc107")
+                : "#6c757d");
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
+
+    public class BoolToStatusTextConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            => value is bool isComplete
+                ? (isComplete ? "Complete" : "In Progress")
+                : "Unknown";
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    }
 }

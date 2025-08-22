@@ -167,12 +167,104 @@ namespace MobileApp
 
     public static class MauiSettings
     {
+
+#if DEBUG
+
+<<<<<<< TODO: cambio sin combinar del proyecto "MobileApp (net9.0-android)", Antes:
+<<<<<<< TODO: cambio sin combinar del proyecto "MobileApp (net9.0-android)", Antes:
+
+<<<<<<< TODO: cambio sin combinar del proyecto "MobileApp (net9.0-android)", Antes:
+    #if ANDROID
+            public static string apiURL = "https://10.0.2.2:7087/api/"; // Android emulator special IP
+    #elif IOS
+=======
+=======
 #if ANDROID
-        public static string apiURL = "https://10.0.2.2:7087/api/"; // Android emulator
+        public static string apiURL = "https://10.0.2.2:7087/api/"; // Android emulator special IP
+#elif IOS
+=======
+>>>>>>> Después
+#if ANDROID
+            public static string apiURL = "https://10.0.2.2:7087/api/"; // Android emulator special IP
+#elif IOS
+=======
+#if ANDROID
+        public static string apiURL = "https://10.0.2.2:7087/api/"; // Android emulator special IP
+#elif IOS
+>>>>>>> Después
+#if ANDROID
+            public static string apiURL = "https://10.0.2.2:7087/api/"; // Android emulator special IP
+
+<<<<<<< TODO: cambio sin combinar del proyecto "MobileApp (net9.0-ios)", Antes:
+
+<<<<<<< TODO: cambio sin combinar del proyecto "MobileApp (net9.0-android)", Antes:
+    #elif IOS
+            public static string apiURL = "https://localhost:7087/api/"; // iOS simulator
+    #else
+=======
+#elif IOS
+        public static string apiURL = "https://localhost:7087/api/"; // iOS simulator
+    #else
+>>>>>>> Después
+=======
+#elif IOS
+            public static string apiURL = "https://localhost:7087/api/"; // iOS simulator
+#else
+=======
+#elif IOS    
+        public static string apiURL = "https://localhost:7087/api/"; // iOS simulator
+#else
+>>>>>>> Después
+>>>>>>> Después
 #elif IOS
         public static string apiURL = "https://localhost:7087/api/"; // iOS simulator
 #else
-        public static string apiURL = "https://localhost:7087/api/"; // Other platforms
+=======
+#elif IOS    
+        public static string apiURL = "https://localhost:7087/api/"; // iOS simulator
+#else
+>>>>>>> Después
+#elif IOS    
+            public static string apiURL = "https://localhost:7087/api/"; // iOS simulator
+#else
+        public static string apiURL = "https://localhost:7087/api/"; // Windows/Other platforms
+#endif
+#else
+=======
+#if ANDROID
+        public static string apiURL = "https://10.0.2.2:7087/api/"; // Android emulator special IP
+#elif IOS
+            public static string apiURL = "https://localhost:7087/api/"; // iOS simulator
+#else
+            public static string apiURL = "https://localhost:7087/api/"; // Windows/Other platforms
+#endif
+#else
+>>>>>>> Después
+#if ANDROID
+            public static string apiURL = "https://10.0.2.2:7087/api/"; // Android emulator special IP
+
+<<<<<<< TODO: cambio sin combinar del proyecto "MobileApp (net9.0-ios)", Antes:
+#elif IOS
+            public static string apiURL = "https://localhost:7087/api/"; // iOS simulator
+#else
+            public static string apiURL = "https://localhost:7087/api/"; // Windows/Other platforms
+#endif
+#else
+=======
+#elif IOS    
+        public static string apiURL = "https://localhost:7087/api/"; // iOS simulator
+#else
+            public static string apiURL = "https://localhost:7087/api/"; // Windows/Other platforms
+#endif
+#else
+>>>>>>> Después
+#elif IOS    
+            public static string apiURL = "https://localhost:7087/api/"; // iOS simulator
+#else
+        public static string apiURL = "https://localhost:7087/api/"; // Windows/Other platforms
+#endif
+#else
+        public static string apiURL = "https://yourdomain.com/api/"; // Production
 #endif
     }
 }

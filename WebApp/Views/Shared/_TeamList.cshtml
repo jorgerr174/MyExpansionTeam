@@ -9,7 +9,7 @@
 <div class="container-fluid mt-4">
     @if (Model is not null && Model.Count() > 0)
     {
-        <div class="row g-3">
+		<div class="row g-3 pb-3">
             @foreach (TeamInfoDto team in Model)
             {
                 <div class="col-md-6 col-lg-4">
@@ -93,28 +93,6 @@
             <p class="text-muted">@(myTeams ? "You haven't created any teams yet." : "No teams are available.")</p>
         </div>
     }
-
-    <div class="row mt-4">
-        <div class="col-12 text-center">
-            <div class="d-flex justify-content-center gap-2 flex-wrap">
-                @if (myTeams)
-                {
-                    <a class="btn btn-success" asp-action="Create" asp-controller="Team">
-                        <i class="fas fa-plus me-2"></i>New Team
-                    </a>
-                    <a class="btn btn-outline-secondary" asp-action="Index" asp-controller="Home">
-                        <i class="fas fa-home me-2"></i>Home
-                    </a>
-                }
-                else
-                {
-                    <a class="btn btn-primary" asp-action="MyTeams" asp-controller="Team">
-                        <i class="fas fa-user me-2"></i>My Teams
-                    </a>
-                }
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- Font Awesome Icons -->

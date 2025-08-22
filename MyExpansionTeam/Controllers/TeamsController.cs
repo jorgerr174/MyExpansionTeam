@@ -215,7 +215,7 @@ namespace METAPI.Controllers
         [HttpGet("GetTeamTrades")]
         public async Task<IActionResult> GetTeamTrades(IdDto dto)
         {
-            ResultDto<IList<TradeDto>> result = await _teamService.GetTeamTrades(User?.Identity?.Name, dto.Id);
+            ResultDto<IList<TradeDto>> result = await _teamService.GetTeamTrades(dto.Id);
 
             return !String.IsNullOrWhiteSpace(result.Message)
                 ? BadRequest(new MessageDto(result.Message))
