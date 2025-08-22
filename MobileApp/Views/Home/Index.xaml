@@ -12,121 +12,163 @@
 
             <!-- Welcome Section -->
             <Border BackgroundColor="#1b6ec2" 
-                    Padding="15"
+                    Padding="20"
                     Stroke="Transparent"
                     StrokeShape="RoundRectangle 10">
-                <StackLayout>
-                    <Label Text="Welcome to MyExpansionTeam" 
-                           FontSize="24" 
+                <StackLayout Spacing="10">
+                    <Label Text="Welcome" 
+                           FontSize="28" 
                            FontAttributes="Bold" 
                            TextColor="White"
                            HorizontalOptions="Center" />
-
-                    <!-- User greeting when authenticated -->
-                    <Label Text="{Binding Username, StringFormat='Hello, {0}!'}" 
+                    <Label Text="Fantasy Football Team Management System" 
                            FontSize="16" 
                            TextColor="White"
-                           HorizontalOptions="Center"
-                           IsVisible="{Binding IsAuthenticated}" />
+                           HorizontalOptions="Center" />
                 </StackLayout>
             </Border>
 
-            <!-- Authentication Section -->
-            <StackLayout IsVisible="{Binding IsNotAuthenticated}">
-                <Label Text="Please log in to access all features" 
-                       FontSize="16" 
-                       HorizontalOptions="Center" />
-                <Button Text="Log In" 
-                        Command="{Binding GoToLogInCommand}"
-                        BackgroundColor="Blue"
-                        TextColor="White" />
+            <!-- Authenticated User Section -->
+            <StackLayout IsVisible="{Binding IsAuthenticated}" Spacing="15">
+                <!-- User Welcome Card -->
+                <Border BackgroundColor="#28a745" 
+                        Padding="15"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Column="0"
+                               Text="{Binding Username, StringFormat='Welcome back, {0}'}" 
+                               FontSize="18" 
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Quick Actions -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Button Grid.Column="0"
+                            Text="My Teams" 
+                            Command="{Binding GoToMyTeamsCommand}"
+                            BackgroundColor="#007bff"
+                            TextColor="White"
+                            FontSize="16"
+                            Padding="15" />
+
+                    <Button Grid.Column="1"
+                            Text="Create Team" 
+                            Command="{Binding GoToCreateTeamCommand}"
+                            BackgroundColor="#28a745"
+                            TextColor="White"
+                            FontSize="16"
+                            Padding="15" />
+                </Grid>
             </StackLayout>
 
-            <!-- Quick Actions for authenticated users -->
-            <StackLayout IsVisible="{Binding IsAuthenticated}" Spacing="10">
-                <Label Text="Quick Actions" 
-                       FontSize="18" 
-                       FontAttributes="Bold" />
+            <!-- Not Authenticated Section -->
+            <StackLayout IsVisible="{Binding IsNotAuthenticated}" Spacing="15">
+                <Label Text="Please log in to access all features" 
+                       FontSize="16" 
+                       HorizontalOptions="Center"
+                       TextColor="#6c757d" />
 
-                <Button Text="Create New Team" 
-                        Command="{Binding GoToCreateTeamCommand}"
-                        BackgroundColor="Green"
-                        TextColor="White" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Button Grid.Column="0"
+                            Text="Log In" 
+                            Command="{Binding GoToLogInCommand}"
+                            BackgroundColor="#007bff"
+                            TextColor="White"
+                            FontSize="16"
+                            Padding="15" />
+
+                    <Button Grid.Column="1"
+                            Text="Sign Up" 
+                            Command="{Binding GoToSignUpCommand}"
+                            BackgroundColor="#28a745"
+                            TextColor="White"
+                            FontSize="16"
+                            Padding="15" />
+                </Grid>
             </StackLayout>
 
             <!-- All Teams Section -->
             <StackLayout Spacing="15">
                 <Label Text="All Teams" 
-                       FontSize="18" 
-                       FontAttributes="Bold" />
+                       FontSize="20" 
+                       FontAttributes="Bold"
+                       TextColor="#333" />
+
+                <!-- Loading Indicator -->
+                <ActivityIndicator IsVisible="{Binding IsLoading}"
+                                 IsRunning="{Binding IsLoading}"
+                                 Color="#007bff" />
+
+                <!-- No Teams Message -->
+                <Label Text="No teams available" 
+                       FontSize="16"
+                       TextColor="#6c757d"
+                       HorizontalOptions="Center"
+                       IsVisible="{Binding HasNoTeams}" />
 
                 <!-- Teams List -->
                 <CollectionView ItemsSource="{Binding AllTeams}"
-                               BackgroundColor="Transparent">
+                               BackgroundColor="Transparent"
+                               IsVisible="{Binding HasTeams}">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" 
+                                        Span="4" 
+                                        HorizontalItemSpacing="10" 
+                                        VerticalItemSpacing="10" />
+                    </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="metcore:TeamInfoDto">
-                            <Border BackgroundColor="White" 
-                                    Padding="15" 
-                                    Margin="0,5"
-                                    Stroke="LightGray" 
+                            <Border BackgroundColor="White"
+                                    Stroke="#dee2e6"
                                     StrokeThickness="1"
+                                    Padding="10"
                                     StrokeShape="RoundRectangle 8">
                                 <Border.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, 
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}},
                                         Path=BindingContext.GoToTeamDetailsCommand}" CommandParameter="{Binding Id}" />
                                 </Border.GestureRecognizers>
 
-                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
-                                    <!-- Team Name -->
-                                    <Label Grid.Row="0" Grid.Column="0"
-                                           Text="{Binding Location, StringFormat='{0}'}"
-                                           FontSize="16"
-                                           FontAttributes="Bold" />
+                                <Grid RowDefinitions="*,*,*" RowSpacing="5">
+                                    <Label Grid.Row="0"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="#333"
+                                           LineBreakMode="TailTruncation">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="{}{0} {1}">
+                                                <Binding Path="Location" />
+                                                <Binding Path="Mascot" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                    </Label>
 
-                                    <!-- Mascot -->
-                                    <Label Grid.Row="0" Grid.Column="1"
-                                           Text="{Binding Mascot}"
-                                           FontSize="16"
-                                           FontAttributes="Bold" />
-
-                                    <!-- Owner -->
-                                    <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                    <Label Grid.Row="1"
                                            Text="{Binding UserUsername, StringFormat='Owner: {0}'}"
                                            FontSize="14"
-                                           TextColor="Gray" />
+                                           TextColor="#6c757d"
+                                           LineBreakMode="TailTruncation"/>
 
-                                    <!-- Additional Info -->
-                                    <StackLayout Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" 
-                                               Orientation="Horizontal" 
-                                               Spacing="10">
-                                        <Label Text="{Binding Date, StringFormat='Date: {0}'}"
-                                               FontSize="12"
-                                               TextColor="Gray" />
-                                        <Label Text="{Binding RosterSettingsCap, StringFormat='Cap: ${0:N0}'}"
-                                               FontSize="12"
-                                               TextColor="Green" />
-                                    </StackLayout>
+                                    <Label Grid.Row="2"
+                                           Text="{Binding Date, StringFormat='Date: {0}'}"
+                                           FontSize="14"
+                                           TextColor="#28a745"
+                                           FontAttributes="Bold"
+                                           LineBreakMode="TailTruncation"/>
                                 </Grid>
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-
-                <!-- Empty state -->
-                <Label Text="No teams available" 
-                       IsVisible="{Binding HasNoTeams}"
-                       HorizontalOptions="Center"
-                       TextColor="Gray"
-                       FontSize="16" />
             </StackLayout>
-
-            <!-- Loading and Error -->
-            <ActivityIndicator IsRunning="{Binding IsLoading}" 
-                             IsVisible="{Binding IsLoading}" />
-
-            <Label Text="{Binding ErrorMessage}" 
-                   TextColor="Red" 
-                   IsVisible="{Binding HasError}" />
 
         </StackLayout>
     </ScrollView>

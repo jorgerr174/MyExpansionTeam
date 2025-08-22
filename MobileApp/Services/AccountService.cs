@@ -5,11 +5,14 @@ namespace MobileApp.Services
 {
     public class AccountService(IHttpClientFactory httpClientFactory) : BaseService(httpClientFactory)
     {
+        public static event EventHandler? UserLoggedOut;
+
         #region TryAutoLogIn
         public static async Task<bool> TryAutoLogInAsync()
         {
-            var token = await SecureStorage.GetAsync("jwt_token");
-            return !string.IsNullOrEmpty(token);
+            bool result = !string.IsNullOrEmpty(await SecureStorage.GetAsync("jwt_token"));
+            if (!result) LogOutAsync();
+            return result;
         }
         #endregion TryAutoLogIn
 
@@ -85,6 +88,8 @@ namespace MobileApp.Services
         {
             SecureStorage.Remove("jwt_token");
             SecureStorage.Remove("username");
+
+            UserLoggedOut?.Invoke(typeof(AccountService), EventArgs.Empty);
         }
         #endregion CU003 LogOut
 

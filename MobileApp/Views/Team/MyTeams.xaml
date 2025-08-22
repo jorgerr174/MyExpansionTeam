@@ -3,27 +3,171 @@
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
-             xmlns:shared="clr-namespace:MobileApp.Views.Shared"
+             xmlns:metcore="clr-namespace:METCore.DTOs.Team;assembly=METCore"
+             xmlns:local="clr-namespace:MobileApp.Converters"
              x:DataType="viewmodels:MyTeamsViewModel"
-             Title="MyTeams">
-
+             Title="My Teams">
+    
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:BoolToStatusColorConverter x:Key="BoolToStatusColorConverter" />
+            <local:BoolToStatusTextConverter x:Key="BoolToStatusTextConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    
     <ScrollView>
-        <StackLayout Padding="20" Spacing="15">
+        <StackLayout Padding="20" Spacing="20">
 
-            <Label Text="My Teams" 
-               FontSize="24" 
-               FontAttributes="Bold" 
-               HorizontalOptions="Center" />
+            <!-- Header Section -->
+            <Border BackgroundColor="#007bff" 
+                    Padding="20"
+                    Stroke="Transparent"
+                    StrokeShape="RoundRectangle 10">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="15">
+                    <Label Grid.Column="0"
+                           Text="My Teams" 
+                           FontSize="24" 
+                           FontAttributes="Bold" 
+                           TextColor="White"
+                           VerticalOptions="Center" />
 
-            <shared:_TeamList BindingContext="{Binding}" />
+                    <Button Grid.Column="1"
+                            Text="New Team"
+                            Command="{Binding GoToCreateTeamCommand}"
+                            BackgroundColor="#28a745"
+                            TextColor="White"
+                            FontSize="14"
+                            Padding="12,8" />
+                </Grid>
+            </Border>
 
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsVisible="{Binding IsLoading}"
+                             IsRunning="{Binding IsLoading}"
+                             Color="#007bff" />
+
+            <!-- Error Message -->
             <Label Text="{Binding ErrorMessage}" 
-               TextColor="Red" 
-               IsVisible="{Binding HasError}" />
+                   TextColor="Red" 
+                   FontSize="16"
+                   HorizontalOptions="Center"
+                   IsVisible="{Binding HasError}" />
 
-            <ActivityIndicator IsRunning="{Binding IsLoading}" 
-                         IsVisible="{Binding IsLoading}" />
+            <!-- No Teams Message -->
+            <StackLayout IsVisible="{Binding HasNoTeams}" Spacing="20">
+                <Label Text="🏈" 
+                       FontSize="48"
+                       HorizontalOptions="Center" />
+                <Label Text="No teams found" 
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="#6c757d"
+                       HorizontalOptions="Center" />
+                <Label Text="You haven't created any teams yet. Get started by creating your first team!" 
+                       FontSize="16"
+                       TextColor="#6c757d"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center" />
+                <Button Text="Create Your First Team"
+                        Command="{Binding GoToCreateTeamCommand}"
+                        BackgroundColor="#28a745"
+                        TextColor="White"
+                        FontSize="18"
+                        Padding="20,12"
+                        HorizontalOptions="Center" />
+            </StackLayout>
 
+            <!-- Teams List -->
+            <CollectionView ItemsSource="{Binding Teams}"
+                           BackgroundColor="Transparent"
+                           IsVisible="{Binding HasTeams}">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" 
+                                    Span="1" 
+                                    VerticalItemSpacing="15" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="metcore:TeamInfoDto">
+                        <Border BackgroundColor="White"
+                                Stroke="#dee2e6"
+                                StrokeThickness="1"
+                                Padding="20"
+                                StrokeShape="RoundRectangle 12">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}},
+                                    Path=BindingContext.GoToTeamDetailsCommand}" CommandParameter="{Binding Id}" />
+                            </Border.GestureRecognizers>
+
+                            <Grid RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="12">
+                                <!-- Team Name -->
+                                <Label Grid.Row="0"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       TextColor="#333">
+                                    <Label.Text>
+                                        <MultiBinding StringFormat="{}{0} {1}">
+                                            <Binding Path="Location" />
+                                            <Binding Path="Mascot" />
+                                        </MultiBinding>
+                                    </Label.Text>
+                                </Label>
+
+                                <!-- Team Info Row -->
+                                <Grid Grid.Row="1" 
+                                      ColumnDefinitions="*,*" 
+                                      ColumnSpacing="15">
+                                    <Label Grid.Column="0"
+                                           Text="{Binding UserUsername, StringFormat='Owner: {0}'}"
+                                           FontSize="14"
+                                           TextColor="#6c757d" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Date, StringFormat='Created: {0:MM/dd/yyyy}'}"
+                                           FontSize="14"
+                                           TextColor="#6c757d" />
+                                </Grid>
+
+                                <!-- Team Status -->
+                                <Border Grid.Row="2"
+                                        BackgroundColor="{Binding Complete, Converter={StaticResource BoolToStatusColorConverter}}"
+                                        Stroke="Transparent"
+                                        Padding="8,4"
+                                        HorizontalOptions="Start"
+                                        StrokeShape="RoundRectangle 4">
+                                    <Label Text="{Binding Complete, Converter={StaticResource BoolToStatusTextConverter}}"
+                                           TextColor="White"
+                                           FontSize="12"
+                                           FontAttributes="Bold" />
+                                </Border>
+
+                                <!-- Action Buttons -->
+                                <Grid Grid.Row="3" 
+                                      ColumnDefinitions="*,*" 
+                                      ColumnSpacing="10">
+                                    <Button Grid.Column="0"
+                                            Text="View Details"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}},
+                                                Path=BindingContext.GoToTeamDetailsCommand}"
+                                            CommandParameter="{Binding Id}"
+                                            BackgroundColor="#6c757d"
+                                            TextColor="White"
+                                            FontSize="14"
+                                            Padding="12,8" />
+
+                                    <Button Grid.Column="1"
+                                            Text="Edit Team"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}},
+                                                Path=BindingContext.GoToEditTeamCommand}"
+                                            CommandParameter="{Binding Id}"
+                                            BackgroundColor="#28a745"
+                                            TextColor="White"
+                                            FontSize="14"
+                                            Padding="12,8" />
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </StackLayout>
     </ScrollView>
 </ContentPage>

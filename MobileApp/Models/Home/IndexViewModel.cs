@@ -19,9 +19,12 @@ namespace MobileApp.Models.Home
         [ObservableProperty] private IEnumerable<TeamInfoDto> allTeams = []; // New: All teams list
 
         public bool IsNotAuthenticated => !IsAuthenticated;
+        public bool HasTeams => AllTeams.Any() && !IsLoading;
         public bool HasNoTeams => !AllTeams.Any() && !IsLoading;
 
+        [RelayCommand] public static async Task GoToMyTeams() => await BaseService.GoToMyTeamsTabAsync();
         [RelayCommand] public static async Task GoToLogIn() => await BaseService.GoToProfileTabAsync();
+        [RelayCommand] public static async Task GoToSignUp() => await BaseService.GoToAsync(AppRoutes.SignUp, null);
         [RelayCommand] public static async Task GoToCreateTeam() => await BaseService.GoToAsync(AppRoutes.CreateTeam, null);
         [RelayCommand] public static async Task GoToTeamDetails(int teamId) => await BaseService.GoToAsync(AppRoutes.TeamDetails, new() { ["TeamId"] = teamId });
 
@@ -44,9 +47,6 @@ namespace MobileApp.Models.Home
 
                 // Load all teams for everyone (authenticated or not)
                 AllTeams = await _teamService.GetAllTeamsAsync() ?? [];
-
-                OnPropertyChanged(nameof(IsNotAuthenticated));
-                OnPropertyChanged(nameof(HasNoTeams));
             }
             catch (Exception ex)
             {
@@ -56,6 +56,10 @@ namespace MobileApp.Models.Home
             {
                 IsLoading = false;
             }
+
+            OnPropertyChanged(nameof(IsNotAuthenticated));
+            OnPropertyChanged(nameof(HasTeams));
+            OnPropertyChanged(nameof(HasNoTeams));
         }
     }
 }

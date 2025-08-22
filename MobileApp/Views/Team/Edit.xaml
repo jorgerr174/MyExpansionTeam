@@ -3,110 +3,262 @@
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
+             xmlns:local="clr-namespace:MobileApp.Converters"
              x:DataType="viewmodels:EditViewModel"
-             Title="Edit">
+             Title="Edit Team">
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:BoolToLoadingTextConverter x:Key="BoolToLoadingTextConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    
     <ScrollView>
-        <StackLayout Padding="20" Spacing="15">
+        <StackLayout Padding="20" Spacing="20">
 
-            <!-- Title -->
-            <Label Text="Edit Team" 
-               FontSize="24" 
-               FontAttributes="Bold" 
-               HorizontalOptions="Center" />
-
-            <!-- Location -->
-            <StackLayout>
-                <Label Text="Location *" />
-                <Entry Text="{Binding Location}" 
-                   Placeholder="Enter team location"
-                   IsEnabled="{Binding IsFormEnabled}" />
+            <!-- Loading State -->
+            <StackLayout IsVisible="{Binding IsLoading}" Spacing="15">
+                <ActivityIndicator IsRunning="True" Color="#007bff" />
+                <Label Text="Loading team..." 
+                       HorizontalOptions="Center" 
+                       FontSize="16" 
+                       TextColor="#6c757d" />
             </StackLayout>
 
-            <!-- Abbreviation -->
-            <StackLayout>
-                <Label Text="Abbreviation *" />
-                <Entry Text="{Binding Abbreviation}" 
-                   Placeholder="Enter team abbreviation"
-                   IsEnabled="{Binding IsFormEnabled}" />
+            <!-- Content -->
+            <StackLayout IsVisible="{Binding HasTeam}" Spacing="20">
+
+                <!-- Team Header Card -->
+                <Border BackgroundColor="#007bff" 
+                        Padding="20"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 12">
+                    <Grid RowDefinitions="Auto,Auto" RowSpacing="10">
+                        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="15">
+                            <Label Grid.Column="0"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   TextColor="White"
+                                   VerticalOptions="Center">
+                                <Label.Text>
+                                    <MultiBinding StringFormat="Edit Team: {0} {1}">
+                                        <Binding Path="OriginalLocation" />
+                                        <Binding Path="OriginalMascot" />
+                                    </MultiBinding>
+                                </Label.Text>
+                            </Label>
+
+                            <Border Grid.Column="1"
+                                    BackgroundColor="White"
+                                    Stroke="Transparent"
+                                    Padding="8,4"
+                                    StrokeShape="RoundRectangle 4">
+                                <Label Text="{Binding OriginalAbb}"
+                                       TextColor="#007bff"
+                                       FontSize="14"
+                                       FontAttributes="Bold" />
+                            </Border>
+                        </Grid>
+
+                        <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="15">
+                            <StackLayout Grid.Column="0">
+                                <Label Text="Owner:" 
+                                       TextColor="White" 
+                                       FontSize="12" 
+                                       Opacity="0.8" />
+                                <Label Text="{Binding Team.UserUsername}" 
+                                       TextColor="White" 
+                                       FontSize="14" />
+                            </StackLayout>
+
+                            <StackLayout Grid.Column="1">
+                                <Label Text="Created:" 
+                                       TextColor="White" 
+                                       FontSize="12" 
+                                       Opacity="0.8" />
+                                <Label Text="{Binding Team.Date, StringFormat='{0:MMM dd, yyyy}'}" 
+                                       TextColor="White" 
+                                       FontSize="14" />
+                            </StackLayout>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- Edit Team Information Card -->
+                <Border BackgroundColor="White"
+                        Stroke="#dee2e6"
+                        StrokeThickness="1"
+                        Padding="20"
+                        StrokeShape="RoundRectangle 12">
+                    <StackLayout Spacing="20">
+                        <Label Text="Team Information" 
+                               FontSize="18" 
+                               FontAttributes="Bold" 
+                               TextColor="#28a745" />
+
+                        <!-- Location Field -->
+                        <StackLayout Spacing="8">
+                            <Label Text="Location" 
+                                   FontSize="14" 
+                                   FontAttributes="Bold" 
+                                   TextColor="#333" />
+                            <Entry Text="{Binding Location}" 
+                                   Placeholder="{Binding OriginalLocation}"
+                                   FontSize="16"
+                                   BackgroundColor="#f8f9fa" />
+                            <Label Text="{Binding LocationError}" 
+                                   TextColor="#dc3545" 
+                                   FontSize="12"
+                                   IsVisible="{Binding HasLocationError}" />
+                        </StackLayout>
+
+                        <!-- Mascot Field -->
+                        <StackLayout Spacing="8">
+                            <Label Text="Mascot" 
+                                   FontSize="14" 
+                                   FontAttributes="Bold" 
+                                   TextColor="#333" />
+                            <Entry Text="{Binding Mascot}" 
+                                   Placeholder="{Binding OriginalMascot}"
+                                   FontSize="16"
+                                   BackgroundColor="#f8f9fa" />
+                            <Label Text="{Binding MascotError}" 
+                                   TextColor="#dc3545" 
+                                   FontSize="12"
+                                   IsVisible="{Binding HasMascotError}" />
+                        </StackLayout>
+
+                        <!-- Abbreviation Field -->
+                        <StackLayout Spacing="8">
+                            <Label Text="Abbreviation" 
+                                   FontSize="14" 
+                                   FontAttributes="Bold" 
+                                   TextColor="#333" />
+                            <Entry Text="{Binding Abb}" 
+                                   Placeholder="{Binding OriginalAbb}"
+                                   MaxLength="3"
+                                   FontSize="16"
+                                   BackgroundColor="#f8f9fa" />
+                            <Label Text="{Binding AbbError}" 
+                                   TextColor="#dc3545" 
+                                   FontSize="12"
+                                   IsVisible="{Binding HasAbbError}" />
+                            <Label Text="2-3 characters only" 
+                                   FontSize="11" 
+                                   TextColor="#6c757d" />
+                        </StackLayout>
+
+                        <!-- Action Buttons -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
+                            <Button Grid.Column="0"
+                                    Text="Cancel"
+                                    Command="{Binding CancelCommand}"
+                                    BackgroundColor="Transparent"
+                                    TextColor="#6c757d"
+                                    BorderColor="#6c757d"
+                                    BorderWidth="1"
+                                    FontSize="16"
+                                    Padding="15" />
+
+                            <Button Grid.Column="1"
+                                    Command="{Binding SaveCommand}"
+                                    BackgroundColor="#28a745"
+                                    TextColor="White"
+                                    FontSize="16"
+                                    Padding="15"
+                                    IsEnabled="{Binding CanSave}">
+                                <Button.Text>
+                                    <MultiBinding StringFormat="{}{0} Save Changes">
+                                        <Binding Path="IsSaving" Converter="{StaticResource BoolToLoadingTextConverter}" />
+                                    </MultiBinding>
+                                </Button.Text>
+                            </Button>
+                        </Grid>
+                    </StackLayout>
+                </Border>
+
+                <!-- Team Management Actions -->
+                <Border BackgroundColor="White"
+                        Stroke="#dee2e6"
+                        StrokeThickness="1"
+                        Padding="20"
+                        StrokeShape="RoundRectangle 12">
+                    <StackLayout Spacing="15">
+                        <Label Text="Team Management" 
+                               FontSize="18" 
+                               FontAttributes="Bold" 
+                               TextColor="#17a2b8" />
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
+                            <Button Grid.Column="0"
+                                    Text="⚙️ Edit Settings"
+                                    Command="{Binding EditSettingsCommand}"
+                                    BackgroundColor="#17a2b8"
+                                    TextColor="White"
+                                    FontSize="14"
+                                    Padding="12" />
+
+                            <Button Grid.Column="1"
+                                    Text="👥 Edit Roster"
+                                    Command="{Binding EditRosterCommand}"
+                                    BackgroundColor="#17a2b8"
+                                    TextColor="White"
+                                    FontSize="14"
+                                    Padding="12" />
+                        </Grid>
+                    </StackLayout>
+                </Border>
+
+                <!-- Advanced Actions -->
+                <Border BackgroundColor="White"
+                        Stroke="#dee2e6"
+                        StrokeThickness="1"
+                        Padding="20"
+                        StrokeShape="RoundRectangle 12">
+                    <StackLayout Spacing="15">
+                        <Label Text="Advanced Actions" 
+                               FontSize="18" 
+                               FontAttributes="Bold" 
+                               TextColor="#ffc107" />
+
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
+                            <Button Grid.Column="0"
+                                    Command="{Binding DuplicateCommand}"
+                                    BackgroundColor="#007bff"
+                                    TextColor="White"
+                                    FontSize="14"
+                                    Padding="12"
+                                    IsEnabled="{Binding CanDuplicate}">
+                                <Button.Text>
+                                    <MultiBinding StringFormat="{}{0} Duplicate Team">
+                                        <Binding Path="IsDuplicating" Converter="{StaticResource BoolToLoadingTextConverter}" />
+                                    </MultiBinding>
+                                </Button.Text>
+                            </Button>
+
+                            <Button Grid.Column="1"
+                                    Command="{Binding DeleteCommand}"
+                                    BackgroundColor="#dc3545"
+                                    TextColor="White"
+                                    FontSize="14"
+                                    Padding="12"
+                                    IsEnabled="{Binding CanDelete}">
+                                <Button.Text>
+                                    <MultiBinding StringFormat="{}{0} Delete Team">
+                                        <Binding Path="IsDeleting" Converter="{StaticResource BoolToLoadingTextConverter}" />
+                                    </MultiBinding>
+                                </Button.Text>
+                            </Button>
+                        </Grid>
+
+                        <Label Text="⚠️ Warning: These actions cannot be undone. Please proceed with caution." 
+                               FontSize="12"
+                               TextColor="#6c757d"
+                               HorizontalTextAlignment="Center" />
+                    </StackLayout>
+                </Border>
+
             </StackLayout>
-
-            <!-- Mascot -->
-            <StackLayout>
-                <Label Text="Mascot *" />
-                <Entry Text="{Binding Mascot}" 
-                   Placeholder="Enter team mascot"
-                   IsEnabled="{Binding IsFormEnabled}" />
-            </StackLayout>
-
-            <!-- Error Message -->
-            <Label Text="{Binding ErrorMessage}" 
-               TextColor="Red" 
-               IsVisible="{Binding HasError}" />
-
-            <!-- Action Buttons -->
-            <StackLayout Spacing="10">
-
-                <!-- Save Button -->
-                <Button Text="Guardar Info" 
-                    Command="{Binding SaveTeamCommand}"
-                    BackgroundColor="Blue"
-                    TextColor="White"
-                    FontAttributes="Bold"
-                    CornerRadius="10"
-                    HeightRequest="50" />
-
-                <!-- Navigation Buttons Row 1 -->
-                <StackLayout Orientation="Horizontal" Spacing="5">
-                    <Button Text="Editar ajustes" 
-                        Command="{Binding GoToSettingsCommand}"
-                        BackgroundColor="Orange"
-                        TextColor="White"
-                        CornerRadius="10"
-                        HeightRequest="45"
-                        HorizontalOptions="Center" />
-
-                    <Button Text="Editar plantilla" 
-                        Command="{Binding GoToRosterCommand}"
-                        BackgroundColor="Orange"
-                        TextColor="White"
-                        CornerRadius="10"
-                        HeightRequest="45"
-                        HorizontalOptions="Center" />
-                </StackLayout>
-
-                <!-- Navigation Buttons Row 2 -->
-                <StackLayout Orientation="Horizontal" Spacing="5">
-                    <Button Text="Duplicar equipo" 
-                        Command="{Binding DuplicateTeamCommand}"
-                        BackgroundColor="Transparent"
-                        TextColor="Blue"
-                        BorderColor="Blue"
-                        BorderWidth="1"
-                        CornerRadius="10"
-                        HeightRequest="45"
-                        HorizontalOptions="Center" />
-
-                    <Button Text="Borrar equipo" 
-                        Command="{Binding DeleteTeamCommand}"
-                        BackgroundColor="Red"
-                        TextColor="White"
-                        CornerRadius="10"
-                        HeightRequest="45"
-                        HorizontalOptions="Center" />
-                </StackLayout>
-
-            </StackLayout>
-            
-            <!-- Loading Indicator -->
-            <ActivityIndicator IsRunning="{Binding IsLoading}" 
-                         IsVisible="{Binding IsLoading}" />
-
-            <!-- Go Back Button -->
-            <Button Text="Go Back" 
-                Command="{Binding GoBackCommand}"
-                BackgroundColor="Transparent"
-                TextColor="Blue" />
 
         </StackLayout>
     </ScrollView>
