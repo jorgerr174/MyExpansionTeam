@@ -36,7 +36,7 @@ namespace MobileApp.Models.Team
 
             try
             {
-                if (await _teamService.GetTeamRosterAsync(id) is TeamDto team)
+                if (await _teamService.GetTeamAsync(id) is TeamDto team)
                 {
                     TeamName = $"{team.Location} {team.Mascot}";
 

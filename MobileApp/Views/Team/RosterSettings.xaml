@@ -4,117 +4,371 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
              x:DataType="viewmodels:RosterSettingsViewModel"
-             Title="RosterSettings">
+             Title="Roster Settings">
 
     <ScrollView>
-        <StackLayout Padding="20" Spacing="15">
+        <StackLayout Padding="20" Spacing="20">
 
-            <!-- Title -->
-            <Label Text="{Binding TeamName}" 
-                FontSize="24" 
-                FontAttributes="Bold" 
-                HorizontalOptions="Center" />
-
-            <Label Text="Roster Settings" 
-                FontSize="18" 
-                HorizontalOptions="Center" />
-
-            <!-- Salary Cap Percentage -->
-            <StackLayout>
-                <Label Text="Salary Cap Percentage (60-120%)" />
-                <Entry Text="{Binding RosterSettingsCap}" 
-                    Placeholder="80"
-                    Keyboard="Numeric"
-                    IsEnabled="{Binding IsFormEnabled}" />
+            <!-- Loading State -->
+            <StackLayout IsVisible="{Binding IsLoading}" Spacing="15">
+                <ActivityIndicator IsRunning="True" Color="#007bff" />
+                <Label Text="Loading roster settings..." 
+                       HorizontalOptions="Center" 
+                       FontSize="16" 
+                       TextColor="#6c757d" />
             </StackLayout>
 
-            <!-- Max Robbed Players per Franchise -->
-            <StackLayout>
-                <Label Text="Max # of Robbed players per Franchise (2-10)" />
-                <Entry Text="{Binding RosterSettingsMaxPerTeam}" 
-                    Placeholder="3"
-                    Keyboard="Numeric"
-                    IsEnabled="{Binding IsFormEnabled}" />
-            </StackLayout>
+            <!-- Content -->
+            <StackLayout IsVisible="{Binding IsNotLoading}" Spacing="20">
 
-            <!-- Protected Players per Franchise -->
-            <StackLayout>
-                <Label Text="Protected Players per Franchise (0-6)" />
-                <Entry Text="{Binding RosterSettingsProtectedPerTeam}" 
-                    Placeholder="3"
-                    Keyboard="Numeric"
-                    IsEnabled="{Binding IsFormEnabled}" />
+                <!-- Team Header -->
+                <Border BackgroundColor="#007bff" 
+                        Padding="20"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 12">
+                    <Grid RowDefinitions="Auto,Auto" RowSpacing="10">
+                        <Label Grid.Row="0"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               HorizontalOptions="Center">
+                            <Label.Text>
+                                <MultiBinding StringFormat="Roster Settings: {0}">
+                                    <Binding Path="TeamName" />
+                                </MultiBinding>
+                            </Label.Text>
+                        </Label>
 
-                <Button Text="Select Protected Players" 
-                    Command="{Binding LoadProtectablePlayersCommand}"
-                    BackgroundColor="Blue"
-                    TextColor="White"
-                    IsEnabled="{Binding IsFormEnabled}" />
-            </StackLayout>
+                        <Label Grid.Row="1"
+                               Text="{Binding Team.UserUsername}" 
+                               TextColor="White" 
+                               FontSize="14"
+                               HorizontalOptions="Center"
+                               Opacity="0.8" />
+                    </Grid>
+                </Border>
 
-            <!-- Protected Players Selection (shown when ShowPlayerSelection is true) -->
-            <StackLayout IsVisible="{Binding ShowPlayerSelection}">
-                <Border BackgroundColor="LightYellow" Padding="10" Stroke="Yellow" StrokeThickness="1" StrokeShape="RoundRectangle 10">
-                    <StackLayout>
-                        <Label Text="Select Protected Players" 
-                            FontAttributes="Bold" />
+                <!-- Roster Configuration -->
+                <Border BackgroundColor="White"
+                        Stroke="#dee2e6"
+                        StrokeThickness="1"
+                        Padding="20"
+                        StrokeShape="RoundRectangle 12">
+                    <StackLayout Spacing="20">
+                        <Label Text="⚙️ Roster Configuration" 
+                               FontSize="18" 
+                               FontAttributes="Bold" 
+                               TextColor="#28a745" />
 
-                        <Label Text="{Binding RosterSettingsProtectedPerTeam, StringFormat='You can select up to {0} players'}" 
-                            FontSize="12" />
+                        <!-- Salary Cap % -->
+                        <Grid ColumnDefinitions="*,*,*" ColumnSpacing="15">
+                            <StackLayout  Grid.Column="0"
+                                        Spacing="8">
+                                <Label Text="💰 Salary Cap %" 
+                                       FontSize="14" 
+                                       FontAttributes="Bold" 
+                                       TextColor="#333" 
+                                       HorizontalOptions="Center" />
+                                <Stepper Value="{Binding RosterSettingsCap}" 
+                                         Minimum="60" 
+                                         Maximum="120" 
+                                         Increment="1" />
+                                <Label Text="{Binding RosterSettingsCap, StringFormat='{0}%'}" 
+                                       HorizontalOptions="Center" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold" 
+                                       TextColor="#007bff" />
+                                <Label Text="Percentage of total salary cap to use" 
+                                       FontSize="11" 
+                                       TextColor="#6c757d" 
+                                       HorizontalOptions="Center" />
+                            </StackLayout>
 
-                        <CollectionView ItemsSource="{Binding ProtectablePlayers}"
-                                    HeightRequest="300">
-                            <CollectionView.ItemTemplate>
+                            <!-- Max Players Per Team -->
+                            <StackLayout  Grid.Column="1" 
+                                        Spacing="8">
+                                <Label Text="👥 Max Players Per Team" 
+                                       FontSize="14" 
+                                       FontAttributes="Bold" 
+                                       TextColor="#333" 
+                                       HorizontalOptions="Center" />
+                                <Stepper Value="{Binding RosterSettingsMaxPerTeam}" 
+                                         Minimum="1" 
+                                         Maximum="10" 
+                                         Increment="1" />
+                                <Label Text="{Binding RosterSettingsMaxPerTeam}" 
+                                       HorizontalOptions="Center" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold" 
+                                       TextColor="#007bff" />
+                                <Label Text="Maximum players from each NFL team" 
+                                       FontSize="11" 
+                                       TextColor="#6c757d" 
+                                       HorizontalOptions="Center" />
+                            </StackLayout>
+
+                            <!-- Protected Players Per Team -->
+                            <StackLayout Grid.Column="2" 
+                                        Spacing="8">
+                                <Label Text="🛡️ Protected Players Per Team" 
+                                       FontSize="14" 
+                                       FontAttributes="Bold" 
+                                       TextColor="#333" 
+                                       HorizontalOptions="Center" />
+                                <Stepper Value="{Binding RosterSettingsProtectedPerTeam}" 
+                                         Minimum="0" 
+                                         Maximum="5" 
+                                         Increment="1" />
+                                <Label Text="{Binding RosterSettingsProtectedPerTeam}" 
+                                       HorizontalOptions="Center" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold" 
+                                       TextColor="#007bff" />
+                                <Label Text="Players to protect per NFL team" 
+                                       FontSize="11" 
+                                       TextColor="#6c757d" 
+                                       HorizontalOptions="Center" />
+                            </StackLayout>
+                        </Grid>
+                    </StackLayout>
+                </Border>
+
+                <!-- Protected Players Selection -->
+                <Border BackgroundColor="White"
+                        Stroke="#dee2e6"
+                        StrokeThickness="1"
+                        Padding="20"
+                        StrokeShape="RoundRectangle 12">
+                    <StackLayout Spacing="20">
+                        <Label Text="🛡️ Protected Players Selection" 
+                               FontSize="18" 
+                               FontAttributes="Bold" 
+                               TextColor="#17a2b8" />
+
+                        <!-- Selection Method -->
+                        <StackLayout Spacing="10">
+                            <Label Text="Selection Method" 
+                                   FontSize="14" 
+                                   FontAttributes="Bold" 
+                                   TextColor="#333" />
+
+                            <StackLayout Orientation="Horizontal" Spacing="20">
+                                <RadioButton Content="🤖 Automatic" 
+                                             IsChecked="{Binding IsAutomaticProtection}" 
+                                             FontSize="14" />
+                                <RadioButton Content="✋ Manual" 
+                                             IsChecked="{Binding IsManualProtection}" 
+                                             FontSize="14" />
+                            </StackLayout>
+
+                            <Label IsVisible="{Binding IsAutomaticProtection}"
+                                   Text="Protect highest-paid players automatically" 
+                                   FontSize="11" 
+                                   TextColor="#6c757d" />
+                            <Label IsVisible="{Binding IsManualProtection}"
+                                   Text="Select specific players to protect" 
+                                   FontSize="11" 
+                                   TextColor="#6c757d" />
+                        </StackLayout>
+
+                        <!-- Manual Selection Progress -->
+                        <StackLayout IsVisible="{Binding IsManualProtection}" Spacing="10">
+                            <Label Text="Protection Progress" 
+                                   FontSize="14" 
+                                   FontAttributes="Bold" 
+                                   TextColor="#333" />
+
+                            <Border BackgroundColor="#f8f9fa" 
+                                    Padding="15" 
+                                    Stroke="#dee2e6" 
+                                    StrokeThickness="1" 
+                                    StrokeShape="RoundRectangle 8">
+                                <StackLayout Spacing="10">
+                                    <Label FontSize="12" TextColor="#6c757d">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="{}{0} of 32 teams selected">
+                                                <Binding Path="TeamsWithSelections" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                    </Label>
+
+                                    <ProgressBar Progress="{Binding SelectionProgress}" 
+                                                 ProgressColor="#28a745" 
+                                                 BackgroundColor="#e9ecef" />
+
+                                    <Label FontSize="12" TextColor="#6c757d">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="{}{0} players protected">
+                                                <Binding Path="TotalProtectedPlayers" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                    </Label>
+                                </StackLayout>
+                            </Border>
+
+                            <Button Text="📋 Select Protected Players" 
+                                    Command="{Binding DisplayPlayerSelectionCommand}"
+                                    BackgroundColor="#17a2b8"
+                                    TextColor="White"
+                                    FontSize="14"
+                                    Padding="12" />
+                        </StackLayout>
+                    </StackLayout>
+                </Border>
+
+                <!-- Player Selection Modal -->
+                <StackLayout IsVisible="{Binding ShowPlayerSelection}" Spacing="15">
+
+                    <!-- Team Selection -->
+                    <Border BackgroundColor="White"
+                            Stroke="#ffc107"
+                            StrokeThickness="2"
+                            Padding="15"
+                            StrokeShape="RoundRectangle 8">
+                        <StackLayout Spacing="10">
+                            <Label Text="🏈 Select NFL Team" 
+                                   FontSize="16" 
+                                   FontAttributes="Bold" 
+                                   TextColor="#333" />
+
+                            <Picker ItemsSource="{Binding NflTeams}"
+                                    ItemDisplayBinding="{Binding DisplayName}"
+                                    SelectedItem="{Binding SelectedNflTeam}"
+                                    Title="Choose a team..." />
+
+                            <Label IsVisible="{Binding HasSelectedTeam}" 
+                                   FontSize="12" 
+                                   TextColor="#6c757d">
+                                <Label.Text>
+                                    <MultiBinding StringFormat="{}{0}/{1} players protected">
+                                        <Binding Path="CurrentTeamProtectedCount" />
+                                        <Binding Path="RosterSettingsProtectedPerTeam" />
+                                    </MultiBinding>
+                                </Label.Text>
+                            </Label>
+                        </StackLayout>
+                    </Border>
+
+                    <!-- Player List -->
+                    <StackLayout IsVisible="{Binding HasSelectedTeam}" Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <Label Grid.Column="0" 
+                                   Text="{Binding SelectedNflTeam.Name}" 
+                                   FontSize="16" 
+                                   FontAttributes="Bold" 
+                                   VerticalOptions="Center" />
+
+                            <Button Grid.Column="1" 
+                                    Text="Clear All" 
+                                    Command="{Binding ClearTeamSelectionCommand}"
+                                    BackgroundColor="#dc3545"
+                                    TextColor="White"
+                                    FontSize="12"
+                                    Padding="8" />
+                        </Grid>
+
+                        <CollectionView ItemsSource="{Binding TeamPlayersGrouped}"
+                                        IsGrouped="True"
+                                        BackgroundColor="Transparent">
+                            <CollectionView.GroupHeaderTemplate>
                                 <DataTemplate>
-                                    <Grid Padding="5" ColumnDefinitions="Auto,*,Auto">
-                                        <CheckBox Grid.Column="0"
-                                            IsChecked="{Binding IsSelected}"
-                                            CheckedChanged="OnPlayerSelectionChanged" />
+                                    <Label Text="{Binding Key}" 
+                                           FontSize="14" 
+                                           FontAttributes="Bold" 
+                                           TextColor="#6c757d" 
+                                           Padding="10,15,10,5" />
+                                </DataTemplate>
+                            </CollectionView.GroupHeaderTemplate>
 
-                                        <StackLayout Grid.Column="1">
-                                            <Label Text="{Binding Name}" 
-                                                FontAttributes="Bold" />
-                                            <Label Text="{Binding Position}" 
-                                                FontSize="12" />
-                                            <Label Text="{Binding TeamName}" 
-                                                FontSize="10" />
-                                        </StackLayout>
-                                    </Grid>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="viewmodels:ProtectedPlayerViewModel">
+                                    <Border BackgroundColor="White" 
+                                            Stroke="#dee2e6" 
+                                            StrokeThickness="1" 
+                                            Padding="15" 
+                                            Margin="5"
+                                            StrokeShape="RoundRectangle 8">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:RosterSettingsViewModel}}, Path=TogglePlayerProtectionCommand}"
+                                                                  CommandParameter="{Binding}" />
+                                        </Border.GestureRecognizers>
+
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsProtected}" Value="True">
+                                                <Setter Property="Stroke" Value="#28a745" />
+                                                <Setter Property="BackgroundColor" Value="#f8fff9" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
+
+                                        <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="10">
+                                            <StackLayout Grid.Column="0">
+                                                <Label Text="{Binding Player.Name}" 
+                                                       FontSize="14" 
+                                                       FontAttributes="Bold" />
+                                                <Label Text="{Binding Player.Position}" 
+                                                       FontSize="11" 
+                                                       TextColor="#007bff" />
+                                            </StackLayout>
+
+                                            <Label Grid.Column="1" 
+                                                   Text="{Binding Player.APY}" 
+                                                   FontSize="12" 
+                                                   FontAttributes="Bold" 
+                                                   TextColor="#28a745" 
+                                                   VerticalOptions="Center" />
+
+                                            <Label Grid.Column="2" 
+                                                   Text="⭐" 
+                                                   FontSize="14" 
+                                                   TextColor="#ffc107" 
+                                                   VerticalOptions="Center"
+                                                   IsVisible="{Binding Player.DefaultProtected}" />
+
+                                            <Label Grid.Column="3" 
+                                                   Text="✅" 
+                                                   FontSize="16" 
+                                                   TextColor="#28a745" 
+                                                   VerticalOptions="Center"
+                                                   IsVisible="{Binding IsProtected}" />
+                                        </Grid>
+                                    </Border>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
 
-                        <Button Text="Done Selecting" 
-                            Command="{Binding HidePlayerSelectionCommand}"
-                            BackgroundColor="Green"
-                            TextColor="White" />
+                        <Button Text="✅ Done Selecting" 
+                                Command="{Binding HidePlayerSelectionCommand}"
+                                BackgroundColor="#28a745"
+                                TextColor="White"
+                                FontSize="14"
+                                Padding="12" />
                     </StackLayout>
-                </Border>
+                </StackLayout>
+
+                <!-- Action Buttons -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
+                    <Button Grid.Column="0"
+                            Text="⬅️ Back to Team"
+                            Command="{Binding GoBackToTeamCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="#6c757d"
+                            BorderColor="#6c757d"
+                            BorderWidth="1"
+                            FontSize="14"
+                            Padding="12" />
+
+                    <Button Grid.Column="1"
+                            Text="💾 Save Settings"
+                            Command="{Binding SaveSettingsCommand}"
+                            BackgroundColor="#28a745"
+                            TextColor="White"
+                            FontSize="14"
+                            Padding="12"
+                            IsEnabled="{Binding CanSave}" />
+                </Grid>
+
             </StackLayout>
-
-            <!-- Error Message -->
-            <Label Text="{Binding ErrorMessage}" 
-                TextColor="Red" 
-                IsVisible="{Binding HasError}" />
-
-            <!-- Save Button -->
-            <Button Text="Save Settings" 
-                Command="{Binding SaveRosterSettingsCommand}"
-                IsEnabled="{Binding IsFormEnabled}"
-                BackgroundColor="Green"
-                TextColor="White" />
-
-            <!-- Loading Indicator -->
-            <ActivityIndicator IsRunning="{Binding IsLoading}" 
-                            IsVisible="{Binding IsLoading}" />
-
-            <!-- Go Back Button -->
-            <Button Text="Go Back" 
-                Command="{Binding GoBackCommand}"
-                BackgroundColor="Transparent"
-                TextColor="Blue" />
 
         </StackLayout>
     </ScrollView>
-
 </ContentPage>

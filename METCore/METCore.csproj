@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="DTOs\Team\RosterSettingsDto.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Diagramas\Analisis\DiagramaDeClases_Final\DiagramaDeClases_Final.png" />
     <None Remove="Diagramas\Analisis\DiagramaDeClases_Final\DiagramaDeClases_Final_Controladores.png" />
     <None Remove="Diagramas\Analisis\DiagramaDeClases_Final\DiagramaDeClases_Final_Controladores_OnlyGroupedEntities.png" />

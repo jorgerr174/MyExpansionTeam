@@ -30,7 +30,7 @@ namespace MobileApp.Models.Team
 
             try
             {
-                var team = await _teamService.GetTeamRosterAsync(id);
+                var team = await _teamService.GetTeamAsync(id);
                 if (team != null)
                 {
                     TeamName = $"{team.Location} {team.Mascot}";

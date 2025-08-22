@@ -378,16 +378,11 @@ namespace METCore.Services
             return Math.Abs(teamValue - franchiseValue) < 50;
         }
 
-        public async Task<ResultDto<IList<TradeDto>>> GetTeamTrades(string username, int TeamId)
+        public async Task<ResultDto<IList<TradeDto>>> GetTeamTrades(int TeamId)
         {
-            User? user = await _userRepository.GetUserByUsername(username);
-            if (user is null) return new ResultDto<IList<TradeDto>>("Username");
-
             if (TeamId < 1) return new ResultDto<IList<TradeDto>>("TeamId");
             Team? team = await _teamRepository.GetTById(TeamId);
             if (team is null) return new ResultDto<IList<TradeDto>>("Team");
-
-            if (user.Id != team.User.Id) return new ResultDto<IList<TradeDto>>("User");
 
             IList<TradeDto> list = [];
             TradeDto dto;
