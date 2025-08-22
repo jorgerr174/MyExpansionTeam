@@ -40,7 +40,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Get, "Users", "List", searchDto);
+                HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Users", "List", searchDto);
                 return response.IsSuccessStatusCode ? await GetResult<SearchResultDto<UserDto>>(response) : null;
             }
             catch { return null; }
@@ -50,7 +50,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Post, "Auth", "AssignRole", assignRoleDto);
+                HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Auth", "AssignRole", assignRoleDto);
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }

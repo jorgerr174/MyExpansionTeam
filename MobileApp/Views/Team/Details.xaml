@@ -451,7 +451,7 @@
                                             Padding="15"
                                             StrokeShape="RoundRectangle 8">
                                         <StackLayout Spacing="8">
-                                            <Label Text="{Binding Pick, StringFormat='Round {0}'}"
+                                            <Label Text="{Binding Pick}"
                                                    FontSize="12"
                                                    FontAttributes="Bold"
                                                    TextColor="#28a745" />

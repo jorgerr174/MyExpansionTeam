@@ -30,7 +30,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Get, "Users", "Profile");
+                HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Users", "Profile");
                 return response.IsSuccessStatusCode ? await GetResult<UserDto>(response) : null;
             }
             catch { return null; }
@@ -44,7 +44,7 @@ namespace MobileApp.Services
             try
             {
                 var signUpDto = new NewUserDto(username, password, confirmPassword, firstName, lastName, email, tlf);
-                var response = await SendRequest(HttpMethod.Post, "Auth", "SignUp", signUpDto);
+                HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Auth", "SignUp", signUpDto);
                 return response.IsSuccessStatusCode;
             }
             catch (Exception ex) { return false; }
@@ -60,7 +60,7 @@ namespace MobileApp.Services
                 var logInDto = new LogInDto(identifier, password);
 
                 // Same API call as your WebApp makes
-                var response = await SendRequest(HttpMethod.Post, "Auth", "LogIn", logInDto);
+                HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Auth", "LogIn", logInDto);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -100,7 +100,7 @@ namespace MobileApp.Services
             try
             {
                 var updateDto = new UpdateCredentialsDto(currentPassword, newUsername, newPassword);
-                var response = await SendRequest(HttpMethod.Put, "Auth", "UpdateCredentials", updateDto);
+                HttpResponseMessage response = await SendRequest(HttpMethod.Put, "Auth", "UpdateCredentials", updateDto);
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
@@ -133,7 +133,7 @@ namespace MobileApp.Services
         {
             try
             {
-                var response = await SendRequest(HttpMethod.Delete, "Auth", "DeleteUser");
+                HttpResponseMessage response = await SendRequest(HttpMethod.Delete, "Auth", "DeleteUser");
                 if (response.IsSuccessStatusCode)
                 {
                     LogOutAsync(); // Clear stored tokens

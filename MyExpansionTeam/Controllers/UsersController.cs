@@ -66,7 +66,7 @@ namespace METAPI.Controllers
 
 
         #region AssignRoles
-        [HttpGet("List")]
+        [HttpPost("List")]
         [Authorize(Roles = "Admin")]
         public async Task<SearchResultDto<UserDto>> List(SearchDto dto)
         {

@@ -14,11 +14,11 @@ namespace METAPI.Controllers
 
         #region Get Protectable Players
         [HttpGet("GetProtectablePlayers")]
-        public async Task<IActionResult> GetProtectablePlayers(IdDto dto)
+        public async Task<IActionResult> GetProtectablePlayers(int FranchiseId)
         {
-            if (dto.Id < 1 || dto.Id > 32) return BadRequest(new MessageDto("<h2 style='color:red'>FranchiseId no válido</h2>"));
+            if (FranchiseId < 1 || FranchiseId > 32) return BadRequest(new MessageDto("<h2 style='color:red'>FranchiseId no válido</h2>"));
 
-            IList<ProtectableDto> players = await _franchiseService.GetProtectablePlayers(dto.Id);
+            IList<ProtectableDto> players = await _franchiseService.GetProtectablePlayers(FranchiseId);
 
             return players is null ? BadRequest(new MessageDto("<h2 style='color:red'>Error en la carga</h2>")) : Ok(players);
         }
@@ -27,11 +27,11 @@ namespace METAPI.Controllers
 
         #region Get Selectable Players
         [HttpGet("GetSelectablePlayers")]
-        public async Task<IActionResult> GetSelectablePlayers(IdDto dto)
+        public async Task<IActionResult> GetSelectablePlayers(int FranchiseId)
         {
-            if (dto.Id < 1 || dto.Id > 32) return BadRequest(new MessageDto("<h2 style='color:red'>FranchiseId no válido</h2>"));
+            if (FranchiseId < 1 || FranchiseId > 32) return BadRequest(new MessageDto("<h2 style='color:red'>FranchiseId no válido</h2>"));
 
-            IList<SelectableDto> players = await _franchiseService.GetSelectablePlayers(dto.Id);
+            IList<SelectableDto> players = await _franchiseService.GetSelectablePlayers(FranchiseId);
 
             return players is null ? BadRequest(new MessageDto("<h2 style='color:red'>Error en la carga</h2>")) : Ok(players);
         }

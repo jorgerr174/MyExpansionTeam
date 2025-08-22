@@ -6,7 +6,7 @@ namespace MobileApp.Services
     {
         public async Task<IEnumerable<TeamInfoDto>?> GetMyTeamsAsync()
         {
-            var response = await SendRequest(HttpMethod.Get, "Teams", "MyTeams");
+            HttpResponseMessage response = await SendRequest(HttpMethod.Get, "Teams", "MyTeams");
             return response.IsSuccessStatusCode ? await GetResult<IEnumerable<TeamInfoDto>>(response) : null;
         }
     }
