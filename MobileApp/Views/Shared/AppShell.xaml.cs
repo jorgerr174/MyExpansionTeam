@@ -1,4 +1,5 @@
 ﻿using MobileApp.Models.Shared;
+using MobileApp.Services;
 
 namespace MobileApp.Views.Shared
 {
@@ -8,6 +9,14 @@ namespace MobileApp.Views.Shared
         {
             InitializeComponent();
             BindingContext = viewModel;
+            AccountService.UserLoggedOut += OnUserLoggedOut;
+        }
+
+        private async void OnUserLoggedOut(object? sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("//HomeTab");
+            await Shell.Current.GoToAsync("//MyTeamsTab");
+            await Shell.Current.GoToAsync("//ProfileTab");
         }
     }
 }
