@@ -42,7 +42,7 @@
                    HorizontalTextAlignment="Center" />
             <Button Text="Try Again" 
                     Command="{Binding LoadViewCommand}" 
-                    CommandParameter="{Binding TeamId}"
+                    CommandParameter="{Binding Team.Id}"
                     BackgroundColor="#007bff" 
                     TextColor="White" 
                     HorizontalOptions="Center" />
@@ -499,7 +499,7 @@
                                 <BoxView Color="#fff" HeightRequest="1" VerticalOptions="End" Margin="0,80" />
 
                                 <!-- Formation Positions -->
-                                <Grid x:Name="FormationField">
+                                <AbsoluteLayout x:Name="FormationField">
                                     <BindableLayout.ItemsSource>
                                         <Binding Path="FormationPositions" />
                                     </BindableLayout.ItemsSource>
@@ -537,7 +537,7 @@
                                             </Border>
                                         </DataTemplate>
                                     </BindableLayout.ItemTemplate>
-                                </Grid>
+                                </AbsoluteLayout>
                             </Grid>
                         </Border>
 
@@ -694,7 +694,7 @@
                                    FontAttributes="Bold" 
                                    TextColor="#495057"
                                    HorizontalOptions="Start" />
-                            <Button Text="📋 Draft View" 
+                            <Button Text="📋 Draft" 
                                     BackgroundColor="#28a745" 
                                     TextColor="White"
                                     FontSize="12"

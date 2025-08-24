@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.Player;
 using METCore.DTOs.Team;
+using METCore.Models.Players;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
 using static METCore.Enums.Types;
@@ -21,7 +22,7 @@ namespace MobileApp.Models.Team
         private IList<int> _protectedPlayerIds = [];
         private IList<int> _tradedPlayerIds = [];
         private double _salaryCapLimit = 224000000; // $224M base
-        private int _maxPerFranchise = 4;
+        private int _maxPerFranchise = 3;
 
         // Caching
         private Dictionary<int, IList<SelectableDto>?> _franchisePlayersCache = [];
@@ -56,7 +57,7 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private string rosterCountText = "0 players";
 
         // Build Tab
-        [ObservableProperty] private FranchiseInfo? selectedFranchise;
+        [ObservableProperty] private FranchiseModel? selectedFranchise;
         [ObservableProperty] private bool hasSelectedFranchise = false;
         [ObservableProperty] private string selectedFranchiseTitle = "";
         [ObservableProperty] private string selectedPositionFilter = "All";
@@ -158,7 +159,7 @@ namespace MobileApp.Models.Team
         {
             Franchises.Clear();
             foreach (FranchiseInfo franchise in FranchiseInfo.GetAllFranchises())
-                Franchises.Add(new(franchise, GetFranchiseSelectedCount(franchise.Id), _maxPerFranchise));
+                Franchises.Add(new(franchise, 0, _maxPerFranchise));
         }
 
         private void UpdateFranchiseCount(int franchiseId)
@@ -262,18 +263,19 @@ namespace MobileApp.Models.Team
         }
 
         [RelayCommand]
-        public async Task SelectFranchise(FranchiseInfo franchise)
+        public async Task SelectFranchise(FranchiseInfo franchiseInfo)
         {
-            if (franchise == null) return;
+            if (franchiseInfo is FranchiseInfo && Franchises.FirstOrDefault(f => f.FranchiseInfo.Id == franchiseInfo.Id) is FranchiseModel franchise)
+            {
+                SelectedFranchise = franchise;
+                HasSelectedFranchise = true;
+                SelectedFranchiseTitle = $"🏈 {franchiseInfo.Abbreviation} - {franchiseInfo.Name}";
 
-            SelectedFranchise = franchise;
-            HasSelectedFranchise = true;
-            SelectedFranchiseTitle = $"🏈 {franchise.Abbreviation} - {franchise.Name}";
+                foreach (FranchiseModel franchiseDisplay in Franchises)
+                    franchiseDisplay.BackgroundColor = franchiseDisplay.FranchiseInfo.Id == franchiseInfo.Id ? Color.FromArgb("#d4edda") : Color.FromArgb("#f8f9fa");
 
-            foreach (FranchiseModel franchiseDisplay in Franchises)
-                franchiseDisplay.BackgroundColor = franchiseDisplay.FranchiseInfo.Id == franchise.Id ? Color.FromArgb("#d4edda") : Color.FromArgb("#f8f9fa");
-
-            await LoadFranchisePlayers(franchise.Id);
+                await LoadFranchisePlayers(franchiseInfo.Id);
+            }
         }
 
         private async Task LoadFranchisePlayers(int franchiseId)
@@ -297,7 +299,7 @@ namespace MobileApp.Models.Team
                     players.Add(new(p, _tradedPlayerIds.Contains(p.Id), _protectedPlayerIds.Contains(p.Id), _rosterPlayerIds.Contains(p.Id)));
                 }
 
-                var playersByPosition = players.GroupBy(p => p.Player.Position).OrderBy(g => g.Key).ToList();
+                var playersByPosition = players.GroupBy(p => p.Player.Position).ToList();
                 if (SelectedPositionFilter != "All")
                     playersByPosition = [.. playersByPosition.Where(pbp => pbp.Key == SelectedPositionFilter)];
 
@@ -314,9 +316,9 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         public async Task TogglePlayer(PlayerModel player)
         {
-            if (player is PlayerModel && player.Clickable && SelectedFranchise != null && SelectedFranchise is FranchiseInfo)
+            if (player is PlayerModel && player.Clickable && SelectedFranchise is FranchiseModel && SelectedFranchise.FranchiseInfo is FranchiseInfo)
             {
-                if (GetFranchiseSelectedCount(SelectedFranchise.Id) >= _maxPerFranchise)
+                if (player.StatusAvailable && GetFranchiseSelectedCount(SelectedFranchise.FranchiseInfo.Id) >= _maxPerFranchise)
                 {
                     await Shell.Current.DisplayAlert("Franchise Limit",
                         $"You can only select {_maxPerFranchise} players from each franchise.", "OK");
@@ -331,7 +333,7 @@ namespace MobileApp.Models.Team
                         _rosterPlayerIds.Remove(player.Id);
 
                     UpdateSalaryCapDisplay();
-                    UpdateFranchiseCount(SelectedFranchise.Id);
+                    UpdateFranchiseCount(SelectedFranchise.FranchiseInfo.Id);
                 }
             }
 
@@ -412,7 +414,7 @@ namespace MobileApp.Models.Team
         private void UpdateSalaryCapDisplay()
         {
             var currentCapUsed = CalculateCurrentCapUsed();
-            var capPercentage = (currentCapUsed / _salaryCapLimit) * 100;
+            var capPercentage = (currentCapUsed / (_salaryCapLimit/1000000)) * 100;
 
             CapProgressWidth = Math.Min(capPercentage * 3, 300); // Max width for progress bar
             CurrentCapText = $"${currentCapUsed:F2}M / ${_salaryCapLimit / 1000000:F0}M";
@@ -445,12 +447,22 @@ namespace MobileApp.Models.Team
         private double CalculateCurrentCapUsed()
         {
             double totalCap = 0;
+            for(int i = 1; i < 33; i++)
+            {
+                if (_franchisePlayersCache.TryGetValue(i, out IList<SelectableDto> list))
+                    foreach (SelectableDto player in list.Where(p => _rosterPlayerIds.Contains(p.Id)))
+                        totalCap += ParseAPY(player.PureAPY);
+                else if (Team is TeamDto)
+                    foreach (RosteredDto player in Team.Players.Where(p => p.FranchiseId == i))
+                        totalCap += ParseAPY(player.PureAPY);
+            }
 
-            foreach (SelectableDto player in _franchisePlayersCache.SelectMany(cache => cache.Value.Where(p => _rosterPlayerIds.Contains(p.Id))))
-                totalCap += double.TryParse(player.PureAPY.Replace(",", "."), out double value) ? value / 1000000 : 0;
+            foreach (RosteredDto player in Team.Players.Where(p => p.FranchiseId == 0))
+                totalCap += ParseAPY(player.PureAPY);
 
             return totalCap;
         }
+        private double ParseAPY(string pureAPY) => double.TryParse(pureAPY.Replace(".", ","), out double value) ? value : 0;
 
         [RelayCommand]
         public async Task SaveRoster()
@@ -549,9 +561,9 @@ namespace MobileApp.Models.Team
         // Property change handlers for filters
         partial void OnSelectedPositionFilterChanged(string value)
         {
-            if (HasSelectedFranchise && SelectedFranchise != null)
+            if (HasSelectedFranchise && SelectedFranchise is FranchiseModel  && SelectedFranchise.FranchiseInfo is FranchiseInfo franchiseInfo)
             {
-                _ = Task.Run(async () => await LoadFranchisePlayers(SelectedFranchise.Id));
+                _ = Task.Run(async () => await LoadFranchisePlayers(franchiseInfo.Id));
             }
         }
 
@@ -965,33 +977,6 @@ namespace MobileApp.Models.Team
                 case 4: lineup.Player4 = playerId; break;
                 case 5: lineup.Player5 = playerId; break;
             }
-        }
-
-        // Property change handler
-        partial void OnSelectedFormationNameChanged(string value)
-        {
-            if (SelectedFormationType switch
-            {
-                "offense" => _offenseLineup,
-                "defense" => _defenseLineup,
-                "special" => (LineupDto)_specialLineup,
-                _ => null
-            } is LineupDto lineup)
-            {
-                lineup.Formation = GetFormationKeyByName(value);
-                LoadFormationPositions();
-            }
-        }
-
-        private string GetFormationKeyByName(string name)
-        {
-            if (_formationData.ContainsKey(SelectedFormationType))
-            {
-                var formation = _formationData[SelectedFormationType]
-                    .FirstOrDefault(f => f.Value.Name == name);
-                return formation.Key ?? "";
-            }
-            return "";
         }
     }
 }
