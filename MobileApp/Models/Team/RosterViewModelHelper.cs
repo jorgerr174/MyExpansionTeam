@@ -67,6 +67,17 @@ namespace MobileApp.Models.Team
                 PlayerStatus = StatusRegistry.Selected;
             else if (StatusSelected && !StatusProtected)
                 PlayerStatus = StatusRegistry.Available;
+
+            OnPropertyChanged(nameof(Player));
+            OnPropertyChanged(nameof(PlayerStatus));
+
+            OnPropertyChanged(nameof(BackgroundColor));
+            OnPropertyChanged(nameof(BorderColor));
+            OnPropertyChanged(nameof(StatusText));
+            OnPropertyChanged(nameof(StatusTextColor));
+            OnPropertyChanged(nameof(StatusBackgroundColor));
+            OnPropertyChanged(nameof(Icon));
+            OnPropertyChanged(nameof(IconColor));
         }
     }
 
@@ -127,6 +138,7 @@ namespace MobileApp.Models.Team
             PlayerIndex = index;
             // Convert percentage coordinates to layout bounds (0-1 range)
             LayoutBounds = new Rect(x / 100.0, y / 100.0, 60, 60);
+            //LayoutBounds = new Rect(index*0.9, y / 100.0, 60, 60);
             UpdateAppearance();
         }
 
@@ -166,17 +178,18 @@ namespace MobileApp.Models.Team
     public partial class FormationDisplayPosition : ObservableObject
     {
         [ObservableProperty] private string positionName;
-        [ObservableProperty] private string playerInitials;
+        [ObservableProperty] private string playerName;
         [ObservableProperty] private Color playerBackgroundColor;
         [ObservableProperty] private Rect layoutBounds;
 
-        public FormationDisplayPosition(string position, string initials, double x, double y, bool hasPlayer)
+        public FormationDisplayPosition(string position, string player, double x, double y, bool hasPlayer)
         {
             PositionName = position;
-            PlayerInitials = initials;
+            PlayerName = player;
             PlayerBackgroundColor = hasPlayer ? Color.FromArgb("#28a745") : Color.FromArgb("#dc3545");
             // Mobile-optimized coordinates (scaled for 300px height field)
-            LayoutBounds = new Rect((x * 0.75) / 100.0, (y * 0.75) / 100.0, 45, 45);
+            LayoutBounds = new Rect(x / 100.0, y / 100.0, 45, 45);
+            //LayoutBounds = new Rect(0.1, 0.1, 20, 60);
         }
     }
 }
