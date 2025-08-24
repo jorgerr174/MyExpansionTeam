@@ -278,23 +278,22 @@ namespace MobileApp.Models.Team
 
         private void LoadAllFormationDisplays()
         {
-            _offenseFormationKey = Team?.OffLineup?.Formation ?? "Eleven";
-            _defenseFormationKey = Team?.DefLineup?.Formation ?? "FourThree";
-            _specialFormationKey = Team?.SPLineup?.Formation ?? "SpecialTeams";
+            _offenseFormationKey = !String.IsNullOrWhiteSpace(Team?.OffLineup?.Formation) ? Team.OffLineup.Formation : "Eleven";
+            _defenseFormationKey = !String.IsNullOrWhiteSpace(Team?.DefLineup?.Formation) ? Team.DefLineup.Formation : "FourThree";
+            _specialFormationKey = !String.IsNullOrWhiteSpace(Team?.SPLineup?.Formation) ? Team.SPLineup.Formation : "SpecialTeams";
 
             GenerateFormationDisplay("offense", _offenseFormationKey, FormationData.GetOffenseFormations(), OffensePositions, Team?.OffLineup);
             GenerateFormationDisplay("defense", _defenseFormationKey, FormationData.GetDefenseFormations(), DefensePositions, Team?.DefLineup);
-            GenerateFormationDisplay("special", _specialFormationKey, FormationData.GetSpecialTeamsFormations(), SpecialPositions, (LineupDto?)Team?.SPLineup);
+            GenerateFormationDisplay("special", _specialFormationKey, FormationData.GetSpecialTeamsFormations(), SpecialPositions, Team?.SPLineup);
 
             UpdateCurrentFormationName();
         }
 
         private void GenerateFormationDisplay(string formationType, string formationKey, IList<FormationInfo> formations,
-            ObservableCollection<FormationDisplayPosition> collection, LineupDto? lineup)
+            ObservableCollection<FormationDisplayPosition> collection, SPLineupDto? lineup)
         {
             collection.Clear();
-
-            if (formations.FirstOrDefault(f => f.Name == formationKey) is FormationInfo formation)
+            if (formations.FirstOrDefault(f => f.Key == formationKey) is FormationInfo formation)
                 for (int i = 0; i < formation.Positions.Count; i++)
                 {
                     var pos = formation.Positions[i];
@@ -304,25 +303,35 @@ namespace MobileApp.Models.Team
                 }
         }
 
-        private int GetPlayerIdFromLineup(LineupDto? lineup, int position)
+        private int GetPlayerIdFromLineup(SPLineupDto? splineup, int position)
         {
-            if (lineup == null) return 0;
+            if (splineup == null) return 0;
 
-            return position switch
-            {
-                1 => lineup.Player1,
-                2 => lineup.Player2,
-                3 => lineup.Player3,
-                4 => lineup.Player4,
-                5 => lineup.Player5,
-                6 => lineup.Player6,
-                7 => lineup.Player7,
-                8 => lineup.Player8,
-                9 => lineup.Player9,
-                10 => lineup.Player10,
-                11 => lineup.Player11,
-                _ => 0
-            };
+            return splineup is LineupDto lineup
+                ? position switch
+                {
+                    1 => lineup.Player1,
+                    2 => lineup.Player2,
+                    3 => lineup.Player3,
+                    4 => lineup.Player4,
+                    5 => lineup.Player5,
+                    6 => lineup.Player6,
+                    7 => lineup.Player7,
+                    8 => lineup.Player8,
+                    9 => lineup.Player9,
+                    10 => lineup.Player10,
+                    11 => lineup.Player11,
+                    _ => 0
+                }
+                :   position switch
+                {
+                    1 => splineup.Player1,
+                    2 => splineup.Player2,
+                    3 => splineup.Player3,
+                    4 => splineup.Player4,
+                    5 => splineup.Player5,
+                    _ => 0
+                };
         }
     }
 
