@@ -400,97 +400,97 @@
                                 <BoxView Color="#fff" HeightRequest="1" VerticalOptions="End" Margin="0,60" />
 
                                 <!-- Offense Formation -->
-                                <Grid x:Name="OffenseFormationField" IsVisible="{Binding IsOffenseViewSelected}">
+                                <AbsoluteLayout x:Name="OffenseFormationField" IsVisible="{Binding IsOffenseViewSelected}">
                                     <BindableLayout.ItemsSource>
                                         <Binding Path="OffensePositions" />
                                     </BindableLayout.ItemsSource>
                                     <BindableLayout.ItemTemplate>
                                         <DataTemplate x:DataType="viewmodels:FormationDisplayPosition">
                                             <Border BackgroundColor="{Binding PlayerBackgroundColor}"
-                                    Stroke="White"
-                                    StrokeThickness="1"
-                                    WidthRequest="45"
-                                    HeightRequest="45"
-                                    StrokeShape="RoundRectangle 22"
-                                    AbsoluteLayout.LayoutBounds="{Binding LayoutBounds}"
-                                    AbsoluteLayout.LayoutFlags="All">
+                                                    Stroke="White"
+                                                    StrokeThickness="1"
+                                                    WidthRequest="45"
+                                                    HeightRequest="45"
+                                                    StrokeShape="RoundRectangle 22"
+                                                    AbsoluteLayout.LayoutBounds="{Binding LayoutBounds}"
+                                                    AbsoluteLayout.LayoutFlags="PositionProportional">
                                                 <StackLayout Spacing="1" VerticalOptions="Center" HorizontalOptions="Center">
                                                     <Label Text="{Binding PositionName}"
-                                           FontSize="8"
-                                           FontAttributes="Bold"
-                                           TextColor="White"
-                                           HorizontalOptions="Center" />
-                                                    <Label Text="{Binding PlayerInitials}"
-                                           FontSize="7"
-                                           TextColor="White"
-                                           HorizontalOptions="Center" />
+                                                           FontSize="8"
+                                                           FontAttributes="Bold"
+                                                           TextColor="White"
+                                                           HorizontalOptions="Center" />
+                                                    <Label Text="{Binding PlayerName}"
+                                                           FontSize="7"
+                                                           TextColor="White"
+                                                           HorizontalOptions="Center" />
                                                 </StackLayout>
                                             </Border>
                                         </DataTemplate>
                                     </BindableLayout.ItemTemplate>
-                                </Grid>
+                                </AbsoluteLayout>
 
                                 <!-- Defense Formation -->
-                                <Grid x:Name="DefenseFormationField" IsVisible="{Binding IsDefenseViewSelected}">
+                                <AbsoluteLayout x:Name="DefenseFormationField" IsVisible="{Binding IsDefenseViewSelected}">
                                     <BindableLayout.ItemsSource>
                                         <Binding Path="DefensePositions" />
                                     </BindableLayout.ItemsSource>
                                     <BindableLayout.ItemTemplate>
                                         <DataTemplate x:DataType="viewmodels:FormationDisplayPosition">
                                             <Border BackgroundColor="{Binding PlayerBackgroundColor}"
-                                    Stroke="White"
-                                    StrokeThickness="1"
-                                    WidthRequest="45"
-                                    HeightRequest="45"
-                                    StrokeShape="RoundRectangle 22"
-                                    AbsoluteLayout.LayoutBounds="{Binding LayoutBounds}"
-                                    AbsoluteLayout.LayoutFlags="All">
+                                                    Stroke="White"
+                                                    StrokeThickness="1"
+                                                    WidthRequest="45"
+                                                    HeightRequest="45"
+                                                    StrokeShape="RoundRectangle 22"
+                                                    AbsoluteLayout.LayoutBounds="{Binding LayoutBounds}"
+                                                    AbsoluteLayout.LayoutFlags="All">
                                                 <StackLayout Spacing="1" VerticalOptions="Center" HorizontalOptions="Center">
                                                     <Label Text="{Binding PositionName}"
-                                           FontSize="8"
-                                           FontAttributes="Bold"
-                                           TextColor="White"
-                                           HorizontalOptions="Center" />
-                                                    <Label Text="{Binding PlayerInitials}"
-                                           FontSize="7"
-                                           TextColor="White"
-                                           HorizontalOptions="Center" />
+                                                           FontSize="8"
+                                                           FontAttributes="Bold"
+                                                           TextColor="White"
+                                                           HorizontalOptions="Center" />
+                                                    <Label Text="{Binding PlayerName}"
+                                                           FontSize="7"
+                                                           TextColor="White"
+                                                           HorizontalOptions="Center" />
                                                 </StackLayout>
                                             </Border>
                                         </DataTemplate>
                                     </BindableLayout.ItemTemplate>
-                                </Grid>
+                                </AbsoluteLayout>
 
                                 <!-- Special Teams Formation -->
-                                <Grid x:Name="SpecialFormationField" IsVisible="{Binding IsSpecialViewSelected}">
+                                <AbsoluteLayout x:Name="SpecialFormationField">
                                     <BindableLayout.ItemsSource>
                                         <Binding Path="SpecialPositions" />
                                     </BindableLayout.ItemsSource>
                                     <BindableLayout.ItemTemplate>
                                         <DataTemplate x:DataType="viewmodels:FormationDisplayPosition">
                                             <Border BackgroundColor="{Binding PlayerBackgroundColor}"
-                                    Stroke="White"
-                                    StrokeThickness="1"
-                                    WidthRequest="45"
-                                    HeightRequest="45"
-                                    StrokeShape="RoundRectangle 22"
-                                    AbsoluteLayout.LayoutBounds="{Binding LayoutBounds}"
-                                    AbsoluteLayout.LayoutFlags="All">
+                                                    Stroke="White"
+                                                    StrokeThickness="1"
+                                                    WidthRequest="45"
+                                                    HeightRequest="45"
+                                                    StrokeShape="RoundRectangle 22"
+                                                    AbsoluteLayout.LayoutBounds="{Binding LayoutBounds}"
+                                                    AbsoluteLayout.LayoutFlags="All">
                                                 <StackLayout Spacing="1" VerticalOptions="Center" HorizontalOptions="Center">
                                                     <Label Text="{Binding PositionName}"
-                                           FontSize="8"
-                                           FontAttributes="Bold"
-                                           TextColor="White"
-                                           HorizontalOptions="Center" />
-                                                    <Label Text="{Binding PlayerInitials}"
-                                           FontSize="7"
-                                           TextColor="White"
-                                           HorizontalOptions="Center" />
+                                                           FontSize="8"
+                                                           FontAttributes="Bold"
+                                                           TextColor="White"
+                                                           HorizontalOptions="Center" />
+                                                    <Label Text="{Binding PlayerName}"
+                                                           FontSize="7"
+                                                           TextColor="White"
+                                                           HorizontalOptions="Center" />
                                                 </StackLayout>
                                             </Border>
                                         </DataTemplate>
                                     </BindableLayout.ItemTemplate>
-                                </Grid>
+                                </AbsoluteLayout>
                             </Grid>
                         </Border>
                     </StackLayout>

@@ -28,6 +28,11 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private bool isDuplicating = false;
         [ObservableProperty] private bool isDeleting = false;
 
+        public string OriginalLocation = string.Empty;
+        public string OriginalMascot = string.Empty;
+        public string OriginalAbb = string.Empty;
+        public bool HasTeam => Team is TeamInfoDto;
+
         public bool CanSave => !IsSaving && !IsLoading;
         public bool CanDuplicate => !IsDuplicating && !IsLoading;
         public bool CanDelete => !IsDeleting && !IsLoading;
@@ -50,6 +55,9 @@ namespace MobileApp.Models.Team
                 if (await _teamService.GetTeamDetailsAsync(teamId) is TeamInfoDto team)
                 {
                     Team = team;
+                    OriginalLocation = team.Location;
+                    OriginalMascot = team.Mascot;
+                    OriginalAbb = team.Abb;
                     ClearErrors();
                 }
                 else
