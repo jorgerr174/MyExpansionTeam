@@ -1,288 +1,556 @@
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.Player;
 using METCore.DTOs.Team;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
+using static METCore.Enums.Types;
 
 namespace MobileApp.Models.Team
 {
-    public partial class TradeViewModel(TeamService teamService) : BaseViewModel
+    public partial class TradeViewModel : TeamBaseViewModel
     {
-        private readonly TeamService _teamService = teamService;
+        private readonly TeamService _teamService;
 
         [ObservableProperty] private int teamId;
-        [ObservableProperty] private string teamName = string.Empty;
-        [ObservableProperty] private string tradeContext = "roster"; // "roster" or "draft"
-        [ObservableProperty] private int currentPick = -1;
+        [ObservableProperty] private int currentPick = -1; // -1 = from roster, >=0 = from draft
+        [ObservableProperty] private int selectedFranchiseId;
+        [ObservableProperty] private string tradePartnerName = "Select Franchise";
+        [ObservableProperty] private string loadingMessage = "Loading...";
 
-        [ObservableProperty] private List<FranchiseInfo> franchises = FranchiseInfo.GetAllFranchises();
-        [ObservableProperty] private FranchiseInfo? selectedFranchise;
-        [ObservableProperty] private bool showFranchiseSelection = true;
-        [ObservableProperty] private bool showTradeBuilder = false;
+        // Tab Management
+        [ObservableProperty] private bool isSummaryTabVisible = true;
+        [ObservableProperty] private bool isUserTabVisible = false;
+        [ObservableProperty] private bool isFranchiseTabVisible = false;
+        [ObservableProperty] private Color summaryTabColor = Color.FromArgb("#007bff");
+        [ObservableProperty] private Color summaryTabTextColor = Colors.White;
+        [ObservableProperty] private Color userTabColor = Color.FromArgb("#f8f9fa");
+        [ObservableProperty] private Color userTabTextColor = Color.FromArgb("#6c757d");
+        [ObservableProperty] private Color franchiseTabColor = Color.FromArgb("#f8f9fa");
+        [ObservableProperty] private Color franchiseTabTextColor = Color.FromArgb("#6c757d");
 
-        [ObservableProperty] private IList<SelectableDto> availableTeamPlayers = [];
-        [ObservableProperty] private IList<SelectableDto> availableFranchisePlayers = [];
-        [ObservableProperty] private IList<string> availableTeamPicks = [];
-        [ObservableProperty] private IList<string> availableFranchisePicks = [];
+        // Trade Value Display
+        [ObservableProperty] private string userTotalValueText = "Your Value: 0";
+        [ObservableProperty] private string franchiseTotalValueText = "Their Value: 0";
+        [ObservableProperty] private string tradeBalanceText = "Select items to trade";
+        [ObservableProperty] private double userValueBarWidth = 0;
+        [ObservableProperty] private double franchiseValueBarWidth = 0;
 
-        [ObservableProperty] private IList<SelectableDto> selectedTeamPlayers = [];
-        [ObservableProperty] private IList<SelectableDto> selectedFranchisePlayers = [];
-        [ObservableProperty] private IList<string> selectedTeamPicks = [];
-        [ObservableProperty] private IList<string> selectedFranchisePicks = [];
+        // Trade Items
+        [ObservableProperty] private ObservableCollection<TradePlayerItem> userPlayers = new();
+        [ObservableProperty] private ObservableCollection<TradePickItem> userPicks = new();
+        [ObservableProperty] private ObservableCollection<TradePlayerItem> franchisePlayers = new();
+        [ObservableProperty] private ObservableCollection<TradePickItem> franchisePicks = new();
+        [ObservableProperty] private ObservableCollection<TradeItemSummary> selectedUserItems = new();
+        [ObservableProperty] private ObservableCollection<TradeItemSummary> selectedFranchiseItems = new();
 
-        [ObservableProperty] private decimal teamTradeValue = 0;
-        [ObservableProperty] private decimal franchiseTradeValue = 0;
-        [ObservableProperty] private decimal teamCurrentCap = 0;
-        [ObservableProperty] private bool isValidTrade = false;
+        // Visibility
+        [ObservableProperty] private bool hasUserPlayers = false;
+        [ObservableProperty] private bool hasUserPicks = false;
+        [ObservableProperty] private bool hasFranchisePlayers = false;
+        [ObservableProperty] private bool hasFranchisePicks = false;
+        [ObservableProperty] private bool canTrade = false;
 
-        public bool HasSelectedItems => SelectedTeamPlayers.Any() || SelectedTeamPicks.Any() || SelectedFranchisePlayers.Any() || SelectedFranchisePicks.Any();
+        // Franchise Selection
+        private List<FranchiseInfo> _availableFranchises = new();
+        private TradeDto? _currentTradeData;
+        private int _userTotalValue;
+        private int _franchiseTotalValue;
 
-        public string TradeValueComparison => $"Your Value: {TeamTradeValue:F1} | Their Value: {FranchiseTradeValue:F1}";
-
-        [RelayCommand]
-        public async Task LoadTradeData()
+        public TradeViewModel(TeamService teamService)
         {
-            IsLoading = true;
-
-            try
-            {
-                ShowFranchiseSelection = true;
-                ShowTradeBuilder = false;
-            }
-            catch (Exception ex)
-            {
-                ErrorMessage = $"Failed to initialize trade: {ex.Message}";
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            _teamService = teamService;
+            LoadAvailableFranchises();
         }
 
-        public async Task InitializeTradeAsync(int id, string context = "roster", int pick = -1)
+        public void LoadTrade(int teamId, int currentPick)
         {
-            TeamId = id;
-            TradeContext = context;
-            CurrentPick = pick;
-            IsLoading = true;
-
-            try
-            {
-                ShowFranchiseSelection = true;
-                ShowTradeBuilder = false;
-            }
-            catch (Exception ex)
-            {
-                ErrorMessage = $"Failed to initialize trade: {ex.Message}";
-            }
-            finally
-            {
-                IsLoading = false;
-            }
+            SelectedFranchiseId = 0;
+            CurrentPick = currentPick;
+            _ = LoadViewAsync(teamId);
         }
 
         [RelayCommand]
-        public async Task SelectFranchise(FranchiseInfo franchise)
+        public override async Task LoadViewAsync(int teamId)
         {
-            SelectedFranchise = franchise;
-            IsLoading = true;
-
+            TeamId = teamId;
             try
             {
-                if (await _teamService.GetTradeDataAsync(TeamId, franchise.Id) is TradeDto tradeData)
+                UpdateLoadingState(true, "Loading trade interface...");
+
+                if (SelectedFranchiseId == 0)
+                    await SelectFranchise();
+                else
+                    await LoadTradeData();
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", $"Failed to load trade data: {ex.Message}", "OK");
+            }
+            finally
+            {
+                UpdateLoadingState(false);
+            }
+        }
+
+        [RelayCommand]
+        private async Task SelectFranchise()
+        {
+            try
+            {
+                var franchiseNames = _availableFranchises.Select(f => f.Name).ToArray();
+                var selectedName = await Shell.Current.DisplayActionSheet(
+                    "Select franchise to trade with", "Cancel", null, franchiseNames);
+
+                if (selectedName != "Cancel" && !string.IsNullOrEmpty(selectedName))
                 {
-                    TeamName = $"{tradeData.TeamPlayers.FirstOrDefault()?.Name ?? "Your Team"}";
+                    var selectedFranchise = _availableFranchises.FirstOrDefault(f => f.Name == selectedName);
+                    if (selectedFranchise != null)
+                    {
+                        SelectedFranchiseId = selectedFranchise.Id;
+                        TradePartnerName = selectedFranchise.Name;
+                        await LoadTradeData();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", $"Failed to select franchise: {ex.Message}", "OK");
+            }
+        }
 
-                    AvailableTeamPlayers = tradeData.TeamPlayers;
-                    AvailableFranchisePlayers = tradeData.FranchisePlayers;
-                    AvailableTeamPicks = [.. tradeData.TeamPicks.Select(p => TradeViewModel.FormatPickAsString(p))];
-                    AvailableFranchisePicks = [.. tradeData.FranchisePicks.Select(p => TradeViewModel.FormatPickAsString(p))];
-                    TeamCurrentCap = tradeData.TeamCurrentCap;
+        [RelayCommand]
+        private void ShowSummaryTab()
+        {
+            UpdateTabVisibility("summary");
+        }
 
-                    ClearSelections();
+        [RelayCommand]
+        private void ShowUserTab()
+        {
+            UpdateTabVisibility("user");
+        }
 
-                    ShowFranchiseSelection = false;
-                    ShowTradeBuilder = true;
+        [RelayCommand]
+        private void ShowFranchiseTab()
+        {
+            UpdateTabVisibility("franchise");
+        }
+
+        [RelayCommand]
+        private void TogglePlayerSelection(TradePlayerItem playerItem)
+        {
+            playerItem.IsSelected = !playerItem.IsSelected;
+            UpdateTradeCalculations();
+        }
+
+        [RelayCommand]
+        private void TogglePickSelection(TradePickItem pickItem)
+        {
+            pickItem.IsSelected = !pickItem.IsSelected;
+            UpdateTradeCalculations();
+        }
+
+        [RelayCommand]
+        private async Task ProposeTradeAsync()
+        {
+            await SubmitTrade(false);
+        }
+
+        [RelayCommand]
+        private async Task ForceTradeAsync()
+        {
+            var confirm = await Shell.Current.DisplayAlert("Force Trade",
+                "Force this trade even if values don't match?", "Yes", "No");
+            if (confirm)
+            {
+                await SubmitTrade(true);
+            }
+        }
+
+        [RelayCommand]
+        private async Task CancelTrade()
+        {
+            await ReturnToOrigin();
+        }
+
+        [RelayCommand]
+        private async Task Return() => await ReturnToOrigin();
+
+        private async Task LoadTradeData()
+        {
+            if (SelectedFranchiseId == 0) return;
+
+            try
+            {
+                UpdateLoadingState(true, $"Loading trade data with {TradePartnerName}...");
+
+                _currentTradeData = await _teamService.GetTradeDataAsync(TeamId, SelectedFranchiseId);
+
+                if (_currentTradeData == null)
+                {
+                    await Shell.Current.DisplayAlert("Error", "Failed to load trade data", "OK");
+                    return;
+                }
+
+                LoadTradeItems();
+                UpdateTradeCalculations();
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", $"Failed to load trade data: {ex.Message}", "OK");
+            }
+            finally
+            {
+                UpdateLoadingState(false);
+            }
+        }
+
+        private void LoadTradeItems()
+        {
+            if (_currentTradeData == null) return;
+
+            // Clear existing items
+            UserPlayers.Clear();
+            UserPicks.Clear();
+            FranchisePlayers.Clear();
+            FranchisePicks.Clear();
+
+            // Load user team players
+            if (_currentTradeData.TeamPlayers?.Any() ?? false)
+            {
+                foreach (var player in _currentTradeData.TeamPlayers)
+                {
+                    UserPlayers.Add(new TradePlayerItem(player, true));
+                }
+            }
+
+            // Load user team picks (filter out already used picks if coming from draft)
+            if (_currentTradeData.TeamPicks?.Any() ?? false)
+            {
+                foreach (var pick in _currentTradeData.TeamPicks)
+                {
+                    // If coming from draft, only show picks after current pick
+                    if (CurrentPick == -1 || pick > CurrentPick)
+                    {
+                        UserPicks.Add(new TradePickItem(pick, true));
+                    }
+                }
+            }
+
+            // Load franchise players
+            if (_currentTradeData.FranchisePlayers?.Any() ?? false)
+            {
+                foreach (var player in _currentTradeData.FranchisePlayers)
+                {
+                    FranchisePlayers.Add(new TradePlayerItem(player, false));
+                }
+            }
+
+            // Load franchise picks (filter out already used picks if coming from draft)
+            if (_currentTradeData.FranchisePicks?.Any() ?? false)
+            {
+                foreach (var pick in _currentTradeData.FranchisePicks)
+                {
+                    // If coming from draft, only show picks after current pick
+                    if (CurrentPick == -1 || pick > CurrentPick)
+                    {
+                        FranchisePicks.Add(new TradePickItem(pick, false));
+                    }
+                }
+            }
+
+            // Update visibility flags
+            HasUserPlayers = UserPlayers.Any();
+            HasUserPicks = UserPicks.Any();
+            HasFranchisePlayers = FranchisePlayers.Any();
+            HasFranchisePicks = FranchisePicks.Any();
+        }
+
+        private void UpdateTradeCalculations()
+        {
+            // Calculate user total value
+            _userTotalValue = 0;
+            _userTotalValue += UserPlayers.Where(p => p.IsSelected).Sum(p => DraftPicks.GetPlayerValue(p.Player));
+            _userTotalValue += UserPicks.Where(p => p.IsSelected).Sum(p => DraftPicks.GetPickValue(p.Pick));
+
+            // Calculate franchise total value
+            _franchiseTotalValue = 0;
+            _franchiseTotalValue += FranchisePlayers.Where(p => p.IsSelected).Sum(p => DraftPicks.GetPlayerValue(p.Player));
+            _franchiseTotalValue += FranchisePicks.Where(p => p.IsSelected).Sum(p => DraftPicks.GetPickValue(p.Pick));
+
+            // Update display texts
+            UserTotalValueText = $"Your Value: {_userTotalValue}";
+            FranchiseTotalValueText = $"Their Value: {_franchiseTotalValue}";
+
+            // Update trade balance
+            var totalValue = _userTotalValue + _franchiseTotalValue;
+            if (totalValue == 0)
+            {
+                TradeBalanceText = "Select items to trade";
+                UserValueBarWidth = 0;
+                FranchiseValueBarWidth = 0;
+            }
+            else
+            {
+                var userPercentage = (double)_userTotalValue / totalValue;
+                var franchisePercentage = (double)_franchiseTotalValue / totalValue;
+
+                UserValueBarWidth = userPercentage * 300; // Max width of progress bar
+                FranchiseValueBarWidth = franchisePercentage * 300;
+
+                if (_userTotalValue > _franchiseTotalValue)
+                {
+                    TradeBalanceText = "You're giving more";
+                }
+                else if (_franchiseTotalValue > _userTotalValue)
+                {
+                    TradeBalanceText = "You're getting more";
                 }
                 else
-                    ErrorMessage = "Failed to load trade data";
+                {
+                    TradeBalanceText = "Balanced trade";
+                }
             }
-            catch (Exception ex)
+
+            // Update selected items summaries
+            UpdateSelectedItemsSummary();
+
+            // Update trade availability
+            CanTrade = (_userTotalValue > 0 || _franchiseTotalValue > 0) &&
+                       (UserPlayers.Any(p => p.IsSelected) || UserPicks.Any(p => p.IsSelected)) &&
+                       (FranchisePlayers.Any(p => p.IsSelected) || FranchisePicks.Any(p => p.IsSelected));
+        }
+
+        private void UpdateSelectedItemsSummary()
+        {
+            SelectedUserItems.Clear();
+            SelectedFranchiseItems.Clear();
+
+            // Add selected user players
+            foreach (var player in UserPlayers.Where(p => p.IsSelected))
             {
-                ErrorMessage = $"Failed to load trade data: {ex.Message}";
+                SelectedUserItems.Add(new TradeItemSummary($"🏃 {player.Name} ({player.Position})", DraftPicks.GetPlayerValue(player.Player)));
             }
-            finally
+
+            // Add selected user picks
+            foreach (var pick in UserPicks.Where(p => p.IsSelected))
             {
-                IsLoading = false;
+                SelectedUserItems.Add(new TradeItemSummary($"🏆 Pick #{pick.Pick}", DraftPicks.GetPickValue(pick.Pick)));
+            }
+
+            // Add selected franchise players
+            foreach (var player in FranchisePlayers.Where(p => p.IsSelected))
+            {
+                SelectedFranchiseItems.Add(new TradeItemSummary($"🏃 {player.Name} ({player.Position})", DraftPicks.GetPlayerValue(player.Player)));
+            }
+
+            // Add selected franchise picks
+            foreach (var pick in FranchisePicks.Where(p => p.IsSelected))
+            {
+                SelectedFranchiseItems.Add(new TradeItemSummary($"🏆 Pick #{pick.Pick}", DraftPicks.GetPickValue(pick.Pick)));
             }
         }
 
-        [RelayCommand]
-        public void ToggleTeamPlayer(SelectableDto player)
+        private void UpdateTabVisibility(string activeTab)
         {
-            if (!SelectedTeamPlayers.Remove(player))
-                SelectedTeamPlayers = [.. SelectedTeamPlayers, player];
+            // Reset all tabs
+            IsSummaryTabVisible = false;
+            IsUserTabVisible = false;
+            IsFranchiseTabVisible = false;
 
-            CalculateTradeValues();
+            SummaryTabColor = Color.FromArgb("#f8f9fa");
+            SummaryTabTextColor = Color.FromArgb("#6c757d");
+            UserTabColor = Color.FromArgb("#f8f9fa");
+            UserTabTextColor = Color.FromArgb("#6c757d");
+            FranchiseTabColor = Color.FromArgb("#f8f9fa");
+            FranchiseTabTextColor = Color.FromArgb("#6c757d");
+
+            // Set active tab
+            switch (activeTab)
+            {
+                case "summary":
+                    IsSummaryTabVisible = true;
+                    SummaryTabColor = Color.FromArgb("#007bff");
+                    SummaryTabTextColor = Colors.White;
+                    break;
+                case "user":
+                    IsUserTabVisible = true;
+                    UserTabColor = Color.FromArgb("#007bff");
+                    UserTabTextColor = Colors.White;
+                    break;
+                case "franchise":
+                    IsFranchiseTabVisible = true;
+                    FranchiseTabColor = Color.FromArgb("#007bff");
+                    FranchiseTabTextColor = Colors.White;
+                    break;
+            }
         }
-
-        [RelayCommand]
-        public void ToggleFranchisePlayer(SelectableDto player)
-        {
-            if (!SelectedFranchisePlayers.Remove(player))
-                SelectedFranchisePlayers = [.. SelectedFranchisePlayers, player];
-
-            CalculateTradeValues();
-        }
-
-        [RelayCommand]
-        public void ToggleTeamPick(string pick)
-        {
-            if (!SelectedTeamPicks.Remove(pick)) SelectedTeamPicks = [.. SelectedTeamPicks, pick];
-
-            CalculateTradeValues();
-        }
-
-        [RelayCommand]
-        public void ToggleFranchisePick(string pick)
-        {
-            if (!SelectedFranchisePicks.Remove(pick)) SelectedFranchisePicks = [.. SelectedFranchisePicks, pick];
-
-            CalculateTradeValues();
-        }
-
-        [RelayCommand]
-        public void BackToFranchiseSelection()
-        {
-            ShowTradeBuilder = false;
-            ShowFranchiseSelection = true;
-            SelectedFranchise = null;
-            ClearSelections();
-        }
-
-        [RelayCommand] public async Task RequestTrade() => await SubmitTrade(false);
-        [RelayCommand] public async Task ForceTrade() => await SubmitTrade(true);
-        [RelayCommand] public async Task CancelTrade() => await GoBackToCaller();
 
         private async Task SubmitTrade(bool force)
         {
-            if (!HasSelectedItems)
-            {
-                ErrorMessage = "Please select items to trade";
-                return;
-            }
-
-            IsLoading = true;
-            ErrorMessage = string.Empty;
-
             try
             {
-                TradeDto tradeDto = new(TeamId, SelectedFranchise!.Id)
+                UpdateLoadingState(true, "Submitting trade...");
+
+                if (_currentTradeData == null) return;
+
+                // Build trade DTO
+                var tradeDto = new TradeDto
                 {
+                    TeamId = TeamId,
+                    FranchiseId = SelectedFranchiseId,
                     Force = force,
-                    TeamCurrentCap = TeamCurrentCap,
-                    TeamPlayers = SelectedTeamPlayers,
-                    FranchisePlayers = SelectedFranchisePlayers,
-                    TeamPicks = [.. SelectedTeamPicks.Select(ParsePickFromString)],
-                    FranchisePicks = [.. SelectedFranchisePicks.Select(ParsePickFromString)]
+                    TeamPlayers = UserPlayers.Where(p => p.IsSelected).Select(p => p.Player).ToList(),
+                    TeamPicks = UserPicks.Where(p => p.IsSelected).Select(p => p.Pick).ToList(),
+                    FranchisePlayers = FranchisePlayers.Where(p => p.IsSelected).Select(p => p.Player).ToList(),
+                    FranchisePicks = FranchisePicks.Where(p => p.IsSelected).Select(p => p.Pick).ToList()
                 };
 
-                if (await _teamService.SaveTradeAsync(tradeDto))
-                    await HandleTradeSuccess(tradeDto);
+                var success = await _teamService.SaveTradeAsync(tradeDto);
+
+                if (success)
+                {
+                    await Shell.Current.DisplayAlert("Success", "Trade completed successfully!", "OK");
+                    await ReturnToOrigin(tradeDto);
+                }
                 else
-                    ErrorMessage = force ? "Failed to force trade" : "Trade was rejected";
+                {
+                    await Shell.Current.DisplayAlert("Trade Failed", "Trade was not accepted. Try adjusting values or use Force Trade.", "OK");
+                }
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Trade failed: {ex.Message}";
+                await Shell.Current.DisplayAlert("Error", $"Failed to submit trade: {ex.Message}", "OK");
             }
             finally
             {
-                IsLoading = false;
+                UpdateLoadingState(false);
             }
         }
 
-        private async Task HandleTradeSuccess(TradeDto tradeDto)
+        private async Task ReturnToOrigin(TradeDto? completedTrade = null)
         {
-            if (TradeContext == "draft")
+            try
             {
-                // Return to draft with trade result
-                var tradeResult = new
+                if (CurrentPick == -1)
+                    await BaseService.GoToAsync(AppRoutes.Roster, new() { ["TeamId"] = TeamId });
+                else
                 {
-                    Success = true,
-                    TeamTraded = tradeDto.TeamPicks,
-                    FranchiseTraded = tradeDto.FranchisePicks,
-                    FranchiseId = tradeDto.FranchiseId
-                };
+                    // Coming from draft - return with trade data
+                    Dictionary<string, object>? parameters = new() { ["teamId"] = TeamId, ["currentPick"] = CurrentPick };
 
-                await BaseService.GoBackAsync(new Dictionary<string, object> { ["tradeResult"] = tradeResult });
+                    // Add trade result data if trade was completed
+                    if (completedTrade != null)
+                    {
+                        parameters["tradedFranchiseId"] = completedTrade.FranchiseId;
+                        parameters["userPicksSent"] = completedTrade.TeamPicks ?? new List<int>();
+                        parameters["franchisePicksSent"] = completedTrade.FranchisePicks ?? new List<int>();
+                    }
+
+                    await BaseService.GoToAsync(AppRoutes.Roster, parameters);
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", $"Navigation error: {ex.Message}", "OK");
+            }
+        }
+
+        private void LoadAvailableFranchises()
+        {
+            _availableFranchises = FranchiseInfo.GetAllFranchises().ToList();
+        }
+
+        private void UpdateLoadingState(bool loading, string message = "Loading...")
+        {
+            IsLoading = loading;
+            LoadingMessage = message;
+        }
+    }
+
+    // Supporting classes
+    public partial class TradePlayerItem : ObservableObject
+    {
+        public SelectableDto Player { get; }
+        public string Name => Player.Name;
+        public string Position => Player.Position;
+        public string ValueText => $"Value: {DraftPicks.GetPlayerValue(Player)}";
+        public bool IsUserPlayer { get; }
+
+        [ObservableProperty] private bool isSelected;
+        [ObservableProperty] private Color selectionColor = Colors.White;
+        [ObservableProperty] private string selectionIcon = "○";
+        [ObservableProperty] private Color selectionIconColor = Color.FromArgb("#6c757d");
+
+        public TradePlayerItem(SelectableDto player, bool isUserPlayer)
+        {
+            Player = player;
+            IsUserPlayer = isUserPlayer;
+        }
+
+        partial void OnIsSelectedChanged(bool value)
+        {
+            if (value)
+            {
+                SelectionColor = Color.FromArgb("#e3f2fd");
+                SelectionIcon = "●";
+                SelectionIconColor = IsUserPlayer ? Color.FromArgb("#007bff") : Color.FromArgb("#dc3545");
             }
             else
-                await BaseService.GoToMyTeamsTabAsync();
+            {
+                SelectionColor = Colors.White;
+                SelectionIcon = "○";
+                SelectionIconColor = Color.FromArgb("#6c757d");
+            }
+        }
+    }
+
+    public partial class TradePickItem : ObservableObject
+    {
+        public int Pick { get; }
+        public string DisplayText => $"Pick #{Pick}";
+        public string ValueText => $"Value: {DraftPicks.GetPickValue(Pick)}";
+        public bool IsUserPick { get; }
+
+        [ObservableProperty] private bool isSelected;
+        [ObservableProperty] private Color selectionColor = Colors.White;
+        [ObservableProperty] private string selectionIcon = "○";
+        [ObservableProperty] private Color selectionIconColor = Color.FromArgb("#6c757d");
+
+        public TradePickItem(int pick, bool isUserPick)
+        {
+            Pick = pick;
+            IsUserPick = isUserPick;
         }
 
-        private async Task GoBackToCaller()
+        partial void OnIsSelectedChanged(bool value)
         {
-            if (TradeContext == "draft") await BaseService.GoBackAsync(null);
-            else await BaseService.GoToMyTeamsTabAsync();
+            if (value)
+            {
+                SelectionColor = Color.FromArgb("#e3f2fd");
+                SelectionIcon = "●";
+                SelectionIconColor = IsUserPick ? Color.FromArgb("#007bff") : Color.FromArgb("#dc3545");
+            }
+            else
+            {
+                SelectionColor = Colors.White;
+                SelectionIcon = "○";
+                SelectionIconColor = Color.FromArgb("#6c757d");
+            }
         }
+    }
 
-        private void ClearSelections()
+    public class TradeItemSummary
+    {
+        public string DisplayText { get; }
+        public int Value { get; }
+
+        public TradeItemSummary(string displayText, int value)
         {
-            SelectedTeamPlayers = [];
-            SelectedFranchisePlayers = [];
-            SelectedTeamPicks = [];
-            SelectedFranchisePicks = [];
-            TeamTradeValue = 0;
-            FranchiseTradeValue = 0;
-        }
-
-        private void CalculateTradeValues()
-        {
-            TeamTradeValue = 0;
-            FranchiseTradeValue = 0;
-
-            foreach (var pick in SelectedTeamPicks)
-                TeamTradeValue += TradeViewModel.GetSimplePickValue(pick);
-
-            foreach (var pick in SelectedFranchisePicks)
-                FranchiseTradeValue += TradeViewModel.GetSimplePickValue(pick);
-
-            foreach (var player in SelectedTeamPlayers)
-                if (decimal.TryParse(player.PureAPY, out decimal value))
-                    TeamTradeValue += value * 10;
-
-            foreach (var player in SelectedFranchisePlayers)
-                if (decimal.TryParse(player.PureAPY, out decimal value))
-                    FranchiseTradeValue += value * 10;
-
-            OnPropertyChanged(nameof(TradeValueComparison));
-            OnPropertyChanged(nameof(HasSelectedItems));
-        }
-
-        private static decimal GetSimplePickValue(string pick)
-        {
-            if (pick.StartsWith("r1")) return 1000;
-            if (pick.StartsWith("r2")) return 500;
-            if (pick.StartsWith("r3")) return 250;
-            if (pick.StartsWith("r4")) return 125;
-            if (pick.StartsWith("r5")) return 60;
-            if (pick.StartsWith("r6")) return 30;
-            if (pick.StartsWith("r7")) return 15;
-            return 0;
-        }
-
-        private static string FormatPickAsString(int pick) => $"r{((pick - 1) / 32) + 1}p{((pick - 1) % 32) + 1}";
-
-        private int ParsePickFromString(string pick)
-        {
-            // Convert "r1p1" format to pick number
-            var parts = pick.Replace("r", "").Split('p');
-            if (parts.Length == 2 && int.TryParse(parts[0], out int round) && int.TryParse(parts[1], out int pickInRound))
-                return ((round - 1) * 32) + pickInRound;
-
-            return 0;
+            DisplayText = displayText;
+            Value = value;
         }
     }
 }

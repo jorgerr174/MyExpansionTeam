@@ -90,13 +90,12 @@ namespace MobileApp
             #region Views.Team
             Routing.RegisterRoute(AppRoutes.CreateTeam, typeof(Views.Team.Create));
             Routing.RegisterRoute(AppRoutes.TeamDetails, typeof(Views.Team.Details));
-            Routing.RegisterRoute(AppRoutes.DraftResults, typeof(Views.Team.DraftResults));
+            Routing.RegisterRoute(AppRoutes.Draft, typeof(Views.Team.Draft));
             Routing.RegisterRoute(AppRoutes.EditTeam, typeof(Views.Team.Edit));
             Routing.RegisterRoute(AppRoutes.ReviewRoster, typeof(Views.Team.ReviewRoster));
             Routing.RegisterRoute(AppRoutes.Roster, typeof(Views.Team.Roster));
             Routing.RegisterRoute(AppRoutes.RosterSettings, typeof(Views.Team.RosterSettings));
             Routing.RegisterRoute(AppRoutes.Trade, typeof(Views.Team.Trade));
-            Routing.RegisterRoute(AppRoutes.Trades, typeof(Views.Team.Trades));
             #endregion Views.Team
             #endregion Routing
 
@@ -180,16 +179,12 @@ namespace MobileApp
             builder.Services.AddTransient<Models.Team.CreateViewModel>();
             builder.Services.AddTransient<Models.Team.DetailsViewModel>();
             builder.Services.AddTransient<Models.Team.DraftViewModel>();
-            builder.Services.AddTransient<Models.Team.DraftResultsViewModel>();
             builder.Services.AddTransient<Models.Team.EditViewModel>();
-            //builder.Services.AddTransient<Models.Team.ListViewModel>();
             builder.Services.AddTransient<Models.Team.MyTeamsViewModel>();
-            //builder.Services.AddTransient<Models.Team.ReviewRosterViewModel>();
             builder.Services.AddTransient<Models.Team.RosterViewModel>();
             builder.Services.AddTransient<Models.Team.RosterSettingsViewModel>();
             builder.Services.AddTransient<Models.Team.TradeViewModel>();
             builder.Services.AddTransient<Models.Team.TradeErrorViewModel>();
-            builder.Services.AddTransient<Models.Team.TradesViewModel>();
             #endregion Models.Team
             #endregion Models
 
