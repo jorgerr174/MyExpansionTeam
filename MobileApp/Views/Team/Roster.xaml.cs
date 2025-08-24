@@ -20,16 +20,35 @@ namespace MobileApp.Views.Team
                 viewModel.LoadViewAsync(TeamId);
         }
 
-        private void OnPositionDrop(object sender, DropEventArgs e)
-        {
-            if (BindingContext is RosterViewModel vm && sender is Border border && border.BindingContext is FormationPosition position)
-                vm.DropPlayerCommand.Execute(position);
-        }
-
         private void OnPlayerDragStarting(object sender, DragStartingEventArgs e)
         {
-            if (BindingContext is RosterViewModel vm && sender is Border border && border.BindingContext is DraggablePlayer player)
-                vm.StartDragCommand.Execute(player);
+            var border = sender as Border;
+            var player = border?.BindingContext as DraggablePlayer;
+            if (player != null)
+            {
+                e.Data.Properties["Player"] = player;
+            }
+        }
+
+        private void OnPositionDrop(object sender, DropEventArgs e)
+        {
+            var border = sender as Border;
+            var position = border?.BindingContext as FormationPosition;
+
+            if (position != null && e.Data.Properties.TryGetValue("Player", out var playerObj) && playerObj is DraggablePlayer player)
+            {
+                ((RosterViewModel)BindingContext).DropPlayer(position, player);
+            }
+        }
+
+        private void OnPositionTapped(object sender, EventArgs e)
+        {
+            var border = sender as Border;
+            var position = border?.BindingContext as FormationPosition;
+            if (position != null)
+            {
+                ((RosterViewModel)BindingContext).SelectPositionPlayer(position);
+            }
         }
     }
 }
