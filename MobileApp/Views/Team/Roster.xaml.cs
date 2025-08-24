@@ -2,8 +2,11 @@
 
 namespace MobileApp.Views.Team
 {
-    public partial class Roster : ContentPage
+    [QueryProperty(nameof(TeamId), "TeamId")]
+    public partial class Roster : ContentPage, ITeamBase<RosterViewModel>
     {
+        public int TeamId { get; set; }
+
         public Roster(RosterViewModel viewModel)
         {
             InitializeComponent();
@@ -14,10 +17,19 @@ namespace MobileApp.Views.Team
         {
             base.OnAppearing();
             if (BindingContext is RosterViewModel viewModel)
-            {
-                // Get teamId from navigation parameters
-                // await viewModel.LoadRosterCommand.ExecuteAsync(teamId);
-            }
+                viewModel.LoadViewAsync(TeamId);
+        }
+
+        private void OnPositionDrop(object sender, DropEventArgs e)
+        {
+            if (BindingContext is RosterViewModel vm && sender is Border border && border.BindingContext is FormationPosition position)
+                vm.DropPlayerCommand.Execute(position);
+        }
+
+        private void OnPlayerDragStarting(object sender, DragStartingEventArgs e)
+        {
+            if (BindingContext is RosterViewModel vm && sender is Border border && border.BindingContext is DraggablePlayer player)
+                vm.StartDragCommand.Execute(player);
         }
     }
 }

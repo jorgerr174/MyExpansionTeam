@@ -92,7 +92,6 @@ namespace MobileApp
             Routing.RegisterRoute(AppRoutes.TeamDetails, typeof(Views.Team.Details));
             Routing.RegisterRoute(AppRoutes.DraftResults, typeof(Views.Team.DraftResults));
             Routing.RegisterRoute(AppRoutes.EditTeam, typeof(Views.Team.Edit));
-            Routing.RegisterRoute(AppRoutes.Formation, typeof(Views.Team.Formation));
             Routing.RegisterRoute(AppRoutes.ReviewRoster, typeof(Views.Team.ReviewRoster));
             Routing.RegisterRoute(AppRoutes.Roster, typeof(Views.Team.Roster));
             Routing.RegisterRoute(AppRoutes.RosterSettings, typeof(Views.Team.RosterSettings));
@@ -183,7 +182,6 @@ namespace MobileApp
             builder.Services.AddTransient<Models.Team.DraftViewModel>();
             builder.Services.AddTransient<Models.Team.DraftResultsViewModel>();
             builder.Services.AddTransient<Models.Team.EditViewModel>();
-            builder.Services.AddTransient<Models.Team.FormationViewModel>();
             //builder.Services.AddTransient<Models.Team.ListViewModel>();
             builder.Services.AddTransient<Models.Team.MyTeamsViewModel>();
             //builder.Services.AddTransient<Models.Team.ReviewRosterViewModel>();

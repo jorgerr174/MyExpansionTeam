@@ -149,9 +149,6 @@
 	  <Compile Update="Views\Team\ReviewRoster.xaml.cs">
 	    <DependentUpon>ReviewRoster.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views\Team\Formation.xaml.cs">
-	    <DependentUpon>Formation.xaml</DependentUpon>
-	  </Compile>
 	  <Compile Update="Views\Team\TradeError.xaml.cs">
 	    <DependentUpon>TradeError.xaml</DependentUpon>
 	  </Compile>
@@ -237,9 +234,6 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Team\ReviewRoster.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Team\Formation.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Team\TradeError.xaml">
