@@ -10,6 +10,8 @@
 
         public bool DefaultProtected { get; set; }
 
+        public int Madden { get; set; }
+
 
         public ProtectableDto() : base()
         {

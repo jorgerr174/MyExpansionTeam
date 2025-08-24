@@ -592,10 +592,7 @@ namespace MobileApp.Models.Team
         {
             if (Team == null) return;
 
-            await BaseService.GoToAsync(AppRoutes.Draft, new Dictionary<string, object>
-            {
-                ["TeamId"] = Team.Id
-            });
+            await BaseService.GoToAsync(AppRoutes.Draft, new Dictionary<string, object> { ["TeamId"] = Team.Id });
         }
 
         // Property change handlers for filters

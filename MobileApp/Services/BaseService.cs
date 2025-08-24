@@ -129,7 +129,7 @@ namespace MobileApp.Services
             EditProfile, SignUp, UpdateCredentials, UpdateUser,
             Admin, AssignRoles, Import,
 
-            CreateTeam, TeamDetails, DraftResults, EditTeam, Formation, ReviewRoster, Roster, RosterSettings, Trade, Trades
+            CreateTeam, TeamDetails, Draft, EditTeam, Formation, ReviewRoster, Roster, RosterSettings, Trade, Trades
         ];
 
         private static string GetParentTab(string route)

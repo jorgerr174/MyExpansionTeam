@@ -3,345 +3,432 @@
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
-             xmlns:converters="clr-namespace:MobileApp.Converters"
              x:DataType="viewmodels:DraftViewModel"
-             Title="Draft">
+             x:Name="DraftPage"
+             Title="NFL Draft">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <converters:StringEqualsConverter x:Key="StringEqualsConverter" />
-            <converters:IsNotNullConverter x:Key="IsNotNullConverter" />
-            <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-    <Grid RowDefinitions="*,Auto">
+        <!-- Pre-Draft Setup -->
+        <StackLayout Grid.Row="0" 
+                     IsVisible="{Binding ShowDraftSettings}" 
+                     Padding="20" 
+                     Spacing="20">
 
-        <!-- Main Content Area -->
-        <ScrollView Grid.Row="0">
-            <StackLayout Padding="20" Spacing="15">
+            <!-- Team Header -->
+            <Border BackgroundColor="#007bff" 
+                    Padding="20"
+                    StrokeShape="RoundRectangle 12">
+                <StackLayout Spacing="5">
+                    <Label Text="{Binding TeamName}" 
+                           FontSize="24" 
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           HorizontalOptions="Center" />
+                    <Label Text="NFL Draft Simulation" 
+                           FontSize="16"
+                           TextColor="White"
+                           HorizontalOptions="Center" />
+                </StackLayout>
+            </Border>
 
-                <!-- Team Header -->
-                <Border BackgroundColor="LightBlue" Padding="15" Stroke="Blue"  StrokeThickness="1" StrokeShape="RoundRectangle 10">
-                    <StackLayout>
+            <!-- Draft Method Selection -->
+            <Border BackgroundColor="White"
+                    Stroke="#dee2e6"
+                    StrokeThickness="1"
+                    Padding="20"
+                    StrokeShape="RoundRectangle 8">
+                <StackLayout Spacing="15">
+                    <Label Text="Draft Control Method" 
+                           FontSize="18" 
+                           FontAttributes="Bold"
+                           TextColor="#495057"
+                           HorizontalOptions="Center" />
+
+                    <StackLayout Spacing="10">
+                        <Border BackgroundColor="#f8f9fa" 
+                                Padding="15" 
+                                StrokeShape="RoundRectangle 6">
+                            <StackLayout>
+                                <StackLayout Orientation="Horizontal" Spacing="10">
+                                    <RadioButton x:Name="ManualRadio"
+                                                 IsChecked="{Binding IsManualDraft}"
+                                                 GroupName="DraftMethod" />
+                                    <Label Text="Manual Draft" 
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           VerticalOptions="Center" />
+                                </StackLayout>
+                                <Label Text="You control all your team's picks manually"
+                                       FontSize="14"
+                                       TextColor="#6c757d"
+                                       Margin="30,0,0,0" />
+                            </StackLayout>
+                        </Border>
+
+                        <Border BackgroundColor="#f8f9fa" 
+                                Padding="15" 
+                                StrokeShape="RoundRectangle 6">
+                            <StackLayout>
+                                <StackLayout Orientation="Horizontal" Spacing="10">
+                                    <RadioButton x:Name="AutoRadio"
+                                                 IsChecked="{Binding IsAutoDraft}"
+                                                 GroupName="DraftMethod" />
+                                    <Label Text="Auto Draft" 
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           VerticalOptions="Center" />
+                                </StackLayout>
+                                <Label Text="CPU controls all picks automatically"
+                                       FontSize="14"
+                                       TextColor="#6c757d"
+                                       Margin="30,0,0,0" />
+                            </StackLayout>
+                        </Border>
+
+                        <Border BackgroundColor="#f8f9fa" 
+                                Padding="15" 
+                                StrokeShape="RoundRectangle 6">
+                            <StackLayout>
+                                <StackLayout Orientation="Horizontal" Spacing="10">
+                                    <RadioButton x:Name="MultipleRadio"
+                                                 IsChecked="{Binding IsMultipleDraft}"
+                                                 GroupName="DraftMethod" />
+                                    <Label Text="Multiple Teams" 
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           VerticalOptions="Center" />
+                                </StackLayout>
+                                <Label Text="Control multiple teams during the draft"
+                                       FontSize="14"
+                                       TextColor="#6c757d"
+                                       Margin="30,0,0,0" />
+                            </StackLayout>
+                        </Border>
+                    </StackLayout>
+                </StackLayout>
+            </Border>
+
+            <!-- Franchise Selection (Visible only for Multiple Teams) -->
+            <Border BackgroundColor="White"
+                    Stroke="#dee2e6"
+                    StrokeThickness="1"
+                    Padding="20"
+                    StrokeShape="RoundRectangle 8"
+                    IsVisible="{Binding IsMultipleDraft}">
+                <StackLayout Spacing="15">
+                    <Label Text="Select Additional Franchises to Control" 
+                           FontSize="16" 
+                           FontAttributes="Bold"
+                           TextColor="#495057"
+                           HorizontalOptions="Center" />
+
+                    <CollectionView ItemsSource="{Binding AvailableFranchises}"
+                                    SelectionMode="None">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout Orientation="Vertical" 
+                                             Span="2" 
+                                             VerticalItemSpacing="5"
+                                             HorizontalItemSpacing="5" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="viewmodels:FranchiseItem">
+                                <Border BackgroundColor="{Binding SelectionColor}"
+                                        Stroke="{Binding SelectionBorderColor}"
+                                        StrokeThickness="2"
+                                        Padding="10"
+                                        StrokeShape="RoundRectangle 6">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={x:Reference DraftPage}, Path=BindingContext.ToggleFranchiseSelectionCommand}"
+                                                              CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <StackLayout Spacing="2">
+                                        <Label Text="{Binding Name}" 
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               HorizontalOptions="Center" />
+                                        <Label Text="{Binding Abbreviation}" 
+                                               FontSize="10"
+                                               TextColor="#6c757d"
+                                               HorizontalOptions="Center" />
+                                    </StackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+            </Border>
+
+            <!-- Start Draft Button -->
+            <Button Text="Start Draft"
+                    BackgroundColor="#28a745"
+                    TextColor="White"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    Padding="15"
+                    Command="{Binding StartDraftCommand}"
+                    CornerRadius="8" />
+        </StackLayout>
+
+        <!-- Draft Interface -->
+        <Grid Grid.Row="0" 
+              IsVisible="{Binding ShowDraftInterface}"
+              RowDefinitions="Auto,*,Auto">
+
+            <!-- Draft Header -->
+            <Border Grid.Row="0" 
+                    BackgroundColor="#007bff" 
+                    Padding="15,10">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                    <Button Grid.Column="0"
+                            Text="← Back"
+                            BackgroundColor="Transparent"
+                            TextColor="White"
+                            FontSize="14"
+                            Command="{Binding ReturnCommand}"
+                            HorizontalOptions="Start" />
+
+                    <StackLayout Grid.Column="1" 
+                                 Spacing="2"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center">
                         <Label Text="{Binding TeamName}" 
-                               TextColor="White"
-                               FontSize="24" 
-                               FontAttributes="Bold" 
-                               HorizontalOptions="Center" />
-                        <Label Text="NFL Draft Simulation" 
-                               TextColor="White"
                                FontSize="16" 
+                               FontAttributes="Bold"
+                               TextColor="White"
                                HorizontalOptions="Center" />
+                        <Label Text="{Binding CurrentPickText}" 
+                               FontSize="12"
+                               TextColor="White"
+                               HorizontalOptions="Center" />
+                    </StackLayout>
+
+                    <Button Grid.Column="2"
+                            Text="⚙️"
+                            BackgroundColor="Transparent"
+                            TextColor="White"
+                            FontSize="16"
+                            Command="{Binding ShowMenuCommand}"
+                            HorizontalOptions="End" />
+                </Grid>
+            </Border>
+
+            <!-- Two-Column Layout -->
+            <Grid Grid.Row="1" 
+                  ColumnDefinitions="*,*" 
+                  ColumnSpacing="2">
+
+                <!-- Left Column - Draft Order -->
+                <Border Grid.Column="0" 
+                        BackgroundColor="White"
+                        Stroke="#dee2e6"
+                        StrokeThickness="1">
+                    <StackLayout Spacing="0">
+                        <Border BackgroundColor="#007bff" 
+                                Padding="10">
+                            <Label Text="Draft Order" 
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="White"
+                                   HorizontalOptions="Center" />
+                        </Border>
+
+                        <CollectionView ItemsSource="{Binding DraftOrder}"
+                                        BackgroundColor="White">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="viewmodels:DraftPickItem">
+                                    <Border BackgroundColor="{Binding BackgroundColor}"
+                                            Stroke="{Binding BorderColor}"
+                                            StrokeThickness="{Binding BorderThickness}"
+                                            Padding="8"
+                                            Margin="2">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={x:Reference DraftPage}, Path=BindingContext.SelectPickCommand}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                            <StackLayout Grid.Column="0" Spacing="1">
+                                                <Label Text="{Binding PickNumber, StringFormat='#{0}'}" 
+                                                       FontSize="12"
+                                                       FontAttributes="Bold"
+                                                       TextColor="{Binding TextColor}" />
+                                                <Label Text="{Binding RoundPickText}" 
+                                                       FontSize="10"
+                                                       TextColor="{Binding TextColor}" />
+                                            </StackLayout>
+
+                                            <StackLayout Grid.Column="1" Spacing="1">
+                                                <Label Text="{Binding TeamAbbreviation}" 
+                                                       FontSize="12"
+                                                       FontAttributes="Bold"
+                                                       TextColor="{Binding TextColor}" />
+                                                <Label Text="{Binding ControlText}" 
+                                                       FontSize="9"
+                                                       TextColor="{Binding TextColor}"
+                                                       IsVisible="{Binding IsUserControlled}" />
+                                            </StackLayout>
+
+                                            <StackLayout Grid.Column="2" 
+                                                         Spacing="1"
+                                                         IsVisible="{Binding HasSelection}">
+                                                <Label Text="{Binding SelectedPlayerName}" 
+                                                       FontSize="10"
+                                                       FontAttributes="Bold"
+                                                       TextColor="{Binding TextColor}"
+                                                       HorizontalOptions="End" />
+                                                <Label Text="{Binding SelectedPlayerPosition}" 
+                                                       FontSize="9"
+                                                       TextColor="{Binding TextColor}"
+                                                       HorizontalOptions="End" />
+                                            </StackLayout>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
                     </StackLayout>
                 </Border>
 
-                <!-- Draft Settings (Visible before draft starts) -->
-                <StackLayout IsVisible="{Binding ShowDraftSettings}" Spacing="20">
-
-                    <!-- Draft Method Selection -->
-                    <Border BackgroundColor="LightBlue" Padding="15" Stroke="Blue"  StrokeThickness="1" StrokeShape="RoundRectangle 10">
-                        <StackLayout>
-                            <Label Text="Draft Control Method" 
-                                   FontSize="18" 
-                                   FontAttributes="Bold" 
-                                   HorizontalOptions="Center" />
-
-                            <StackLayout Spacing="10" Margin="0,10,0,0">
-                                <Border BackgroundColor="White" Padding="10" Stroke="LightGray" StrokeThickness="1" StrokeShape="RoundRectangle 8">
-                                    <StackLayout>
-                                        <RadioButton x:Name="FullSimRadio" 
-                                                     Content="Full Simulation" 
-                                                     Value="full"
-                                                     IsChecked="{Binding SelectedDraftMethod, Converter={StaticResource StringEqualsConverter}, ConverterParameter=full}"
-                                                     CheckedChanged="OnDraftMethodChanged" />
-                                        <Label Text="Watch the entire draft unfold automatically" 
-                                               FontSize="12" 
-                                               TextColor="Gray" 
-                                               Margin="25,0,0,0" />
-                                    </StackLayout>
-                                </Border>
-
-                                <Border BackgroundColor="White" Padding="10" Stroke="LightGray" StrokeThickness="1" StrokeShape="RoundRectangle 8">
-                                    <StackLayout>
-                                        <RadioButton x:Name="MyTeamRadio" 
-                                                     Content="Control My Team" 
-                                                     Value="myteam"
-                                                     IsChecked="{Binding SelectedDraftMethod, Converter={StaticResource StringEqualsConverter}, ConverterParameter=myteam}"
-                                                     CheckedChanged="OnDraftMethodChanged" />
-                                        <Label Text="{Binding TeamName, StringFormat='Make picks for {0} only'}" 
-                                               FontSize="12" 
-                                               TextColor="Gray" 
-                                               Margin="25,0,0,0" />
-                                    </StackLayout>
-                                </Border>
-
-                                <Border BackgroundColor="White" Padding="10" Stroke="LightGray" StrokeThickness="1" StrokeShape="RoundRectangle 8">
-                                    <StackLayout>
-                                        <RadioButton x:Name="MultipleRadio" 
-                                                     Content="Control Multiple Teams" 
-                                                     Value="multiple"
-                                                     IsChecked="{Binding SelectedDraftMethod, Converter={StaticResource StringEqualsConverter}, ConverterParameter=multiple}"
-                                                     CheckedChanged="OnDraftMethodChanged" />
-                                        <Label Text="Choose which franchises to control" 
-                                               FontSize="12" 
-                                               TextColor="Gray" 
-                                               Margin="25,0,0,0" />
-                                    </StackLayout>
-                                </Border>
-                            </StackLayout>
-                        </StackLayout>
-                    </Border>
-
-                    <!-- Manual Rounds Selection -->
-                    <Border BackgroundColor="LightGreen" Padding="15" Stroke="Green" StrokeThickness="1" StrokeShape="RoundRectangle 10">
-                        <StackLayout>
-                            <Label Text="Manual Control Rounds" 
-                                   FontSize="16" 
-                                   FontAttributes="Bold" 
-                                   HorizontalOptions="Center" />
-                            <Label Text="Number of rounds to manually control (0 = full auto)" 
-                                   FontSize="12" 
-                                   TextColor="Gray" 
-                                   HorizontalOptions="Center" />
-
-                            <Picker ItemsSource="{Binding RoundOptions}" 
-                                    SelectedItem="{Binding ManualRounds}"
-                                    Title="Select Rounds"
-                                    Margin="0,10,0,0" />
-                        </StackLayout>
-                    </Border>
-
-                    <!-- Franchise Selection (Visible for multiple team method) -->
-                    <Border BackgroundColor="LightYellow" Padding="15" Stroke="Yellow" StrokeThickness="1" StrokeShape="RoundRectangle 10" IsVisible="{Binding ShowFranchiseSelection}">
-                        <StackLayout>
-                            <Label Text="Select Franchises to Control" 
-                                   FontSize="16" 
-                                   FontAttributes="Bold" 
-                                   HorizontalOptions="Center" />
-                            <Label Text="Choose which teams you want to control picks for" 
-                                   FontSize="12" 
-                                   TextColor="Gray" 
-                                   HorizontalOptions="Center" 
-                                   Margin="0,0,0,10" />
-
-                            <ScrollView HeightRequest="200">
-                                <CollectionView ItemsSource="{Binding SelectedFranchises}"
-                                              SelectionMode="None">
-                                    <CollectionView.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid Padding="5" ColumnDefinitions="Auto,*">
-                                                <CheckBox Grid.Column="0" 
-                                                         IsChecked="{Binding IsSelected}"
-                                                         VerticalOptions="Center" />
-                                                <StackLayout Grid.Column="1" 
-                                                           Orientation="Horizontal" 
-                                                           VerticalOptions="Center"
-                                                           Margin="10,0,0,0">
-                                                    <Label Text="{Binding Abbreviation}" 
-                                                           FontAttributes="Bold" 
-                                                           VerticalOptions="Center" />
-                                                    <Label Text="{Binding Name}" 
-                                                           VerticalOptions="Center" 
-                                                           Margin="10,0,0,0" />
-                                                </StackLayout>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </CollectionView.ItemTemplate>
-                                </CollectionView>
-                            </ScrollView>
-                        </StackLayout>
-                    </Border>
-
-                    <!-- Start Draft Button -->
-                    <Button Text="Start Draft" 
-                            Command="{Binding StartDraftCommand}"
-                            BackgroundColor="Green"
-                            TextColor="White"
-                            FontAttributes="Bold"
-                            CornerRadius="25"
-                            HeightRequest="50"
-                            FontSize="18" />
-
-                </StackLayout>
-
-                <!-- Draft In Progress (Visible during draft) -->
-                <StackLayout IsVisible="{Binding IsDraftActive}" Spacing="15">
-
-                    <!-- Current Pick Info -->
-                    <Border BackgroundColor="LightBlue" Padding="15" Stroke="Blue" StrokeThickness="1" StrokeShape="RoundRectangle 10">
-                        <StackLayout HorizontalOptions="Center">
-                            <Label Text="{Binding CurrentPickText}" 
-                                   TextColor="White"
-                                   FontSize="20" 
-                                   FontAttributes="Bold" 
-                                   HorizontalOptions="Center" />
-
-                            <Label Text="{Binding TeamPicksText}" 
-                                   TextColor="White"
-                                   FontSize="14" 
-                                   HorizontalOptions="Center" />
-
-                            <Label Text="{Binding NextPickText}" 
-                                   TextColor="White"
-                                   FontSize="14" 
-                                   HorizontalOptions="Center" />
-
-                            <!-- Action Buttons -->
-                            <StackLayout Orientation="Horizontal" 
-                                         HorizontalOptions="Center"
-                                         Spacing="10"
-                                         Margin="0,15,0,0">
-                                <Button Text="Make Pick"
-                                        Command="{Binding MakePickCommand}"
-                                        IsVisible="{Binding CanMakePick}"
-                                        BackgroundColor="White"
-                                        TextColor="Blue"
-                                        FontAttributes="Bold"
-                                        CornerRadius="20"
-                                        WidthRequest="120" />
-
-                                <Button Text="Simulate Pick"
-                                        Command="{Binding SimulatePickCommand}"
-                                        IsVisible="{Binding CanSimulatePick}"
-                                        BackgroundColor="#4CAF50"
-                                        TextColor="White"
-                                        FontAttributes="Bold"
-                                        CornerRadius="20"
-                                        WidthRequest="120" />
-
-                                <Button Text="{Binding PauseResumeText}"
-                                        Command="{Binding PauseResumeCommand}"
-                                        IsVisible="{Binding CanPauseResume}"
-                                        BackgroundColor="#FF9800"
-                                        TextColor="White"
-                                        FontAttributes="Bold"
-                                        CornerRadius="20"
-                                        WidthRequest="80" />
-                            </StackLayout>
-                        </StackLayout>
-                    </Border>
-
-                    <!-- Draft Order and Prospects -->
-                    <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,*">
-
-                        <Border Grid.Row="0" Grid.Column="0" BackgroundColor="Blue" Shadow="False" StrokeShape="RoundRectangle 10" Margin="0,0,1,0">
-                            <Label Text="Draft Order" 
-                                   TextColor="White"
-                                   FontAttributes="Bold" 
-                                   HorizontalOptions="Center" 
-                                   VerticalOptions="Center" />
-                        </Border>
-
-                        <Border Grid.Row="0" Grid.Column="1" BackgroundColor="Gray" Shadow="False" StrokeShape="RoundRectangle 10" Margin="1,0,0,0">
+                <!-- Right Column - Available Prospects -->
+                <Border Grid.Column="1" 
+                        BackgroundColor="White"
+                        Stroke="#dee2e6"
+                        StrokeThickness="1">
+                    <StackLayout Spacing="0">
+                        <Border BackgroundColor="#6c757d" 
+                                Padding="10">
                             <Label Text="Available Prospects" 
+                                   FontSize="14"
+                                   FontAttributes="Bold"
                                    TextColor="White"
-                                   FontAttributes="Bold" 
-                                   HorizontalOptions="Center" 
-                                   VerticalOptions="Center" />
+                                   HorizontalOptions="Center" />
                         </Border>
 
-                        <!-- Draft Order List -->
-                        <Border Grid.Row="1" Grid.Column="0" BackgroundColor="White" Shadow="False" StrokeShape="RoundRectangle 10" Margin="0,0,1,0">
-                            <CollectionView ItemsSource="{Binding DraftOrder}"
-                                          HeightRequest="400">
-                                <CollectionView.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid Padding="8" Margin="2">
-                                            <Border BackgroundColor="{Binding IsUserTeam, Converter={StaticResource BoolToColorConverter}}" Padding="10" StrokeShape="RoundRectangle 5">
-                                                <StackLayout>
-                                                    <Label Text="{Binding Overall, StringFormat='#{0}'}" 
-                                                           FontAttributes="Bold" 
-                                                           FontSize="16" />
-                                                    <Label Text="{Binding TeamAbbr}" 
-                                                           FontSize="14" />
-                                                    <Label Text="{Binding Round, StringFormat='Round {0}'}" 
-                                                           FontSize="12" 
-                                                           TextColor="Gray" />
-                                                    <Label Text="{Binding SelectedPlayer.Name}" 
-                                                           FontAttributes="Bold"
-                                                           IsVisible="{Binding SelectedPlayer, Converter={StaticResource IsNotNullConverter}}" />
-                                                </StackLayout>
-                                            </Border>
+                        <!-- Position Filter -->
+                        <Border BackgroundColor="#f8f9fa" 
+                                Padding="8">
+                            <Picker ItemsSource="{Binding PositionFilters}"
+                                    SelectedItem="{Binding SelectedPositionFilter}"
+                                    Title="Filter by Position"
+                                    FontSize="12" />
+                        </Border>
+
+                        <!-- Current Pick Info -->
+                        <Border BackgroundColor="#d1ecf1"
+                                Stroke="#bee5eb"
+                                StrokeThickness="1"
+                                Padding="8"
+                                Margin="4"
+                                IsVisible="{Binding ShowCurrentPickInfo}">
+                            <StackLayout Spacing="2">
+                                <Label Text="{Binding CurrentPickInfoTitle}" 
+                                       FontSize="12"
+                                       FontAttributes="Bold"
+                                       TextColor="#0c5460" />
+                                <Label Text="{Binding CurrentPickInfoText}" 
+                                       FontSize="10"
+                                       TextColor="#0c5460" />
+                            </StackLayout>
+                        </Border>
+
+                        <!-- Available Players List -->
+                        <CollectionView ItemsSource="{Binding FilteredProspects}"
+                                        BackgroundColor="White"
+                                        SelectionMode="None">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="viewmodels:ProspectItem">
+                                    <Border BackgroundColor="White"
+                                            Stroke="#dee2e6"
+                                            StrokeThickness="1"
+                                            Padding="8"
+                                            Margin="2">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={x:Reference DraftPage}, Path=BindingContext.SelectProspectCommand}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                            <StackLayout Grid.Column="0" Spacing="2">
+                                                <Label Text="{Binding Name}" 
+                                                       FontSize="12"
+                                                       FontAttributes="Bold" />
+                                                <Label Text="{Binding PositionCollege}" 
+                                                       FontSize="10"
+                                                       TextColor="#6c757d" />
+                                                <Label Text="{Binding PhysicalInfo}" 
+                                                       FontSize="9"
+                                                       TextColor="#6c757d" />
+                                            </StackLayout>
+                                            <StackLayout Grid.Column="1" 
+                                                         Spacing="2"
+                                                         HorizontalOptions="End">
+                                                <Label Text="{Binding ConsensusText, StringFormat='OVR: {0}'}" 
+                                                       FontSize="10"
+                                                       TextColor="#007bff"
+                                                       HorizontalOptions="End" />
+                                                <Label Text="{Binding AthScore}" 
+                                                       FontSize="9"
+                                                       TextColor="#28a745"
+                                                       HorizontalOptions="End" />
+                                            </StackLayout>
                                         </Grid>
-                                    </DataTemplate>
-                                </CollectionView.ItemTemplate>
-                            </CollectionView>
-                        </Border>
-
-                        <!-- Available Prospects List -->
-                        <Border Grid.Row="1" Grid.Column="1" BackgroundColor="White" Shadow="False" StrokeShape="RoundRectangle 5" Margin="1,0,0,0">
-                            <CollectionView ItemsSource="{Binding AvailableProspects}" HeightRequest="400">
-                                <CollectionView.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid Padding="5" Margin="1">
-                                            <Border BackgroundColor="LightGray" Padding="8" Stroke="Gray" StrokeThickness="1" StrokeShape="RoundRectangle 5">
-                                                <Grid ColumnDefinitions="*,Auto,Auto">
-                                                    <StackLayout Grid.Column="0" VerticalOptions="Center">
-                                                        <Label Text="{Binding Name}" 
-                                                               FontAttributes="Bold" 
-                                                               FontSize="14" />
-                                                        <Label Text="{Binding Position}" 
-                                                               FontSize="12" 
-                                                               TextColor="Gray" />
-                                                    </StackLayout>
-                                                    <Label Grid.Column="1"
-                                                           Text="{Binding Position}"
-                                                           TextColor="Blue"
-                                                           VerticalOptions="Center"
-                                                           Margin="8,0,0,0" />
-                                                    <Label Grid.Column="2"
-                                                           Text="{Binding Consensus, StringFormat='#{0}'}"
-                                                           FontSize="12"
-                                                           TextColor="Gray"
-                                                           VerticalOptions="Center"
-                                                           Margin="8,0,0,0" />
-                                                </Grid>
-                                            </Border>
-                                        </Grid>
-                                    </DataTemplate>
-                                </CollectionView.ItemTemplate>
-                            </CollectionView>
-                        </Border>
-                    </Grid>
-
-                    <!-- Draft Controls -->
-                    <StackLayout Orientation="Horizontal" 
-                                 HorizontalOptions="Center"
-                                 Spacing="10">
-                        <Button Text="Save Draft"
-                                Command="{Binding SaveDraftCommand}"
-                                BackgroundColor="#2196F3"
-                                TextColor="White"
-                                FontAttributes="Bold"
-                                CornerRadius="20"
-                                WidthRequest="100" />
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
                     </StackLayout>
+                </Border>
+            </Grid>
 
+            <!-- Bottom Controls -->
+            <Border Grid.Row="2" 
+                    BackgroundColor="White"
+                    Stroke="#dee2e6"
+                    StrokeThickness="1"
+                    Padding="10">
+                <StackLayout Orientation="Horizontal" 
+                             Spacing="10"
+                             HorizontalOptions="Center">
+                    <Button Text="{Binding PauseResumeText}"
+                            BackgroundColor="#ffc107"
+                            TextColor="Black"
+                            FontSize="12"
+                            Padding="10,6"
+                            Command="{Binding TogglePauseCommand}"
+                            IsVisible="{Binding ShowPauseButton}" />
+                    <Button Text="Trade"
+                            BackgroundColor="#17a2b8"
+                            TextColor="White"
+                            FontSize="12"
+                            Padding="10,6"
+                            Command="{Binding TradePickCommand}"
+                            IsVisible="{Binding CanTrade}" />
+                    <Button Text="Save Draft"
+                            BackgroundColor="#28a745"
+                            TextColor="White"
+                            FontSize="12"
+                            Padding="10,6"
+                            Command="{Binding SaveDraftCommand}"
+                            IsVisible="{Binding CanSaveDraft}" />
                 </StackLayout>
-
-            </StackLayout>
-        </ScrollView>
-
-        <!-- Loading Indicator -->
-        <Grid Grid.Row="0" IsVisible="{Binding IsLoading}" BackgroundColor="Black" Opacity="0.6">
-            <StackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10">
-                <ActivityIndicator IsRunning="{Binding IsLoading}" Color="White" />
-                <Label Text="Loading..." TextColor="White" HorizontalOptions="Center" />
-            </StackLayout>
+            </Border>
         </Grid>
 
-        <!-- Bottom Navigation -->
-        <Button Grid.Row="1"
-                Text="Back to Team"
-                Command="{Binding BackCommand}"
-                BackgroundColor="LightGray"
-                TextColor="Black"
-                FontAttributes="Bold"
-                CornerRadius="8"
-                HeightRequest="45"
-                Margin="20" />
-
+        <!-- Loading Overlay -->
+        <StackLayout Grid.Row="0"
+                     BackgroundColor="#80000000"
+                     IsVisible="{Binding IsLoading}"
+                     VerticalOptions="FillAndExpand"
+                     HorizontalOptions="FillAndExpand">
+            <ActivityIndicator IsRunning="True" 
+                               Color="White" 
+                               VerticalOptions="CenterAndExpand" />
+            <Label Text="{Binding LoadingMessage}"
+                   TextColor="White"
+                   FontSize="16"
+                   HorizontalOptions="Center" />
+        </StackLayout>
     </Grid>
-
 </ContentPage>

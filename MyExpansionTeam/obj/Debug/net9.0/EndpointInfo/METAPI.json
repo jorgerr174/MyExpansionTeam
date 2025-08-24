@@ -1120,6 +1120,10 @@
           "defaultProtected": {
             "type": "boolean"
           },
+          "madden": {
+            "type": "integer",
+            "format": "int32"
+          },
           "pureAPY": {
             "type": "string",
             "nullable": true
@@ -1216,6 +1220,10 @@
           },
           "defaultProtected": {
             "type": "boolean"
+          },
+          "madden": {
+            "type": "integer",
+            "format": "int32"
           },
           "pureAPY": {
             "type": "string",
