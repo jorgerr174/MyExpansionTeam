@@ -1,177 +1,486 @@
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.Player;
 using METCore.DTOs.Team;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
+using static METCore.Enums.Types;
 
 namespace MobileApp.Models.Team
 {
-    public partial class RosterViewModel(TeamService teamService) : BaseViewModel
+    public partial class RosterViewModel(TeamService teamService) : TeamBaseViewModel
     {
         private readonly TeamService _teamService = teamService;
-        private const decimal BaseSalaryCap = 224m;
 
-        [ObservableProperty] private int teamId;
-        [ObservableProperty] private string teamName = string.Empty;
-        [ObservableProperty] private List<FranchiseInfo> franchises = FranchiseInfo.GetAllFranchises();
+        [ObservableProperty] private TeamDto? team = null;
+        [ObservableProperty] private bool hasTeam = false;
+
+        // Local state management
+        private IList<int> _rosterPlayerIds = [];
+        private IList<int> _protectedPlayerIds = [];
+        private IList<int> _tradedPlayerIds = [];
+        private double _salaryCapLimit = 224000000; // $224M base
+        private int _maxPerFranchise = 4;
+
+        // Caching
+        private Dictionary<int, IList<SelectableDto>?> _franchisePlayersCache = [];
+
+        // Tab Management
+        [ObservableProperty] private string selectedTab = "build";
+        [ObservableProperty] private double tabIndicatorPosition = 0;
+
+        // Tab Colors
+        [ObservableProperty] private Color buildTabColor = Colors.White;
+        [ObservableProperty] private Color buildTabTextColor = Color.FromArgb("#007bff");
+        [ObservableProperty] private Color reviewTabColor = Color.FromArgb("#f8f9fa");
+        [ObservableProperty] private Color reviewTabTextColor = Color.FromArgb("#6c757d");
+        [ObservableProperty] private Color formationTabColor = Color.FromArgb("#f8f9fa");
+        [ObservableProperty] private Color formationTabTextColor = Color.FromArgb("#6c757d");
+        [ObservableProperty] private Color tradesTabColor = Color.FromArgb("#f8f9fa");
+        [ObservableProperty] private Color tradesTabTextColor = Color.FromArgb("#6c757d");
+        [ObservableProperty] private Color draftTabColor = Color.FromArgb("#f8f9fa");
+        [ObservableProperty] private Color draftTabTextColor = Color.FromArgb("#6c757d");
+
+        // Tab Visibility
+        [ObservableProperty] private bool isBuildTabSelected = true;
+        [ObservableProperty] private bool isReviewTabSelected = false;
+        [ObservableProperty] private bool isFormationTabSelected = false;
+        [ObservableProperty] private bool isTradesTabSelected = false;
+        [ObservableProperty] private bool isDraftTabSelected = false;
+
+        // Salary Cap Display
+        [ObservableProperty] private double capProgressWidth = 0;
+        [ObservableProperty] private Color capProgressColor = Color.FromArgb("#007bff");
+        [ObservableProperty] private string currentCapText = "$0M / $224M";
+        [ObservableProperty] private string rosterCountText = "0 players";
+
+        // Build Tab
         [ObservableProperty] private FranchiseInfo? selectedFranchise;
-        [ObservableProperty] private IList<SelectablePlayerViewModel> availablePlayers = [];
-        [ObservableProperty] private IList<SelectablePlayerViewModel> rosterPlayers = [];
-        [ObservableProperty] private bool showPlayerSelection = false;
-        [ObservableProperty] private decimal currentSalaryCap = 0m;
-        [ObservableProperty] private int selectedPlayerCount = 0;
+        [ObservableProperty] private bool hasSelectedFranchise = false;
+        [ObservableProperty] private string selectedFranchiseTitle = "";
+        [ObservableProperty] private string selectedPositionFilter = "All";
+        [ObservableProperty] private string selectedReviewPositionFilter = "All";
+
+        // Save functionality
+        [ObservableProperty] private bool canSaveRoster = true;
+        [ObservableProperty] private Color saveButtonColor = Color.FromArgb("#28a745");
+        [ObservableProperty] private bool hasSaveWarning = false;
+        [ObservableProperty] private string saveWarningText = "";
+
+        // Formation Management Properties
+        [ObservableProperty] private string selectedFormationType = "offense";
+        [ObservableProperty] private string selectedFormationName = "";
+        [ObservableProperty] private Color offenseButtonColor = Color.FromArgb("#007bff");
+        [ObservableProperty] private Color offenseButtonTextColor = Colors.White;
+        [ObservableProperty] private Color defenseButtonColor = Color.FromArgb("#f8f9fa");
+        [ObservableProperty] private Color defenseButtonTextColor = Color.FromArgb("#6c757d");
+        [ObservableProperty] private Color specialButtonColor = Color.FromArgb("#f8f9fa");
+        [ObservableProperty] private Color specialButtonTextColor = Color.FromArgb("#6c757d");
+
+        // Collections
+        public ObservableCollection<FranchiseModel> Franchises { get; } = [];
+        public ObservableCollection<PositionGroupModel> PlayersByPosition { get; } = [];
+        public ObservableCollection<PositionGroupModel> RosterByPosition { get; } = [];
+
+        // Formation Collections
+        public ObservableCollection<string> AvailableFormations { get; } = [];
+        public ObservableCollection<FormationPosition> FormationPositions { get; } = [];
+        public ObservableCollection<DraggablePlayer> AvailablePlayersForFormation { get; } = [];
+        // Formation Data Storage
+        private LineupDto _offenseLineup = new();
+        private LineupDto _defenseLineup = new();
+        private SPLineupDto _specialLineup = new();
+        private Dictionary<string, Dictionary<string, FormationInfo>> _formationData = [];
+        private DraggablePlayer? _draggedPlayer;
 
 
-        public decimal AvailableCap => BaseSalaryCap - CurrentSalaryCap;
-        public string SalaryCapText => $"Cap: ${CurrentSalaryCap:F1}M / ${BaseSalaryCap}M";
-        public string AvailableCapText => $"Available: ${AvailableCap:F1}M";
+        [ObservableProperty] private IList<TradeDto> tradeHistory = [];
+        [ObservableProperty] private IList<DraftSelection> draftResults = [];
+        [ObservableProperty] private DraftDto draft;
 
+        // Filter Lists
+        public ObservableCollection<string> PositionFilters { get; } = ["All", "QB", "RB", "WR", "TE", "OL", "DL", "LB", "DB", "K", "P"];
+        public ObservableCollection<string> ReviewPositionFilters { get; } = ["All", "QB", "RB", "WR", "TE", "OL", "DL", "LB", "DB", "K", "P"];
+
+        private bool AreFormationsLoaded => _formationData.Any() && AvailableFormations.Any();
 
         [RelayCommand]
-        public async Task LoadRoster(int id)
+        public override async Task LoadViewAsync(int teamId)
         {
-            TeamId = id;
             IsLoading = true;
+            HasLoadError = false;
 
             try
             {
-                if (await _teamService.GetTeamAsync(id) is TeamDto team)
+                // Load team data
+                Team = await _teamService.GetTeamAsync(teamId);
+
+                if (Team != null)
                 {
-                    TeamName = $"{team.Location} {team.Mascot}";
+                    HasTeam = true;
 
-                    // Load current roster
-                    IList<SelectablePlayerViewModel> rosterPlayersList = [.. team.Players.Select(p =>
-                    {
-                        SelectablePlayerViewModel wrapper = new(new SelectableDto
-                        {
-                            Id = p.Id,
-                            Name = p.Name,
-                            Position = p.Position,
-                            APY = p.APY,
-                            PureAPY = p.PureAPY
-                        }) { IsSelected = true };
-                        return wrapper;
-                    })];
+                    _rosterPlayerIds = Team.Players?.Select(p => p.Id).ToList() ?? [];
+                    _protectedPlayerIds = Team.RosterSettingsProtectedPlayersIds ?? [];
+                    _tradedPlayerIds = Team.TradedPlayers?.Select(p => p.Id).ToList() ?? [];
 
-                    RosterPlayers = rosterPlayersList;
-                    UpdateSalaryCap();
+                    var capPercentage = Team.RosterSettingsCap;
+                    _salaryCapLimit = (capPercentage / 100.0) * 224000000; // $224M base
+                    _maxPerFranchise = Team.RosterSettingsMaxPerTeam;
+
+                    LoadFranchises();
+
+                    UpdateSalaryCapDisplay();
+                    LoadRosterDisplay();
+
+                    HasLoadError = false;
+                }
+                else
+                {
+                    HasLoadError = true;
+                    LoadErrorMessage = "Team not found";
                 }
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Failed to load roster: {ex.Message}";
+                HasLoadError = true;
+                LoadErrorMessage = $"Failed to load roster: {ex.Message}";
             }
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        private int GetFranchiseSelectedCount(int franchiseId) => _franchisePlayersCache[franchiseId]?.Count(p => _rosterPlayerIds.Contains(p.Id)) ?? 0;
+
+        private void LoadFranchises()
+        {
+            Franchises.Clear();
+            foreach (FranchiseInfo franchise in FranchiseInfo.GetAllFranchises())
+                Franchises.Add(new(franchise, GetFranchiseSelectedCount(franchise.Id), _maxPerFranchise));
+        }
+
+        private void UpdateFranchiseCount(int franchiseId)
+        {
+            if (Franchises.Where(f => f.FranchiseInfo.Id == franchiseId) is FranchiseModel franchise)
+                franchise.SelectedCount = GetFranchiseSelectedCount(franchise.FranchiseInfo.Id);
+        }
+
+        private void UpdateFranchisesCounts()
+        {
+            foreach (FranchiseModel franchise in Franchises)
+                franchise.SelectedCount = GetFranchiseSelectedCount(franchise.FranchiseInfo.Id);
+        }
+
+        private async Task LoadDraftResults()
+        {
+            try
+            {
+                Draft = await _teamService.GetTeamDraftAsync(Team.Id);
+                if (Draft is DraftDto && (Draft.Selections?.Any() ?? false))
+                    foreach (KeyValuePair<int, int> selection in Draft.Selections)
+                        if (Draft.Prospects.FirstOrDefault(p => p.Id == selection.Value) is ProspectDto prospect)
+                        {
+                            (int round, int pos) = DraftPicks.GetPickRoundPosFromOverall(selection.Key);
+                            DraftResults.Add(new DraftSelection() { Pick = $"Round: {round}, Pick: {pos}", Player = prospect });
+                        }
+            }
+            catch { }
+        }
+
+        [RelayCommand]
+        public async Task SelectTab(string tabName)
+        {
+            // Reset all tabs
+            IsBuildTabSelected = false;
+            IsReviewTabSelected = false;
+            IsFormationTabSelected = false;
+            IsTradesTabSelected = false;
+            IsDraftTabSelected = false;
+
+            // Reset colors
+            BuildTabColor = Color.FromArgb("#f8f9fa");
+            BuildTabTextColor = Color.FromArgb("#6c757d");
+            ReviewTabColor = Color.FromArgb("#f8f9fa");
+            ReviewTabTextColor = Color.FromArgb("#6c757d");
+            FormationTabColor = Color.FromArgb("#f8f9fa");
+            FormationTabTextColor = Color.FromArgb("#6c757d");
+            TradesTabColor = Color.FromArgb("#f8f9fa");
+            TradesTabTextColor = Color.FromArgb("#6c757d");
+            DraftTabColor = Color.FromArgb("#f8f9fa");
+            DraftTabTextColor = Color.FromArgb("#6c757d");
+
+            // Set selected tab
+            SelectedTab = tabName;
+
+            switch (tabName)
+            {
+                case "build":
+                    IsBuildTabSelected = true;
+                    BuildTabColor = Colors.White;
+                    BuildTabTextColor = Color.FromArgb("#007bff");
+                    TabIndicatorPosition = 0;
+                    break;
+                case "review":
+                    IsReviewTabSelected = true;
+                    ReviewTabColor = Colors.White;
+                    ReviewTabTextColor = Color.FromArgb("#007bff");
+                    TabIndicatorPosition = 70;
+                    LoadRosterDisplay();
+                    break;
+                case "formation":
+                    IsFormationTabSelected = true;
+                    FormationTabColor = Colors.White;
+                    FormationTabTextColor = Color.FromArgb("#007bff");
+                    TabIndicatorPosition = 140;
+                    if (!_formationData.Any())
+                    {
+                        LoadFormationData();
+                        LoadCurrentLineups();
+                        UpdateFormationTypeButtons();
+                        LoadAvailableFormations();
+                    }
+                    else
+                        LoadFormationPositions(); // Just refresh positions if already loaded
+                    break;
+                case "trades":
+                    TradeHistory = await _teamService.GetTeamTradesAsync(Team?.Id ?? 0) ?? [];
+                    IsTradesTabSelected = true;
+                    TradesTabColor = Colors.White;
+                    TradesTabTextColor = Color.FromArgb("#007bff");
+                    TabIndicatorPosition = 210;
+                    break;
+                case "draft":
+                    await LoadDraftResults();
+                    IsDraftTabSelected = true;
+                    DraftTabColor = Colors.White;
+                    DraftTabTextColor = Color.FromArgb("#007bff");
+                    TabIndicatorPosition = 280;
+                    break;
             }
         }
 
         [RelayCommand]
         public async Task SelectFranchise(FranchiseInfo franchise)
         {
-            SelectedFranchise = franchise;
-            IsLoading = true;
+            if (franchise == null) return;
 
+            SelectedFranchise = franchise;
+            HasSelectedFranchise = true;
+            SelectedFranchiseTitle = $"🏈 {franchise.Abbreviation} - {franchise.Name}";
+
+            foreach (FranchiseModel franchiseDisplay in Franchises)
+                franchiseDisplay.BackgroundColor = franchiseDisplay.FranchiseInfo.Id == franchise.Id ? Color.FromArgb("#d4edda") : Color.FromArgb("#f8f9fa");
+
+            await LoadFranchisePlayers(franchise.Id);
+        }
+
+        private async Task LoadFranchisePlayers(int franchiseId)
+        {
             try
             {
-                if (await _teamService.GetSelectablePlayersAsync(franchise.Id) is IList<SelectableDto> players)
+                // Use cached data or load from API
+                IList<SelectableDto> dtos;
+                if (_franchisePlayersCache.ContainsKey(franchiseId))
+                    dtos = _franchisePlayersCache[franchiseId];
+                else
                 {
-                    IList<SelectablePlayerViewModel> wrappedPlayers = [.. players.Select(p =>
-                    {
-                        SelectablePlayerViewModel wrapper = new(p) {
-                            // Check if player is already in roster
-                        IsSelected = RosterPlayers.Any(rp => rp.Id == p.Id) };
-                        wrapper.IsAlreadyRostered = wrapper.IsSelected;
-                        return wrapper;
-                    })];
-
-                    AvailablePlayers = wrappedPlayers;
-                    ShowPlayerSelection = true;
+                    dtos = await _teamService.GetSelectablePlayersAsync(franchiseId);
+                    if (dtos is null) return;
+                    _franchisePlayersCache.Add(franchiseId, dtos);
                 }
+
+                IList<PlayerModel> players = [];
+                foreach (SelectableDto p in dtos ?? [])
+                {
+                    players.Add(new(p, _tradedPlayerIds.Contains(p.Id), _protectedPlayerIds.Contains(p.Id), _rosterPlayerIds.Contains(p.Id)));
+                }
+
+                var playersByPosition = players.GroupBy(p => p.Player.Position).OrderBy(g => g.Key).ToList();
+                if (SelectedPositionFilter != "All")
+                    playersByPosition = [.. playersByPosition.Where(pbp => pbp.Key == SelectedPositionFilter)];
+
+                PlayersByPosition.Clear();
+                foreach (var group in playersByPosition)
+                    PlayersByPosition.Add(new([.. group.OrderBy(p => p.Player.Name)]));
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Failed to load players: {ex.Message}";
-            }
-            finally
-            {
-                IsLoading = false;
+                await Shell.Current.DisplayAlert("Error", $"Failed to load players: {ex.Message}", "OK");
             }
         }
 
         [RelayCommand]
-        public void TogglePlayerSelection(SelectablePlayerViewModel player)
+        public async Task TogglePlayer(PlayerModel player)
         {
-            if (player.IsAlreadyRostered && player.IsSelected)
+            if (player is PlayerModel && player.Clickable && SelectedFranchise != null && SelectedFranchise is FranchiseInfo)
             {
-                ErrorMessage = "Player is already in your roster";
+                if (GetFranchiseSelectedCount(SelectedFranchise.Id) >= _maxPerFranchise)
+                {
+                    await Shell.Current.DisplayAlert("Franchise Limit",
+                        $"You can only select {_maxPerFranchise} players from each franchise.", "OK");
+                    return;
+                }
+                else
+                {
+                    player.TogglePlayer();
+                    if (player.IsSelected)
+                        _rosterPlayerIds.Add(player.Id);
+                    else if (player.StatusAvailable)
+                        _rosterPlayerIds.Remove(player.Id);
+
+                    UpdateSalaryCapDisplay();
+                    UpdateFranchiseCount(SelectedFranchise.Id);
+                }
+            }
+
+        }
+
+        [RelayCommand]
+        public async Task RemovePlayer(PlayerModel player)
+        {
+            if (player == null) return;
+
+            // Cannot remove protected players
+            if (_protectedPlayerIds.Contains(player.Id))
+            {
+                await Shell.Current.DisplayAlert("Protected Player",
+                    "This player is protected and cannot be removed.", "OK");
                 return;
             }
 
-            if (!player.IsSelected)
+            var confirm = await Shell.Current.DisplayAlert(
+                "Remove Player",
+                $"Remove {player.Player.Name} from roster?",
+                "Yes", "No");
+
+            if (!confirm) return;
+
+            // Remove from local roster
+            _rosterPlayerIds.Remove(player.Id);
+
+            // Update displays
+            UpdateSalaryCapDisplay();
+            LoadRosterDisplay();
+            UpdateFranchisesCounts();
+        }
+
+        private void LoadRosterDisplay()
+        {
+            try
             {
-                // Adding player - check salary cap
-                if (decimal.TryParse(player.Player.PureAPY, out decimal playerSalary)
-                    && (CurrentSalaryCap + playerSalary) > BaseSalaryCap)
+                // Build roster display from cached data
+                var allRosterPlayers = new List<PlayerModel>();
+
+                foreach (var cacheEntry in _franchisePlayersCache)
                 {
-                    ErrorMessage = $"Cannot add player. Would exceed salary cap by ${(CurrentSalaryCap + playerSalary - BaseSalaryCap):F1}M";
-                    return;
+                    var rosterPlayers = cacheEntry.Value.Where(p => _rosterPlayerIds.Contains(p.Id));
+                    foreach (var player in rosterPlayers)
+                    {
+                        allRosterPlayers.Add(new(player,
+                            _tradedPlayerIds.Contains(player.Id),
+                            _protectedPlayerIds.Contains(player.Id),
+                            true)); // All are selected in roster view
+                    }
                 }
 
-                player.IsSelected = true;
-                RosterPlayers = [.. RosterPlayers, player];
+                // Group by position and apply filter
+                var filteredPlayers = SelectedReviewPositionFilter == "All"
+                    ? allRosterPlayers
+                    : allRosterPlayers.Where(p => p.Player.Position == SelectedReviewPositionFilter);
+
+                var playersByPosition = filteredPlayers
+                    .GroupBy(p => p.Player.Position)
+                    .OrderBy(g => g.Key)
+                    .ToList();
+
+                RosterByPosition.Clear();
+                foreach (var group in playersByPosition)
+                {
+                    RosterByPosition.Add(new([.. group.OrderBy(p => p.Player.Name)]));
+                }
+
+                RosterCountText = $"{allRosterPlayers.Count} players";
+            }
+            catch (Exception ex)
+            {
+                Shell.Current.DisplayAlert("Error", $"Failed to load roster display: {ex.Message}", "OK");
+            }
+        }
+
+        private void UpdateSalaryCapDisplay()
+        {
+            var currentCapUsed = CalculateCurrentCapUsed();
+            var capPercentage = (currentCapUsed / _salaryCapLimit) * 100;
+
+            CapProgressWidth = Math.Min(capPercentage * 3, 300); // Max width for progress bar
+            CurrentCapText = $"${currentCapUsed:F2}M / ${_salaryCapLimit / 1000000:F0}M";
+
+            // Update cap progress color based on usage
+            if (capPercentage > 100)
+            {
+                CapProgressColor = Color.FromArgb("#dc3545"); // Red
+                HasSaveWarning = true;
+                SaveWarningText = "⚠️ Salary cap exceeded! Reduce roster cost before saving.";
+                CanSaveRoster = false;
+                SaveButtonColor = Color.FromArgb("#dc3545");
+            }
+            else if (capPercentage > 90)
+            {
+                CapProgressColor = Color.FromArgb("#ffc107"); // Yellow
+                HasSaveWarning = false;
+                CanSaveRoster = true;
+                SaveButtonColor = Color.FromArgb("#28a745");
             }
             else
             {
-                // Removing player
-                player.IsSelected = false;
-                RosterPlayers = [.. RosterPlayers.Where(p => p.Id != player.Id)];
+                CapProgressColor = Color.FromArgb("#28a745"); // Green
+                HasSaveWarning = false;
+                CanSaveRoster = true;
+                SaveButtonColor = Color.FromArgb("#28a745");
             }
-
-            UpdateSalaryCap();
-            ErrorMessage = string.Empty;
         }
 
-        [RelayCommand]
-        public void HidePlayerSelection()
+        private double CalculateCurrentCapUsed()
         {
-            ShowPlayerSelection = false;
-            SelectedFranchise = null;
+            double totalCap = 0;
+
+            foreach (SelectableDto player in _franchisePlayersCache.SelectMany(cache => cache.Value.Where(p => _rosterPlayerIds.Contains(p.Id))))
+                totalCap += double.TryParse(player.PureAPY.Replace(",", "."), out double value) ? value / 1000000 : 0;
+
+            return totalCap;
         }
 
         [RelayCommand]
         public async Task SaveRoster()
         {
-            IsLoading = true;
-            ErrorMessage = string.Empty;
+            if (Team == null) return;
 
             try
             {
-                TeamDto teamDto = new() { Id = TeamId };
+                IsLoading = true;
 
-                IList<RosteredDto> rosteredPlayers = [.. RosterPlayers.Select(p => new RosteredDto
+                Team.SelectedIds = _rosterPlayerIds;
+                Team.OffLineup = _offenseLineup;
+                Team.DefLineup = _defenseLineup;
+                Team.SPLineup = _specialLineup;
+
+                Team.SelectedIds = _rosterPlayerIds;
+
+                var success = await _teamService.UpdateRosterAsync(Team);
+                if (success)
                 {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Position = p.Position,
-                    APY = p.APY,
-                    PureAPY = p.Player.PureAPY,
-                    FranchiseId = 0
-                })];
-
-                teamDto.Players = rosteredPlayers;
-                teamDto.SelectedIds = [.. RosterPlayers.Select(p => p.Id)];
-
-                if (await _teamService.UpdateRosterAsync(teamDto))
-                    await BaseService.GoToMyTeamsTabAsync();
+                    await Shell.Current.DisplayAlert("Success", "Roster saved successfully!", "OK");
+                }
                 else
-                    ErrorMessage = "Failed to save roster";
+                {
+                    await Shell.Current.DisplayAlert("Error", "Failed to save roster.", "OK");
+                }
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Save failed: {ex.Message}";
+                await Shell.Current.DisplayAlert("Error", $"Error saving roster: {ex.Message}", "OK");
             }
             finally
             {
@@ -180,27 +489,509 @@ namespace MobileApp.Models.Team
         }
 
         [RelayCommand]
-        public void ClearRoster()
+        public async Task ClearRoster()
         {
-            RosterPlayers = [];
-            UpdateSalaryCap();
+            var confirm = await Shell.Current.DisplayAlert(
+                "Clear Roster",
+                "This will remove all non-protected players from your roster. Protected players will remain. Are you sure?",
+                "Yes", "No");
 
-            // Update available players selection state
-            foreach (var player in AvailablePlayers.Where(p => !p.IsAlreadyRostered))
-                player.IsSelected = false;
+            if (!confirm) return;
+
+            try
+            {
+                // Remove all non-protected players
+                _rosterPlayerIds = _rosterPlayerIds.Where(id => _protectedPlayerIds.Contains(id)).ToList();
+
+                // Update displays
+                UpdateSalaryCapDisplay();
+                LoadRosterDisplay();
+                UpdateFranchisesCounts();
+
+                await Shell.Current.DisplayAlert("Success", "Roster cleared successfully! Protected players remain.", "OK");
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", $"Failed to clear roster: {ex.Message}", "OK");
+            }
         }
 
-        private void UpdateSalaryCap()
+        [RelayCommand]
+        public async Task NewTrade()
         {
-            CurrentSalaryCap = 0;
-            foreach (var player in RosterPlayers)
-                if (decimal.TryParse(player.Player.PureAPY, out decimal salary))
-                    CurrentSalaryCap += salary;
+            if (Team == null) return;
 
-            SelectedPlayerCount = RosterPlayers.Count;
-            OnPropertyChanged(nameof(AvailableCap));
-            OnPropertyChanged(nameof(SalaryCapText));
-            OnPropertyChanged(nameof(AvailableCapText));
+            await BaseService.GoToAsync(AppRoutes.Trade, new Dictionary<string, object> { ["teamId"] = Team.Id, ["context"] = "roster" });
+        }
+
+        [RelayCommand]
+        public async Task GoToFormation()
+        {
+            if (Team == null) return;
+
+            await BaseService.GoToAsync(AppRoutes.Formation, new Dictionary<string, object>
+            {
+                ["TeamId"] = Team.Id
+            });
+        }
+
+        [RelayCommand]
+        public async Task GoToDraft()
+        {
+            if (Team == null) return;
+
+            await BaseService.GoToAsync(AppRoutes.Draft, new Dictionary<string, object>
+            {
+                ["TeamId"] = Team.Id
+            });
+        }
+
+        // Property change handlers for filters
+        partial void OnSelectedPositionFilterChanged(string value)
+        {
+            if (HasSelectedFranchise && SelectedFranchise != null)
+            {
+                _ = Task.Run(async () => await LoadFranchisePlayers(SelectedFranchise.Id));
+            }
+        }
+
+        partial void OnSelectedReviewPositionFilterChanged(string value)
+        {
+            LoadRosterDisplay();
+        }
+
+
+        // Commands
+        // Formation Commands
+        [RelayCommand]
+        public void SelectFormationType(string formationType)
+        {
+            SelectedFormationType = formationType;
+            UpdateFormationTypeButtons();
+            LoadAvailableFormations();
+        }
+
+        [RelayCommand]
+        public async Task SelectPositionPlayer(FormationPosition position)
+        {
+            var eligiblePlayers = GetEligiblePlayersForPosition(position.RequiredPosition);
+
+            if (!eligiblePlayers.Any())
+            {
+                await Shell.Current.DisplayAlert("No Players",
+                    $"No {position.RequiredPosition} players available in your roster.", "OK");
+                return;
+            }
+
+            // Add "Remove Player" option if position is occupied
+            var options = eligiblePlayers.Select(p => p.Player.Player.Name).ToList();
+            if (position.AssignedPlayer != null)
+                options.Insert(0, "🗑️ Remove Player");
+
+            var selectedOption = await Shell.Current.DisplayActionSheet(
+                $"Select {position.PositionName} ({position.RequiredPosition})",
+                "Cancel", null, options.ToArray());
+
+            if (selectedOption == "Cancel" || string.IsNullOrEmpty(selectedOption)) return;
+
+            if (selectedOption == "🗑️ Remove Player")
+            {
+                RemovePlayerFromPosition(position);
+            }
+            else
+            {
+                var selectedPlayer = eligiblePlayers.FirstOrDefault(p => p.Player.Player.Name == selectedOption);
+                if (selectedPlayer != null)
+                    AssignPlayerToPosition(selectedPlayer, position);
+            }
+        }
+
+        [RelayCommand]
+        public void DropPlayer(FormationPosition position)
+        {
+            if (_draggedPlayer == null) return;
+
+            // Check if player is eligible for this position
+            if (!IsPlayerEligibleForPosition(_draggedPlayer.Player, position.RequiredPosition))
+            {
+                Shell.Current.DisplayAlert("Invalid Position",
+                    $"{_draggedPlayer.Player.Player.Name} cannot play {position.RequiredPosition}", "OK");
+                return;
+            }
+
+            AssignPlayerToPosition(_draggedPlayer, position);
+            _draggedPlayer = null;
+        }
+
+        [RelayCommand]
+        public void StartDrag(DraggablePlayer player)
+        {
+            _draggedPlayer = player;
+        }
+
+        // Formation Management Methods
+        private void LoadFormationData()
+        {
+            _formationData = new Dictionary<string, Dictionary<string, FormationInfo>>
+            {
+                ["offense"] = FormationData.GetOffenseFormations().ToDictionary(f => f.Key, f => f),
+                ["defense"] = FormationData.GetDefenseFormations().ToDictionary(f => f.Key, f => f),
+                ["special"] = FormationData.GetSpecialTeamsFormations().ToDictionary(f => f.Key, f => f)
+            };
+        }
+
+        private void LoadCurrentLineups()
+        {
+            if (Team?.OffLineup != null)
+            {
+                _offenseLineup = new LineupDto
+                {
+                    Formation = Team.OffLineup.Formation,
+                    Player1 = Team.OffLineup.Player1,
+                    Player2 = Team.OffLineup.Player2,
+                    Player3 = Team.OffLineup.Player3,
+                    Player4 = Team.OffLineup.Player4,
+                    Player5 = Team.OffLineup.Player5,
+                    Player6 = Team.OffLineup.Player6,
+                    Player7 = Team.OffLineup.Player7,
+                    Player8 = Team.OffLineup.Player8,
+                    Player9 = Team.OffLineup.Player9,
+                    Player10 = Team.OffLineup.Player10,
+                    Player11 = Team.OffLineup.Player11
+                };
+
+                _defenseLineup = new LineupDto
+                {
+                    Formation = Team.DefLineup?.Formation ?? "FourThree",
+                    Player1 = Team.DefLineup?.Player1 ?? 0,
+                    Player2 = Team.DefLineup?.Player2 ?? 0,
+                    Player3 = Team.DefLineup?.Player3 ?? 0,
+                    Player4 = Team.DefLineup?.Player4 ?? 0,
+                    Player5 = Team.DefLineup?.Player5 ?? 0,
+                    Player6 = Team.DefLineup?.Player6 ?? 0,
+                    Player7 = Team.DefLineup?.Player7 ?? 0,
+                    Player8 = Team.DefLineup?.Player8 ?? 0,
+                    Player9 = Team.DefLineup?.Player9 ?? 0,
+                    Player10 = Team.DefLineup?.Player10 ?? 0,
+                    Player11 = Team.DefLineup?.Player11 ?? 0
+                };
+            }
+
+            if (Team?.SPLineup != null)
+            {
+                _specialLineup = new SPLineupDto
+                {
+                    Formation = Team.SPLineup.Formation,
+                    Player1 = Team.SPLineup.Player1,
+                    Player2 = Team.SPLineup.Player2,
+                    Player3 = Team.SPLineup.Player3,
+                    Player4 = Team.SPLineup.Player4,
+                    Player5 = Team.SPLineup.Player5
+                };
+            }
+        }
+
+        private void UpdateFormationTypeButtons()
+        {
+            // Reset all colors
+            OffenseButtonColor = Color.FromArgb("#f8f9fa");
+            OffenseButtonTextColor = Color.FromArgb("#6c757d");
+            DefenseButtonColor = Color.FromArgb("#f8f9fa");
+            DefenseButtonTextColor = Color.FromArgb("#6c757d");
+            SpecialButtonColor = Color.FromArgb("#f8f9fa");
+            SpecialButtonTextColor = Color.FromArgb("#6c757d");
+
+            // Set active button
+            switch (SelectedFormationType)
+            {
+                case "offense":
+                    OffenseButtonColor = Color.FromArgb("#007bff");
+                    OffenseButtonTextColor = Colors.White;
+                    break;
+                case "defense":
+                    DefenseButtonColor = Color.FromArgb("#007bff");
+                    DefenseButtonTextColor = Colors.White;
+                    break;
+                case "special":
+                    SpecialButtonColor = Color.FromArgb("#007bff");
+                    SpecialButtonTextColor = Colors.White;
+                    break;
+            }
+        }
+
+        private void LoadAvailableFormations()
+        {
+            AvailableFormations.Clear();
+
+            if (_formationData.ContainsKey(SelectedFormationType))
+            {
+                foreach (var formation in _formationData[SelectedFormationType].Values)
+                {
+                    AvailableFormations.Add(formation.Name);
+                }
+
+                // Set default formation
+                if (AvailableFormations.Any())
+                {
+                    var currentFormation = GetCurrentFormationName();
+                    SelectedFormationName = AvailableFormations.Contains(currentFormation)
+                        ? currentFormation
+                        : AvailableFormations.First();
+                }
+            }
+
+            LoadFormationPositions();
+        }
+
+        private string GetCurrentFormationName()
+        {
+            return SelectedFormationType switch
+            {
+                "offense" => _offenseLineup.Formation ?? "Eleven",
+                "defense" => _defenseLineup.Formation ?? "FourThree",
+                "special" => _specialLineup.Formation ?? "SpecialTeams",
+                _ => ""
+            };
+        }
+
+        private void LoadFormationPositions()
+        {
+            FormationPositions.Clear();
+
+            if (!_formationData.ContainsKey(SelectedFormationType)) return;
+
+            var selectedFormation = _formationData[SelectedFormationType].Values
+                .FirstOrDefault(f => f.Name == SelectedFormationName);
+
+            if (selectedFormation?.Positions == null) return;
+
+            for (int i = 0; i < selectedFormation.Positions.Count; i++)
+            {
+                var pos = selectedFormation.Positions[i];
+                var formationPos = new FormationPosition(
+                    pos.Id, pos.Name, pos.Position, pos.X, pos.Y, i + 1);
+
+                // Assign current player if exists
+                var currentPlayerId = GetCurrentPlayerForPosition(i + 1);
+                if (currentPlayerId > 0)
+                {
+                    var player = FindRosterPlayerById(currentPlayerId);
+                    formationPos.AssignPlayer(player);
+                }
+
+                FormationPositions.Add(formationPos);
+            }
+
+            LoadAvailablePlayersForFormation();
+        }
+
+        private int GetCurrentPlayerForPosition(int position)
+        {
+            return SelectedFormationType switch
+            {
+                "offense" => GetLineupPlayerByIndex(_offenseLineup, position),
+                "defense" => GetLineupPlayerByIndex(_defenseLineup, position),
+                "special" => GetSPLineupPlayerByIndex(_specialLineup, position),
+                _ => 0
+            };
+        }
+
+        private static int GetLineupPlayerByIndex(LineupDto lineup, int index)
+        {
+            return index switch
+            {
+                1 => lineup.Player1,
+                2 => lineup.Player2,
+                3 => lineup.Player3,
+                4 => lineup.Player4,
+                5 => lineup.Player5,
+                6 => lineup.Player6,
+                7 => lineup.Player7,
+                8 => lineup.Player8,
+                9 => lineup.Player9,
+                10 => lineup.Player10,
+                11 => lineup.Player11,
+                _ => 0
+            };
+        }
+
+        private static int GetSPLineupPlayerByIndex(SPLineupDto lineup, int index)
+        {
+            return index switch
+            {
+                1 => lineup.Player1,
+                2 => lineup.Player2,
+                3 => lineup.Player3,
+                4 => lineup.Player4,
+                5 => lineup.Player5,
+                _ => 0
+            };
+        }
+
+        private PlayerModel? FindRosterPlayerById(int playerId)
+        {
+            foreach (var cache in _franchisePlayersCache.Values)
+            {
+                var player = cache.FirstOrDefault(p => p.Id == playerId && _rosterPlayerIds.Contains(p.Id));
+                if (player != null)
+                    return new PlayerModel(player, false, false, true);
+            }
+            return null;
+        }
+
+        private void LoadAvailablePlayersForFormation()
+        {
+            AvailablePlayersForFormation.Clear();
+
+            // Get all roster players
+            var rosterPlayers = new List<PlayerModel>();
+            foreach (var cache in _franchisePlayersCache.Values)
+            {
+                var players = cache.Where(p => _rosterPlayerIds.Contains(p.Id));
+                foreach (var player in players)
+                {
+                    rosterPlayers.Add(new PlayerModel(player, false, false, true));
+                }
+            }
+
+            // Convert to draggable players
+            foreach (var player in rosterPlayers.OrderBy(p => p.Player.Position).ThenBy(p => p.Player.Name))
+            {
+                AvailablePlayersForFormation.Add(new DraggablePlayer(player));
+            }
+        }
+
+        private List<DraggablePlayer> GetEligiblePlayersForPosition(string requiredPosition)
+        {
+            return AvailablePlayersForFormation
+                .Where(p => IsPlayerEligibleForPosition(p.Player, requiredPosition))
+                .ToList();
+        }
+
+        private static bool IsPlayerEligibleForPosition(PlayerModel player, string requiredPosition)
+        {
+            var playerPos = player.Player.Position;
+
+            // Position compatibility rules
+            return requiredPosition switch
+            {
+                "QB" => playerPos == "QB",
+                "RB" => playerPos == "RB",
+                "WR" => playerPos == "WR",
+                "TE" => playerPos == "TE",
+                "OL" => playerPos == "OL",
+                "DL" => playerPos == "DL",
+                "LB" => playerPos == "LB",
+                "DB" => playerPos == "DB",
+                "K" => playerPos == "K",
+                "P" => playerPos == "P",
+                "LS" => playerPos == "OL", // Long Snapper can be OL
+                "ATH" => playerPos is "WR" or "RB" or "DB", // Athletes for returns
+                _ => false
+            };
+        }
+
+        private void AssignPlayerToPosition(DraggablePlayer player, FormationPosition position)
+        {
+            // Remove player from any other position first
+            RemovePlayerFromAllPositions(player.Player);
+
+            // Assign to new position
+            position.AssignPlayer(player.Player);
+
+            // Update lineup data
+            SetCurrentPlayerForPosition(position.PlayerIndex, player.Player.Id);
+        }
+
+        private void RemovePlayerFromPosition(FormationPosition position)
+        {
+            position.AssignPlayer(null);
+            SetCurrentPlayerForPosition(position.PlayerIndex, 0);
+        }
+
+        private void RemovePlayerFromAllPositions(PlayerModel player)
+        {
+            foreach (var pos in FormationPositions)
+            {
+                if (pos.AssignedPlayer?.Id == player.Id)
+                {
+                    pos.AssignPlayer(null);
+                    SetCurrentPlayerForPosition(pos.PlayerIndex, 0);
+                }
+            }
+        }
+
+        private void SetCurrentPlayerForPosition(int position, int playerId)
+        {
+            switch (SelectedFormationType)
+            {
+                case "offense":
+                    SetLineupPlayerByIndex(_offenseLineup, position, playerId);
+                    break;
+                case "defense":
+                    SetLineupPlayerByIndex(_defenseLineup, position, playerId);
+                    break;
+                case "special":
+                    SetSPLineupPlayerByIndex(_specialLineup, position, playerId);
+                    break;
+            }
+        }
+
+        private static void SetLineupPlayerByIndex(LineupDto lineup, int index, int playerId)
+        {
+            switch (index)
+            {
+                case 1: lineup.Player1 = playerId; break;
+                case 2: lineup.Player2 = playerId; break;
+                case 3: lineup.Player3 = playerId; break;
+                case 4: lineup.Player4 = playerId; break;
+                case 5: lineup.Player5 = playerId; break;
+                case 6: lineup.Player6 = playerId; break;
+                case 7: lineup.Player7 = playerId; break;
+                case 8: lineup.Player8 = playerId; break;
+                case 9: lineup.Player9 = playerId; break;
+                case 10: lineup.Player10 = playerId; break;
+                case 11: lineup.Player11 = playerId; break;
+            }
+        }
+
+        private static void SetSPLineupPlayerByIndex(SPLineupDto lineup, int index, int playerId)
+        {
+            switch (index)
+            {
+                case 1: lineup.Player1 = playerId; break;
+                case 2: lineup.Player2 = playerId; break;
+                case 3: lineup.Player3 = playerId; break;
+                case 4: lineup.Player4 = playerId; break;
+                case 5: lineup.Player5 = playerId; break;
+            }
+        }
+
+        // Property change handler
+        partial void OnSelectedFormationNameChanged(string value)
+        {
+            if (SelectedFormationType switch
+            {
+                "offense" => _offenseLineup,
+                "defense" => _defenseLineup,
+                "special" => (LineupDto)_specialLineup,
+                _ => null
+            } is LineupDto lineup)
+            {
+                lineup.Formation = GetFormationKeyByName(value);
+                LoadFormationPositions();
+            }
+        }
+
+        private string GetFormationKeyByName(string name)
+        {
+            if (_formationData.ContainsKey(SelectedFormationType))
+            {
+                var formation = _formationData[SelectedFormationType]
+                    .FirstOrDefault(f => f.Value.Name == name);
+                return formation.Key ?? "";
+            }
+            return "";
         }
     }
 }

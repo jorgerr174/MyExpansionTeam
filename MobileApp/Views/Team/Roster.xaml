@@ -3,152 +3,801 @@
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
+             xmlns:playerDtos="clr-namespace:METCore.DTOs.Player;assembly=METCore"
+             xmlns:teamDtos="clr-namespace:METCore.DTOs.Team;assembly=METCore"
+             x:Name="root"
              x:DataType="viewmodels:RosterViewModel"
-             Title="Roster">
+             Title="Build Team Roster">
 
-    <ScrollView>
-        <StackLayout Padding="20" Spacing="15">
-
-            <!-- Header -->
-            <Label Text="{Binding TeamName}" 
-                FontSize="24" 
-                FontAttributes="Bold" 
-                HorizontalOptions="Center" />
-
-            <Label Text="Build Roster - Phase 1" 
-                FontSize="18" 
-                HorizontalOptions="Center" />
-
-            <!-- Salary Cap Display -->
-            <Border BackgroundColor="LightBlue" Padding="15" Stroke="Blue"  StrokeThickness="1" StrokeShape="RoundRectangle 10">
-                <StackLayout>
-                    <Label Text="{Binding SalaryCapText}" 
-                        FontAttributes="Bold" 
-                        HorizontalOptions="Center" />
-                    <Label Text="{Binding AvailableCapText}" 
-                        FontSize="12" 
-                        HorizontalOptions="Center" />
-                    <Label Text="{Binding SelectedPlayerCount, StringFormat='Players Selected: {0}'}" 
-                        FontSize="12" 
-                        HorizontalOptions="Center" />
-                </StackLayout>
-            </Border>
-
-            <!-- Franchise Selection -->
-            <StackLayout IsVisible="{Binding ShowPlayerSelection, Converter={StaticResource InvertedBoolConverter}}">
-                <Label Text="Select a Franchise:" FontAttributes="Bold" />
-
-                <CollectionView ItemsSource="{Binding Franchises}"
-                            SelectionMode="Single"
-                            SelectedItem="{Binding SelectedFranchise}"
-                            SelectionChangedCommand="{Binding SelectFranchiseCommand}"
-                            SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Padding="10" BackgroundColor="LightGray" Margin="2">
-                                <StackLayout Orientation="Horizontal">
-                                    <Label Text="{Binding Abbreviation}" 
-                                        FontAttributes="Bold" 
-                                        VerticalOptions="Center" />
-                                    <Label Text="{Binding Name}" 
-                                        VerticalOptions="Center" 
-                                        Margin="10,0,0,0" />
-                                </StackLayout>
-                            </Grid>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </StackLayout>
-
-            <!-- Player Selection (shown when franchise selected) -->
-            <StackLayout IsVisible="{Binding ShowPlayerSelection}">
-                <StackLayout Orientation="Horizontal">
-                    <Label Text="{Binding SelectedFranchise.Name, StringFormat='Players from {0}'}" 
-                        FontAttributes="Bold" 
-                        VerticalOptions="Center" />
-                    <Button Text="Back to Franchises" 
-                        Command="{Binding HidePlayerSelectionCommand}"
-                        BackgroundColor="Gray"
-                        TextColor="White"
-                        HorizontalOptions="End" />
-                </StackLayout>
-
-                <CollectionView ItemsSource="{Binding AvailablePlayers}"
-                            HeightRequest="400">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Padding="5" Margin="2">
-                                <Border BackgroundColor="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}}" 
-                                       Opacity="{Binding CanBeToggled, Converter={StaticResource BoolToOpacityConverter}}">
-                                    <StackLayout>
-                                        <StackLayout.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.TogglePlayerSelectionCommand}"
-                                                            CommandParameter="{Binding}" />
-                                        </StackLayout.GestureRecognizers>
-
-                                        <StackLayout Orientation="Horizontal">
-                                            <Label Text="{Binding Name}" 
-                                                FontAttributes="Bold" 
-                                                VerticalOptions="Center" />
-                                            <Label Text="{Binding Position}" 
-                                                FontSize="12"
-                                                VerticalOptions="Center"
-                                                Margin="10,0,0,0" />
-                                        </StackLayout>
-
-                                        <StackLayout Orientation="Horizontal">
-                                            <Label Text="{Binding APY, StringFormat='Salary: {0}'}" 
-                                                FontSize="12" />
-                                            <Label Text="{Binding IsAlreadyRostered, Converter={StaticResource BoolToTextConverter}}" 
-                                                FontSize="10"
-                                                TextColor="Red"
-                                                IsVisible="{Binding IsAlreadyRostered}" />
-                                        </StackLayout>
-                                    </StackLayout>
-                                </Border>
-                            </Grid>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </StackLayout>
-
-            <!-- Current Roster Summary -->
-            <Border BackgroundColor="LightGreen" Padding="15" Stroke="Green" StrokeThickness="1" StrokeShape="RoundRectangle 10">
-                <StackLayout>
-                    <Label Text="Current Roster" FontAttributes="Bold" />
-                    <Label Text="{Binding RosterPlayers.Count, StringFormat='Players: {0}'}" />
-
-                    <Button Text="Clear All Players" 
-                        Command="{Binding ClearRosterCommand}"
-                        BackgroundColor="Red"
-                        TextColor="White"
-                        IsVisible="{Binding RosterPlayers.Count, Converter={StaticResource CountToBoolConverter}}" />
-                </StackLayout>
-            </Border>
-
-            <!-- Error Message -->
-            <Label Text="{Binding ErrorMessage}" 
-                TextColor="Red" 
-                IsVisible="{Binding HasError}" />
-
-            <!-- Save Button -->
-            <Button Text="Save Roster" 
-                Command="{Binding SaveRosterCommand}"
-                IsEnabled="{Binding IsFormEnabled}"
-                BackgroundColor="Green"
-                TextColor="White" />
-
-            <!-- Loading Indicator -->
-            <ActivityIndicator IsRunning="{Binding IsLoading}" 
-                            IsVisible="{Binding IsLoading}" />
-
-            <!-- Go Back Button -->
-            <Button Text="Go Back" 
-                Command="{Binding GoBackCommand}"
-                BackgroundColor="Transparent"
-                TextColor="Blue" />
-
+    <Grid>
+        <!-- Loading State -->
+        <StackLayout IsVisible="{Binding IsLoading}" 
+                     BackgroundColor="White"
+                     VerticalOptions="FillAndExpand"
+                     HorizontalOptions="FillAndExpand"
+                     Spacing="15">
+            <ActivityIndicator IsRunning="True" 
+                             Color="#007bff" 
+                             VerticalOptions="CenterAndExpand" />
+            <Label Text="Loading roster data..." 
+                   HorizontalOptions="Center" 
+                   FontSize="16" 
+                   TextColor="#6c757d" />
         </StackLayout>
-    </ScrollView>
+
+        <!-- Error State -->
+        <StackLayout IsVisible="{Binding HasLoadError}" 
+                     Padding="20"
+                     BackgroundColor="White"
+                     VerticalOptions="FillAndExpand"
+                     Spacing="15">
+            <Label Text="⚠️" 
+                   HorizontalOptions="Center" 
+                   FontSize="48" 
+                   VerticalOptions="CenterAndExpand" />
+            <Label Text="{Binding LoadErrorMessage}" 
+                   HorizontalOptions="Center" 
+                   FontSize="16" 
+                   TextColor="Red"
+                   HorizontalTextAlignment="Center" />
+            <Button Text="Try Again" 
+                    Command="{Binding LoadViewCommand}" 
+                    CommandParameter="{Binding TeamId}"
+                    BackgroundColor="#007bff" 
+                    TextColor="White" 
+                    HorizontalOptions="Center" />
+        </StackLayout>
+
+        <!-- Main Content -->
+        <ScrollView IsVisible="{Binding HasTeam}">
+            <StackLayout Spacing="0">
+
+                <!-- Team Header -->
+                <Border BackgroundColor="#007bff" 
+                        Padding="20,15"
+                        Stroke="Transparent">
+                    <StackLayout Spacing="8">
+                        <Label Text="{Binding Team.Location}" 
+                               FontSize="24" 
+                               FontAttributes="Bold" 
+                               TextColor="White"
+                               HorizontalOptions="Center" />
+                        <Label Text="{Binding Team.Mascot}" 
+                               FontSize="20" 
+                               TextColor="White"
+                               HorizontalOptions="Center" />
+                        <Label Text="Build Team Roster" 
+                               FontSize="14" 
+                               TextColor="White"
+                               Opacity="0.9"
+                               HorizontalOptions="Center" />
+                    </StackLayout>
+                </Border>
+
+                <!-- Salary Cap Indicator -->
+                <Border BackgroundColor="#d1ecf1" 
+                        Stroke="#bee5eb"
+                        StrokeThickness="1"
+                        Padding="15">
+                    <StackLayout Spacing="8">
+                        <Label Text="💰 Salary Cap Status" 
+                               FontSize="16" 
+                               FontAttributes="Bold" 
+                               TextColor="#0c5460" />
+
+                        <!-- Progress Bar -->
+                        <Grid HeightRequest="8">
+                            <Frame BackgroundColor="#e9ecef" 
+                                   HeightRequest="8" 
+                                   CornerRadius="4" 
+                                   Padding="0"
+                                   HasShadow="False" />
+                            <Frame BackgroundColor="{Binding CapProgressColor}" 
+                                   HeightRequest="8" 
+                                   CornerRadius="4" 
+                                   Padding="0"
+                                   HasShadow="False"
+                                   WidthRequest="{Binding CapProgressWidth}"
+                                   HorizontalOptions="Start" />
+                        </Grid>
+
+                        <StackLayout Orientation="Horizontal" Spacing="10">
+                            <Label Text="{Binding CurrentCapText}" 
+                                   FontSize="12" 
+                                   TextColor="#0c5460" />
+                            <Label Text="•" 
+                                   FontSize="12" 
+                                   TextColor="#0c5460" />
+                            <Label Text="{Binding RosterCountText}" 
+                                   FontSize="12" 
+                                   TextColor="#0c5460" />
+                        </StackLayout>
+                    </StackLayout>
+                </Border>
+
+                <!-- Tab Navigation -->
+                <Grid BackgroundColor="White">
+                    <ScrollView Orientation="Horizontal" 
+                                HorizontalScrollBarVisibility="Never">
+                        <StackLayout Orientation="Horizontal" 
+                                     Spacing="0"
+                                     Padding="5,0">
+
+                            <Button Text="🏗️ Build"
+                                    BackgroundColor="{Binding BuildTabColor}"
+                                    TextColor="{Binding BuildTabTextColor}"
+                                    FontSize="13"
+                                    Padding="12,10"
+                                    CornerRadius="0"
+                                    BorderWidth="0"
+                                    Command="{Binding SelectTabCommand}"
+                                    CommandParameter="build" />
+
+                            <Button Text="📋 Review"
+                                    BackgroundColor="{Binding ReviewTabColor}"
+                                    TextColor="{Binding ReviewTabTextColor}"
+                                    FontSize="13"
+                                    Padding="12,10"
+                                    CornerRadius="0"
+                                    BorderWidth="0"
+                                    Command="{Binding SelectTabCommand}"
+                                    CommandParameter="review" />
+
+                            <Button Text="🏈 Formation"
+                                    BackgroundColor="{Binding FormationTabColor}"
+                                    TextColor="{Binding FormationTabTextColor}"
+                                    FontSize="13"
+                                    Padding="12,10"
+                                    CornerRadius="0"
+                                    BorderWidth="0"
+                                    Command="{Binding SelectTabCommand}"
+                                    CommandParameter="formation" />
+
+                            <Button Text="🔄 Trades"
+                                    BackgroundColor="{Binding TradesTabColor}"
+                                    TextColor="{Binding TradesTabTextColor}"
+                                    FontSize="13"
+                                    Padding="12,10"
+                                    CornerRadius="0"
+                                    BorderWidth="0"
+                                    Command="{Binding SelectTabCommand}"
+                                    CommandParameter="trades" />
+
+                            <Button Text="🏆 Draft"
+                                    BackgroundColor="{Binding DraftTabColor}"
+                                    TextColor="{Binding DraftTabTextColor}"
+                                    FontSize="13"
+                                    Padding="12,10"
+                                    CornerRadius="0"
+                                    BorderWidth="0"
+                                    Command="{Binding SelectTabCommand}"
+                                    CommandParameter="draft" />
+                        </StackLayout>
+                    </ScrollView>
+
+                    <!-- Tab indicator line -->
+                    <BoxView BackgroundColor="#007bff" 
+                             HeightRequest="2" 
+                             VerticalOptions="End"
+                             HorizontalOptions="Start"
+                             WidthRequest="70"
+                             TranslationX="{Binding TabIndicatorPosition}" />
+                </Grid>
+
+                <!-- Tab Content -->
+                <StackLayout Padding="15" Spacing="20">
+
+                    <!-- Build Roster Tab -->
+                    <StackLayout IsVisible="{Binding IsBuildTabSelected}" Spacing="15">
+
+                        <!-- Action Buttons -->
+                        <StackLayout Orientation="Horizontal" 
+                                     Spacing="10" 
+                                     HorizontalOptions="FillAndExpand">
+                            <Button Text="🔄 New Trade" 
+                                    BackgroundColor="#17a2b8" 
+                                    TextColor="White"
+                                    FontSize="14"
+                                    Padding="12,8"
+                                    CornerRadius="6"
+                                    Command="{Binding NewTradeCommand}"
+                                    HorizontalOptions="FillAndExpand" />
+                            <Button Text="🗑️ Clear All" 
+                                    BackgroundColor="#dc3545" 
+                                    TextColor="White"
+                                    FontSize="14"
+                                    Padding="12,8"
+                                    CornerRadius="6"
+                                    Command="{Binding ClearRosterCommand}"
+                                    HorizontalOptions="FillAndExpand" />
+                        </StackLayout>
+
+                        <!-- Franchises List -->
+                        <Border BackgroundColor="White"
+                                Stroke="#dee2e6"
+                                StrokeThickness="1"
+                                Padding="15"
+                                StrokeShape="RoundRectangle 8">
+                            <StackLayout Spacing="12">
+                                <Label Text="🏈 Select Franchise" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold" 
+                                       TextColor="#495057" />
+
+                                <CollectionView ItemsSource="{Binding Franchises}"
+                                                SelectionMode="Single"
+                                                SelectedItem="{Binding SelectedFranchise}">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:DataType="viewmodels:FranchiseModel">
+                                            <Border BackgroundColor="{Binding BackgroundColor}"
+                                                    Stroke="#dee2e6"
+                                                    StrokeThickness="1"
+                                                    Padding="12"
+                                                    StrokeShape="RoundRectangle 6"
+                                                    Margin="0,2">
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference root}, Path=BindingContext.SelectFranchiseCommand}"
+                                                                          CommandParameter="{Binding FranchiseInfo}" />
+                                                </Border.GestureRecognizers>
+                                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                                    <Label Grid.Column="0"
+                                                           Text="{Binding FranchiseInfo.Abbreviation}"
+                                                           FontSize="14"
+                                                           FontAttributes="Bold"
+                                                           TextColor="#007bff"
+                                                           VerticalOptions="Center" />
+                                                    <Label Grid.Column="1"
+                                                           Text="{Binding FranchiseInfo.Name}"
+                                                           FontSize="14"
+                                                           TextColor="#495057"
+                                                           VerticalOptions="Center" />
+                                                    <Label Grid.Column="2"
+                                                           Text="{Binding PlayerCountText}"
+                                                           FontSize="12"
+                                                           TextColor="#6c757d"
+                                                           BackgroundColor="#f8f9fa"
+                                                           Padding="6,3"
+                                                           VerticalOptions="Center" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </StackLayout>
+                        </Border>
+
+                        <!-- Selected Franchise Players -->
+                        <Border BackgroundColor="White"
+                                Stroke="#dee2e6"
+                                StrokeThickness="1"
+                                Padding="15"
+                                StrokeShape="RoundRectangle 8"
+                                IsVisible="{Binding HasSelectedFranchise}">
+                            <StackLayout Spacing="12">
+                                <StackLayout Orientation="Horizontal" Spacing="10">
+                                    <Label Text="{Binding SelectedFranchiseTitle}" 
+                                           FontSize="16" 
+                                           FontAttributes="Bold" 
+                                           TextColor="#495057"
+                                           HorizontalOptions="StartAndExpand" />
+                                    <Picker ItemsSource="{Binding PositionFilters}"
+                                            SelectedItem="{Binding SelectedPositionFilter}"
+                                            Title="All Positions"
+                                            FontSize="12"
+                                            BackgroundColor="#f8f9fa" />
+                                </StackLayout>
+
+                                <!-- Players by Position -->
+                                <CollectionView ItemsSource="{Binding PlayersByPosition}">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:DataType="viewmodels:PositionGroupModel">
+                                            <StackLayout Spacing="8" Margin="0,10">
+                                                <Label Text="{Binding Position}" 
+                                                       FontSize="14" 
+                                                       FontAttributes="Bold" 
+                                                       TextColor="#6c757d"
+                                                       Margin="0,0,0,5" />
+
+                                                <CollectionView ItemsSource="{Binding Players}">
+                                                    <CollectionView.ItemTemplate>
+                                                        <DataTemplate x:DataType="viewmodels:PlayerModel">
+                                                            <Border BackgroundColor="{Binding BackgroundColor}"
+                                                                    Stroke="{Binding BorderColor}"
+                                                                    StrokeThickness="1"
+                                                                    Padding="12"
+                                                                    StrokeShape="RoundRectangle 6"
+                                                                    Margin="0,2"
+                                                                    IsEnabled="{Binding Clickable}">
+                                                                <Border.GestureRecognizers>
+                                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference root}, Path=BindingContext.TogglePlayerCommand}"
+                                                                                          CommandParameter="{Binding .}" />
+                                                                </Border.GestureRecognizers>
+
+                                                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                                                                    <StackLayout Grid.Column="0" Spacing="4">
+                                                                        <Label Text="{Binding Player.Name}"
+                                                                               FontSize="14"
+                                                                               FontAttributes="Bold"
+                                                                               TextColor="#212529" />
+                                                                        <StackLayout Orientation="Horizontal" Spacing="8">
+                                                                            <Label Text="{Binding Player.Position}"
+                                                                                   FontSize="12"
+                                                                                   TextColor="#007bff"
+                                                                                   BackgroundColor="#e3f2fd"
+                                                                                   Padding="4,2"
+                                                                                   FontAttributes="Bold" />
+                                                                            <Label Text="{Binding Player.APY}"
+                                                                                   FontSize="12"
+                                                                                   TextColor="#28a745"
+                                                                                   FontAttributes="Bold" />
+                                                                        </StackLayout>
+                                                                        <StackLayout Orientation="Horizontal" Spacing="5">
+                                                                            <Label Text="{Binding Player.Age}"
+                                                                                   FontSize="11"
+                                                                                   TextColor="#6c757d" />
+                                                                            <Label Text="•"
+                                                                                   FontSize="11"
+                                                                                   TextColor="#6c757d" />
+                                                                            <Label Text="{Binding Player.Height}"
+                                                                                   FontSize="11"
+                                                                                   TextColor="#6c757d" />
+                                                                            <Label Text="•"
+                                                                                   FontSize="11"
+                                                                                   TextColor="#6c757d" />
+                                                                            <Label Text="{Binding Player.Weight}"
+                                                                                   FontSize="11"
+                                                                                   TextColor="#6c757d" />
+                                                                        </StackLayout>
+                                                                    </StackLayout>
+
+                                                                    <Label Grid.Column="1"
+                                                                           Text="{Binding StatusText}"
+                                                                           FontSize="10"
+                                                                           TextColor="{Binding StatusTextColor}"
+                                                                           BackgroundColor="{Binding StatusBackgroundColor}"
+                                                                           Padding="4,2"
+                                                                           IsVisible="{Binding HasStatus}"
+                                                                           VerticalOptions="Center" />
+
+                                                                    <Label Grid.Column="2"
+                                                                           Text="{Binding Icon}"
+                                                                           FontSize="16"
+                                                                           TextColor="{Binding IconColor}"
+                                                                           FontAttributes="Bold"
+                                                                           IsVisible="{Binding HasIcon}"
+                                                                           VerticalOptions="Center" />
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </CollectionView.ItemTemplate>
+                                                </CollectionView>
+                                            </StackLayout>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </StackLayout>
+                        </Border>
+                    </StackLayout>
+
+                    <!-- Review Tab -->
+                    <StackLayout IsVisible="{Binding IsReviewTabSelected}" Spacing="15">
+                        <Label Text="📋 Current Roster" 
+                               FontSize="18" 
+                               FontAttributes="Bold" 
+                               TextColor="#495057" />
+
+                        <!-- Position Filter -->
+                        <Picker ItemsSource="{Binding ReviewPositionFilters}"
+                                SelectedItem="{Binding SelectedReviewPositionFilter}"
+                                Title="All Positions"
+                                BackgroundColor="#f8f9fa" />
+
+                        <!-- Roster Players by Position -->
+                        <CollectionView ItemsSource="{Binding RosterByPosition}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="viewmodels:PositionGroup">
+                                    <StackLayout Spacing="10" Margin="0,10">
+                                        <Label Text="{Binding PositionName, StringFormat='{0}'}" 
+                                               FontSize="14" 
+                                               FontAttributes="Bold" 
+                                               TextColor="#007bff" />
+
+                                        <CollectionView ItemsSource="{Binding Players}">
+                                            <CollectionView.ItemsLayout>
+                                                <GridItemsLayout Orientation="Vertical" 
+                                                               Span="2" 
+                                                               HorizontalItemSpacing="10" 
+                                                               VerticalItemSpacing="10" />
+                                            </CollectionView.ItemsLayout>
+                                            <CollectionView.ItemTemplate>
+                                                <DataTemplate x:DataType="playerDtos:RosteredDto">
+                                                    <Border BackgroundColor="White"
+                                                            Stroke="#dee2e6"
+                                                            StrokeThickness="1"
+                                                            Padding="10"
+                                                            StrokeShape="RoundRectangle 8">
+                                                        <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="5">
+                                                            <Label Grid.Row="0"
+                                                                   Text="{Binding Name}"
+                                                                   FontSize="14"
+                                                                   FontAttributes="Bold" />
+                                                            <Label Grid.Row="1"
+                                                                   Text="{Binding Position}"
+                                                                   FontSize="12"
+                                                                   TextColor="#007bff" />
+                                                            <Label Grid.Row="2"
+                                                                   Text="{Binding APY}"
+                                                                   FontSize="12"
+                                                                   TextColor="#28a745"
+                                                                   FontAttributes="Bold" />
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </CollectionView.ItemTemplate>
+                                        </CollectionView>
+                                    </StackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                    </StackLayout>
+
+                    <!-- Formation Tab -->
+                    <StackLayout IsVisible="{Binding IsFormationTabSelected}" Spacing="15">
+
+                        <!-- Formation Type Selector -->
+                        <StackLayout Orientation="Horizontal" 
+                                 Spacing="5" 
+                                 HorizontalOptions="Center">
+                            <Button Text="Offense" 
+                                    BackgroundColor="{Binding OffenseButtonColor}"
+                                    TextColor="{Binding OffenseButtonTextColor}"
+                                    FontSize="14"
+                                    Padding="15,10"
+                                    CornerRadius="6"
+                                    Command="{Binding SelectFormationTypeCommand}"
+                                    CommandParameter="offense" />
+                            <Button Text="Defense" 
+                                    BackgroundColor="{Binding DefenseButtonColor}"
+                                    TextColor="{Binding DefenseButtonTextColor}"
+                                    FontSize="14"
+                                    Padding="15,10"
+                                    CornerRadius="6"
+                                    Command="{Binding SelectFormationTypeCommand}"
+                                    CommandParameter="defense" />
+                            <Button Text="Special" 
+                                    BackgroundColor="{Binding SpecialButtonColor}"
+                                    TextColor="{Binding SpecialButtonTextColor}"
+                                    FontSize="14"
+                                    Padding="15,10"
+                                    CornerRadius="6"
+                                    Command="{Binding SelectFormationTypeCommand}"
+                                    CommandParameter="special" />
+                        </StackLayout>
+
+                        <!-- Formation Dropdown -->
+                        <Picker ItemsSource="{Binding AvailableFormations}"
+                                SelectedItem="{Binding SelectedFormationName}"
+                                Title="Select Formation"
+                                FontSize="14"
+                                BackgroundColor="#f8f9fa" />
+
+                        <!-- Field Display -->
+                        <Border BackgroundColor="#228B22" 
+                                Stroke="#fff"
+                                StrokeThickness="2"
+                                HeightRequest="500"
+                                WidthRequest="600"
+                                Padding="10"
+                                StrokeShape="RoundRectangle 8">
+
+                            <!-- Field Lines -->
+                            <Grid>
+                                <!-- Yard lines -->
+                                <BoxView Color="#fff" HeightRequest="1" VerticalOptions="Start" Margin="0,80" />
+                                <BoxView Color="#fff" HeightRequest="1" VerticalOptions="Center" />
+                                <BoxView Color="#fff" HeightRequest="1" VerticalOptions="End" Margin="0,80" />
+
+                                <!-- Formation Positions -->
+                                <Grid x:Name="FormationField">
+                                    <BindableLayout.ItemsSource>
+                                        <Binding Path="FormationPositions" />
+                                    </BindableLayout.ItemsSource>
+
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate x:DataType="viewmodels:FormationPosition">
+                                            <Border BackgroundColor="{Binding PlayerBackgroundColor}"
+                                                    Stroke="{Binding PlayerBorderColor}"
+                                                    StrokeThickness="2"
+                                                    WidthRequest="60"
+                                                    HeightRequest="60"
+                                                    StrokeShape="RoundRectangle 30"
+                                                    AbsoluteLayout.LayoutBounds="{Binding LayoutBounds}"
+                                                    AbsoluteLayout.LayoutFlags="All">
+
+                                                <Border.GestureRecognizers>
+                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference root}, Path=BindingContext.SelectPositionPlayerCommand}"
+                                                                        CommandParameter="{Binding .}" />
+                                                    <DropGestureRecognizer Drop="OnPositionDrop" />
+                                                </Border.GestureRecognizers>
+
+                                                <StackLayout Spacing="2" VerticalOptions="Center" HorizontalOptions="Center">
+                                                    <Label Text="{Binding PositionName}"
+                                                           FontSize="8"
+                                                           FontAttributes="Bold"
+                                                           TextColor="White"
+                                                           HorizontalOptions="Center" />
+                                                    <Label Text="{Binding PlayerName}"
+                                                           FontSize="9"
+                                                           TextColor="White"
+                                                           HorizontalOptions="Center"
+                                                           LineBreakMode="TailTruncation"
+                                                           MaxLines="1" />
+                                                </StackLayout>
+                                            </Border>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <!-- Available Players for Drag -->
+                        <Border BackgroundColor="White"
+                                Stroke="#dee2e6"
+                                StrokeThickness="1"
+                                Padding="15"
+                                StrokeShape="RoundRectangle 8">
+                            <StackLayout Spacing="12">
+                                <Label Text="🏈 Available Players (Drag to Position)" 
+                                       FontSize="16" 
+                                       FontAttributes="Bold" 
+                                       TextColor="#495057" />
+
+                                <CollectionView ItemsSource="{Binding AvailablePlayersForFormation}" 
+                                        HeightRequest="80">
+                                    <CollectionView.ItemsLayout>
+                                        <LinearItemsLayout Orientation="Horizontal" ItemSpacing="5" />
+                                    </CollectionView.ItemsLayout>
+                                    
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:DataType="viewmodels:DraggablePlayer">
+                                            <Border BackgroundColor="#f8f9fa"
+                                                    Stroke="#dee2e6"
+                                                    StrokeThickness="1"
+                                                    WidthRequest="100"
+                                                    Padding="8"
+                                                    StrokeShape="RoundRectangle 6"
+                                                    Margin="5,0">
+
+                                                <Border.GestureRecognizers>
+                                                    <DragGestureRecognizer DragStarting="OnPlayerDragStarting" />
+                                                </Border.GestureRecognizers>
+
+                                                <StackLayout Spacing="4">
+                                                    <Label Text="{Binding Player.Player.Name}"
+                                                           FontSize="12"
+                                                           FontAttributes="Bold"
+                                                           TextColor="#212529"
+                                                           HorizontalOptions="Center"
+                                                           LineBreakMode="TailTruncation"
+                                                           MaxLines="1" />
+                                                    <Label Text="{Binding Player.Player.Position}"
+                                                           FontSize="10"
+                                                           TextColor="#007bff"
+                                                           HorizontalOptions="Center" />
+                                                </StackLayout>
+                                            </Border>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </StackLayout>
+                        </Border>
+                    </StackLayout>
+                    
+                    <!-- Trades Tab -->
+                    <StackLayout IsVisible="{Binding IsTradesTabSelected}" Spacing="15">
+                        <StackLayout Orientation="Horizontal" Spacing="10">
+                            <Label Text="🔄 Trade History" 
+                                   FontSize="18" 
+                                   FontAttributes="Bold" 
+                                   TextColor="#495057"
+                                   HorizontalOptions="Start" />
+                            <Button Text="+ New Trade" 
+                                    BackgroundColor="#17a2b8" 
+                                    TextColor="White"
+                                    FontSize="12"
+                                    Padding="8,6"
+                                    CornerRadius="6"
+                                    Command="{Binding NewTradeCommand}" />
+                        </StackLayout>
+
+                        <CollectionView ItemsSource="{Binding TradeHistory}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="teamDtos:TradeDto">
+                                    <Border BackgroundColor="#f8f9fa"
+                                            Stroke="#17a2b8"
+                                            StrokeThickness="1"
+                                            Padding="15"
+                                            Margin="0,5"
+                                            StrokeShape="RoundRectangle 8">
+                                        <StackLayout Spacing="10">
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                                <Label Grid.Column="1"
+                                                       Text="{Binding Date, StringFormat='Date: {0:M/d/yyyy}'}"
+                                                       FontSize="12"
+                                                       TextColor="#6c757d" />
+                                            </Grid>
+
+                                            <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
+                                                <StackLayout Grid.Column="0">
+                                                    <Label Text="Received:" 
+                                                           FontSize="12" 
+                                                           FontAttributes="Bold" 
+                                                           TextColor="#28a745" />
+                                                    <CollectionView ItemsSource="{Binding TeamPicks}">
+                                                        <CollectionView.ItemTemplate>
+                                                            <DataTemplate x:DataType="x:Int32">
+                                                                <Label Text="{Binding ., StringFormat='Pick: {0}'}" 
+                                                                   FontSize="11" 
+                                                                   LineBreakMode="WordWrap" />
+                                                            </DataTemplate>
+                                                        </CollectionView.ItemTemplate>
+                                                    </CollectionView>
+                                                    <CollectionView ItemsSource="{Binding TeamPlayers}">
+                                                        <CollectionView.ItemTemplate>
+                                                            <DataTemplate x:DataType="playerDtos:SelectableDto">
+                                                                <Label Text="{Binding Name}" 
+                                                                   FontSize="11" 
+                                                                   LineBreakMode="WordWrap" />
+                                                            </DataTemplate>
+                                                        </CollectionView.ItemTemplate>
+                                                    </CollectionView>
+                                                </StackLayout>
+
+                                                <StackLayout Grid.Column="1">
+                                                    <Label Text="Sent:" 
+                                                           FontSize="12" 
+                                                           FontAttributes="Bold" 
+                                                           TextColor="#dc3545" />
+                                                    <CollectionView ItemsSource="{Binding FranchisePicks}">
+                                                        <CollectionView.ItemTemplate>
+                                                            <DataTemplate x:DataType="x:Int32">
+                                                                <Label Text="{Binding ., StringFormat='Pick: {0}'}" 
+                                                                   FontSize="11" 
+                                                                   LineBreakMode="WordWrap" />
+                                                            </DataTemplate>
+                                                        </CollectionView.ItemTemplate>
+                                                    </CollectionView>
+                                                    <CollectionView ItemsSource="{Binding FranchisePlayers}">
+                                                        <CollectionView.ItemTemplate>
+                                                            <DataTemplate x:DataType="playerDtos:SelectableDto">
+                                                                <Label Text="{Binding Name}" 
+                                                                   FontSize="11" 
+                                                                   LineBreakMode="WordWrap" />
+                                                            </DataTemplate>
+                                                        </CollectionView.ItemTemplate>
+                                                    </CollectionView>
+                                                </StackLayout>
+                                            </Grid>
+                                        </StackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </StackLayout>
+
+                    <!-- Draft Tab -->
+                    <StackLayout IsVisible="{Binding IsDraftTabSelected}" Spacing="15">
+                        <StackLayout Orientation="Horizontal" Spacing="10">
+                            <Label Text="🏆 Draft Results" 
+                                   FontSize="18" 
+                                   FontAttributes="Bold" 
+                                   TextColor="#495057"
+                                   HorizontalOptions="Start" />
+                            <Button Text="📋 Draft View" 
+                                    BackgroundColor="#28a745" 
+                                    TextColor="White"
+                                    FontSize="12"
+                                    Padding="8,6"
+                                    CornerRadius="6"
+                                    Command="{Binding GoToDraftCommand}" />
+                        </StackLayout>
+
+                        <CollectionView ItemsSource="{Binding DraftResults}">
+                            <CollectionView.ItemsLayout>
+                                <GridItemsLayout Orientation="Vertical" 
+                                               Span="2" 
+                                               HorizontalItemSpacing="10" 
+                                               VerticalItemSpacing="10" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="viewmodels:DraftSelection">
+                                    <Border BackgroundColor="#f8f9fa"
+                                            Stroke="#28a745"
+                                            StrokeThickness="1"
+                                            Padding="15"
+                                            StrokeShape="RoundRectangle 8">
+                                        <StackLayout Spacing="8">
+                                            <Label Text="{Binding Pick}"
+                                                   FontSize="12"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#28a745" />
+
+                                            <Label Text="{Binding Player.Name}"
+                                                   FontSize="14"
+                                                   FontAttributes="Bold" />
+
+                                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="5">
+                                                <StackLayout Grid.Column="0">
+                                                    <Label Text="Position" 
+                                                           FontSize="10" 
+                                                           TextColor="#6c757d" />
+                                                    <Label Text="{Binding Player.Position}" 
+                                                           FontSize="11"
+                                                           TextColor="#007bff" />
+                                                </StackLayout>
+
+                                                <StackLayout Grid.Column="1">
+                                                    <Label Text="College" 
+                                                           FontSize="10" 
+                                                           TextColor="#6c757d" />
+                                                    <Label Text="{Binding Player.College}" 
+                                                           FontSize="11" />
+                                                </StackLayout>
+
+                                                <StackLayout Grid.Column="2">
+                                                    <Label Text="Consensus" 
+                                                           FontSize="10" 
+                                                           TextColor="#6c757d" />
+                                                    <Label Text="{Binding Player.Consensus, StringFormat='#{0}'}" 
+                                                           FontSize="11" />
+                                                </StackLayout>
+                                            </Grid>
+
+                                            <StackLayout>
+                                                <ProgressBar Progress="{Binding Player.AthScore}" 
+                                                           ProgressColor="#17a2b8" 
+                                                           BackgroundColor="#e9ecef" />
+                                                <Label Text="{Binding Player.AthScore, StringFormat='Athletic Score: {0}'}" 
+                                                       FontSize="10" 
+                                                       TextColor="#6c757d" />
+                                            </StackLayout>
+                                        </StackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </StackLayout>
+
+                    <!-- Back Button -->
+                    <Button Text="Back to Teams"
+                        Command="{Binding GoBackCommand}"
+                        BackgroundColor="#6c757d"
+                        TextColor="White"
+                        FontSize="16"
+                        Padding="15"
+                        HorizontalOptions="Center" />
+
+                    <!-- Save Button -->
+                    <Button Text="💾 Save Roster" 
+                                BackgroundColor="{Binding SaveButtonColor}" 
+                                TextColor="White"
+                                FontSize="16"
+                                Padding="15"
+                                CornerRadius="8"
+                                Command="{Binding SaveRosterCommand}"
+                                IsEnabled="{Binding CanSaveRoster}" />
+
+                    <!-- Save Warning -->
+                    <Label Text="{Binding SaveWarningText}"
+                               FontSize="12"
+                               TextColor="#dc3545"
+                               HorizontalTextAlignment="Center"
+                               IsVisible="{Binding HasSaveWarning}" />
+
+                </StackLayout>
+            </StackLayout>
+        </ScrollView>
+    </Grid>
 
 </ContentPage>

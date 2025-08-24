@@ -1,8 +1,10 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.Player;
 using METCore.DTOs.Shared;
 using METCore.DTOs.Team;
+using MobileApp.Models.Shared;
 using MobileApp.Services;
 using static METCore.Enums.Types;
 
@@ -17,6 +19,7 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private IList<PositionGroup> rosterByPosition = [];
         [ObservableProperty] private decimal totalCap = 0;
         [ObservableProperty] private string positionBreakdown = string.Empty;
+
         [ObservableProperty] private IList<TradeDto>? tradeHistory = [];
         [ObservableProperty] private IList<DraftSelection>? draftResults = [];
         [ObservableProperty] private DraftDto? draft = null;
@@ -26,6 +29,30 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private bool showLoadingState = false;
         [ObservableProperty] private bool showErrorState = false;
         [ObservableProperty] private bool showContent = false;
+
+        // Formation Display Properties
+        [ObservableProperty] private string viewedFormationType = "offense";
+        [ObservableProperty] private Color offenseViewColor = Color.FromArgb("#007bff");
+        [ObservableProperty] private Color offenseViewTextColor = Colors.White;
+        [ObservableProperty] private Color defenseViewColor = Color.FromArgb("#f8f9fa");
+        [ObservableProperty] private Color defenseViewTextColor = Color.FromArgb("#6c757d");
+        [ObservableProperty] private Color specialViewColor = Color.FromArgb("#f8f9fa");
+        [ObservableProperty] private Color specialViewTextColor = Color.FromArgb("#6c757d");
+        [ObservableProperty] private string currentFormationDisplayName = "";
+        // Visibility Properties
+        [ObservableProperty] private bool isOffenseViewSelected = true;
+        [ObservableProperty] private bool isDefenseViewSelected = false;
+        [ObservableProperty] private bool isSpecialViewSelected = false;
+
+        // Pre-generated Formation Collections (Load Once)
+        public ObservableCollection<FormationDisplayPosition> OffensePositions { get; } = [];
+        public ObservableCollection<FormationDisplayPosition> DefensePositions { get; } = [];
+        public ObservableCollection<FormationDisplayPosition> SpecialPositions { get; } = [];
+        private string _offenseFormationKey = "";
+        private string _defenseFormationKey = "";
+        private string _specialFormationKey = "";
+
+        public ObservableCollection<FormationDisplayPosition> CurrentFormationPositions { get; } = [];
 
         [RelayCommand] public async Task GoToEditTeam() => await BaseService.GoToAsync(AppRoutes.EditTeam, new() { ["TeamId"] = Team.Id });
 
@@ -54,6 +81,9 @@ namespace MobileApp.Models.Team
                     TradeHistory = await tradesTask;
                     Draft = await draftTask;
                     IsOwner = Team.UserUsername == (await AccountService.GetUsernameAsync() ?? string.Empty);
+
+                    LoadAllFormationDisplays();
+                    UpdateFormationViewButtons();
                     HasLoadError = false;
                     LoadErrorMessage = string.Empty;
                 }
@@ -173,6 +203,126 @@ namespace MobileApp.Models.Team
                     }
                 }
             }
+        }
+
+        [RelayCommand]
+        public void ViewFormation(string formationType)
+        {
+            ViewedFormationType = formationType;
+            UpdateFormationViewButtons();
+            UpdateCurrentFormationName();
+        }
+
+        private void UpdateFormationViewButtons()
+        {
+            // Reset all
+            OffenseViewColor = Color.FromArgb("#f8f9fa");
+            OffenseViewTextColor = Color.FromArgb("#6c757d");
+            DefenseViewColor = Color.FromArgb("#f8f9fa");
+            DefenseViewTextColor = Color.FromArgb("#6c757d");
+            SpecialViewColor = Color.FromArgb("#f8f9fa");
+            SpecialViewTextColor = Color.FromArgb("#6c757d");
+
+            IsOffenseViewSelected = false;
+            IsDefenseViewSelected = false;
+            IsSpecialViewSelected = false;
+
+            // Set active
+            switch (ViewedFormationType)
+            {
+                case "offense":
+                    OffenseViewColor = Color.FromArgb("#007bff");
+                    OffenseViewTextColor = Colors.White;
+                    IsOffenseViewSelected = true;
+                    break;
+                case "defense":
+                    DefenseViewColor = Color.FromArgb("#007bff");
+                    DefenseViewTextColor = Colors.White;
+                    IsDefenseViewSelected = true;
+                    break;
+                case "special":
+                    SpecialViewColor = Color.FromArgb("#007bff");
+                    SpecialViewTextColor = Colors.White;
+                    IsSpecialViewSelected = true;
+                    break;
+            }
+        }
+
+        private void UpdateCurrentFormationName()
+        {
+            string formationKey = string.Empty;
+            IList<FormationInfo> formations = [];
+
+            switch (ViewedFormationType)
+            {
+                case "offense":
+                    formationKey = _offenseFormationKey;
+                    formations = FormationData.GetOffenseFormations();
+                    break;
+                case "defense":
+                    formationKey = _defenseFormationKey;
+                    formations = FormationData.GetDefenseFormations();
+                    break;
+                case "special":
+                    formationKey = _specialFormationKey;
+                    formations = FormationData.GetSpecialTeamsFormations();
+                    break;
+                default: break;
+            }
+
+            CurrentFormationDisplayName =
+                formations.FirstOrDefault(f => f.Key == formationKey) is FormationInfo formation
+                ? formation.Name
+                : "Unknown Formation";
+        }
+
+        private void LoadAllFormationDisplays()
+        {
+            _offenseFormationKey = Team?.OffLineup?.Formation ?? "Eleven";
+            _defenseFormationKey = Team?.DefLineup?.Formation ?? "FourThree";
+            _specialFormationKey = Team?.SPLineup?.Formation ?? "SpecialTeams";
+
+            GenerateFormationDisplay("offense", _offenseFormationKey, FormationData.GetOffenseFormations(), OffensePositions, Team?.OffLineup);
+            GenerateFormationDisplay("defense", _defenseFormationKey, FormationData.GetDefenseFormations(), DefensePositions, Team?.DefLineup);
+            GenerateFormationDisplay("special", _specialFormationKey, FormationData.GetSpecialTeamsFormations(), SpecialPositions, (LineupDto?)Team?.SPLineup);
+
+            UpdateCurrentFormationName();
+        }
+
+        private void GenerateFormationDisplay(string formationType, string formationKey, IList<FormationInfo> formations,
+            ObservableCollection<FormationDisplayPosition> collection, LineupDto? lineup)
+        {
+            collection.Clear();
+
+            if (formations.FirstOrDefault(f => f.Name == formationKey) is FormationInfo formation)
+                for (int i = 0; i < formation.Positions.Count; i++)
+                {
+                    var pos = formation.Positions[i];
+                    var player = Team?.Players?.FirstOrDefault(p => p.Id == GetPlayerIdFromLineup(lineup, i + 1));
+
+                    collection.Add(new FormationDisplayPosition(pos.Name, player?.Name ?? "Empty", pos.X, pos.Y, player != null));
+                }
+        }
+
+        private int GetPlayerIdFromLineup(LineupDto? lineup, int position)
+        {
+            if (lineup == null) return 0;
+
+            return position switch
+            {
+                1 => lineup.Player1,
+                2 => lineup.Player2,
+                3 => lineup.Player3,
+                4 => lineup.Player4,
+                5 => lineup.Player5,
+                6 => lineup.Player6,
+                7 => lineup.Player7,
+                8 => lineup.Player8,
+                9 => lineup.Player9,
+                10 => lineup.Player10,
+                11 => lineup.Player11,
+                _ => 0
+            };
         }
     }
 
