@@ -44,6 +44,11 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private bool isDefenseViewSelected = false;
         [ObservableProperty] private bool isSpecialViewSelected = false;
 
+        public Thickness FDylMargin => new(IsDefenseViewSelected ? 90 : 10);
+        public LayoutOptions SylVo => new(IsDefenseViewSelected ? LayoutAlignment.End : LayoutAlignment.Start, true);
+        public Thickness SylMargin => new(IsDefenseViewSelected ? 60 : 95);
+
+
         // Pre-generated Formation Collections (Load Once)
         public ObservableCollection<FormationDisplayPosition> OffensePositions { get; } = [];
         public ObservableCollection<FormationDisplayPosition> DefensePositions { get; } = [];
@@ -246,6 +251,9 @@ namespace MobileApp.Models.Team
                     IsSpecialViewSelected = true;
                     break;
             }
+            OnPropertyChanged(nameof(FDylMargin));
+            OnPropertyChanged(nameof(SylVo));
+            OnPropertyChanged(nameof(SylMargin));
         }
 
         private void UpdateCurrentFormationName()

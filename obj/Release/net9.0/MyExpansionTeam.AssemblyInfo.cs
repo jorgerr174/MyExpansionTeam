@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MyExpansionTeam")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b8412fa3633e2819ba6799ec3fcd9ea3ea2c3438")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5489767595ac7273d3cdd5e2d45fdecce9bd7c55")]
 [assembly: System.Reflection.AssemblyProductAttribute("MyExpansionTeam")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MyExpansionTeam")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

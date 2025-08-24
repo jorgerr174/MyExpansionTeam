@@ -395,9 +395,8 @@
 
                             <Grid>
                                 <!-- Yard lines -->
-                                <BoxView Color="#fff" HeightRequest="1" VerticalOptions="Start" Margin="0,60" />
-                                <BoxView Color="#fff" HeightRequest="1" VerticalOptions="Center" />
-                                <BoxView Color="#fff" HeightRequest="1" VerticalOptions="End" Margin="0,60" />
+                                <BoxView Color="Coral" HeightRequest="1" VerticalOptions="Start" Margin="{Binding FDylMargin}" />
+                                <BoxView Color="Yellow" HeightRequest="2" VerticalOptions="{Binding SylVo}" Margin="{Binding SylMargin}"/>
 
                                 <!-- Offense Formation -->
                                 <AbsoluteLayout x:Name="OffenseFormationField" IsVisible="{Binding IsOffenseViewSelected}">
@@ -444,7 +443,7 @@
                                                     HeightRequest="45"
                                                     StrokeShape="RoundRectangle 22"
                                                     AbsoluteLayout.LayoutBounds="{Binding LayoutBounds}"
-                                                    AbsoluteLayout.LayoutFlags="All">
+                                                    AbsoluteLayout.LayoutFlags="PositionProportional">
                                                 <StackLayout Spacing="1" VerticalOptions="Center" HorizontalOptions="Center">
                                                     <Label Text="{Binding PositionName}"
                                                            FontSize="8"
@@ -462,7 +461,7 @@
                                 </AbsoluteLayout>
 
                                 <!-- Special Teams Formation -->
-                                <AbsoluteLayout x:Name="SpecialFormationField">
+                                <AbsoluteLayout x:Name="SpecialFormationField" IsVisible="{Binding IsSpecialViewSelected}">
                                     <BindableLayout.ItemsSource>
                                         <Binding Path="SpecialPositions" />
                                     </BindableLayout.ItemsSource>
@@ -475,7 +474,7 @@
                                                     HeightRequest="45"
                                                     StrokeShape="RoundRectangle 22"
                                                     AbsoluteLayout.LayoutBounds="{Binding LayoutBounds}"
-                                                    AbsoluteLayout.LayoutFlags="All">
+                                                    AbsoluteLayout.LayoutFlags="PositionProportional">
                                                 <StackLayout Spacing="1" VerticalOptions="Center" HorizontalOptions="Center">
                                                     <Label Text="{Binding PositionName}"
                                                            FontSize="8"
