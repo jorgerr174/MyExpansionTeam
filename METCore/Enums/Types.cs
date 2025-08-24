@@ -1,4 +1,5 @@
-﻿using METCore.Models.Players;
+﻿using METCore.DTOs.Player;
+using METCore.Models.Players;
 
 namespace METCore.Enums
 {
@@ -384,6 +385,18 @@ namespace METCore.Enums
 
 
 
+
+            public static int GetPlayerValue(SelectableDto player)
+            {
+                PositionEnum position = Enum.TryParse(player.Position, out PositionEnum pos) ? pos : PositionEnum.ATH;
+                int age = int.TryParse(player.Age, out int edad) ? edad : 30;
+                double apy = double.TryParse(player.APY.Replace('.', ','), out double money) ? money : 0;
+
+                return (int)(player.Madden != 0 ? player.Madden : 70
+                    * GetPositionMultiplier(position)
+                    * CalculateAgeFactor(age)
+                    * CalculateContractValue(position, apy));
+            }
 
             public static int GetPlayerValue(Player player)
             {
