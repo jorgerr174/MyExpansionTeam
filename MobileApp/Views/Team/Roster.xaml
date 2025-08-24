@@ -5,7 +5,7 @@
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
              xmlns:playerDtos="clr-namespace:METCore.DTOs.Player;assembly=METCore"
              xmlns:teamDtos="clr-namespace:METCore.DTOs.Team;assembly=METCore"
-             x:Name="root"
+             x:Name="RosterPage"
              x:DataType="viewmodels:RosterViewModel"
              Title="Build Team Roster">
 
@@ -194,14 +194,6 @@
                         <StackLayout Orientation="Horizontal" 
                                      Spacing="10" 
                                      HorizontalOptions="FillAndExpand">
-                            <Button Text="🔄 New Trade" 
-                                    BackgroundColor="#17a2b8" 
-                                    TextColor="White"
-                                    FontSize="14"
-                                    Padding="12,8"
-                                    CornerRadius="6"
-                                    Command="{Binding NewTradeCommand}"
-                                    HorizontalOptions="FillAndExpand" />
                             <Button Text="🗑️ Clear All" 
                                     BackgroundColor="#dc3545" 
                                     TextColor="White"
@@ -236,8 +228,8 @@
                                                     StrokeShape="RoundRectangle 6"
                                                     Margin="0,2">
                                                 <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference root}, Path=BindingContext.SelectFranchiseCommand}"
-                                                                          CommandParameter="{Binding FranchiseInfo}" />
+                                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}},
+                                                            Path=BindingContext.SelectFranchiseCommand}" CommandParameter="{Binding FranchiseInfo}" />
                                                 </Border.GestureRecognizers>
                                                 <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
                                                     <Label Grid.Column="0"
@@ -395,9 +387,9 @@
                         <!-- Roster Players by Position -->
                         <CollectionView ItemsSource="{Binding RosterByPosition}">
                             <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="viewmodels:PositionGroup">
+                                <DataTemplate x:DataType="viewmodels:PositionGroupModel">
                                     <StackLayout Spacing="10" Margin="0,10">
-                                        <Label Text="{Binding PositionName, StringFormat='{0}'}" 
+                                        <Label Text="{Binding Position, StringFormat='{0}'}" 
                                                FontSize="14" 
                                                FontAttributes="Bold" 
                                                TextColor="#007bff" />
@@ -410,7 +402,7 @@
                                                                VerticalItemSpacing="10" />
                                             </CollectionView.ItemsLayout>
                                             <CollectionView.ItemTemplate>
-                                                <DataTemplate x:DataType="playerDtos:RosteredDto">
+                                                <DataTemplate x:DataType="viewmodels:PlayerModel">
                                                     <Border BackgroundColor="White"
                                                             Stroke="#dee2e6"
                                                             StrokeThickness="1"
@@ -418,15 +410,11 @@
                                                             StrokeShape="RoundRectangle 8">
                                                         <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="5">
                                                             <Label Grid.Row="0"
-                                                                   Text="{Binding Name}"
+                                                                   Text="{Binding Player.Name}"
                                                                    FontSize="14"
                                                                    FontAttributes="Bold" />
-                                                            <Label Grid.Row="1"
-                                                                   Text="{Binding Position}"
-                                                                   FontSize="12"
-                                                                   TextColor="#007bff" />
                                                             <Label Grid.Row="2"
-                                                                   Text="{Binding APY}"
+                                                                   Text="{Binding Player.APY}"
                                                                    FontSize="12"
                                                                    TextColor="#28a745"
                                                                    FontAttributes="Bold" />
@@ -443,148 +431,225 @@
                     </StackLayout>
 
                     <!-- Formation Tab -->
-                    <StackLayout IsVisible="{Binding IsFormationTabSelected}" Spacing="15">
+                    <StackLayout x:Name="FormationsTab" IsVisible="{Binding IsFormationTabSelected}" Spacing="15">
 
-                        <!-- Formation Type Selector -->
-                        <StackLayout Orientation="Horizontal" 
-                                 Spacing="5" 
-                                 HorizontalOptions="Center">
-                            <Button Text="Offense" 
-                                    BackgroundColor="{Binding OffenseButtonColor}"
-                                    TextColor="{Binding OffenseButtonTextColor}"
-                                    FontSize="14"
-                                    Padding="15,10"
-                                    CornerRadius="6"
-                                    Command="{Binding SelectFormationTypeCommand}"
-                                    CommandParameter="offense" />
-                            <Button Text="Defense" 
-                                    BackgroundColor="{Binding DefenseButtonColor}"
-                                    TextColor="{Binding DefenseButtonTextColor}"
-                                    FontSize="14"
-                                    Padding="15,10"
-                                    CornerRadius="6"
-                                    Command="{Binding SelectFormationTypeCommand}"
-                                    CommandParameter="defense" />
-                            <Button Text="Special" 
-                                    BackgroundColor="{Binding SpecialButtonColor}"
-                                    TextColor="{Binding SpecialButtonTextColor}"
-                                    FontSize="14"
-                                    Padding="15,10"
-                                    CornerRadius="6"
-                                    Command="{Binding SelectFormationTypeCommand}"
-                                    CommandParameter="special" />
-                        </StackLayout>
-
-                        <!-- Formation Dropdown -->
-                        <Picker ItemsSource="{Binding AvailableFormations}"
-                                SelectedItem="{Binding SelectedFormationName}"
-                                Title="Select Formation"
-                                FontSize="14"
-                                BackgroundColor="#f8f9fa" />
-
-                        <!-- Field Display -->
-                        <Border BackgroundColor="#228B22" 
-                                Stroke="#fff"
-                                StrokeThickness="2"
-                                HeightRequest="500"
-                                WidthRequest="600"
-                                Padding="10"
-                                StrokeShape="RoundRectangle 8">
-
-                            <!-- Field Lines -->
-                            <Grid>
-                                <!-- Yard lines -->
-                                <BoxView Color="#fff" HeightRequest="1" VerticalOptions="Start" Margin="0,80" />
-                                <BoxView Color="#fff" HeightRequest="1" VerticalOptions="Center" />
-                                <BoxView Color="#fff" HeightRequest="1" VerticalOptions="End" Margin="0,80" />
-
-                                <!-- Formation Positions -->
-                                <AbsoluteLayout x:Name="FormationField">
-                                    <BindableLayout.ItemsSource>
-                                        <Binding Path="FormationPositions" />
-                                    </BindableLayout.ItemsSource>
-
-                                    <BindableLayout.ItemTemplate>
-                                        <DataTemplate x:DataType="viewmodels:FormationPosition">
-                                            <Border BackgroundColor="{Binding PlayerBackgroundColor}"
-                                                    Stroke="{Binding PlayerBorderColor}"
-                                                    StrokeThickness="2"
-                                                    WidthRequest="60"
-                                                    HeightRequest="60"
-                                                    StrokeShape="RoundRectangle 30"
-                                                    AbsoluteLayout.LayoutBounds="{Binding LayoutBounds}"
-                                                    AbsoluteLayout.LayoutFlags="All">
-
-                                                <Border.GestureRecognizers>
-                                                    <TapGestureRecognizer Command="{Binding Source={x:Reference root}, Path=BindingContext.SelectPositionPlayerCommand}"
-                                                                        CommandParameter="{Binding .}" />
-                                                    <DropGestureRecognizer Drop="OnPositionDrop" />
-                                                </Border.GestureRecognizers>
-
-                                                <StackLayout Spacing="2" VerticalOptions="Center" HorizontalOptions="Center">
-                                                    <Label Text="{Binding PositionName}"
-                                                           FontSize="8"
-                                                           FontAttributes="Bold"
-                                                           TextColor="White"
-                                                           HorizontalOptions="Center" />
-                                                    <Label Text="{Binding PlayerName}"
-                                                           FontSize="9"
-                                                           TextColor="White"
-                                                           HorizontalOptions="Center"
-                                                           LineBreakMode="TailTruncation"
-                                                           MaxLines="1" />
-                                                </StackLayout>
-                                            </Border>
-                                        </DataTemplate>
-                                    </BindableLayout.ItemTemplate>
-                                </AbsoluteLayout>
-                            </Grid>
-                        </Border>
-
-                        <!-- Available Players for Drag -->
+                        <!-- Formation Display (same visual as Details view but with drag/drop) -->
                         <Border BackgroundColor="White"
                                 Stroke="#dee2e6"
                                 StrokeThickness="1"
                                 Padding="15"
                                 StrokeShape="RoundRectangle 8">
                             <StackLayout Spacing="12">
-                                <Label Text="🏈 Available Players (Drag to Position)" 
+                                <Label Text="🏈 Current Formation" 
                                        FontSize="16" 
                                        FontAttributes="Bold" 
                                        TextColor="#495057" />
 
-                                <CollectionView ItemsSource="{Binding AvailablePlayersForFormation}" 
-                                        HeightRequest="80">
-                                    <CollectionView.ItemsLayout>
-                                        <LinearItemsLayout Orientation="Horizontal" ItemSpacing="5" />
-                                    </CollectionView.ItemsLayout>
-                                    
+                                <!-- Formation Type Selector -->
+                                <StackLayout Orientation="Horizontal" 
+                                             Spacing="5" 
+                                             HorizontalOptions="Center">
+                                    <Button Text="Offense" 
+                                            BackgroundColor="{Binding OffenseViewColor}"
+                                            TextColor="{Binding OffenseViewTextColor}"
+                                            FontSize="12"
+                                            Padding="10,6"
+                                            CornerRadius="4"
+                                            Command="{Binding ViewFormationCommand}"
+                                            CommandParameter="offense" />
+                                    <Button Text="Defense" 
+                                            BackgroundColor="{Binding DefenseViewColor}"
+                                            TextColor="{Binding DefenseViewTextColor}"
+                                            FontSize="12"
+                                            Padding="10,6"
+                                            CornerRadius="4"
+                                            Command="{Binding ViewFormationCommand}"
+                                            CommandParameter="defense" />
+                                    <Button Text="Special" 
+                                            BackgroundColor="{Binding SpecialViewColor}"
+                                            TextColor="{Binding SpecialViewTextColor}"
+                                            FontSize="12"
+                                            Padding="10,6"
+                                            CornerRadius="4"
+                                            Command="{Binding ViewFormationCommand}"
+                                            CommandParameter="special" />
+                                </StackLayout>
+
+                                <!-- Current Formation Name -->
+                                <Label Text="{Binding CurrentFormationDisplayName}" 
+                   FontSize="14" 
+                   FontAttributes="Bold"
+                   TextColor="#007bff"
+                   HorizontalOptions="Center" />
+
+                                <!-- Formation Field with Drag/Drop -->
+                                <Border BackgroundColor="#228B22" 
+                    Stroke="#fff"
+                    StrokeThickness="1"
+                    HeightRequest="300"
+                    Padding="8"
+                    StrokeShape="RoundRectangle 6">
+
+                                    <Grid>
+                                        <!-- Yard lines -->
+                                        <BoxView Color="Coral" HeightRequest="1" VerticalOptions="Start" Margin="{Binding FDylMargin}" />
+                                        <BoxView Color="Yellow" HeightRequest="2" VerticalOptions="{Binding SylVo}" Margin="{Binding SylMargin}"/>
+
+                                        <!-- Offense Formation with Drag/Drop -->
+                                        <AbsoluteLayout x:Name="OffenseFormationField" IsVisible="{Binding IsOffenseViewSelected}">
+                                            <BindableLayout.ItemsSource>
+                                                <Binding Path="FormationPositions" />
+                                            </BindableLayout.ItemsSource>
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate x:DataType="viewmodels:FormationPosition">
+                                                    <Border BackgroundColor="{Binding PlayerBackgroundColor}"
+                                                            Stroke="White"
+                                                            StrokeThickness="1"
+                                                            WidthRequest="45"
+                                                            HeightRequest="45"
+                                                            StrokeShape="RoundRectangle 22"
+                                                            AbsoluteLayout.LayoutBounds="{Binding LayoutBounds}"
+                                                            AbsoluteLayout.LayoutFlags="PositionProportional">
+                                                        <Border.GestureRecognizers>
+                                                            <TapGestureRecognizer Tapped="OnPositionTapped" />
+                                                            <DropGestureRecognizer Drop="OnPositionDrop" />
+                                                        </Border.GestureRecognizers>
+
+                                                        <StackLayout Spacing="1" VerticalOptions="Center" HorizontalOptions="Center">
+                                                            <Label Text="{Binding PositionName}"
+                                                                   FontSize="8"
+                                                                   FontAttributes="Bold"
+                                                                   TextColor="White"
+                                                                   HorizontalOptions="Center" />
+                                                            <Label Text="{Binding PlayerName}"
+                                                                   FontSize="7"
+                                                                   TextColor="White"
+                                                                   HorizontalOptions="Center"
+                                                                   LineBreakMode="TailTruncation"
+                                                                   MaxLines="1" />
+                                                        </StackLayout>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </AbsoluteLayout>
+
+                                        <!-- Defense Formation with Drag/Drop -->
+                                        <AbsoluteLayout x:Name="DefenseFormationField" IsVisible="{Binding IsDefenseViewSelected}">
+                                            <BindableLayout.ItemsSource>
+                                                <Binding Path="FormationPositions" />
+                                            </BindableLayout.ItemsSource>
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate x:DataType="viewmodels:FormationPosition">
+                                                    <Border BackgroundColor="{Binding PlayerBackgroundColor}"
+                                                            Stroke="White"
+                                                            StrokeThickness="1"
+                                                            WidthRequest="45"
+                                                            HeightRequest="45"
+                                                            StrokeShape="RoundRectangle 22"
+                                                            AbsoluteLayout.LayoutBounds="{Binding LayoutBounds}"
+                                                            AbsoluteLayout.LayoutFlags="PositionProportional">
+                                                        <Border.GestureRecognizers>
+                                                            <TapGestureRecognizer Tapped="OnPositionTapped" />
+                                                            <DropGestureRecognizer Drop="OnPositionDrop" />
+                                                        </Border.GestureRecognizers>
+
+                                                        <StackLayout Spacing="1" VerticalOptions="Center" HorizontalOptions="Center">
+                                                            <Label Text="{Binding PositionName}"
+                                               FontSize="8"
+                                               FontAttributes="Bold"
+                                               TextColor="White"
+                                               HorizontalOptions="Center" />
+                                                            <Label Text="{Binding PlayerName}"
+                                               FontSize="7"
+                                               TextColor="White"
+                                               HorizontalOptions="Center"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1" />
+                                                        </StackLayout>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </AbsoluteLayout>
+
+                                        <!-- Special Teams Formation with Drag/Drop -->
+                                        <AbsoluteLayout x:Name="SpecialFormationField" IsVisible="{Binding IsSpecialViewSelected}">
+                                            <BindableLayout.ItemsSource>
+                                                <Binding Path="FormationPositions" />
+                                            </BindableLayout.ItemsSource>
+                                            <BindableLayout.ItemTemplate>
+                                                <DataTemplate x:DataType="viewmodels:FormationPosition">
+                                                    <Border BackgroundColor="{Binding PlayerBackgroundColor}"
+                                        Stroke="White"
+                                        StrokeThickness="1"
+                                        WidthRequest="45"
+                                        HeightRequest="45"
+                                        StrokeShape="RoundRectangle 22"
+                                        AbsoluteLayout.LayoutBounds="{Binding LayoutBounds}"
+                                        AbsoluteLayout.LayoutFlags="PositionProportional">
+                                                        <Border.GestureRecognizers>
+                                                            <TapGestureRecognizer Tapped="OnPositionTapped" />
+                                                            <DropGestureRecognizer Drop="OnPositionDrop" />
+                                                        </Border.GestureRecognizers>
+
+                                                        <StackLayout Spacing="1" VerticalOptions="Center" HorizontalOptions="Center">
+                                                            <Label Text="{Binding PositionName}"
+                                               FontSize="8"
+                                               FontAttributes="Bold"
+                                               TextColor="White"
+                                               HorizontalOptions="Center" />
+                                                            <Label Text="{Binding PlayerName}"
+                                               FontSize="7"
+                                               TextColor="White"
+                                               HorizontalOptions="Center"
+                                               LineBreakMode="TailTruncation"
+                                               MaxLines="1" />
+                                                        </StackLayout>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </BindableLayout.ItemTemplate>
+                                        </AbsoluteLayout>
+                                    </Grid>
+                                </Border>
+                            </StackLayout>
+                        </Border>
+
+                        <!-- Available Players for Drag (keep this existing section) -->
+                        <Border BackgroundColor="White"
+            Stroke="#dee2e6"
+            StrokeThickness="1"
+            Padding="15"
+            StrokeShape="RoundRectangle 8">
+                            <StackLayout Spacing="12">
+                                <Label Text="🏈 Available Players (Drag to Position)" 
+                   FontSize="16" 
+                   FontAttributes="Bold" 
+                   TextColor="#495057" />
+
+                                <CollectionView ItemsSource="{Binding AvailablePlayersForFormation}"
+                            ItemsLayout="VerticalGrid, 2">
                                     <CollectionView.ItemTemplate>
                                         <DataTemplate x:DataType="viewmodels:DraggablePlayer">
-                                            <Border BackgroundColor="#f8f9fa"
+                                            <Border BackgroundColor="White" 
                                                     Stroke="#dee2e6"
-                                                    StrokeThickness="1"
-                                                    WidthRequest="100"
-                                                    Padding="8"
-                                                    StrokeShape="RoundRectangle 6"
-                                                    Margin="5,0">
-
+                                                    StrokeThickness="1" 
+                                                    Padding="8" 
+                                                    Margin="2"
+                                                    StrokeShape="RoundRectangle 6">
                                                 <Border.GestureRecognizers>
                                                     <DragGestureRecognizer DragStarting="OnPlayerDragStarting" />
                                                 </Border.GestureRecognizers>
 
-                                                <StackLayout Spacing="4">
-                                                    <Label Text="{Binding Player.Player.Name}"
-                                                           FontSize="12"
+                                                <StackLayout Spacing="2">
+                                                    <Label Text="{Binding Player.Player.Name}" 
+                                                           FontSize="12" 
                                                            FontAttributes="Bold"
-                                                           TextColor="#212529"
-                                                           HorizontalOptions="Center"
-                                                           LineBreakMode="TailTruncation"
-                                                           MaxLines="1" />
-                                                    <Label Text="{Binding Player.Player.Position}"
+                                                           TextColor="#333" />
+                                                    <Label Text="{Binding Player.Player.Position}" 
                                                            FontSize="10"
-                                                           TextColor="#007bff"
-                                                           HorizontalOptions="Center" />
+                                                           TextColor="#6c757d" />
+                                                    <Label Text="{Binding Player.Player.APY}" 
+                                                           FontSize="10"
+                                                           TextColor="#007bff" />
                                                 </StackLayout>
                                             </Border>
                                         </DataTemplate>
@@ -592,6 +657,7 @@
                                 </CollectionView>
                             </StackLayout>
                         </Border>
+
                     </StackLayout>
                     
                     <!-- Trades Tab -->

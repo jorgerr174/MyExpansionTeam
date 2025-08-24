@@ -1,9 +1,12 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.Player;
 using METCore.DTOs.Team;
 using METCore.Models.Players;
+using METCore.Models.Teams;
+using Microsoft.AspNetCore.Http.Features;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
 using static METCore.Enums.Types;
@@ -70,14 +73,25 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private string saveWarningText = "";
 
         // Formation Management Properties
-        [ObservableProperty] private string selectedFormationType = "offense";
-        [ObservableProperty] private string selectedFormationName = "";
-        [ObservableProperty] private Color offenseButtonColor = Color.FromArgb("#007bff");
-        [ObservableProperty] private Color offenseButtonTextColor = Colors.White;
-        [ObservableProperty] private Color defenseButtonColor = Color.FromArgb("#f8f9fa");
-        [ObservableProperty] private Color defenseButtonTextColor = Color.FromArgb("#6c757d");
-        [ObservableProperty] private Color specialButtonColor = Color.FromArgb("#f8f9fa");
-        [ObservableProperty] private Color specialButtonTextColor = Color.FromArgb("#6c757d");
+        //[ObservableProperty] private string selectedFormationType = "offense";
+        //[ObservableProperty] private string selectedFormationName = "";
+        //[ObservableProperty] private Color offenseButtonColor = Color.FromArgb("#007bff");
+        //[ObservableProperty] private Color offenseButtonTextColor = Colors.White;
+        //[ObservableProperty] private Color defenseButtonColor = Color.FromArgb("#f8f9fa");
+        //[ObservableProperty] private Color defenseButtonTextColor = Color.FromArgb("#6c757d");
+        //[ObservableProperty] private Color specialButtonColor = Color.FromArgb("#f8f9fa");
+        //[ObservableProperty] private Color specialButtonTextColor = Color.FromArgb("#6c757d");
+        [ObservableProperty] private string viewedFormationType = "offense";
+        [ObservableProperty] private Color offenseViewColor = Color.FromArgb("#007bff");
+        [ObservableProperty] private Color offenseViewTextColor = Colors.White;
+        [ObservableProperty] private Color defenseViewColor = Color.FromArgb("#f8f9fa");
+        [ObservableProperty] private Color defenseViewTextColor = Color.FromArgb("#6c757d");
+        [ObservableProperty] private Color specialViewColor = Color.FromArgb("#f8f9fa");
+        [ObservableProperty] private Color specialViewTextColor = Color.FromArgb("#6c757d");
+        [ObservableProperty] private string currentFormationDisplayName = "";
+        [ObservableProperty] private bool isOffenseViewSelected = true;
+        [ObservableProperty] private bool isDefenseViewSelected = false;
+        [ObservableProperty] private bool isSpecialViewSelected = false;
 
         // Collections
         public ObservableCollection<FranchiseModel> Franchises { get; } = [];
@@ -89,6 +103,10 @@ namespace MobileApp.Models.Team
         public ObservableCollection<FormationPosition> FormationPositions { get; } = [];
         public ObservableCollection<DraggablePlayer> AvailablePlayersForFormation { get; } = [];
         // Formation Data Storage
+        public Thickness FDylMargin => new(IsDefenseViewSelected ? 90 : 10);
+        public LayoutOptions SylVo => new(IsDefenseViewSelected ? LayoutAlignment.End : LayoutAlignment.Start, true);
+        public Thickness SylMargin => new(IsDefenseViewSelected ? 60 : 95);
+
         private LineupDto _offenseLineup = new();
         private LineupDto _defenseLineup = new();
         private SPLineupDto _specialLineup = new();
@@ -229,12 +247,34 @@ namespace MobileApp.Models.Team
                     ReviewTabTextColor = Color.FromArgb("#007bff");
                     TabIndicatorPosition = 70;
                     LoadRosterDisplay();
+                    OnPropertyChanged(nameof(RosterByPosition));
                     break;
                 case "formation":
                     IsFormationTabSelected = true;
                     FormationTabColor = Colors.White;
                     FormationTabTextColor = Color.FromArgb("#007bff");
                     TabIndicatorPosition = 140;
+                    IsOffenseViewSelected = false;
+                    IsDefenseViewSelected = false;
+                    IsSpecialViewSelected = false;
+                    switch (ViewedFormationType)
+                    {
+                        case "offense":
+                            OffenseViewColor = Color.FromArgb("#007bff");
+                            OffenseViewTextColor = Colors.White;
+                            IsOffenseViewSelected = true;
+                            break;
+                        case "defense":
+                            DefenseViewColor = Color.FromArgb("#007bff");
+                            DefenseViewTextColor = Colors.White;
+                            IsDefenseViewSelected = true;
+                            break;
+                        case "special":
+                            SpecialViewColor = Color.FromArgb("#007bff");
+                            SpecialViewTextColor = Colors.White;
+                            IsSpecialViewSelected = true;
+                            break;
+                    }
                     if (!_formationData.Any())
                     {
                         LoadFormationData();
@@ -244,6 +284,9 @@ namespace MobileApp.Models.Team
                     }
                     else
                         LoadFormationPositions(); // Just refresh positions if already loaded
+                    OnPropertyChanged(nameof(FDylMargin));
+                    OnPropertyChanged(nameof(SylVo));
+                    OnPropertyChanged(nameof(SylMargin));
                     break;
                 case "trades":
                     TradeHistory = await _teamService.GetTeamTradesAsync(Team?.Id ?? 0) ?? [];
@@ -368,40 +411,37 @@ namespace MobileApp.Models.Team
             UpdateFranchisesCounts();
         }
 
-        private void LoadRosterDisplay()
+        public void LoadRosterDisplay()
         {
             try
             {
                 // Build roster display from cached data
-                var allRosterPlayers = new List<PlayerModel>();
-
-                foreach (var cacheEntry in _franchisePlayersCache)
+                IList<SelectableDto> rosterPlayers = [];
+                for (int i = 1; i < 33; i++)
                 {
-                    var rosterPlayers = cacheEntry.Value.Where(p => _rosterPlayerIds.Contains(p.Id));
-                    foreach (var player in rosterPlayers)
-                    {
-                        allRosterPlayers.Add(new(player,
-                            _tradedPlayerIds.Contains(player.Id),
-                            _protectedPlayerIds.Contains(player.Id),
-                            true)); // All are selected in roster view
-                    }
+                    rosterPlayers =
+                        rosterPlayers.Concat(
+                        _franchisePlayersCache.TryGetValue(i, out IList<SelectableDto> list)
+                        ? list : Team.Players.Where(p => p.FranchiseId == i).ToList())
+                        .ToList();
                 }
+                rosterPlayers = rosterPlayers.Concat(Team.Players.Where(p => p.FranchiseId == 0)).ToList();
 
-                // Group by position and apply filter
+                IList<PlayerModel> allRosterPlayers = [];
+                foreach (SelectableDto player in rosterPlayers)
+                    allRosterPlayers.Add(new PlayerModel(player, false, _protectedPlayerIds.Contains(player.Id), true));
+
                 var filteredPlayers = SelectedReviewPositionFilter == "All"
                     ? allRosterPlayers
                     : allRosterPlayers.Where(p => p.Player.Position == SelectedReviewPositionFilter);
 
                 var playersByPosition = filteredPlayers
                     .GroupBy(p => p.Player.Position)
-                    .OrderBy(g => g.Key)
                     .ToList();
 
                 RosterByPosition.Clear();
                 foreach (var group in playersByPosition)
-                {
                     RosterByPosition.Add(new([.. group.OrderBy(p => p.Player.Name)]));
-                }
 
                 RosterCountText = $"{allRosterPlayers.Count} players";
             }
@@ -578,7 +618,7 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         public void SelectFormationType(string formationType)
         {
-            SelectedFormationType = formationType;
+            ViewedFormationType = formationType;
             UpdateFormationTypeButtons();
             LoadAvailableFormations();
         }
@@ -618,21 +658,17 @@ namespace MobileApp.Models.Team
             }
         }
 
-        [RelayCommand]
-        public void DropPlayer(FormationPosition position)
+        public void DropPlayer(FormationPosition position, DraggablePlayer player)
         {
-            if (_draggedPlayer == null) return;
-
             // Check if player is eligible for this position
-            if (!IsPlayerEligibleForPosition(_draggedPlayer.Player, position.RequiredPosition))
+            if (!IsPlayerEligibleForPosition(player.Player, position.RequiredPosition))
             {
                 Shell.Current.DisplayAlert("Invalid Position",
-                    $"{_draggedPlayer.Player.Player.Name} cannot play {position.RequiredPosition}", "OK");
+                    $"{player.Player.Player.Name} cannot play {position.RequiredPosition}", "OK");
                 return;
             }
 
-            AssignPlayerToPosition(_draggedPlayer, position);
-            _draggedPlayer = null;
+            AssignPlayerToPosition(player, position);
         }
 
         [RelayCommand]
@@ -654,79 +690,45 @@ namespace MobileApp.Models.Team
 
         private void LoadCurrentLineups()
         {
-            if (Team?.OffLineup != null)
-            {
-                _offenseLineup = new LineupDto
-                {
-                    Formation = Team.OffLineup.Formation,
-                    Player1 = Team.OffLineup.Player1,
-                    Player2 = Team.OffLineup.Player2,
-                    Player3 = Team.OffLineup.Player3,
-                    Player4 = Team.OffLineup.Player4,
-                    Player5 = Team.OffLineup.Player5,
-                    Player6 = Team.OffLineup.Player6,
-                    Player7 = Team.OffLineup.Player7,
-                    Player8 = Team.OffLineup.Player8,
-                    Player9 = Team.OffLineup.Player9,
-                    Player10 = Team.OffLineup.Player10,
-                    Player11 = Team.OffLineup.Player11
-                };
+            if (Team is not TeamDto) return;
 
-                _defenseLineup = new LineupDto
-                {
-                    Formation = Team.DefLineup?.Formation ?? "FourThree",
-                    Player1 = Team.DefLineup?.Player1 ?? 0,
-                    Player2 = Team.DefLineup?.Player2 ?? 0,
-                    Player3 = Team.DefLineup?.Player3 ?? 0,
-                    Player4 = Team.DefLineup?.Player4 ?? 0,
-                    Player5 = Team.DefLineup?.Player5 ?? 0,
-                    Player6 = Team.DefLineup?.Player6 ?? 0,
-                    Player7 = Team.DefLineup?.Player7 ?? 0,
-                    Player8 = Team.DefLineup?.Player8 ?? 0,
-                    Player9 = Team.DefLineup?.Player9 ?? 0,
-                    Player10 = Team.DefLineup?.Player10 ?? 0,
-                    Player11 = Team.DefLineup?.Player11 ?? 0
-                };
-            }
+            _offenseLineup = 
+                Team.OffLineup is LineupDto olineup && !String.IsNullOrWhiteSpace(olineup.Formation)
+                ? olineup : new() { Formation = "ZeroOne" };
 
-            if (Team?.SPLineup != null)
-            {
-                _specialLineup = new SPLineupDto
-                {
-                    Formation = Team.SPLineup.Formation,
-                    Player1 = Team.SPLineup.Player1,
-                    Player2 = Team.SPLineup.Player2,
-                    Player3 = Team.SPLineup.Player3,
-                    Player4 = Team.SPLineup.Player4,
-                    Player5 = Team.SPLineup.Player5
-                };
-            }
+            _defenseLineup = 
+                Team.DefLineup is LineupDto dlineup && !String.IsNullOrWhiteSpace(dlineup.Formation)
+                ? dlineup : new() { Formation = "Bear" };
+
+            _specialLineup = 
+                Team.SPLineup is SPLineupDto splineup && !String.IsNullOrWhiteSpace(splineup.Formation)
+                ? splineup : new() { Formation = "SpecialTeams" };
         }
 
         private void UpdateFormationTypeButtons()
         {
             // Reset all colors
-            OffenseButtonColor = Color.FromArgb("#f8f9fa");
-            OffenseButtonTextColor = Color.FromArgb("#6c757d");
-            DefenseButtonColor = Color.FromArgb("#f8f9fa");
-            DefenseButtonTextColor = Color.FromArgb("#6c757d");
-            SpecialButtonColor = Color.FromArgb("#f8f9fa");
-            SpecialButtonTextColor = Color.FromArgb("#6c757d");
+            OffenseViewColor = Color.FromArgb("#f8f9fa");
+            OffenseViewTextColor = Color.FromArgb("#6c757d");
+            DefenseViewColor = Color.FromArgb("#f8f9fa");
+            DefenseViewTextColor = Color.FromArgb("#6c757d");
+            SpecialViewColor = Color.FromArgb("#f8f9fa");
+            SpecialViewTextColor = Color.FromArgb("#6c757d");
 
             // Set active button
-            switch (SelectedFormationType)
+            switch (ViewedFormationType)
             {
                 case "offense":
-                    OffenseButtonColor = Color.FromArgb("#007bff");
-                    OffenseButtonTextColor = Colors.White;
+                    OffenseViewColor = Color.FromArgb("#007bff");
+                    OffenseViewTextColor = Colors.White;
                     break;
                 case "defense":
-                    DefenseButtonColor = Color.FromArgb("#007bff");
-                    DefenseButtonTextColor = Colors.White;
+                    DefenseViewColor = Color.FromArgb("#007bff");
+                    DefenseViewTextColor = Colors.White;
                     break;
                 case "special":
-                    SpecialButtonColor = Color.FromArgb("#007bff");
-                    SpecialButtonTextColor = Colors.White;
+                    SpecialViewColor = Color.FromArgb("#007bff");
+                    SpecialViewTextColor = Colors.White;
                     break;
             }
         }
@@ -735,9 +737,9 @@ namespace MobileApp.Models.Team
         {
             AvailableFormations.Clear();
 
-            if (_formationData.ContainsKey(SelectedFormationType))
+            if (_formationData.ContainsKey(ViewedFormationType))
             {
-                foreach (var formation in _formationData[SelectedFormationType].Values)
+                foreach (var formation in _formationData[ViewedFormationType].Values)
                 {
                     AvailableFormations.Add(formation.Name);
                 }
@@ -746,7 +748,7 @@ namespace MobileApp.Models.Team
                 if (AvailableFormations.Any())
                 {
                     var currentFormation = GetCurrentFormationName();
-                    SelectedFormationName = AvailableFormations.Contains(currentFormation)
+                    CurrentFormationDisplayName = AvailableFormations.Contains(currentFormation)
                         ? currentFormation
                         : AvailableFormations.First();
                 }
@@ -757,7 +759,7 @@ namespace MobileApp.Models.Team
 
         private string GetCurrentFormationName()
         {
-            return SelectedFormationType switch
+            return ViewedFormationType switch
             {
                 "offense" => _offenseLineup.Formation ?? "Eleven",
                 "defense" => _defenseLineup.Formation ?? "FourThree",
@@ -769,22 +771,35 @@ namespace MobileApp.Models.Team
         private void LoadFormationPositions()
         {
             FormationPositions.Clear();
-
-            if (!_formationData.ContainsKey(SelectedFormationType)) return;
-
-            var selectedFormation = _formationData[SelectedFormationType].Values
-                .FirstOrDefault(f => f.Name == SelectedFormationName);
-
-            if (selectedFormation?.Positions == null) return;
-
-            for (int i = 0; i < selectedFormation.Positions.Count; i++)
+            SPLineupDto lineup = null;
+            IList<FormationInfo> formations = [];
+            switch (ViewedFormationType)
             {
-                var pos = selectedFormation.Positions[i];
-                var formationPos = new FormationPosition(
-                    pos.Id, pos.Name, pos.Position, pos.X, pos.Y, i + 1);
+                case "offense":
+                    lineup = _offenseLineup;
+                    formations = FormationData.GetOffenseFormations();
+                    break;
+                case "defense":
+                    lineup = _defenseLineup;
+                    formations = FormationData.GetDefenseFormations();
+                    break;
+                case "special":
+                    lineup = _specialLineup;
+                    formations = FormationData.GetSpecialTeamsFormations();
+                    break;
+                default: break;
+            }
 
-                // Assign current player if exists
-                var currentPlayerId = GetCurrentPlayerForPosition(i + 1);
+            if (lineup is SPLineupDto && String.IsNullOrWhiteSpace(lineup.Formation) && formations.Any()) return;
+            FormationInfo formation = formations.FirstOrDefault(f => f.Key == lineup.Formation);
+            if (formation is not FormationInfo || !formation.Positions.Any()) return;
+
+            for (int i = 0; i < formation.Positions.Count; i++)
+            {
+                var pos = formation.Positions[i];
+                FormationPosition formationPos = new(pos.Id, pos.Name, pos.Position, pos.X, pos.Y, i + 1);
+
+                var currentPlayerId = GetLineupPlayerByIndex(lineup, i+1);
                 if (currentPlayerId > 0)
                 {
                     var player = FindRosterPlayerById(currentPlayerId);
@@ -797,20 +812,10 @@ namespace MobileApp.Models.Team
             LoadAvailablePlayersForFormation();
         }
 
-        private int GetCurrentPlayerForPosition(int position)
+        private static int GetLineupPlayerByIndex(SPLineupDto splineup, int index)
         {
-            return SelectedFormationType switch
-            {
-                "offense" => GetLineupPlayerByIndex(_offenseLineup, position),
-                "defense" => GetLineupPlayerByIndex(_defenseLineup, position),
-                "special" => GetSPLineupPlayerByIndex(_specialLineup, position),
-                _ => 0
-            };
-        }
-
-        private static int GetLineupPlayerByIndex(LineupDto lineup, int index)
-        {
-            return index switch
+            return splineup is LineupDto lineup
+                ? index switch
             {
                 1 => lineup.Player1,
                 2 => lineup.Player2,
@@ -824,53 +829,61 @@ namespace MobileApp.Models.Team
                 10 => lineup.Player10,
                 11 => lineup.Player11,
                 _ => 0
-            };
-        }
-
-        private static int GetSPLineupPlayerByIndex(SPLineupDto lineup, int index)
-        {
-            return index switch
+            }
+            : index switch
             {
-                1 => lineup.Player1,
-                2 => lineup.Player2,
-                3 => lineup.Player3,
-                4 => lineup.Player4,
-                5 => lineup.Player5,
+                1 => splineup.Player1,
+                2 => splineup.Player2,
+                3 => splineup.Player3,
+                4 => splineup.Player4,
+                5 => splineup.Player5,
                 _ => 0
             };
         }
 
         private PlayerModel? FindRosterPlayerById(int playerId)
         {
-            foreach (var cache in _franchisePlayersCache.Values)
-            {
-                var player = cache.FirstOrDefault(p => p.Id == playerId && _rosterPlayerIds.Contains(p.Id));
-                if (player != null)
-                    return new PlayerModel(player, false, false, true);
-            }
-            return null;
+            PlayerModel model = null;
+
+            if (Team is null) return null;
+            if(Team.Players.FirstOrDefault(player => player.Id == playerId) is SelectableDto p)
+                model = new(p, false, false, true);
+            if(_franchisePlayersCache.SelectMany(f => f.Value).ToList().FirstOrDefault(player => player.Id == playerId) is SelectableDto p2)
+                model = new(p2, false, false, true);
+
+            return model;
         }
 
         private void LoadAvailablePlayersForFormation()
         {
             AvailablePlayersForFormation.Clear();
 
-            // Get all roster players
-            var rosterPlayers = new List<PlayerModel>();
-            foreach (var cache in _franchisePlayersCache.Values)
+            SPLineupDto lineup = ViewedFormationType switch
             {
-                var players = cache.Where(p => _rosterPlayerIds.Contains(p.Id));
-                foreach (var player in players)
-                {
-                    rosterPlayers.Add(new PlayerModel(player, false, false, true));
-                }
-            }
+                "offense" => _offenseLineup,
+                "defense" => _defenseLineup,
+                "special" => _specialLineup,
+                _ => null,
+            };
 
-            // Convert to draggable players
-            foreach (var player in rosterPlayers.OrderBy(p => p.Player.Position).ThenBy(p => p.Player.Name))
+
+            if (Team is null) return;
+
+            IList<SelectableDto> rosterPlayers = [];
+            for (int i = 1; i < 33; i++)
             {
-                AvailablePlayersForFormation.Add(new DraggablePlayer(player));
+                rosterPlayers = 
+                    [
+                        .. rosterPlayers,
+                        .. (_franchisePlayersCache.TryGetValue(i, out IList<SelectableDto> list)
+                        ? list.Where(p => _rosterPlayerIds.Contains(p.Id)) : Team.Players.Where(p => p.FranchiseId == i)).ToList(),
+                    ];
             }
+            rosterPlayers = rosterPlayers.Concat(Team.Players.Where(p => p.FranchiseId == 0)).ToList();
+            IList<int> formationIds = GetAllIdsInLineup(lineup);
+
+            foreach (var player in rosterPlayers.Where(p => !formationIds.Contains(p.Id)).ToList())
+                AvailablePlayersForFormation.Add(new DraggablePlayer(new PlayerModel(player, false, false, true)));
         }
 
         private List<DraggablePlayer> GetEligiblePlayersForPosition(string requiredPosition)
@@ -935,7 +948,7 @@ namespace MobileApp.Models.Team
 
         private void SetCurrentPlayerForPosition(int position, int playerId)
         {
-            switch (SelectedFormationType)
+            switch (ViewedFormationType)
             {
                 case "offense":
                     SetLineupPlayerByIndex(_offenseLineup, position, playerId);
@@ -947,6 +960,15 @@ namespace MobileApp.Models.Team
                     SetSPLineupPlayerByIndex(_specialLineup, position, playerId);
                     break;
             }
+        }
+
+        private static IList<int> GetAllIdsInLineup(SPLineupDto splineup)
+        {
+            IList<int> list = [ splineup.Player1, splineup.Player2, splineup.Player3, splineup.Player4, splineup.Player5 ];
+            if(splineup is LineupDto lineup)
+                list = [.. list, lineup.Player6, lineup.Player7, lineup.Player8, lineup.Player9, lineup.Player10, lineup.Player11];
+
+            return list;
         }
 
         private static void SetLineupPlayerByIndex(LineupDto lineup, int index, int playerId)
@@ -977,6 +999,75 @@ namespace MobileApp.Models.Team
                 case 4: lineup.Player4 = playerId; break;
                 case 5: lineup.Player5 = playerId; break;
             }
+        }
+
+
+        [RelayCommand]
+        public void ViewFormation(string formationType)
+        {
+            ViewedFormationType = formationType;
+            LoadFormationPositions();
+            UpdateFormationViewColors();
+            UpdateCurrentFormationName();
+        }
+
+        private void UpdateFormationViewColors()
+        {
+            // Reset all to inactive
+            OffenseViewColor = Color.FromArgb("#f8f9fa");
+            OffenseViewTextColor = Color.FromArgb("#6c757d");
+            DefenseViewColor = Color.FromArgb("#f8f9fa");
+            DefenseViewTextColor = Color.FromArgb("#6c757d");
+            SpecialViewColor = Color.FromArgb("#f8f9fa");
+            SpecialViewTextColor = Color.FromArgb("#6c757d");
+
+            IsOffenseViewSelected = false;
+            IsDefenseViewSelected = false;
+            IsSpecialViewSelected = false;
+
+            // Set active
+            switch (ViewedFormationType)
+            {
+                case "offense":
+                    OffenseViewColor = Color.FromArgb("#007bff");
+                    OffenseViewTextColor = Colors.White;
+                    IsOffenseViewSelected = true;
+                    break;
+                case "defense":
+                    DefenseViewColor = Color.FromArgb("#007bff");
+                    DefenseViewTextColor = Colors.White;
+                    IsDefenseViewSelected = true;
+                    break;
+                case "special":
+                    SpecialViewColor = Color.FromArgb("#007bff");
+                    SpecialViewTextColor = Colors.White;
+                    IsSpecialViewSelected = true;
+                    break;
+            }
+        }
+
+        private void UpdateCurrentFormationName()
+        {
+            string formationKey = string.Empty;
+            IList<FormationInfo> formations = [];
+
+            switch (ViewedFormationType)
+            {
+                case "offense":
+                    formationKey = currentFormationDisplayName;
+                    formations = FormationData.GetOffenseFormations();
+                    break;
+                case "defense":
+                    formationKey = CurrentFormationDisplayName;
+                    formations = FormationData.GetDefenseFormations();
+                    break;
+                case "special":
+                    formationKey = CurrentFormationDisplayName;
+                    formations = FormationData.GetSpecialTeamsFormations();
+                    break;
+            }
+
+            CurrentFormationDisplayName = formations.FirstOrDefault(f => f.Key == formationKey)?.Name ?? "Unknown Formation";
         }
     }
 }
