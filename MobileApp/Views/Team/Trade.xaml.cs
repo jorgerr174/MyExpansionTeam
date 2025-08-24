@@ -3,12 +3,10 @@
 namespace MobileApp.Views.Team
 {
     [QueryProperty(nameof(TeamId), "teamId")]
-    [QueryProperty(nameof(Context), "context")]
     [QueryProperty(nameof(CurrentPick), "currentPick")]
     public partial class Trade : ContentPage
     {
         public int TeamId { get; set; }
-        public string Context { get; set; } = "roster";
         public int CurrentPick { get; set; } = -1;
 
         public Trade(TradeViewModel viewModel)
@@ -21,9 +19,7 @@ namespace MobileApp.Views.Team
         {
             base.OnAppearing();
             if (BindingContext is TradeViewModel viewModel)
-            {
-                await viewModel.InitializeTradeAsync(TeamId, Context, CurrentPick);
-            }
+                viewModel.LoadTrade(TeamId, CurrentPick);
         }
     }
 }
