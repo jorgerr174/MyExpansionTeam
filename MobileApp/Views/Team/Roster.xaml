@@ -766,6 +766,7 @@
                                     FontSize="12"
                                     Padding="8,6"
                                     CornerRadius="6"
+                                    IsVisible="{Binding NotHasDraft}"
                                     Command="{Binding GoToDraftCommand}" />
                         </StackLayout>
 

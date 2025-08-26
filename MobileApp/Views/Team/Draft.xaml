@@ -13,165 +13,207 @@
         </Grid.RowDefinitions>
 
         <!-- Pre-Draft Setup -->
-        <StackLayout Grid.Row="0" 
+        <ScrollView>
+            <StackLayout Grid.Row="0" 
                      IsVisible="{Binding ShowDraftSettings}" 
                      Padding="20" 
                      Spacing="20">
 
-            <!-- Team Header -->
-            <Border BackgroundColor="#007bff" 
-                    Padding="20"
-                    StrokeShape="RoundRectangle 12">
-                <StackLayout Spacing="5">
-                    <Label Text="{Binding TeamName}" 
-                           FontSize="24" 
-                           FontAttributes="Bold"
-                           TextColor="White"
-                           HorizontalOptions="Center" />
-                    <Label Text="NFL Draft Simulation" 
-                           FontSize="16"
-                           TextColor="White"
-                           HorizontalOptions="Center" />
-                </StackLayout>
-            </Border>
-
-            <!-- Draft Method Selection -->
-            <Border BackgroundColor="White"
-                    Stroke="#dee2e6"
-                    StrokeThickness="1"
-                    Padding="20"
-                    StrokeShape="RoundRectangle 8">
-                <StackLayout Spacing="15">
-                    <Label Text="Draft Control Method" 
-                           FontSize="18" 
-                           FontAttributes="Bold"
-                           TextColor="#495057"
-                           HorizontalOptions="Center" />
-
-                    <StackLayout Spacing="10">
-                        <Border BackgroundColor="#f8f9fa" 
-                                Padding="15" 
-                                StrokeShape="RoundRectangle 6">
-                            <StackLayout>
-                                <StackLayout Orientation="Horizontal" Spacing="10">
-                                    <RadioButton x:Name="ManualRadio"
-                                                 IsChecked="{Binding IsManualDraft}"
-                                                 GroupName="DraftMethod" />
-                                    <Label Text="Manual Draft" 
-                                           FontSize="16"
-                                           FontAttributes="Bold"
-                                           VerticalOptions="Center" />
-                                </StackLayout>
-                                <Label Text="You control all your team's picks manually"
-                                       FontSize="14"
-                                       TextColor="#6c757d"
-                                       Margin="30,0,0,0" />
-                            </StackLayout>
-                        </Border>
-
-                        <Border BackgroundColor="#f8f9fa" 
-                                Padding="15" 
-                                StrokeShape="RoundRectangle 6">
-                            <StackLayout>
-                                <StackLayout Orientation="Horizontal" Spacing="10">
-                                    <RadioButton x:Name="AutoRadio"
-                                                 IsChecked="{Binding IsAutoDraft}"
-                                                 GroupName="DraftMethod" />
-                                    <Label Text="Auto Draft" 
-                                           FontSize="16"
-                                           FontAttributes="Bold"
-                                           VerticalOptions="Center" />
-                                </StackLayout>
-                                <Label Text="CPU controls all picks automatically"
-                                       FontSize="14"
-                                       TextColor="#6c757d"
-                                       Margin="30,0,0,0" />
-                            </StackLayout>
-                        </Border>
-
-                        <Border BackgroundColor="#f8f9fa" 
-                                Padding="15" 
-                                StrokeShape="RoundRectangle 6">
-                            <StackLayout>
-                                <StackLayout Orientation="Horizontal" Spacing="10">
-                                    <RadioButton x:Name="MultipleRadio"
-                                                 IsChecked="{Binding IsMultipleDraft}"
-                                                 GroupName="DraftMethod" />
-                                    <Label Text="Multiple Teams" 
-                                           FontSize="16"
-                                           FontAttributes="Bold"
-                                           VerticalOptions="Center" />
-                                </StackLayout>
-                                <Label Text="Control multiple teams during the draft"
-                                       FontSize="14"
-                                       TextColor="#6c757d"
-                                       Margin="30,0,0,0" />
-                            </StackLayout>
-                        </Border>
+                <!-- Team Header -->
+                <Border BackgroundColor="#007bff" 
+                        Padding="20"
+                        StrokeShape="RoundRectangle 12">
+                    <StackLayout Spacing="5">
+                        <Label Text="{Binding TeamName}" 
+                               FontSize="24" 
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               HorizontalOptions="Center" />
+                        <Label Text="NFL Draft Simulation" 
+                               FontSize="16"
+                               TextColor="White"
+                               HorizontalOptions="Center" />
                     </StackLayout>
-                </StackLayout>
-            </Border>
+                </Border>
 
-            <!-- Franchise Selection (Visible only for Multiple Teams) -->
-            <Border BackgroundColor="White"
-                    Stroke="#dee2e6"
-                    StrokeThickness="1"
-                    Padding="20"
-                    StrokeShape="RoundRectangle 8"
-                    IsVisible="{Binding IsMultipleDraft}">
-                <StackLayout Spacing="15">
-                    <Label Text="Select Additional Franchises to Control" 
-                           FontSize="16" 
-                           FontAttributes="Bold"
-                           TextColor="#495057"
-                           HorizontalOptions="Center" />
+                <!-- Rounds Selection -->
+                <Border BackgroundColor="White"
+                        Stroke="#dee2e6"
+                        StrokeThickness="1"
+                        Padding="20"
+                        StrokeShape="RoundRectangle 8">
+                    <StackLayout Spacing="10">
+                        <Label Text="Number of Rounds to Control" 
+                                    FontSize="16" 
+                                    FontAttributes="Bold"
+                                    TextColor="#495057"
+                                    HorizontalOptions="Center" />
+                        <Label Text="Remaining rounds will be auto-simulated"
+                               FontSize="12"
+                               TextColor="#6c757d"
+                               HorizontalOptions="Center" />
+                        <Entry Text="{Binding ManualRounds}" 
+                                Placeholder="Enter rounds (1-7)"
+                                Keyboard="Numeric"
+                                HorizontalOptions="Center"
+                                WidthRequest="100" />
+                    </StackLayout>
+                </Border>
 
-                    <CollectionView ItemsSource="{Binding AvailableFranchises}"
-                                    SelectionMode="None">
-                        <CollectionView.ItemsLayout>
-                            <GridItemsLayout Orientation="Vertical" 
-                                             Span="2" 
-                                             VerticalItemSpacing="5"
-                                             HorizontalItemSpacing="5" />
-                        </CollectionView.ItemsLayout>
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="viewmodels:FranchiseItem">
-                                <Border BackgroundColor="{Binding SelectionColor}"
-                                        Stroke="{Binding SelectionBorderColor}"
-                                        StrokeThickness="2"
-                                        Padding="10"
-                                        StrokeShape="RoundRectangle 6">
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer Command="{Binding Source={x:Reference DraftPage}, Path=BindingContext.ToggleFranchiseSelectionCommand}"
-                                                              CommandParameter="{Binding .}" />
-                                    </Border.GestureRecognizers>
-                                    <StackLayout Spacing="2">
-                                        <Label Text="{Binding Name}" 
-                                               FontSize="12"
+                <!-- Trade Availability Toggle -->
+                <Border BackgroundColor="White"
+                        Stroke="#dee2e6"
+                        StrokeThickness="1"
+                        Padding="20"
+                        StrokeShape="RoundRectangle 8">
+                    <StackLayout Orientation="Horizontal" 
+                                 Spacing="15"
+                                 HorizontalOptions="Center">
+                        <CheckBox IsChecked="{Binding AllowTrades}" />
+                        <Label Text="Enable trading during draft" 
+                               FontSize="16"
+                               VerticalOptions="Center" />
+                    </StackLayout>
+                </Border>
+                
+                <!-- Draft Method Selection -->
+                <Border BackgroundColor="White"
+                        Stroke="#dee2e6"
+                        StrokeThickness="1"
+                        Padding="20"
+                        StrokeShape="RoundRectangle 8">
+                    <StackLayout Spacing="15">
+                        <Label Text="Draft Control Method" 
+                               FontSize="18" 
+                               FontAttributes="Bold"
+                               TextColor="#495057"
+                               HorizontalOptions="Center" />
+
+                        <StackLayout Spacing="10">
+                            <Border BackgroundColor="#f8f9fa" 
+                                    Padding="15" 
+                                    StrokeShape="RoundRectangle 6">
+                                <StackLayout>
+                                    <StackLayout Orientation="Horizontal" Spacing="10">
+                                        <RadioButton x:Name="AutoRadio"
+                                                     IsChecked="{Binding IsAutoDraft}"
+                                                     GroupName="DraftMethod" />
+                                        <Label Text="Auto Draft" 
+                                               FontSize="16"
                                                FontAttributes="Bold"
-                                               HorizontalOptions="Center" />
-                                        <Label Text="{Binding Abbreviation}" 
-                                               FontSize="10"
-                                               TextColor="#6c757d"
-                                               HorizontalOptions="Center" />
+                                               VerticalOptions="Center" />
                                     </StackLayout>
-                                </Border>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </StackLayout>
-            </Border>
+                                    <Label Text="CPU controls all picks automatically"
+                                           FontSize="14"
+                                           TextColor="#6c757d"
+                                           Margin="30,0,0,0" />
+                                </StackLayout>
+                            </Border>
 
-            <!-- Start Draft Button -->
-            <Button Text="Start Draft"
-                    BackgroundColor="#28a745"
-                    TextColor="White"
-                    FontSize="18"
-                    FontAttributes="Bold"
-                    Padding="15"
-                    Command="{Binding StartDraftCommand}"
-                    CornerRadius="8" />
-        </StackLayout>
+                            <Border BackgroundColor="#f8f9fa" 
+                                    Padding="15" 
+                                    StrokeShape="RoundRectangle 6">
+                                <StackLayout>
+                                    <StackLayout Orientation="Horizontal" Spacing="10">
+                                        <RadioButton x:Name="ManualRadio"
+                                                     IsChecked="{Binding IsOnlyTeam}"
+                                                     GroupName="DraftMethod" />
+                                        <Label Text="Manual Draft" 
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               VerticalOptions="Center" />
+                                    </StackLayout>
+                                    <Label Text="You control only you team's picks"
+                                           FontSize="14"
+                                           TextColor="#6c757d"
+                                           Margin="30,0,0,0" />
+                                </StackLayout>
+                            </Border>
+
+                            <Border BackgroundColor="#f8f9fa" 
+                                    Padding="15" 
+                                    StrokeShape="RoundRectangle 6">
+                                <StackLayout>
+                                    <StackLayout Orientation="Horizontal" Spacing="10">
+                                        <RadioButton x:Name="MultipleRadio"
+                                                     IsChecked="{Binding IsMultipleDraft}"
+                                                     GroupName="DraftMethod" />
+                                        <Label Text="Multiple Teams" 
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               VerticalOptions="Center" />
+                                    </StackLayout>
+                                    <Label Text="Control multiple teams during the draft"
+                                           FontSize="14"
+                                           TextColor="#6c757d"
+                                           Margin="30,0,0,0" />
+                                </StackLayout>
+                            </Border>
+                        </StackLayout>
+                    </StackLayout>
+                </Border>
+
+                <!-- Franchise Selection (Visible only for Multiple Teams) -->
+                <Border BackgroundColor="White"
+                        Stroke="#dee2e6"
+                        StrokeThickness="1"
+                        Padding="20"
+                        StrokeShape="RoundRectangle 8"
+                        IsVisible="{Binding IsMultipleDraft}">
+                    <StackLayout Spacing="15">
+                        <Label Text="Select Additional Franchises to Control" 
+                               FontSize="16" 
+                               FontAttributes="Bold"
+                               TextColor="#495057"
+                               HorizontalOptions="Center" />
+
+                        <CollectionView ItemsSource="{Binding Franchises}"
+                                        SelectionMode="None">
+                            <CollectionView.ItemsLayout>
+                                <GridItemsLayout Orientation="Vertical" 
+                                                 Span="2" 
+                                                 VerticalItemSpacing="5"
+                                                 HorizontalItemSpacing="5" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="viewmodels:FranchiseItem">
+                                    <Border BackgroundColor="{Binding SelectionColor}"
+                                            Stroke="{Binding SelectionBorderColor}"
+                                            StrokeThickness="2"
+                                            Padding="10"
+                                            StrokeShape="RoundRectangle 6">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={x:Reference DraftPage}, Path=BindingContext.ToggleFranchiseSelectionCommand}"
+                                                                  CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                        <StackLayout Spacing="2">
+                                            <Label Text="{Binding Name}" 
+                                                   FontSize="12"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Center" />
+                                            <Label Text="{Binding Abb}" 
+                                                   FontSize="10"
+                                                   TextColor="#6c757d"
+                                                   HorizontalOptions="Center" />
+                                        </StackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </StackLayout>
+                </Border>
+
+                <!-- Start Draft Button -->
+                <Button Text="Start Draft"
+                        BackgroundColor="#28a745"
+                        TextColor="White"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        Padding="15"
+                        Command="{Binding LoadDraftCommand}"
+                        CornerRadius="8" />
+            </StackLayout>
+        </ScrollView>
 
         <!-- Draft Interface -->
         <Grid Grid.Row="0" 
@@ -205,14 +247,6 @@
                                TextColor="White"
                                HorizontalOptions="Center" />
                     </StackLayout>
-
-                    <Button Grid.Column="2"
-                            Text="⚙️"
-                            BackgroundColor="Transparent"
-                            TextColor="White"
-                            FontSize="16"
-                            Command="{Binding ShowMenuCommand}"
-                            HorizontalOptions="End" />
                 </Grid>
             </Border>
 
@@ -237,7 +271,8 @@
                         </Border>
 
                         <CollectionView ItemsSource="{Binding DraftOrder}"
-                                        BackgroundColor="White">
+                                        BackgroundColor="White"
+                                        HeightRequest="400">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="viewmodels:DraftPickItem">
                                     <Border BackgroundColor="{Binding BackgroundColor}"
@@ -245,23 +280,19 @@
                                             StrokeThickness="{Binding BorderThickness}"
                                             Padding="8"
                                             Margin="2">
-                                        <Border.GestureRecognizers>
-                                            <TapGestureRecognizer Command="{Binding Source={x:Reference DraftPage}, Path=BindingContext.SelectPickCommand}"
-                                                                  CommandParameter="{Binding .}" />
-                                        </Border.GestureRecognizers>
                                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
                                             <StackLayout Grid.Column="0" Spacing="1">
-                                                <Label Text="{Binding PickNumber, StringFormat='#{0}'}" 
+                                                <Label Text="{Binding Overall, StringFormat='#{0}'}" 
                                                        FontSize="12"
                                                        FontAttributes="Bold"
                                                        TextColor="{Binding TextColor}" />
-                                                <Label Text="{Binding RoundPickText}" 
+                                                <Label Text="{Binding Pickround}" 
                                                        FontSize="10"
                                                        TextColor="{Binding TextColor}" />
                                             </StackLayout>
 
                                             <StackLayout Grid.Column="1" Spacing="1">
-                                                <Label Text="{Binding TeamAbbreviation}" 
+                                                <Label Text="{Binding TeamAbb}" 
                                                        FontSize="12"
                                                        FontAttributes="Bold"
                                                        TextColor="{Binding TextColor}" />
@@ -274,12 +305,12 @@
                                             <StackLayout Grid.Column="2" 
                                                          Spacing="1"
                                                          IsVisible="{Binding HasSelection}">
-                                                <Label Text="{Binding SelectedPlayerName}" 
+                                                <Label Text="{Binding Prospect.Name}" 
                                                        FontSize="10"
                                                        FontAttributes="Bold"
                                                        TextColor="{Binding TextColor}"
                                                        HorizontalOptions="End" />
-                                                <Label Text="{Binding SelectedPlayerPosition}" 
+                                                <Label Text="{Binding Prospect.Position}" 
                                                        FontSize="9"
                                                        TextColor="{Binding TextColor}"
                                                        HorizontalOptions="End" />
@@ -321,8 +352,7 @@
                                 Stroke="#bee5eb"
                                 StrokeThickness="1"
                                 Padding="8"
-                                Margin="4"
-                                IsVisible="{Binding ShowCurrentPickInfo}">
+                                Margin="4">
                             <StackLayout Spacing="2">
                                 <Label Text="{Binding CurrentPickInfoTitle}" 
                                        FontSize="12"
@@ -337,7 +367,8 @@
                         <!-- Available Players List -->
                         <CollectionView ItemsSource="{Binding FilteredProspects}"
                                         BackgroundColor="White"
-                                        SelectionMode="None">
+                                        SelectionMode="None"
+                                        HeightRequest="400">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="viewmodels:ProspectItem">
                                     <Border BackgroundColor="White"
@@ -368,7 +399,7 @@
                                                        FontSize="10"
                                                        TextColor="#007bff"
                                                        HorizontalOptions="End" />
-                                                <Label Text="{Binding AthScore}" 
+                                                <Label Text="{Binding Prospect.AthScore}" 
                                                        FontSize="9"
                                                        TextColor="#28a745"
                                                        HorizontalOptions="End" />
@@ -403,15 +434,15 @@
                             TextColor="White"
                             FontSize="12"
                             Padding="10,6"
-                            Command="{Binding TradePickCommand}"
-                            IsVisible="{Binding CanTrade}" />
+                            Command="{Binding TradeCommand}"
+                            IsVisible="{Binding AllowTrades}" />
                     <Button Text="Save Draft"
                             BackgroundColor="#28a745"
                             TextColor="White"
                             FontSize="12"
                             Padding="10,6"
                             Command="{Binding SaveDraftCommand}"
-                            IsVisible="{Binding CanSaveDraft}" />
+                            IsVisible="{Binding IsDraftComplete}" />
                 </StackLayout>
             </Border>
         </Grid>
@@ -420,11 +451,11 @@
         <StackLayout Grid.Row="0"
                      BackgroundColor="#80000000"
                      IsVisible="{Binding IsLoading}"
-                     VerticalOptions="FillAndExpand"
-                     HorizontalOptions="FillAndExpand">
+                     VerticalOptions="Fill"
+                     HorizontalOptions="Fill">
             <ActivityIndicator IsRunning="True" 
                                Color="White" 
-                               VerticalOptions="CenterAndExpand" />
+                               VerticalOptions="Center" />
             <Label Text="{Binding LoadingMessage}"
                    TextColor="White"
                    FontSize="16"

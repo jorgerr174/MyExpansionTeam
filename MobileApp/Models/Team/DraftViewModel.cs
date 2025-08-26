@@ -1,42 +1,36 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.Player;
 using METCore.DTOs.Team;
-using METCore.Models.Teams;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
 using static METCore.Enums.Types;
 
 namespace MobileApp.Models.Team
 {
-    public partial class DraftViewModel : TeamBaseViewModel
+    public partial class DraftViewModel(TeamService teamService) : TeamBaseViewModel
     {
-        private readonly TeamService _teamService;
+        private readonly TeamService _teamService = teamService;
 
-        [ObservableProperty] private int teamId;
-        [ObservableProperty] private string teamName = "";
         [ObservableProperty] private string loadingMessage = "Loading...";
 
         // Draft Setup
-        [ObservableProperty] private bool showDraftSettings = true;
         [ObservableProperty] private bool showDraftInterface = false;
-        [ObservableProperty] private bool isManualDraft = true;
         [ObservableProperty] private bool isAutoDraft = false;
+        [ObservableProperty] private bool isOnlyTeam = true;
         [ObservableProperty] private bool isMultipleDraft = false;
 
         // Draft State
         [ObservableProperty] private int currentPickIndex = 0;
         [ObservableProperty] private string currentPickText = "";
-        [ObservableProperty] private bool isPaused = false;
-        [ObservableProperty] private bool isSimulating = false;
-        [ObservableProperty] private string pauseResumeText = "Pause";
-        [ObservableProperty] private bool showPauseButton = false;
-        [ObservableProperty] private bool canTrade = false;
-        [ObservableProperty] private bool canSaveDraft = false;
+
+        [ObservableProperty] private bool isPaused = true;
+        [ObservableProperty] private bool showPauseButton = true;
+        [ObservableProperty] private string pauseResumeText = "Start";
 
         // Current Pick Info
-        [ObservableProperty] private bool showCurrentPickInfo = false;
         [ObservableProperty] private string currentPickInfoTitle = "";
         [ObservableProperty] private string currentPickInfoText = "";
 
@@ -46,618 +40,46 @@ namespace MobileApp.Models.Team
 
         // Collections
         [ObservableProperty] private ObservableCollection<DraftPickItem> draftOrder = [];
-        [ObservableProperty] private ObservableCollection<ProspectItem> allProspects = [];
-        [ObservableProperty] private ObservableCollection<ProspectItem> filteredProspects = [];
-        [ObservableProperty] private ObservableCollection<FranchiseItem> availableFranchises = [];
-        [ObservableProperty] private ObservableCollection<FranchiseItem> selectedFranchises = [];
+        [ObservableProperty] private ObservableCollection<ProspectItem> prospects = [];
+        [ObservableProperty] private ObservableCollection<FranchiseItem> franchises = [];
+
+        public ObservableCollection<ProspectItem> FilteredProspects => new(Prospects.Where(p => p.IsVisible));
+
+        [ObservableProperty] private int manualRounds = 3;
+        [ObservableProperty] private bool allowTrades = true;
+        [ObservableProperty] private bool showCurrentPickInfo = false;
 
         // Data
-        private DraftDto? _draftData;
-        private List<DraftPickInfo> _picks = [];
-        private List<ProspectDto> _prospects = [];
-        private Dictionary<int, string> _franchiseNames = [];
-        private HashSet<int> _userControlledTeams = [];
-        private string _draftMethod = "manual";
-        private Timer? _simulationTimer;
+        [NotNull] private DraftDto Draft;
+        [ObservableProperty] private string teamName = string.Empty;
 
-        public DraftViewModel(TeamService teamService)
+        public bool ShowDraftSettings => CurrentPickIndex == 0;
+        [ObservableProperty] private bool isDraftComplete = false;
+
+        public DraftPickItem CurrentPick => DraftOrder[CurrentPickIndex - 1];
+
+        //public void ApplyQueryAttributes(IDictionary<string, object> query)
+        //{
+        //    if (query.ContainsKey("teamId") && query["teamId"] is int tId)
+        //        TeamId = tId;
+
+        //    // Check if returning from trade
+        //    if (query.ContainsKey("tradedFranchiseId") && query.ContainsKey("currentPick"))
+        //    {
+        //        HandleTradeReturn(query);
+        //        return;
+        //    }
+
+        //    _ = LoadViewCommand.ExecuteAsync(null);
+        //}
+
+
+        #region OnLoad
+        private void LoadFranchises()
         {
-            _teamService = teamService;
-            InitializePositionFilters();
-            LoadAvailableFranchises();
-        }
-
-        public void ApplyQueryAttributes(IDictionary<string, object> query)
-        {
-            if (query.ContainsKey("teamId") && query["teamId"] is int tId)
-                TeamId = tId;
-
-            // Check if returning from trade
-            if (query.ContainsKey("tradedFranchiseId") && query.ContainsKey("currentPick"))
-            {
-                HandleTradeReturn(query);
-                return;
-            }
-
-            _ = LoadViewCommand.ExecuteAsync(null);
-        }
-
-        [RelayCommand]
-        public override async Task LoadViewAsync(int teamId)
-        {
-            try
-            {
-                TeamId = teamId;
-                UpdateLoadingState(true, "Loading draft data...");
-
-                _draftData = await _teamService.GetTeamDraftAsync(TeamId);
-
-                if (_draftData == null)
-                {
-                    await Shell.Current.DisplayAlert("Error", "Failed to load draft data", "OK");
-                    return;
-                }
-
-                TeamName = $"{_draftData.Location} {_draftData.Mascot}"  ?? "Unknown Team";
-                _picks = ConvertPicksToPickInfo(_draftData.Picks);
-
-                await LoadProspects();
-                LoadFranchiseNames();
-
-                // Check if draft is already in progress
-                if (CurrentPickIndex > 0)
-                {
-                    await ContinueDraft();
-                }
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlert("Error", $"Failed to load draft: {ex.Message}", "OK");
-            }
-            finally
-            {
-                UpdateLoadingState(false);
-            }
-        }
-
-        [RelayCommand]
-        private async Task StartDraft()
-        {
-            try
-            {
-                UpdateLoadingState(true, "Starting draft...");
-
-                // Set draft method
-                _draftMethod = IsManualDraft ? "manual" : (IsAutoDraft ? "auto" : "multiple");
-
-                // Set user controlled teams
-                _userControlledTeams.Clear();
-                _userControlledTeams.Add(TeamId); // Always control own team
-
-                if (IsMultipleDraft)
-                {
-                    foreach (var franchise in SelectedFranchises)
-                    {
-                        _userControlledTeams.Add(franchise.Id);
-                    }
-                }
-
-                await InitializeDraftOrder();
-
-                ShowDraftSettings = false;
-                ShowDraftInterface = true;
-
-                await StartDraftProcess();
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlert("Error", $"Failed to start draft: {ex.Message}", "OK");
-            }
-            finally
-            {
-                UpdateLoadingState(false);
-            }
-        }
-
-        [RelayCommand]
-        private void ToggleFranchiseSelection(FranchiseItem franchise)
-        {
-            if (SelectedFranchises.Contains(franchise))
-            {
-                SelectedFranchises.Remove(franchise);
-                franchise.IsSelected = false;
-            }
-            else
-            {
-                SelectedFranchises.Add(franchise);
-                franchise.IsSelected = true;
-            }
-
-            franchise.UpdateSelectionColors();
-        }
-
-        [RelayCommand]
-        private async Task SelectPick(DraftPickItem pick)
-        {
-            if (pick.PickIndex == CurrentPickIndex && pick.IsUserControlled && !IsSimulating)
-            {
-                // This is the current pick and user controlled - allow selection
-                return;
-            }
-
-            // Could add trade functionality here for future picks
-        }
-
-        [RelayCommand]
-        private async Task SelectProspect(ProspectItem prospect)
-        {
-            if (IsSimulating || CurrentPickIndex >= DraftOrder.Count)
-                return;
-
-            var currentPick = DraftOrder[CurrentPickIndex];
-            if (!currentPick.IsUserControlled)
-                return;
-
-            // Show confirmation dialog
-            var confirm = await Shell.Current.DisplayAlert(
-                "Confirm Selection",
-                $"Draft {prospect.Name} ({prospect.Position}) with pick #{currentPick.PickNumber}?",
-                "Draft Player", "Cancel");
-
-            if (confirm)
-            {
-                await MakeSelection(prospect);
-            }
-        }
-
-        [RelayCommand]
-        private void TogglePause()
-        {
-            IsPaused = !IsPaused;
-            PauseResumeText = IsPaused ? "Resume" : "Pause";
-
-            if (IsPaused)
-            {
-                StopSimulation();
-            }
-            else if (_draftMethod != "manual")
-            {
-                StartSimulation();
-            }
-        }
-
-        [RelayCommand]
-        private async Task TradePick()
-        {
-            if (CurrentPickIndex >= DraftOrder.Count)
-                return;
-
-            var currentPick = DraftOrder[CurrentPickIndex];
-
-            // Pause simulation before trading
-            if (IsSimulating)
-            {
-                IsPaused = true;
-                PauseResumeText = "Resume";
-                StopSimulation();
-            }
-
-            // Navigate to trade view with current pick
-            var parameters = new Dictionary<string, object>
-            {
-                ["teamId"] = TeamId,
-                ["currentPick"] = currentPick.PickNumber
-            };
-
-            await BaseService.GoToAsync("//trade", parameters);
-        }
-
-        [RelayCommand]
-        private async Task SaveDraft()
-        {
-            try
-            {
-                UpdateLoadingState(true, "Saving draft...");
-
-                // Create draft results DTO
-                var selections = new Dictionary<int, int>();
-                foreach (var pick in DraftOrder.Where(p => p.HasSelection))
-                {
-                    selections[pick.PickNumber] = pick.SelectedProspect?.Id ?? 0;
-                }
-
-                var success = false;
-                // Update draft data
-                if (_draftData != null)
-                {
-                    _draftData.Selections = selections;
-                    success = await _teamService.SaveDraftAsync(_draftData);
-                }
-
-                if (success)
-                {
-                    await Shell.Current.DisplayAlert("Success", "Draft saved successfully!", "OK");
-                    await GoToRoster();
-                }
-                else
-                {
-                    await Shell.Current.DisplayAlert("Error", "Failed to save draft", "OK");
-                }
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlert("Error", $"Failed to save draft: {ex.Message}", "OK");
-            }
-            finally
-            {
-                UpdateLoadingState(false);
-            }
-        }
-
-        private async Task GoToRoster() => await BaseService.GoToAsync(AppRoutes.Roster, new() { ["TeamId"] = TeamId });
-        
-        [RelayCommand]
-        private async Task Return()
-        {
-            var confirm = await Shell.Current.DisplayAlert(
-                "Exit Draft",
-                "Are you sure you want to exit? Unsaved progress will be lost.",
-                "Exit", "Stay");
-
-            if (confirm)
-            {
-                StopSimulation();
-                await GoToRoster();
-            }
-        }
-
-        [RelayCommand]
-        private async Task ShowMenu()
-        {
-            var options = new List<string> { "Cancel" };
-
-            if (ShowPauseButton)
-                options.Insert(0, PauseResumeText);
-
-            if (CanTrade)
-                options.Insert(0, "Trade Pick");
-
-            if (CanSaveDraft)
-                options.Insert(0, "Save Draft");
-
-            var result = await Shell.Current.DisplayActionSheet("Draft Options", "Cancel", null, options.ToArray());
-
-            switch (result)
-            {
-                case "Save Draft":
-                    await SaveDraft();
-                    break;
-                case "Trade Pick":
-                    await TradePick();
-                    break;
-                case "Pause":
-                case "Resume":
-                    TogglePause();
-                    break;
-            }
-        }
-
-        partial void OnSelectedPositionFilterChanged(string value)
-        {
-            FilterProspects();
-        }
-
-        private async Task LoadProspects()
-        {
-            try
-            {
-                var prospects = await _teamService.GetDraftProspectsAsync();
-                _prospects = prospects?.ToList() ?? new List<ProspectDto>();
-
-                AllProspects.Clear();
-                foreach (var prospect in _prospects)
-                {
-                    AllProspects.Add(new ProspectItem(prospect));
-                }
-
-                FilterProspects();
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlert("Error", $"Failed to load prospects: {ex.Message}", "OK");
-            }
-        }
-
-        private void FilterProspects()
-        {
-            FilteredProspects.Clear();
-
-            var filtered = AllProspects.AsEnumerable();
-
-            if (SelectedPositionFilter != "All")
-            {
-                filtered = filtered.Where(p => p.Position == SelectedPositionFilter);
-            }
-
-            // Filter out already drafted players
-            var draftedPlayerIds = DraftOrder.Where(p => p.HasSelection)
-                                            .Select(p => p.SelectedProspect?.Id ?? 0)
-                                            .Where(id => id > 0)
-                                            .ToHashSet();
-
-            foreach (var prospect in filtered.OrderBy(p => p.Consensus))
-            {
-                FilteredProspects.Add(prospect);
-            }
-        }
-
-        private async Task InitializeDraftOrder()
-        {
-            DraftOrder.Clear();
-
-            // Sort picks by overall number
-            var sortedPicks = _picks.OrderBy(p => p.Overall).ToList();
-
-            for (int i = 0; i < sortedPicks.Count; i++)
-            {
-                var pick = sortedPicks[i];
-                var isUserControlled = _userControlledTeams.Contains(pick.TeamId);
-
-                var draftPickItem = new DraftPickItem
-                {
-                    PickIndex = i,
-                    PickNumber = pick.Overall,
-                    Round = pick.Round,
-                    PickInRound = pick.PickInRound,
-                    TeamId = pick.TeamId,
-                    TeamName = _franchiseNames.GetValueOrDefault(pick.TeamId, "Unknown"),
-                    TeamAbbreviation = GetTeamAbbreviation(pick.TeamId),
-                    IsUserControlled = isUserControlled,
-                    ControlText = isUserControlled ? "Your Control" : "",
-                    RoundPickText = $"R{pick.Round}, P{pick.PickInRound}",
-                    IsCurrentPick = false,
-                    HasSelection = false
-                };
-
-                draftPickItem.UpdateColors();
-                DraftOrder.Add(draftPickItem);
-            }
-        }
-
-        private async Task StartDraftProcess()
-        {
-            CurrentPickIndex = 0;
-            UpdateCurrentPick();
-
-            // Start simulation if not manual draft
-            if (_draftMethod != "manual" && !IsPaused)
-            {
-                StartSimulation();
-            }
-        }
-
-        private async Task ContinueDraft()
-        {
-            // Load existing draft progress
-            ShowDraftSettings = false;
-            ShowDraftInterface = true;
-
-            await InitializeDraftOrder();
-
-            // Find current pick index based on existing selections
-            // This would need to be implemented based on your draft data structure
-            CurrentPickIndex = DraftOrder.Count(p => p.HasSelection);
-
-            UpdateCurrentPick();
-        }
-
-        private void StartSimulation()
-        {
-            if (IsSimulating || IsPaused) return;
-
-            IsSimulating = true;
-            ShowPauseButton = true;
-
-            _simulationTimer = new Timer(async _ => await ProcessNextPick(), null, 2000, 3000);
-        }
-
-        private void StopSimulation()
-        {
-            IsSimulating = false;
-            _simulationTimer?.Dispose();
-            _simulationTimer = null;
-        }
-
-        private async Task ProcessNextPick()
-        {
-            if (IsPaused || CurrentPickIndex >= DraftOrder.Count)
-            {
-                StopSimulation();
-                return;
-            }
-
-            var currentPick = DraftOrder[CurrentPickIndex];
-
-            if (currentPick.IsUserControlled)
-            {
-                // Wait for user selection
-                StopSimulation();
-                ShowCurrentPickInfo = true;
-                CurrentPickInfoTitle = "Your Turn";
-                CurrentPickInfoText = $"Select a player for pick #{currentPick.PickNumber}";
-                CanTrade = true;
-                return;
-            }
-
-            // Auto-select for CPU teams
-            await MakeAutoPick();
-        }
-
-        private async Task MakeAutoPick()
-        {
-            // Simple auto-pick logic - select best available player
-            var bestAvailable = FilteredProspects.OrderBy(p => p.Consensus).FirstOrDefault();
-
-            if (bestAvailable != null)
-            {
-                await MakeSelection(bestAvailable);
-            }
-            else
-            {
-                // No prospects available - advance pick
-                await AdvanceToNextPick();
-            }
-        }
-
-        private async Task MakeSelection(ProspectItem prospect)
-        {
-            if (CurrentPickIndex >= DraftOrder.Count) return;
-
-            var currentPick = DraftOrder[CurrentPickIndex];
-
-            // Update pick with selection
-            currentPick.SelectedProspect = prospect;
-            currentPick.SelectedPlayerName = prospect.Name;
-            currentPick.SelectedPlayerPosition = prospect.Position;
-            currentPick.HasSelection = true;
-            currentPick.UpdateColors();
-
-            // Remove prospect from available list
-            AllProspects.Remove(prospect);
-            FilterProspects();
-
-            await AdvanceToNextPick();
-        }
-
-        private async Task AdvanceToNextPick()
-        {
-            CurrentPickIndex++;
-
-            if (CurrentPickIndex >= DraftOrder.Count)
-            {
-                // Draft completed
-                await CompleteDraft();
-                return;
-            }
-
-            UpdateCurrentPick();
-
-            // Continue simulation if not paused and not user controlled
-            var nextPick = DraftOrder[CurrentPickIndex];
-            if (!nextPick.IsUserControlled && !IsPaused && _draftMethod != "manual")
-            {
-                if (!IsSimulating)
-                    StartSimulation();
-            }
-            else
-            {
-                StopSimulation();
-                if (nextPick.IsUserControlled)
-                {
-                    ShowCurrentPickInfo = true;
-                    CurrentPickInfoTitle = "Your Turn";
-                    CurrentPickInfoText = $"Select a player for pick #{nextPick.PickNumber}";
-                    CanTrade = true;
-                }
-            }
-        }
-
-        private void UpdateCurrentPick()
-        {
-            // Update previous pick styling
-            foreach (var pick in DraftOrder)
-            {
-                pick.IsCurrentPick = false;
-                pick.UpdateColors();
-            }
-
-            if (CurrentPickIndex < DraftOrder.Count)
-            {
-                var currentPick = DraftOrder[CurrentPickIndex];
-                currentPick.IsCurrentPick = true;
-                currentPick.UpdateColors();
-
-                CurrentPickText = $"Pick #{currentPick.PickNumber} - {currentPick.TeamAbbreviation}";
-                ShowCurrentPickInfo = currentPick.IsUserControlled;
-                CanTrade = currentPick.IsUserControlled;
-            }
-            else
-            {
-                CurrentPickText = "Draft Complete";
-                ShowCurrentPickInfo = false;
-                CanTrade = false;
-            }
-
-            CanSaveDraft = DraftOrder.Any(p => p.HasSelection);
-        }
-
-        private async Task CompleteDraft()
-        {
-            StopSimulation();
-            ShowCurrentPickInfo = false;
-            CanTrade = false;
-            CanSaveDraft = true;
-            CurrentPickText = "Draft Complete";
-
-            await Shell.Current.DisplayAlert("Draft Complete",
-                "The draft has been completed! Save your results to continue.", "OK");
-        }
-
-        private void HandleTradeReturn(IDictionary<string, object> query)
-        {
-            // Handle return from trade view
-            if (query.ContainsKey("userPicksSent") && query["userPicksSent"] is List<int> userPicks && userPicks.Any())
-            {
-                // User traded away picks - update draft order
-                UpdateDraftOrderAfterTrade(userPicks);
-            }
-
-            if (query.ContainsKey("franchisePicksSent") && query["franchisePicksSent"] is List<int> franchisePicks && franchisePicks.Any())
-            {
-                // User received picks - update draft order
-                UpdateDraftOrderAfterTrade(franchisePicks, true);
-            }
-
-            // Resume draft if it was running
-            UpdateCurrentPick();
-        }
-
-        private void UpdateDraftOrderAfterTrade(List<int> picks, bool received = false)
-        {
-            // This would need more complex logic to properly update the draft order
-            // For now, just mark that a trade occurred and may need draft order refresh
-            _ = LoadViewAsync(TeamId); // Reload draft data
-        }
-
-        private void LoadFranchiseNames()
-        {
-            _franchiseNames.Clear();
-            var franchises = FranchiseInfo.GetAllFranchises();
-
-            foreach (var franchise in franchises)
-            {
-                _franchiseNames[franchise.Id] = franchise.Name;
-            }
-        }
-
-        private string GetTeamAbbreviation(int teamId)
-        {
-            if (teamId == TeamId)
-                return "YOU";
-
-            var franchise = FranchiseInfo.GetAllFranchises().FirstOrDefault(f => f.Id == teamId);
-            return franchise?.Abbreviation ?? "UNK";
-        }
-
-        private void LoadAvailableFranchises()
-        {
-            AvailableFranchises.Clear();
-            var franchises = FranchiseInfo.GetAllFranchises().Where(f => f.Id != TeamId);
-
-            foreach (var franchise in franchises)
-            {
-                AvailableFranchises.Add(new FranchiseItem(franchise));
-            }
+            Franchises.Clear();
+            foreach (FranchiseInfo franchise in FranchiseInfo.GetAllFranchises())
+                Franchises.Add(new FranchiseItem(franchise));
         }
 
         private void InitializePositionFilters()
@@ -665,7 +87,7 @@ namespace MobileApp.Models.Team
             PositionFilters.Clear();
             PositionFilters.Add("All");
             PositionFilters.Add("QB");
-            PositionFilters.Add("RB");
+            PositionFilters.Add("HB");
             PositionFilters.Add("WR");
             PositionFilters.Add("TE");
             PositionFilters.Add("OL");
@@ -677,84 +99,414 @@ namespace MobileApp.Models.Team
             PositionFilters.Add("LS");
         }
 
+        [RelayCommand]
+        public override async Task LoadViewAsync(int teamId)
+        {
+            try
+            {
+                UpdateLoadingState(true, "Loading draft data...");
+
+                if (await _teamService.GetTeamDraftAsync(teamId) is DraftDto draft)
+                {
+                    Draft = draft;
+                    TeamName = $"{Draft.Location} {Draft.Mascot}";
+                    OnPropertyChanged(nameof(TeamName));
+
+                    Prospects.Clear();
+                    foreach (ProspectDto prospect in await _teamService.GetDraftProspectsAsync() ?? [])
+                        Prospects.Add(new ProspectItem(prospect));
+                    OnPropertyChanged(nameof(FilteredProspects));
+                    InitializePositionFilters();
+
+                    LoadFranchises();
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Error", "Failed to load draft data", "OK");
+                    return;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", $"Failed to load draft: {ex.Message}", "OK");
+            }
+            finally
+            {
+                UpdateLoadingState(false);
+            }
+        }
+        #endregion OnLoad
+
+
+        #region DraftSettings
+        private async Task ConvertPicksToPickItem(IList<IList<int>>? picks)
+        {
+            if (!picks.Any()) return;
+
+            IList<DraftPickItem> list = [];
+            IList<IList<DraftPickItem>> teamsPicks = [];
+
+            int totalManualPicks = DraftPicks.TotalAtRound[IsAutoDraft ? 0 : ManualRounds];
+            foreach (int pick in picks?[0] ?? [])
+                list.Add(new DraftPickItem(pick, totalManualPicks, !IsAutoDraft, TeamName, Draft.Abb));
+            teamsPicks.Add(list);
+
+            FranchiseItem franchise;
+            bool userControlled;
+            IList<int> teamPicks;
+            IList<int> selectedFranchisesIds = [.. Franchises.Where(f => f.IsSelected).Select(f => f.Id)];
+            for (int i = 1; i < picks.Count; i++)
+            {
+                list = [];
+                franchise = Franchises[i - 1];
+                userControlled = selectedFranchisesIds.Contains(franchise.Id);
+                teamPicks = picks[i];
+                foreach (int pick in teamPicks ?? [])
+                    list.Add(new DraftPickItem(pick, totalManualPicks, userControlled, franchise));
+                teamsPicks.Add(list);
+            }
+
+            foreach (DraftPickItem pick in teamsPicks.SelectMany(team => team).OrderBy(p => p.Overall))
+                DraftOrder.Add(pick);
+        }
+
+        [RelayCommand]
+        private void ToggleFranchiseSelection(FranchiseItem franchise)
+        {
+            franchise.IsSelected = !franchise.IsSelected;
+            franchise.UpdateSelectionColors();
+        }
+
+        [RelayCommand]
+        private async Task LoadDraft()
+        {
+            try
+            {
+                UpdateLoadingState(true, "Starting draft...");
+                ShowDraftInterface = true;
+
+                await ConvertPicksToPickItem(Draft.Picks);
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", $"Failed to start draft: {ex.Message}", "OK");
+            }
+            finally
+            {
+                UpdateLoadingState(false);
+            }
+        }
+        #endregion DraftSettings
+
+
+        #region Extra functionality
         private void UpdateLoadingState(bool loading, string message = "Loading...")
         {
             IsLoading = loading;
             LoadingMessage = message;
         }
 
-        private List<DraftPickInfo> ConvertPicksToPickInfo(IList<IList<int>>? picks)
+        [RelayCommand]
+        private async Task TogglePause()
         {
-            var pickInfoList = new List<DraftPickInfo>();
+            IsPaused = !IsPaused;
+            PauseResumeText = IsPaused ? "Resume" : "Pause";
 
-            if (picks == null) return pickInfoList;
+            if (!IsPaused) await AdvanceToNextPick();
+        }
 
-            for (int teamIndex = 0; teamIndex < picks.Count; teamIndex++)
-            {
-                var teamPicks = picks[teamIndex];
-                if (teamPicks == null) continue;
-
-                foreach (var pick in teamPicks)
+        private void FilterProspects()
+        {
+            string[] positions =
+                SelectedPositionFilter switch
                 {
-                    var overall = DraftPicks.GetPickOverall(pick);
-                    var round = pick / 100;
-                    var pickInRound = pick % 100;
+                    "QB" => ["QB"],
+                    "HB" => ["RB", "FB"],
+                    "WR" => ["WR"],
+                    "TE" => ["TE"],
+                    "OL" => ["OT", "G", "C"],
+                    "DL" => ["NT", "DT", "ED"],
+                    "LB" => ["OLB", "MLB"],
+                    "DB" => ["DB", "CB", "S", "FS", "SS"],
+                    "P/K" => ["P", "K"],
+                    "PR/KR" => ["PR", "KR"],
+                    "LS" => ["LS"],
+                    _ => [] //All
+                };
 
-                    pickInfoList.Add(new DraftPickInfo
-                    {
-                        Overall = overall,
-                        Round = round,
-                        PickInRound = pickInRound,
-                        RppFormat = pick,
-                        TeamId = teamIndex,
-                        IsUserTeam = teamIndex == TeamId,
-                        TeamName = TeamName,
-                        TeamAbbr = GetTeamAbbreviation(teamIndex)
-                    });
-                }
+            if (positions.Length == 0) foreach (ProspectItem prospect in Prospects) prospect.IsVisible = true;
+            else if (positions.Length == 1)
+            {
+                string position = positions[0];
+                foreach (ProspectItem prospect in Prospects) prospect.IsVisible = prospect.Position == position;
+            }
+            else foreach (ProspectItem prospect in Prospects) prospect.IsVisible = positions.Contains(prospect.Position);
+
+            OnPropertyChanged(nameof(FilteredProspects));
+        }
+
+        private async Task FinishDraft()
+        {
+            IsDraftComplete = true;
+            ShowPauseButton = false;
+
+            AllowTrades = false;
+            IsPaused = true;
+            CurrentPickText = "Draft Complete";
+
+            await Shell.Current.DisplayAlert("Draft Complete", "The draft has been completed! Save your results to continue.", "OK");
+        }
+        #endregion Extra functionality
+
+
+        #region Flow functionality
+        private async Task AdvanceToNextPick()
+        {
+            if (IsPaused) return;
+            CurrentPickIndex++;
+
+            if (CurrentPickIndex >= DraftOrder.Count)
+            {
+                await FinishDraft();
+                return;
             }
 
-            return pickInfoList.OrderBy(p => p.Overall).ToList();
+            UpdatePickDisplays();
+
+            if (!CurrentPick.IsUserControlled)
+            {
+                CurrentPickInfoTitle = $"{CurrentPick.TeamAbb} Turn";
+                CurrentPickInfoText = $"Analyzing prospects for pick #{CurrentPick.Overall}";
+
+                await Task.Delay(500);
+                await MakeSelection(Prospects.OrderBy(p => p.Consensus).FirstOrDefault());
+            }
+            else
+            {
+                CurrentPickInfoTitle = "Your Turn";
+                CurrentPickInfoText = $"Select a player for pick #{CurrentPick.Overall}";
+                ShowPauseButton = false;
+            }
         }
+
+        [RelayCommand]
+        private async Task SelectProspect(ProspectItem prospect)
+        {
+            if (CurrentPickIndex <= DraftOrder.Count && CurrentPick.IsUserControlled &&
+                await Shell.Current.DisplayAlert("Confirm Selection", $"Draft {prospect.Name} ({prospect.Position}) with pick #{CurrentPick.Overall}?", "Draft Player", "Cancel"))
+            {
+                ShowPauseButton = true;
+                await MakeSelection(prospect);
+            }
+        }
+
+        private async Task MakeSelection(ProspectItem prospect)
+        {
+            CurrentPick.AssignProspect(prospect);
+            Prospects.Remove(prospect);
+            OnPropertyChanged(nameof(FilteredProspects));
+            FilterProspects();
+
+            await Task.Delay(1000);
+            await AdvanceToNextPick();
+        }
+
+        private void UpdatePickDisplays()
+        {
+            try
+            {
+                if (DraftOrder[CurrentPickIndex - 2] is DraftPickItem previous)
+                    previous.UpdateColors();
+            }
+            catch { }
+
+            try
+            {
+                CurrentPickText = $"Pick #{CurrentPick.Overall} - {CurrentPick.TeamAbb}";
+                CurrentPick.UpdateColorsCurrentPick();
+            }
+            catch { }
+        }
+        #endregion Flow functionality
+
+
+        #region Trade
+        [RelayCommand]
+        private async Task Trade()
+        {
+            if (IsDraftComplete) return;
+
+            IsPaused = true;
+            PauseResumeText = "Resume";
+            await BaseService.GoToAsync(AppRoutes.Trade, new() { ["teamId"] = Draft.Id, ["currentPick"] = CurrentPick.Overall });
+        }
+
+        public void HandleTradeReturn(int franchiseId, IList<int> teamPicks, IList<int> franchisePicks)
+        {
+            FranchiseItem? franchise = Franchises[franchiseId - 1];
+
+            bool isFranchiseControlled = franchise.IsSelected;
+            bool isTeamControlled = !IsAutoDraft;
+            DraftPickItem pickItem;
+
+            foreach (int pick in franchisePicks ?? [])
+            {
+                pickItem = DraftOrder[DraftPicks.GetPickOverall(pick)];
+                pickItem.UpdateOwnerAfterTrade(isFranchiseControlled, franchise, null, null);
+                OnPropertyChanged(nameof(pickItem));
+            }
+
+            foreach (int pick in franchisePicks ?? [])
+            {
+                pickItem = DraftOrder[DraftPicks.GetPickOverall(pick)];
+                pickItem.UpdateOwnerAfterTrade(isFranchiseControlled, franchise, TeamName, Draft.Abb);
+                OnPropertyChanged(nameof(pickItem));
+            }
+        }
+        #endregion Trade
+
+
+        #region End actions
+        [RelayCommand]
+        private async Task SaveDraft()
+        {
+            try
+            {
+                UpdateLoadingState(true, "Saving draft...");
+
+                Dictionary<int, int> selections = [];
+                foreach (var pick in DraftOrder.Where(p => p.IsUserControlled && p.HasSelection))
+                    selections[pick.Overall] = pick.Prospect?.Id ?? 0;
+
+                var success = false;
+                if (Draft != null)
+                {
+                    Draft.Selections = selections;
+                    success = await _teamService.SaveDraftAsync(Draft);
+                }
+
+                if (success)
+                {
+                    await Shell.Current.DisplayAlert("Success", "Draft saved successfully!", "OK");
+                    await GoToRoster();
+                }
+                else
+                    await Shell.Current.DisplayAlert("Error", "Failed to save draft", "OK");
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", $"Failed to save draft: {ex.Message}", "OK");
+            }
+            finally
+            {
+                UpdateLoadingState(false);
+            }
+        }
+
+        private async Task GoToRoster() => await BaseService.GoToAsync(AppRoutes.Roster, new() { ["TeamId"] = Draft.Id });
+
+        [RelayCommand]
+        private async Task Return()
+        {
+            if (await Shell.Current.DisplayAlert("Exit Draft", "Are you sure you want to exit? Unsaved progress will be lost.", "Exit", "Stay"))
+            {
+                IsPaused = true;
+                await GoToRoster();
+            }
+        }
+        #endregion End actions
     }
 
-    // Supporting classes
     public partial class DraftPickItem : ObservableObject
     {
-        public int PickIndex { get; set; }
-        public int PickNumber { get; set; }
-        public int Round { get; set; }
-        public int PickInRound { get; set; }
-        public int TeamId { get; set; }
-        public string TeamName { get; set; } = "";
-        public string TeamAbbreviation { get; set; } = "";
-        public string RoundPickText { get; set; } = "";
-        public bool IsUserControlled { get; set; }
+        public FranchiseItem? Franchise { get; private set; }
+
+        public int RppFormat { get; private set; }
+        public int Overall { get; private set; }
+        public int Round { get; private set; }
+        public int PickInRound { get; private set; }
+
+        public int TeamId { get; private set; }
+        public string TeamName { get; private set; }
+        public string TeamAbb { get; private set; }
+
+        public bool IsUserControlled { get; private set; }
         public string ControlText { get; set; } = "";
 
-        [ObservableProperty] private bool isCurrentPick;
-        [ObservableProperty] private bool hasSelection;
-        [ObservableProperty] private string selectedPlayerName = "";
-        [ObservableProperty] private string selectedPlayerPosition = "";
-        [ObservableProperty] private ProspectItem? selectedProspect;
+        public string Pickround => $"Round: {this.Round} PicK: {this.PickInRound}";
+        private bool isCurrentPick(int currentPick) => currentPick == Overall;
+        public bool HasSelection => Prospect is ProspectItem;
+        private string SelectedPlayerName => Prospect?.Name ?? string.Empty;
+        private string SelectedPlayerPosition => Prospect?.Position ?? string.Empty;
+
         [ObservableProperty] private Color backgroundColor = Colors.White;
         [ObservableProperty] private Color borderColor = Color.FromArgb("#dee2e6");
         [ObservableProperty] private Color textColor = Colors.Black;
         [ObservableProperty] private int borderThickness = 1;
+        [ObservableProperty] private ProspectItem? prospect;
 
+        private DraftPickItem(int pick)
+        {
+            this.RppFormat = pick;
+            this.Overall = DraftPicks.GetPickOverall(pick);
+            this.Round = pick / 100;
+            this.PickInRound = pick % 100;
+        }
+
+        public DraftPickItem(int pick, int totalManualPicks, bool isUserControlled, string teamName, string teamAbb) : this(pick)
+        {
+            this.IsUserControlled = this.Overall <= totalManualPicks && isUserControlled;
+            this.Franchise = null;
+            this.TeamId = 0;
+            this.TeamName = teamName;
+            this.TeamAbb = teamAbb;
+
+            this.UpdateColors();
+        }
+
+        public DraftPickItem(int pick, int totalManualPicks, bool isUserControlled, FranchiseItem franchise) : this(pick)
+        {
+            this.IsUserControlled = this.Overall <= totalManualPicks && isUserControlled;
+            this.Franchise = franchise;
+            this.TeamId = franchise.Id;
+            this.TeamName = franchise.Name;
+            this.TeamAbb = franchise.Abb;
+
+            this.UpdateColors();
+        }
+
+        public DraftPickItem(int pick, int totalManualPicks, bool isUserControlled, FranchiseItem? franchise, string teamName, string teamAbb) : this(pick)
+        {
+            this.IsUserControlled = this.Overall <= totalManualPicks && isUserControlled;
+            this.Franchise = franchise;
+            this.TeamId = Franchise is null ? 0 : franchise.Id;
+            this.TeamName = Franchise is null ? teamName : franchise.Name;
+            this.TeamAbb = Franchise is null ? teamAbb : franchise.Abb;
+
+            this.UpdateColors();
+        }
+
+        public void UpdateColorsCurrentPick()
+        {
+            BackgroundColor = Color.FromArgb("#007bff");
+            BorderColor = Color.FromArgb("#0056b3");
+            TextColor = Colors.White;
+            BorderThickness = 2;
+        }
         public void UpdateColors()
         {
-            if (IsCurrentPick)
-            {
-                BackgroundColor = Color.FromArgb("#007bff");
-                BorderColor = Color.FromArgb("#0056b3");
-                TextColor = Colors.White;
-                BorderThickness = 2;
-            }
-            else if (HasSelection)
+            if (HasSelection)
             {
                 BackgroundColor = Color.FromArgb("#d4edda");
                 BorderColor = Color.FromArgb("#28a745");
+                TextColor = Colors.Black;
+                BorderThickness = 1;
+            }
+            else if (Franchise is null)
+            {
+                BackgroundColor = Color.FromArgb("#91C4FF");
+                BorderColor = Color.FromArgb("#ffc107");
                 TextColor = Colors.Black;
                 BorderThickness = 1;
             }
@@ -772,53 +524,58 @@ namespace MobileApp.Models.Team
                 TextColor = Colors.Black;
                 BorderThickness = 1;
             }
+            OnPropertyChanged(nameof(BackgroundColor));
+            OnPropertyChanged(nameof(BorderColor));
+            OnPropertyChanged(nameof(TextColor));
+            OnPropertyChanged(nameof(BorderThickness));
         }
-    }
-
-    public class ProspectItem
-    {
-        public int Id { get; }
-        public string Name { get; }
-        public string Position { get; }
-        public string College { get; }
-        public int Height { get; }
-        public int Weight { get; }
-        public int Consensus { get; }
-        public int AthScore { get; }
-
-        public string PositionCollege => $"{Position} - {College}";
-        public string PhysicalInfo => $"{Height}\" {Weight} lbs";
-        public string ConsensusText => $"#{Consensus}";
-
-        public ProspectItem(ProspectDto prospect)
+        public void UpdateOwnerAfterTrade(bool isUserControlled, FranchiseItem? franchise, string? teamName, string? teamAbb)
         {
-            Id = prospect.Id ?? 0;
-            Name = prospect.Name;
-            Position = prospect.Position;
-            College = prospect.College ?? "";
-            Height = prospect.Height ?? 72;
-            Weight = prospect.Weight ?? 220;
-            Consensus = prospect.Consensus;
-            AthScore = prospect.AthScore ;
+            this.IsUserControlled = isUserControlled;
+            this.Franchise = franchise;
+            this.TeamId = Franchise is null ? 0 : franchise.Id;
+            this.TeamName = Franchise is null ? teamName : franchise.Name;
+            this.TeamAbb = Franchise is null ? teamAbb : franchise.Abb;
+
+            OnPropertyChanged(nameof(IsUserControlled));
+            OnPropertyChanged(nameof(Franchise));
+            OnPropertyChanged(nameof(TeamId));
+            OnPropertyChanged(nameof(TeamName));
+            OnPropertyChanged(nameof(TeamAbb));
+        }
+        public void AssignProspect(ProspectItem prospect)
+        {
+            this.Prospect = prospect;
+            OnPropertyChanged(nameof(Prospect));
+            OnPropertyChanged(nameof(Prospect.Name));
+            OnPropertyChanged(nameof(Prospect.Position));
         }
     }
 
-    public partial class FranchiseItem : ObservableObject
+    public partial class ProspectItem(ProspectDto prospect) : ObservableObject
     {
-        public int Id { get; }
-        public string Name { get; }
-        public string Abbreviation { get; }
+        [ObservableProperty] private bool isVisible = true;
+        public ProspectDto Prospect { get; } = prospect;
+        public int Id => Prospect.Id ?? 0;
+        public string Name => Prospect.Name;
+        public string Position => Prospect.Position;
+        public int Consensus => Prospect.Consensus;
+
+
+        public string PositionCollege => $"{Prospect.Position} - {Prospect.College}";
+        public string PhysicalInfo => $"{Prospect.Height}\" {Prospect.Weight} lbs";
+        public string ConsensusText => $"#{Prospect.Consensus}";
+    }
+
+    public partial class FranchiseItem(FranchiseInfo franchise) : ObservableObject
+    {
+        public int Id { get; } = franchise.Id;
+        public string Name { get; } = franchise.Name;
+        public string Abb { get; } = franchise.Abbreviation;
 
         [ObservableProperty] private bool isSelected;
         [ObservableProperty] private Color selectionColor = Colors.White;
         [ObservableProperty] private Color selectionBorderColor = Color.FromArgb("#dee2e6");
-
-        public FranchiseItem(FranchiseInfo franchise)
-        {
-            Id = franchise.Id;
-            Name = franchise.Name;
-            Abbreviation = franchise.Abbreviation;
-        }
 
         public void UpdateSelectionColors()
         {
