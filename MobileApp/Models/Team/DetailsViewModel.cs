@@ -331,7 +331,7 @@ namespace MobileApp.Models.Team
                     11 => lineup.Player11,
                     _ => 0
                 }
-                :   position switch
+                : position switch
                 {
                     1 => splineup.Player1,
                     2 => splineup.Player2,

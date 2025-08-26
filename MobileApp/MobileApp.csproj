@@ -131,9 +131,6 @@
 	  <Compile Update="Views\Team\Edit.xaml.cs">
 	    <DependentUpon>Edit.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views\Team\DraftResults.xaml.cs">
-	    <DependentUpon>DraftResults.xaml</DependentUpon>
-	  </Compile>
 	  <Compile Update="Views\Team\ProspectSelectionModal.xaml.cs">
 	    <DependentUpon>ProspectSelectionModal.xaml</DependentUpon>
 	  </Compile>
@@ -216,9 +213,6 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Team\Edit.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Team\DraftResults.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Team\ProspectSelectionModal.xaml">
