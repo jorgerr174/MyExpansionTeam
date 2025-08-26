@@ -10,7 +10,8 @@ namespace MobileApp.Services
         #region TryAutoLogIn
         public static async Task<bool> TryAutoLogInAsync()
         {
-            bool result = !string.IsNullOrEmpty(await SecureStorage.GetAsync("jwt_token"));
+            bool result = DateTime.TryParse(await SecureStorage.GetAsync("ExpireSessionTime"), out DateTime time) && time > DateTime.Now
+                && !string.IsNullOrEmpty(await SecureStorage.GetAsync("jwt_token"));
             if (!result) LogOutAsync();
             return result;
         }
@@ -69,6 +70,7 @@ namespace MobileApp.Services
                     // Store JWT token in secure storage (mobile equivalent of cookies)
                     await SecureStorage.SetAsync("jwt_token", result.Message);
                     await SecureStorage.SetAsync("username", identifier);
+                    await SecureStorage.SetAsync("ExpireSessionTime", (DateTime.Now.AddHours(2)).ToString());
 
                     return true;
                 }
@@ -84,10 +86,11 @@ namespace MobileApp.Services
 
 
         #region CU003 LogOut
-        public static void LogOutAsync()
+        public static async Task LogOutAsync()
         {
             SecureStorage.Remove("jwt_token");
             SecureStorage.Remove("username");
+            SecureStorage.Remove("ExpireSessionTime");
 
             UserLoggedOut?.Invoke(typeof(AccountService), EventArgs.Empty);
         }
