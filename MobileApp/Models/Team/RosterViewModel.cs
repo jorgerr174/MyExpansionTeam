@@ -1,12 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.Player;
 using METCore.DTOs.Team;
-using METCore.Models.Players;
-using METCore.Models.Teams;
-using Microsoft.AspNetCore.Http.Features;
 using MobileApp.Models.Shared;
 using MobileApp.Services;
 using static METCore.Enums.Types;
@@ -73,14 +69,6 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private string saveWarningText = "";
 
         // Formation Management Properties
-        //[ObservableProperty] private string selectedFormationType = "offense";
-        //[ObservableProperty] private string selectedFormationName = "";
-        //[ObservableProperty] private Color offenseButtonColor = Color.FromArgb("#007bff");
-        //[ObservableProperty] private Color offenseButtonTextColor = Colors.White;
-        //[ObservableProperty] private Color defenseButtonColor = Color.FromArgb("#f8f9fa");
-        //[ObservableProperty] private Color defenseButtonTextColor = Color.FromArgb("#6c757d");
-        //[ObservableProperty] private Color specialButtonColor = Color.FromArgb("#f8f9fa");
-        //[ObservableProperty] private Color specialButtonTextColor = Color.FromArgb("#6c757d");
         [ObservableProperty] private string viewedFormationType = "offense";
         [ObservableProperty] private Color offenseViewColor = Color.FromArgb("#007bff");
         [ObservableProperty] private Color offenseViewTextColor = Colors.White;
@@ -117,6 +105,7 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private IList<TradeDto> tradeHistory = [];
         [ObservableProperty] private IList<DraftSelection> draftResults = [];
         [ObservableProperty] private DraftDto draft;
+        [ObservableProperty] private bool notHasDraft = true;
 
         // Filter Lists
         public ObservableCollection<string> PositionFilters { get; } = ["All", "QB", "RB", "WR", "TE", "OL", "DL", "LB", "DB", "K", "P"];
@@ -198,12 +187,16 @@ namespace MobileApp.Models.Team
             {
                 Draft = await _teamService.GetTeamDraftAsync(Team.Id);
                 if (Draft is DraftDto && (Draft.Selections?.Any() ?? false))
-                    foreach (KeyValuePair<int, int> selection in Draft.Selections)
-                        if (Draft.Prospects.FirstOrDefault(p => p.Id == selection.Value) is ProspectDto prospect)
-                        {
-                            (int round, int pos) = DraftPicks.GetPickRoundPosFromOverall(selection.Key);
-                            DraftResults.Add(new DraftSelection() { Pick = $"Round: {round}, Pick: {pos}", Player = prospect });
-                        }
+                {
+                    NotHasDraft = false;
+                    if (Draft.Selections?.Any() ?? false)
+                        foreach (KeyValuePair<int, int> selection in Draft.Selections)
+                            if (Draft.Prospects.FirstOrDefault(p => p.Id == selection.Value) is ProspectDto prospect)
+                            {
+                                (int round, int pos) = DraftPicks.GetPickRoundPosFromOverall(selection.Key);
+                                DraftResults.Add(new DraftSelection() { Pick = $"Round: {round}, Pick: {pos}", Player = prospect });
+                            }
+                }
             }
             catch { }
         }
@@ -454,7 +447,7 @@ namespace MobileApp.Models.Team
         private void UpdateSalaryCapDisplay()
         {
             var currentCapUsed = CalculateCurrentCapUsed();
-            var capPercentage = (currentCapUsed / (_salaryCapLimit/1000000)) * 100;
+            var capPercentage = (currentCapUsed / (_salaryCapLimit / 1000000)) * 100;
 
             CapProgressWidth = Math.Min(capPercentage * 3, 300); // Max width for progress bar
             CurrentCapText = $"${currentCapUsed:F2}M / ${_salaryCapLimit / 1000000:F0}M";
@@ -487,7 +480,7 @@ namespace MobileApp.Models.Team
         private double CalculateCurrentCapUsed()
         {
             double totalCap = 0;
-            for(int i = 1; i < 33; i++)
+            for (int i = 1; i < 33; i++)
             {
                 if (_franchisePlayersCache.TryGetValue(i, out IList<SelectableDto> list))
                     foreach (SelectableDto player in list.Where(p => _rosterPlayerIds.Contains(p.Id)))
@@ -598,7 +591,7 @@ namespace MobileApp.Models.Team
         // Property change handlers for filters
         partial void OnSelectedPositionFilterChanged(string value)
         {
-            if (HasSelectedFranchise && SelectedFranchise is FranchiseModel  && SelectedFranchise.FranchiseInfo is FranchiseInfo franchiseInfo)
+            if (HasSelectedFranchise && SelectedFranchise is FranchiseModel && SelectedFranchise.FranchiseInfo is FranchiseInfo franchiseInfo)
             {
                 _ = Task.Run(async () => await LoadFranchisePlayers(franchiseInfo.Id));
             }
@@ -689,15 +682,15 @@ namespace MobileApp.Models.Team
         {
             if (Team is not TeamDto) return;
 
-            _offenseLineup = 
+            _offenseLineup =
                 Team.OffLineup is LineupDto olineup && !String.IsNullOrWhiteSpace(olineup.Formation)
                 ? olineup : new() { Formation = "ZeroOne" };
 
-            _defenseLineup = 
+            _defenseLineup =
                 Team.DefLineup is LineupDto dlineup && !String.IsNullOrWhiteSpace(dlineup.Formation)
                 ? dlineup : new() { Formation = "Bear" };
 
-            _specialLineup = 
+            _specialLineup =
                 Team.SPLineup is SPLineupDto splineup && !String.IsNullOrWhiteSpace(splineup.Formation)
                 ? splineup : new() { Formation = "SpecialTeams" };
         }
@@ -796,7 +789,7 @@ namespace MobileApp.Models.Team
                 var pos = formation.Positions[i];
                 FormationPosition formationPos = new(pos.Id, pos.Name, pos.Position, pos.X, pos.Y, i + 1);
 
-                var currentPlayerId = GetLineupPlayerByIndex(lineup, i+1);
+                var currentPlayerId = GetLineupPlayerByIndex(lineup, i + 1);
                 if (currentPlayerId > 0)
                 {
                     var player = FindRosterPlayerById(currentPlayerId);
@@ -813,20 +806,20 @@ namespace MobileApp.Models.Team
         {
             return splineup is LineupDto lineup
                 ? index switch
-            {
-                1 => lineup.Player1,
-                2 => lineup.Player2,
-                3 => lineup.Player3,
-                4 => lineup.Player4,
-                5 => lineup.Player5,
-                6 => lineup.Player6,
-                7 => lineup.Player7,
-                8 => lineup.Player8,
-                9 => lineup.Player9,
-                10 => lineup.Player10,
-                11 => lineup.Player11,
-                _ => 0
-            }
+                {
+                    1 => lineup.Player1,
+                    2 => lineup.Player2,
+                    3 => lineup.Player3,
+                    4 => lineup.Player4,
+                    5 => lineup.Player5,
+                    6 => lineup.Player6,
+                    7 => lineup.Player7,
+                    8 => lineup.Player8,
+                    9 => lineup.Player9,
+                    10 => lineup.Player10,
+                    11 => lineup.Player11,
+                    _ => 0
+                }
             : index switch
             {
                 1 => splineup.Player1,
@@ -843,9 +836,9 @@ namespace MobileApp.Models.Team
             PlayerModel model = null;
 
             if (Team is null) return null;
-            if(Team.Players.FirstOrDefault(player => player.Id == playerId) is SelectableDto p)
+            if (Team.Players.FirstOrDefault(player => player.Id == playerId) is SelectableDto p)
                 model = new(p, false, false, true);
-            if(_franchisePlayersCache.SelectMany(f => f.Value).ToList().FirstOrDefault(player => player.Id == playerId) is SelectableDto p2)
+            if (_franchisePlayersCache.SelectMany(f => f.Value).ToList().FirstOrDefault(player => player.Id == playerId) is SelectableDto p2)
                 model = new(p2, false, false, true);
 
             return model;
@@ -869,7 +862,7 @@ namespace MobileApp.Models.Team
             IList<SelectableDto> rosterPlayers = [];
             for (int i = 1; i < 33; i++)
             {
-                rosterPlayers = 
+                rosterPlayers =
                     [
                         .. rosterPlayers,
                         .. (_franchisePlayersCache.TryGetValue(i, out IList<SelectableDto> list)
@@ -961,8 +954,8 @@ namespace MobileApp.Models.Team
 
         private static IList<int> GetAllIdsInLineup(SPLineupDto splineup)
         {
-            IList<int> list = [ splineup.Player1, splineup.Player2, splineup.Player3, splineup.Player4, splineup.Player5 ];
-            if(splineup is LineupDto lineup)
+            IList<int> list = [splineup.Player1, splineup.Player2, splineup.Player3, splineup.Player4, splineup.Player5];
+            if (splineup is LineupDto lineup)
                 list = [.. list, lineup.Player6, lineup.Player7, lineup.Player8, lineup.Player9, lineup.Player10, lineup.Player11];
 
             return list;
