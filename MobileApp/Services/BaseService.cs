@@ -103,7 +103,6 @@ namespace MobileApp.Services
         public const string ProfileTab = "ProfileTab";
 
 
-        public const string EditProfile = "EditProfile";
         public const string SignUp = "SignUp";
         public const string UpdateCredentials = "UpdateCredentials";
         public const string UpdateUser = "UpdateUser";
@@ -122,14 +121,12 @@ namespace MobileApp.Services
         public const string Roster = "Roster";
         public const string RosterSettings = "RosterSettings";
         public const string Trade = "Trade";
-        public const string Trades = "Trades";
 
         private static readonly HashSet<string> ValidRoutes =
         [
-            EditProfile, SignUp, UpdateCredentials, UpdateUser,
+            SignUp, UpdateCredentials, UpdateUser,
             Admin, AssignRoles, Import,
-
-            CreateTeam, TeamDetails, Draft, EditTeam, Formation, ReviewRoster, Roster, RosterSettings, Trade, Trades
+            CreateTeam, TeamDetails, Draft, EditTeam, Formation, ReviewRoster, Roster, RosterSettings, Trade
         ];
 
         private static string GetParentTab(string route)
@@ -137,10 +134,10 @@ namespace MobileApp.Services
             return route switch
             {
                 Admin or AssignRoles or Import or
-                EditProfile or SignUp or UpdateCredentials or UpdateUser => ProfileTab,
+                SignUp or UpdateCredentials or UpdateUser => ProfileTab,
 
-                CreateTeam or TeamDetails or DraftResults or EditTeam or Formation or
-                ReviewRoster or Roster or RosterSettings or Trade or Trades => MyTeamsTab,
+                CreateTeam or TeamDetails or EditTeam or Formation or
+                ReviewRoster or Roster or RosterSettings or Trade => MyTeamsTab,
 
                 _ => string.Empty
             };

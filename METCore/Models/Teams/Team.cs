@@ -5,7 +5,7 @@ using METCore.Models.Players;
 
 namespace METCore.Models.Teams
 {
-    public class Team : Squad
+    public class Team : Squad, ICloneable
     {
         #region Attributes
         public virtual User User { get; set; }
@@ -59,5 +59,18 @@ namespace METCore.Models.Teams
             this.Players = [];
         }
         #endregion Constructors
+
+        public object Clone()
+        {
+            return new Team
+            {
+                Id = 0,
+                Date = DateTime.Now,
+                Location = this.Location,
+                Mascot = this.Mascot,
+                Abb = this.Abb,
+                Complete = false,
+            };
+        }
     }
 }

@@ -4,30 +4,28 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
              x:DataType="viewmodels:TradesViewModel"
-             Title="Past Trades">
+             Title="Trueques Pasados">
 
     <ScrollView>
         <StackLayout Padding="20" Spacing="15">
 
-            <!-- Header -->
             <Label Text="{Binding TeamName}" 
                 FontSize="24" 
                 FontAttributes="Bold" 
                 HorizontalOptions="Center" />
 
-            <Label Text="Past Trades - Phase 4" 
+            <Label Text="Historial de Trueques - Phase 4" 
                 FontSize="18" 
                 HorizontalOptions="Center" />
 
-            <!-- Action Buttons -->
             <StackLayout Orientation="Horizontal" Spacing="10">
-                <Button Text="Make New Trade" 
+                <Button Text="Nuevo Trade" 
                     Command="{Binding GoToNewTradeCommand}"
                     BackgroundColor="Green"
                     TextColor="White"
                     HorizontalOptions="Fill" />
 
-                <Button Text="Refresh" 
+                <Button Text="Recargar" 
                     Command="{Binding LoadTradesCommand}"
                     CommandParameter="{Binding TeamId}"
                     BackgroundColor="Blue"
@@ -35,9 +33,8 @@
                     HorizontalOptions="Fill" />
             </StackLayout>
 
-            <!-- Year Filter -->
             <StackLayout>
-                <Label Text="Filter by Year:" FontAttributes="Bold" />
+                <Label Text="Filtrar por Año:" FontAttributes="Bold" />
 
                 <CollectionView ItemsSource="{Binding YearFilters}"
                             ItemsLayout="HorizontalList"
@@ -55,22 +52,20 @@
                 </CollectionView>
             </StackLayout>
 
-            <!-- Trades Summary -->
             <Border BackgroundColor="LightBlue" Padding="15" Stroke="Blue"  StrokeThickness="1" StrokeShape="RoundRectangle 10" 
                     IsVisible="{Binding FilteredTrades.Count, Converter={StaticResource CountToBoolConverter}}">
                 <StackLayout>
-                    <Label Text="{Binding FilteredTrades.Count, StringFormat='Total Trades: {0}'}" 
+                    <Label Text="{Binding FilteredTrades.Count, StringFormat='Núm Trueques: {0}'}" 
                         FontAttributes="Bold" 
                         HorizontalOptions="Center" />
-                    <Label Text="{Binding SelectedYearFilter, StringFormat='Showing trades for: {0}'}" 
+                    <Label Text="{Binding SelectedYearFilter, StringFormat='Mostrando trueques de: {0}'}" 
                         FontSize="12" 
                         HorizontalOptions="Center" />
                 </StackLayout>
             </Border>
 
-            <!-- Trades List -->
             <StackLayout IsVisible="{Binding HasNoTrades, Converter={StaticResource InvertedBoolConverter}}">
-                <Label Text="{Binding FilteredTrades.Count, StringFormat='Showing {0} trades'}" 
+                <Label Text="{Binding FilteredTrades.Count, StringFormat='Mostrando {0} trueques'}" 
                     FontSize="12" />
 
                 <CollectionView ItemsSource="{Binding FilteredTrades}"
@@ -85,7 +80,6 @@
                                                             CommandParameter="{Binding}" />
                                         </StackLayout.GestureRecognizers>
 
-                                        <!-- Trade Header -->
                                         <StackLayout Orientation="Horizontal">
                                             <Label Text="{Binding TradeTitle}" 
                                                 FontAttributes="Bold" 
@@ -95,26 +89,22 @@
                                             <Label Text="⚠️" 
                                                 VerticalOptions="Center"
                                                 IsVisible="{Binding IsForced}"
-                                                ToolTipProperties.Text="Forced Trade" />
+                                                ToolTipProperties.Text="Trueque Forzado" />
                                         </StackLayout>
 
-                                        <!-- Trade Info -->
                                         <Label Text="{Binding TradeSubtitle}" 
                                             FontSize="12"
                                             TextColor="Gray" />
 
-                                        <!-- Trade Summary -->
                                         <Label Text="{Binding TradeSummary}" 
                                             FontSize="12"
                                             FontAttributes="Italic" />
 
-                                        <!-- Quick Preview -->
                                         <StackLayout Orientation="Horizontal" Spacing="20" Margin="0,5,0,0">
-                                            <!-- Given -->
                                             <StackLayout HorizontalOptions="Fill">
-                                                <Label Text="Gave:" FontSize="10" FontAttributes="Bold" />
+                                                <Label Text="Envió:" FontSize="10" FontAttributes="Bold" />
                                                 <StackLayout>
-                                                    <Label Text="{Binding TeamPlayers.Count, StringFormat='{0} Players'}" 
+                                                    <Label Text="{Binding TeamPlayers.Count, StringFormat='{0} Jugadores'}" 
                                                         FontSize="10" 
                                                         IsVisible="{Binding TeamPlayers.Count, Converter={StaticResource CountToBoolConverter}}" />
                                                     <Label Text="{Binding TeamPicks.Count, StringFormat='{0} Picks'}" 
@@ -123,11 +113,10 @@
                                                 </StackLayout>
                                             </StackLayout>
 
-                                            <!-- Received -->
                                             <StackLayout HorizontalOptions="Fill">
-                                                <Label Text="Received:" FontSize="10" FontAttributes="Bold" />
+                                                <Label Text="Recivió:" FontSize="10" FontAttributes="Bold" />
                                                 <StackLayout>
-                                                    <Label Text="{Binding FranchisePlayers.Count, StringFormat='{0} Players'}" 
+                                                    <Label Text="{Binding FranchisePlayers.Count, StringFormat='{0} Jugadores'}" 
                                                         FontSize="10" 
                                                         IsVisible="{Binding FranchisePlayers.Count, Converter={StaticResource CountToBoolConverter}}" />
                                                     <Label Text="{Binding FranchisePicks.Count, StringFormat='{0} Picks'}" 
@@ -137,8 +126,7 @@
                                             </StackLayout>
                                         </StackLayout>
 
-                                        <!-- Tap hint -->
-                                        <Label Text="Tap for details" 
+                                        <Label Text="Pulse para detalles" 
                                             FontSize="10" 
                                             TextColor="Blue"
                                             HorizontalOptions="End" />
@@ -150,22 +138,21 @@
                 </CollectionView>
             </StackLayout>
 
-            <!-- No Trades State -->
             <StackLayout IsVisible="{Binding HasNoTrades}">
                 <Border BackgroundColor="LightGray" Padding="30" Stroke="Gray" StrokeThickness="1" StrokeShape="RoundRectangle 10">
                     <StackLayout HorizontalOptions="Center">
                         <Label Text="📈" 
                             FontSize="48" 
                             HorizontalOptions="Center" />
-                        <Label Text="No Trades Found" 
+                        <Label Text="Sin Trueques encontrados" 
                             FontSize="18" 
                             FontAttributes="Bold"
                             HorizontalOptions="Center" />
-                        <Label Text="This team hasn't made any trades yet." 
+                        <Label Text="Este equipo no ha realizado trueques aún." 
                             FontSize="14" 
                             HorizontalOptions="Center"
                             Margin="0,5,0,0" />
-                        <Button Text="Make Your First Trade" 
+                        <Button Text="Haz tu primer trade" 
                             Command="{Binding GoToNewTradeCommand}"
                             BackgroundColor="Green"
                             TextColor="White"
@@ -174,17 +161,14 @@
                 </Border>
             </StackLayout>
 
-            <!-- Error Message -->
             <Label Text="{Binding ErrorMessage}" 
                 TextColor="Red" 
                 IsVisible="{Binding HasError}" />
 
-            <!-- Loading Indicator -->
             <ActivityIndicator IsRunning="{Binding IsLoading}" 
                             IsVisible="{Binding IsLoading}" />
 
-            <!-- Go Back Button -->
-            <Button Text="Go Back" 
+            <Button Text="Volver" 
                 Command="{Binding GoBackCommand}"
                 BackgroundColor="Transparent"
                 TextColor="Blue" />

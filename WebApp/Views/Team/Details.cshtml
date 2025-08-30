@@ -1,8 +1,8 @@
-﻿@model METCore.DTOs.Team.TeamDto
+﻿@using static METCore.Enums.Types
+@model METCore.DTOs.Team.TeamDto
 
 <div class="container-fluid">
     <div class="row">
-        <!-- Team Header Card -->
         <div class="col-12 mb-4">
             <div class="card">
                 <div class="card-header bg-primary text-white">
@@ -14,18 +14,18 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <p class="mb-2"><strong>Owner:</strong> <span class="text-muted">@Model.UserUsername</span></p>
-                            <p class="mb-0"><strong>Created:</strong> <span class="text-muted">@Model.Date.ToString("MMM dd, yyyy")</span></p>
+                            <p class="mb-2"><strong>@Html.LabelFor(model => model.UserUsername):</strong> <span class="text-muted">@Html.DisplayFor(model => model.UserUsername)</span></p>
+                            <p class="mb-0"><strong>@Html.LabelFor(model => model.Date):</strong> <span class="text-muted">@Html.DisplayFor(model => model.Date)</span></p>
                         </div>
                         <div class="col-md-6">
                             <div class="text-md-end">
                                 @if (Model.Complete)
                                 {
-                                    <span class="badge bg-success fs-6">Team Complete</span>
+                                    <span class="badge bg-success fs-6">Equipo Completado</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-warning fs-6">Setup Required</span>
+                                    <span class="badge bg-warning fs-6">Edición requerida</span>
                                 }
                             </div>
                         </div>
@@ -34,53 +34,50 @@
             </div>
         </div>
 
-        <!-- Team Information Cards -->
         <div class="col-md-6 mb-3">
             <div class="card h-100">
                 <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Team Information</h5>
+                    <h5 class="mb-0">Información del Equipo</h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-muted">Location</label>
-                        <p class="mb-0">@Model.Location</p>
+                        <label class="form-label fw-bold text-muted">@Html.LabelFor(model => model.Location)</label>
+                        <p class="mb-0">@Html.DisplayFor(model => model.Location)</p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-muted">Mascot</label>
-                        <p class="mb-0">@Model.Mascot</p>
+                        <label class="form-label fw-bold text-muted">@Html.LabelFor(model => model.Mascot)</label>
+                        <p class="mb-0">@Html.DisplayFor(model => model.Mascot)</p>
                     </div>
                     <div class="mb-0">
-                        <label class="form-label fw-bold text-muted">Abbreviation</label>
-                        <p class="mb-0">@Model.Abb</p>
+                        <label class="form-label fw-bold text-muted">@Html.LabelFor(model => model.Abb)</label>
+                        <p class="mb-0">@Html.DisplayFor(model => model.Abb)</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Roster Settings Card -->
         <div class="col-md-6 mb-3">
             <div class="card h-100">
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Roster Settings</h5>
+                    <h5 class="mb-0">Ajustes del equipo</h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-muted">Salary Cap %</label>
-                        <p class="mb-0">@Model.RosterSettingsCap.ToString("N0")</p>
+                        <label class="form-label fw-bold text-muted">@Html.LabelFor(model => model.RosterSettingsCap)</label>
+                        <p class="mb-0">@Html.DisplayFor(model => model.RosterSettingsCap)</p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-muted">Max Players Per Team</label>
-                        <p class="mb-0">@Model.RosterSettingsMaxPerTeam players</p>
+                        <label class="form-label fw-bold text-muted">@Html.LabelFor(model => model.RosterSettingsMaxPerTeam)</label>
+                        <p class="mb-0">@Html.DisplayFor(model => model.RosterSettingsMaxPerTeam) jugadores</p>
                     </div>
                     <div class="mb-0">
-                        <label class="form-label fw-bold text-muted">Protected Players Per Team</label>
-                        <p class="mb-0">@Model.RosterSettingsProtectedPerTeam players</p>
+                        <label class="form-label fw-bold text-muted">@Html.LabelFor(model => model.RosterSettingsProtectedPerTeam)</label>
+                        <p class="mb-0">@Html.DisplayFor(model => model.RosterSettingsProtectedPerTeam) jugadores</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Action Buttons -->
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
@@ -89,18 +86,21 @@
                             @if (Model.UserUsername == User?.Identity?.Name)
                             {
                                 <a asp-controller="Team" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-edit me-1"></i>Edit Team
+                                    <i class="fas fa-edit me-1"></i>Editar Información
                                 </a>
                                 <a asp-controller="Team" asp-action="RosterSettings" asp-route-id="@Model.Id" class="btn btn-success btn-sm">
-                                    <i class="fas fa-cog me-1"></i>Roster Settings
+                                    <i class="fas fa-cog me-1"></i>Cambiar ajustes
                                 </a>
                                 <a asp-controller="Team" asp-action="EditRoster" asp-route-id="@Model.Id" class="btn btn-info btn-sm">
-                                    <i class="fas fa-users me-1"></i>Build Roster
+                                    <i class="fas fa-users me-1"></i>Modificar plantilla
                                 </a>
-                            }
+							}
+                            <button type="button" class="btn btn-outline-warning btn-sm" onclick="confirmDuplicate(event)">
+                                <i class="fas fa-copy me-1"></i>Duplicar Equipo
+                            </button>
                         </div>
                         <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary btn-sm">
-                            <i class="fas fa-arrow-left me-1"></i>Back to Teams
+                            <i class="fas fa-arrow-left me-1"></i>Volver
                         </a>
                     </div>
                 </div>
@@ -112,7 +112,7 @@
             <div class="card">
                 <div class="card-header bg-warning text-dark">
                     <h5 class="mb-0">
-                        <i class="fas fa-users me-2"></i>Team Roster Overview
+                        <i class="fas fa-users me-2"></i>Resumen de la plantilla
                     </h5>
                 </div>
                 <div class="card-body">
@@ -138,7 +138,7 @@
                     <div id="rosterDisplay" style="max-height: 500px; overflow-y: auto; overflow-x: hidden;">
                         <div class="text-center text-muted p-4">
                             <i class="fas fa-users fa-2x mb-3"></i>
-                            <p>Loading roster...</p>
+                            <p>Cargando plantilla...</p>
                         </div>
                     </div>
                 </div>
@@ -150,7 +150,7 @@
             <div class="card">
                 <div class="card-header bg-secondary text-white">
                     <h5 class="mb-0">
-                        <i class="fas fa-chess-board me-2"></i>Formation & Starters
+                        <i class="fas fa-chess-board me-2"></i>Formaciones y titulares
                     </h5>
                 </div>
                 <div class="card-body">
@@ -158,13 +158,13 @@
                     <div class="mb-3">
                         <div class="btn-group" role="group" id="formationSelector">
                             <button type="button" class="btn btn-outline-primary active" data-formation="offense">
-                                <i class="fas fa-football-ball me-1"></i>Offense
+                                <i class="fas fa-football-ball me-1"></i>Ataque
                             </button>
                             <button type="button" class="btn btn-outline-primary" data-formation="defense">
-                                <i class="fas fa-shield-alt me-1"></i>Defense
+                                <i class="fas fa-shield-alt me-1"></i>Defensa
                             </button>
                             <button type="button" class="btn btn-outline-primary" data-formation="special">
-                                <i class="fas fa-star me-1"></i>Special Teams
+                                <i class="fas fa-star me-1"></i>Equipos especiales
                             </button>
                         </div>
                     </div>
@@ -172,22 +172,22 @@
                     <div class="row">
                         <!-- Formation Display -->
                         <div class="col-md-8">
-                            <h6 class="mb-3">Current Formation: <span id="currentFormationName" class="text-primary">Loading...</span></h6>
+                            <h6 class="mb-3">Formación actual: <span id="currentFormationName" class="text-primary">Cargando...</span></h6>
                             <div id="formationDisplay" style="position: relative; height: 400px; background: linear-gradient(to bottom, #228B22 0%, #32CD32 50%, #228B22 100%); border-radius: 8px;">
                                 <div class="text-center text-white p-5">
                                     <i class="fas fa-football-ball fa-2x mb-3"></i>
-                                    <p>Loading formation...</p>
+                                    <p>Cargando formaciones...</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Bench Players -->
                         <div class="col-md-4">
-                            <h6 class="mb-3">Bench Players</h6>
+                            <h6 class="mb-3">Jugadores suplentes</h6>
                             <div id="benchDisplay" style="max-height: 400px; overflow-y: auto;" class="bg-light p-3 rounded">
                                 <div class="text-center text-muted p-3">
                                     <i class="fas fa-clock fa-2x mb-3"></i>
-                                    <p>Loading bench players...</p>
+                                    <p>Cargando suplentes...</p>
                                 </div>
                             </div>
                         </div>
@@ -201,14 +201,14 @@
             <div class="card">
                 <div class="card-header bg-danger text-white">
                     <h5 class="mb-0">
-                        <i class="fas fa-exchange-alt me-2"></i>Trade History
+                        <i class="fas fa-exchange-alt me-2"></i>Historial de trueques
                     </h5>
                 </div>
                 <div class="card-body">
                     <div id="tradeHistoryDisplay" style="max-height: 400px; overflow-y: auto;">
                         <div class="text-center text-muted p-4">
                             <i class="fas fa-handshake fa-2x mb-3"></i>
-                            <p>Loading trade history...</p>
+                            <p>Cargando historial de trueques...</p>
                         </div>
                     </div>
                 </div>
@@ -220,14 +220,14 @@
             <div class="card">
                 <div class="card-header bg-info text-white">
                     <h5 class="mb-0">
-                        <i class="fas fa-trophy me-2"></i>Draft Results
+                        <i class="fas fa-trophy me-2"></i>Resultados del Draft
                     </h5>
                 </div>
                 <div class="card-body">
                     <div id="draftResultsDisplay" style="overflow-y: auto;">
                         <div class="text-center text-muted p-4">
                             <i class="fas fa-award fa-2x mb-3"></i>
-                            <p>Loading draft results...</p>
+                            <p>Cargando draft...</p>
                         </div>
                     </div>
                 </div>
@@ -257,6 +257,7 @@
                 'PR/KR': ['PR', 'KR'],
                 'LS': ['LS']
             };
+            const totalAtRound = @Html.Raw(Json.Serialize(DraftPicks.TotalAtRound));
 
             // Load data from model - EXACTLY like in Roster view
             const teamRosterData = @Html.Raw(Json.Serialize(Model.Players));
@@ -269,10 +270,9 @@
             };
 
             let currentPositionFilter = 'all';
-            let currentFormation = 'offense'; // offense, defense, special
-            let currentFormationType = 'Eleven'; // specific formation within category
+            let currentFormation = 'offense';
+            let currentFormationType = 'Eleven';
 
-            // EXACTLY same formations object as Roster view
             const formations = {
                 offense: {
                     ZeroOne: {
@@ -316,7 +316,7 @@
                             { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                             { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                             { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                            { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
                             { id: "LWRX", name: "X-WR", position: "WR", x: 10, y: 45},
                             { id: "RWRX", name: "X-WR", position: "WR", x: 90, y: 45},
                             { id: "WRZ", name: "Z-WR", position: "WR", x: 20, y: 50},
@@ -332,7 +332,7 @@
                             { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                             { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                             { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                            { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
                             { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                             { id: "WRZ", name: "Z-WR", position: "WR", x: 83, y: 45},
                             { id: "WRS", name: "Slot", position: "WR", x: 73, y: 55},
@@ -348,7 +348,7 @@
                             { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                             { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                             { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                            { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
                             { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                             { id: "WRZ", name: "Z-WR", position: "WR", x: 90, y: 45},
                             { id: "LTE", name: "TE", position: "TE", x: 25, y: 58},
@@ -364,7 +364,7 @@
                             { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                             { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                             { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                            { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
                             { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                             { id: "LTE", name: "TE", position: "TE", x: 29, y: 50},
                             { id: "RTE", name: "TE", position: "TE", x: 71, y: 45},
@@ -380,8 +380,8 @@
                             { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                             { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                             { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
-                            { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                            { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
+                            { id: "FB", name: "FB", position: "HB", x: 58, y: 72},
                             { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                             { id: "WRZ", name: "Z-WR", position: "WR", x: 85, y: 45},
                             { id: "WRS", name: "Slot", position: "WR", x: 75, y: 50}
@@ -396,8 +396,8 @@
                             { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                             { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                             { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
-                            { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                            { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
+                            { id: "FB", name: "FB", position: "HB", x: 58, y: 72},
                             { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                             { id: "WRZ", name: "Z-WR", position: "WR", x: 80, y: 45},
                             { id: "TE", name: "TE", position: "TE", x: 25, y: 58}
@@ -412,8 +412,8 @@
                             { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                             { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                             { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
-                            { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                            { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
+                            { id: "FB", name: "FB", position: "HB", x: 58, y: 72},
                             { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                             { id: "LTE", name: "TE", position: "TE", x: 25, y: 58},
                             { id: "RTE", name: "TE", position: "TE", x: 80, y: 45}
@@ -429,8 +429,8 @@
                             { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                             { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                             { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                            { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
-                            { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                            { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
+                            { id: "FB", name: "FB", position: "HB", x: 58, y: 72},
                             { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                             { id: "TE", name: "TE", position: "TE", x: 71, y: 45},
                         ]
@@ -445,7 +445,7 @@
                             { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                             { id: "LQB", name: "QB", position: "QB", x: 46, y: 72},
                             { id: "RQB", name: "QB", position: "QB", x: 54, y: 72},
-                            { id: "RB", name: "RB", position: "RB", x: 62, y: 78},
+                            { id: "RB", name: "RB", position: "HB", x: 62, y: 78},
                             { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                             { id: "WRZ", name: "Z-WR", position: "WR", x: 90, y: 45},
                             { id: "TE", name: "TE", position: "TE", x: 25, y: 58}
@@ -549,36 +549,54 @@
             };
 
 
-            // Get current lineups configurations exactly like Roster view
             let offenseStartersConfiguration = {};
             let defenseStartersConfiguration = {};
             let specialStartersConfiguration = {};
+            loadFormations();
 
-            // Load starters from lineups data
-            if (lineupsData.offense && lineupsData.offense.formation) {
-                currentFormationType = lineupsData.offense.formation;
-                // Load assigned players for offense
-                const offenseFormation = formations.offense[currentFormationType];
-                if (offenseFormation) {
-                    offenseFormation.positions.forEach((pos, index) => {
-                        const playerData = lineupsData.offense[`player${index + 1}`];
-                        if (playerData && playerData > 0) {
-                            const player = teamRosterData.find(p => p.id === playerData);
-                            if (player) {
-                                offenseStartersConfiguration[pos.id] = player;
-                            }
-                        }
-                    });
+            function loadFormations(){
+                if (lineupsData.offense && lineupsData.offense.formation) {
+                    currentFormationType = lineupsData.offense.formation;
+
+                    const offenseFormation = formations.offense[currentFormationType];
+                    if (offenseFormation) {
+                        loadFormation(lineupsData.offense, offenseFormation, offenseStartersConfiguration);
+                    }
+                }
+                if (lineupsData.defense && lineupsData.defense.formation) {
+                    currentFormationType = lineupsData.defense.formation;
+
+                    const defenseFormation = formations.defense[currentFormationType];
+                    if (defenseFormation) {
+                        loadFormation(lineupsData.defense, defenseFormation, defenseStartersConfiguration);
+                    }
+                }
+                if (lineupsData.special && lineupsData.special.formation) {
+                    currentFormationType = lineupsData.special.formation;
+
+                    const specialFormation = formations.special[currentFormationType];
+                    if (specialFormation) {
+                        loadFormation(lineupsData.special, specialFormation, specialStartersConfiguration);
+                    }
                 }
             }
+            function loadFormation(lineup, formation, startersConfiguration){
+                formation.positions.forEach((pos, index) => {
+                    const playerData = lineup[`player${index + 1}`];
+                    if (playerData && playerData > 0) {
+                        const player = teamRosterData.find(p => p.id === playerData);
+                        if (player) {
+                            startersConfiguration[pos.id] = player;
+                        }
+                    }
+                });
+            }
 
-            // Initialize displays
             displayRoster();
             displayFormation();
             loadTradeHistory();
             loadDraftResults();
 
-            // Position filter event handler for roster
             document.getElementById('rosterPositionFilters').addEventListener('click', function(e) {
                 if (e.target.tagName === 'BUTTON') {
                     this.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
@@ -589,7 +607,6 @@
                 }
             });
 
-            // Formation selector event handler - EXACTLY like Roster view
             document.getElementById('formationSelector').addEventListener('click', function(e) {
                 if (e.target.tagName === 'BUTTON') {
                     this.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
@@ -600,7 +617,6 @@
                 }
             });
 
-            // EXACTLY same roster display as Roster view - Review tab
             function displayRoster() {
                 const container = document.getElementById('rosterDisplay');
 
@@ -628,14 +644,13 @@
                 const summaryDiv = document.createElement('div');
                 summaryDiv.className = 'alert alert-secondary mb-4';
                 summaryDiv.innerHTML = `
-                    <h6 class="mb-2">Roster Summary</h6>
                     <div class="row">
                         <div class="col-md-6">
-                            <strong>Total Players:</strong> ${teamRosterData.length}<br>
-                            <strong>Total Cap Used:</strong> ${teamRosterData.reduce((sum, p) => sum + parseFloat(p.pureAPY || 0), 0).toFixed(1)}M
+                            <strong># Jugadores:</strong> ${teamRosterData.length}<br>
+                            <strong>Salario usado total:</strong> ${teamRosterData.reduce((sum, p) => sum + parseFloat(p.pureAPY || 0), 0).toFixed(1)}M
                         </div>
                         <div class="col-md-6">
-                            <strong>Positions:</strong> ${Object.keys(playersByPosition).map(pos => `${pos} (${playersByPosition[pos].length})`).join(', ')}
+                            <strong>Posiciones:</strong> ${Object.keys(playersByPosition).map(pos => `${pos} (${playersByPosition[pos].length})`).join(', ')}
                         </div>
                     </div>
                 `;
@@ -667,7 +682,6 @@
                         const playerDiv = document.createElement('div');
                         playerDiv.className = 'col-md-6 col-lg-4 mb-3';
 
-                        // EXACTLY same structure as Roster view - but WITHOUT remove button
                         playerDiv.innerHTML = `
                             <div class="card h-100">
                                 <div class="card-body p-3">
@@ -675,7 +689,7 @@
                                         <div class="flex-grow-1">
                                             <h6 class="card-title mb-1">${player.name}</h6>
                                             <p class="card-text mb-1">
-                                                <small class="text-muted">${player.college}</small>
+                                                <small class="text-muted">${player.stats}</small>
                                             </p>
                                             <p class="card-text mb-0">
                                                 <span class="badge bg-primary">${player.position}</span>
@@ -697,7 +711,6 @@
                 });
             }
 
-            // EXACTLY same formation display as Roster view
             function displayFormation() {
                 updateFormationDisplay();
                 updateBenchPlayers();
@@ -705,27 +718,8 @@
 
             function updateFormationDisplay() {
                 const fieldDisplay = document.getElementById('formationDisplay');
-                const formationTypes = formations[currentFormation];
 
-                if (!formationTypes) {
-                    fieldDisplay.innerHTML = '<div class="text-center p-5"><p>Formation category not found</p></div>';
-                    return;
-                }
 
-                // Get the first available formation type for this category
-                const formationTypeKeys = Object.keys(formationTypes);
-                if (formationTypeKeys.length === 0) {
-                    fieldDisplay.innerHTML = '<div class="text-center p-5"><p>No formations available</p></div>';
-                    return;
-                }
-
-                currentFormationType = formationTypeKeys[0];
-                const formation = formationTypes[currentFormationType];
-
-                // Update formation name display
-                document.getElementById('currentFormationName').textContent = formation.name;
-
-                // EXACTLY same field display as Roster view
                 fieldDisplay.innerHTML = `
                     <div class="field-lines">
                         <div class="yard-line FirstDown-YardLine"></div>
@@ -737,19 +731,23 @@
                 const positionsContainer = fieldDisplay.querySelector('.formation-positions');
                 fieldDisplay.className = `football-field ${currentFormation}`;
 
-                // Get the appropriate starters configuration
                 let startersConfig = {};
+                let formation;
                 switch(currentFormation) {
                     case 'offense':
                         startersConfig = offenseStartersConfiguration;
+                        formation = formations['offense'][lineupsData['offense'].formation] ?? formations['offense'].ZeroOne;
                         break;
                     case 'defense':
                         startersConfig = defenseStartersConfiguration;
+                        formation = formations['defense'][lineupsData['defense'].formation] ?? formations['defense'].Bear;
                         break;
                     case 'special':
                         startersConfig = specialStartersConfiguration;
+                        formation = formations['special'][lineupsData['special'].formation] ?? formations['special'].SpecialTeams;
                         break;
                 }
+                document.getElementById('currentFormationName').textContent = formation.name;
 
                 formation.positions.forEach((position, index) => {
                     const positionDiv = document.createElement('div');
@@ -764,7 +762,7 @@
                     positionDiv.innerHTML = `
                         <div class="position-circle">
                             <div class="position-label">${position.name}</div>
-                            ${assignedPlayer ? `<div class="player-name">${assignedPlayer.name}</div>` : '<div class="player-name empty">Empty</div>'}
+                            ${assignedPlayer ? `<div class="player-name">${assignedPlayer.name}</div>` : '<div class="player-name empty">Vacío</div>'}
                         </div>
                     `;
 
@@ -840,7 +838,6 @@
                 benchContainer.innerHTML = html;
             }
 
-            // EXACTLY same trade loading as Roster view
             function loadTradeHistory() {
                 const tradesDisplay = document.getElementById('tradeHistoryDisplay');
 
@@ -877,7 +874,6 @@
                 });
             }
 
-            // EXACTLY same trade display as Roster view
             function displayTrades(trades) {
                 const tradesDisplay = document.getElementById('tradeHistoryDisplay');
 
@@ -897,20 +893,20 @@
                         <div class="col-md-6 mb-3">
                             <div class="card border-info">
                                 <div class="card-header bg-info text-white">
-                                    <h6 class="mb-0">Trade #${index + 1}</h6>
-                                    <small>Date: ${new Date(trade.date).toLocaleDateString()}</small>
+                                    <h6 class="mb-0">Trueque #${index + 1}</h6>
+                                    <small>Fecha: ${new Date(trade.date).toLocaleDateString()}</small>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-6">
-                                            <h6 class="text-success">Received:</h6>
+                                            <h6 class="text-success">Recibido:</h6>
                                             <ul class="list-unstyled small">
                                                 ${trade.teamPlayers ? trade.teamPlayers.map(p => `<li><i class="fas fa-user me-1"></i>${p.name}</li>`).join('') : ''}
                                                 ${trade.teamPicks ? trade.teamPicks.map(p => `<li><i class="fas fa-trophy me-1"></i>Pick ${p}</li>`).join('') : ''}
                                             </ul>
                                         </div>
                                         <div class="col-6">
-                                            <h6 class="text-danger">Sent:</h6>
+                                            <h6 class="text-danger">Enviado:</h6>
                                             <ul class="list-unstyled small">
                                                 ${trade.franchisePlayers ? trade.franchisePlayers.map(p => `<li><i class="fas fa-user me-1"></i>${p.name}</li>`).join('') : ''}
                                                 ${trade.franchisePicks ? trade.franchisePicks.map(p => `<li><i class="fas fa-trophy me-1"></i>Pick ${p}</li>`).join('') : ''}
@@ -927,17 +923,13 @@
                 tradesDisplay.innerHTML = tradesHtml;
             }
 
-            // EXACTLY same draft loading as Roster view
             function loadDraftResults() {
                 const draftDisplay = document.getElementById('draftResultsDisplay');
 
                 fetch(`/Team/GetTeamDraft?TeamId=${teamId}`)
                 .then(response => {return response.json();})
                 .then(draftData => {
-                    const prospects = draftData.prospects || [];
-                    const selections = draftData.selections || [];
-
-                    displayDraftResults(prospects, selections);
+                    displayDraftResults(draftData.prospects || [], Object.entries(draftData.selections || []));
                 })
                 .catch(error => {
                     console.error('Error loading draft results:', error);
@@ -950,7 +942,6 @@
                 });
             }
 
-            // EXACTLY same draft display as Roster view
             function displayDraftResults(prospects, selections) {
                 const draftDisplay = document.getElementById('draftResultsDisplay');
 
@@ -965,26 +956,36 @@
                 }
 
                 let draftHtml = '<div class="row justify-content-between" style="margin-right: 0;">';
-                prospects.forEach((prospect, index) => {
+                selections.forEach((selection, index) => {
+                    let prospect = prospects.find(prospect => selection[1] == prospect.id);
+                    let pick = selection[0];
+                    let round = 0;
+                    let pos = 0;
+                    totalAtRound.forEach(total => {
+                        if (pick > total) round++;
+                        else return;
+                    });
+                    pos = pick-totalAtRound[round-1];
+                    
                     draftHtml += `
                         <div class="col-md-6 col-lg-4 mb-3">
                             <div class="card h-100 border-success">
                                 <div class="card-header bg-success text-white">
-                                    <h6 class="mb-0">Round ${prospect.round}, Pick ${prospect.pick}</h6>
+                                    <h6 class="mb-0">Ronda ${round}, Selección ${pos}</h6>
                                 </div>
                                 <div class="card-body">
                                     <h6 class="card-title">${prospect.name}</h6>
                                     <div class="row text-center">
                                         <div class="col-4">
-                                            <small class="text-muted">Position</small>
+                                            <small class="text-muted">Posición</small>
                                             <div><span class="badge bg-primary">${prospect.position}</span></div>
                                         </div>
                                         <div class="col-4">
-                                            <small class="text-muted">College</small>
+                                            <small class="text-muted">Universidad</small>
                                             <div>${prospect.college}</div>
                                         </div>
                                         <div class="col-4">
-                                            <small class="text-muted">Consensus</small>
+                                            <small class="text-muted">Consenso</small>
                                             <div>#${prospect.consensus || 'N/A'}</div>
                                         </div>
                                     </div>
@@ -992,7 +993,7 @@
                                         <div class="progress" style="height: 6px;">
                                             <div class="progress-bar bg-info" style="width: ${(prospect.athScore || 0)}%"></div>
                                         </div>
-                                        <small class="text-muted">Athletic Score: ${prospect.athScore || 0}</small>
+                                        <small class="text-muted">Val. Atlética: ${prospect.athScore || 0}</small>
                                     </div>
                                 </div>
                             </div>
@@ -1004,6 +1005,13 @@
                 draftDisplay.innerHTML = draftHtml;
             }
         });
+
+        function confirmDuplicate(event) {
+            event.preventDefault();
+            if (confirm('¿Estás seguro de que deseas duplicar este equipo?')) {
+                window.location.href = '@Url.Action("DuplicateTeam", "Team", new { TeamId = @Model.Id })';
+            }
+        }
     </script>
 
     <style>

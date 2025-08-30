@@ -242,7 +242,7 @@ namespace METAPI.Controllers
         #region CU008 DeleteTeam
         [HttpDelete("DeleteTeam")]
         [Authorize]
-        public async Task<IActionResult> DeleteUser(IdDto dto)
+        public async Task<IActionResult> DeleteTeam(IdDto dto)
         {
             string? username = User?.Identity?.Name;
             if (String.IsNullOrWhiteSpace(username)) return BadRequest(new MessageDto("Username"));

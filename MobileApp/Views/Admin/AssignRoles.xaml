@@ -4,21 +4,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Admin"
              x:DataType="viewmodels:AssignRolesViewModel"
-             Title="Assign Roles">
+             Title="Asignar Roles">
 
     <ScrollView>
         <StackLayout Padding="20" Spacing="15">
 
-            <!-- Header -->
-            <Label Text="Role Assignment" 
+            <Label Text="Asignar Roles" 
                    FontSize="24" 
                    FontAttributes="Bold" 
                    HorizontalOptions="Center" />
 
-            <!-- Search Section -->
             <Border BackgroundColor="LightGray" Padding="15" Stroke="Gray"  StrokeThickness="1" StrokeShape="RoundRectangle 10">
                 <StackLayout Spacing="10">
-                    <Label Text="Search Users" FontAttributes="Bold" />
+                    <Label Text="Buscar Usuarios" FontAttributes="Bold" />
 
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                         <Entry Grid.Column="0" 
@@ -27,7 +25,7 @@
                                ReturnCommand="{Binding SearchCommand}" />
 
                         <Button Grid.Column="1" 
-                                Text="Search" 
+                                Text="Buscar" 
                                 Command="{Binding SearchCommand}"
                                 BackgroundColor="Blue"
                                 TextColor="White"
@@ -36,11 +34,10 @@
                 </StackLayout>
             </Border>
 
-            <!-- Pagination Controls -->
             <Border BackgroundColor="LightBlue" Padding="15" Stroke="Blue"  StrokeThickness="1" StrokeShape="RoundRectangle 10">
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
                     <Label Grid.Column="0" 
-                           Text="Show:" 
+                           Text="Mostrar:" 
                            VerticalOptions="Center" 
                            FontAttributes="Bold" />
 
@@ -54,24 +51,20 @@
                 </Grid>
             </Border>
 
-            <!-- Results Info -->
             <Label Text="{Binding ResultsInfo}" 
                    FontSize="12" 
                    TextColor="Gray" 
                    HorizontalOptions="Center" />
 
-            <!-- Loading Indicator -->
             <ActivityIndicator IsRunning="{Binding IsLoading}" 
                              IsVisible="{Binding IsLoading}" />
 
-            <!-- Error Message -->
             <Label Text="{Binding ErrorMessage}" 
                    TextColor="Red" 
                    IsVisible="{Binding HasError}"
                    FontSize="14"
                    HorizontalOptions="Center" />
 
-            <!-- Users List -->
             <CollectionView ItemsSource="{Binding Users}" 
                            IsVisible="{Binding HasUsers}">
                 <CollectionView.ItemTemplate>
@@ -79,7 +72,6 @@
                         <Border BackgroundColor="White" Padding="15" Margin="0,5" Shadow="10" Stroke="LightGrey" StrokeThickness="1" StrokeShape="RoundRectangle 10">
                             <StackLayout Spacing="8">
 
-                                <!-- Username with conditional red color for inactive users -->
                                 <Label FontAttributes="Bold" FontSize="16">
                                     <Label.Text>
                                         <Binding Path="Username" />
@@ -91,7 +83,6 @@
                                     </Label.Triggers>
                                 </Label>
 
-                                <!-- User Info -->
                                 <Label Text="{Binding FullName}" FontSize="14" />
                                 <Label Text="{Binding Email}" FontSize="12" TextColor="Gray" />
                                 <Label Text="{Binding Phone}" 
@@ -99,10 +90,9 @@
                                        TextColor="Gray"
                                        IsVisible="{Binding Phone, Converter={StaticResource IsNotNullOrEmptyConverter}}" />
 
-                                <!-- Role Selection -->
                                 <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
                                     <Label Grid.Column="0" 
-                                           Text="Role:" 
+                                           Text="Rol:" 
                                            FontAttributes="Bold" 
                                            VerticalOptions="Center" />
 
@@ -119,7 +109,7 @@
                                     </Picker>
 
                                     <Button Grid.Column="2"
-                                           Text="Save New Role" 
+                                           Text="Guardar Nuevo Rol" 
                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AssignRolesViewModel}}, Path=SaveRoleCommand}"
                                            CommandParameter="{Binding .}"
                                            IsVisible="{Binding HasChanges}"
@@ -135,22 +125,20 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <!-- No Results Message -->
             <Border BackgroundColor="LightGray" Padding="20" Stroke="Gray"  StrokeThickness="1" StrokeShape="RoundRectangle 10"
                    IsVisible="{Binding HasUsers, Converter={StaticResource InvertedBoolConverter}}">
-                <Label Text="No users found." 
+                <Label Text="Ningún usuario encontrado." 
                        HorizontalOptions="Center"
                        TextColor="Gray"
                        FontSize="16" />
             </Border>
 
-            <!-- Pagination -->
             <StackLayout IsVisible="{Binding ShowPagination}" 
                         Orientation="Horizontal" 
                         HorizontalOptions="Center" 
                         Spacing="15">
 
-                <Button Text="Previous" 
+                <Button Text="Previa" 
                        Command="{Binding GoToPageCommand}"
                        CommandParameter="{Binding PreviousPage}"
                        IsEnabled="{Binding CanGoPrevious}"
@@ -163,7 +151,7 @@
                        FontAttributes="Bold"
                        FontSize="16" />
 
-                <Button Text="Next" 
+                <Button Text="Siguiente" 
                        Command="{Binding GoToPageCommand}"
                        CommandParameter="{Binding NextPage}"
                        IsEnabled="{Binding CanGoNext}"
@@ -172,8 +160,7 @@
                        WidthRequest="100" />
             </StackLayout>
 
-            <!-- Back Button -->
-            <Button Text="Back" 
+            <Button Text="Volver" 
                     Command="{Binding GoBackCommand}"
                     BackgroundColor="Gray"
                     TextColor="White"

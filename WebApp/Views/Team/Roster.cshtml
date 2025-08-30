@@ -1,47 +1,46 @@
-﻿@model METCore.DTOs.Team.TeamDto
+﻿@using static METCore.Enums.Types
+@model METCore.DTOs.Team.TeamDto
 
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <h2>Build Team Roster - @Model.Location @Model.Mascot</h2>
+            <h2>Edición de Plantilla - @Model.Location @Model.Mascot</h2>
 
-            <!-- Phase Navigation -->
             <ul class="nav nav-pills mb-4" id="phaseNavigation" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="roster-tab" data-bs-toggle="pill" data-bs-target="#roster-phase" type="button" role="tab">
-                        <i class="fas fa-users me-2"></i>Build Roster
+                        <i class="fas fa-users me-2"></i>Edición de Plantilla
                         <span class="badge bg-secondary ms-2" id="roster-count">0</span>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="review-tab" data-bs-toggle="pill" data-bs-target="#review-phase" type="button" role="tab">
-                        <i class="fas fa-clipboard-list me-2"></i>Review Roster
+                        <i class="fas fa-clipboard-list me-2"></i>Revisión de Plantilla
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="formation-tab" data-bs-toggle="pill" data-bs-target="#formation-phase" type="button" role="tab">
-                        <i class="fas fa-chess-board me-2"></i>Formation & Starters
+                        <i class="fas fa-chess-board me-2"></i>Formaciones y Titulares
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="trades-tab" data-bs-toggle="pill" data-bs-target="#trades-phase" type="button" role="tab">
-                        <i class="fas fa-exchange-alt me-2"></i>Past Trades
+                        <i class="fas fa-exchange-alt me-2"></i>Trueques completados
                         <span class="badge bg-info ms-2" id="trades-count">0</span>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="draft-results-tab" data-bs-toggle="pill" data-bs-target="#draft-results-phase" type="button" role="tab">
-                        <i class="fas fa-trophy me-2"></i>Draft Results
+                        <i class="fas fa-trophy me-2"></i>Resultados del Draft
                         <span class="badge bg-success ms-2" id="draft-picks-count">0</span>
                     </button>
                 </li>
             </ul>
 
-            <!-- Salary Cap Indicator -->
             <div class="alert alert-info mb-4" id="salaryCapIndicator">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <h6><i class="fas fa-dollar-sign me-2"></i>Salary Cap Status</h6>
+                        <h6><i class="fas fa-dollar-sign me-2"></i>@Html.LabelFor(model => model.RosterSettingsCap)</h6>
                         <div class="progress" style="height: 8px;">
                             <div class="progress-bar" id="capProgressBar" style="width: 0%"></div>
                         </div>
@@ -52,7 +51,7 @@
                     </div>
                     <div class="col-md-4 text-end">
                         <div class="text-success">
-                            <strong>Remaining: $<span id="capRemaining">0</span>M</strong>
+                            <strong>Disponible: $<span id="capRemaining">0</span>M</strong>
                         </div>
                     </div>
                 </div>
@@ -72,7 +71,6 @@
                 @Html.HiddenFor(m => m.RosterSettingsProtectedPerTeam)
                 <input type="hidden" id="TeamsCap" name="TeamsCap" value="0" />
                 
-                <!-- Hidden fields for protected players -->
                 @for (int i = 0; i < (Model.RosterSettingsProtectedPlayersIds?.Count ?? 0); i++)
                 {
                 <input type="hidden" name="RosterSettingsProtectedPlayersIds[@i]" value="@Model.RosterSettingsProtectedPlayersIds[i]" />
@@ -95,46 +93,42 @@
                 <div id="lineupsContainer"></div>
 
                 <div class="tab-content">
-                    <!-- Phase 1: Build Roster -->
                     <div class="tab-pane fade show active" id="roster-phase" role="tabpanel">
                         <div class="row">
-                            <!-- Franchise Selection Sidebar -->
                             <div class="col-md-3">
                                 <div class="card sticky-top" style="top: 20px;">
                                     <div class="card-header">
-                                        <h5>NFL Franchises</h5>
+                                        <h5>Franquicias</h5>
                                         <div class="progress mt-2" style="height: 6px;">
                                             <div class="progress-bar" id="selectionProgress" style="width: 0%"></div>
                                         </div>
                                         <small class="text-muted">
-                                            <span id="franchisesWithSelections">0</span> of 32 franchises selected from
+                                            <span id="franchisesWithSelections">0</span> de 32 franquicias
                                         </small>
                                     </div>
                                     <div class="card-body p-0" style="max-height: 600px; overflow-y: auto;">
                                         <div class="list-group list-group-flush" id="franchisesList">
-                                            <!-- Franchises will be populated here -->
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Player Selection Area -->
                             <div class="col-md-9">
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
                                         <div>
-                                            <h5 id="currentFranchiseName">Select a franchise</h5>
+                                            <h5 id="currentFranchiseName">Elija una franquicia</h5>
                                             <div class="d-flex align-items-center">
                                                 <span class="badge bg-primary me-2" id="franchiseSelectedCount">0</span>
-                                                <span class="text-muted">of <span id="maxPerFranchise">0</span> max from this franchise</span>
+                                                <span class="text-muted">de <span id="maxPerFranchise">0</span> máximo por franquicia</span>
                                             </div>
                                         </div>
                                         <div class="btn-group btn-group-sm" role="group">
                                             <button type="button" class="btn btn-outline-secondary" id="showAllPlayers">
-                                                <i class="fas fa-users me-1"></i>All
+                                                <i class="fas fa-users me-1"></i>Todos
                                             </button>
                                             <button type="button" class="btn btn-outline-secondary" id="showAvailableOnly">
-                                                <i class="fas fa-user-check me-1"></i>Available
+                                                <i class="fas fa-user-check me-1"></i>Disponibles
                                             </button>
                                         </div>
                                     </div>
@@ -142,7 +136,7 @@
                                         <div id="playerSelectionArea">
                                             <div class="text-center text-muted p-5">
                                                 <i class="fas fa-hand-point-left fa-2x mb-3"></i>
-                                                <p>Select a franchise from the sidebar to view available players</p>
+                                                <p>Seleccione una franquicia del lateral paramostrar sus jugadores</p>
                                             </div>
                                         </div>
                                     </div>
@@ -157,15 +151,14 @@
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h5>Current Team Roster</h5>
+                                        <h5>Plantilla actual</h5>
                                         <div>
                                             <button type="button" class="btn btn-sm btn-outline-danger" id="clearAllRoster">
-                                                <i class="fas fa-trash me-1"></i>Clear All
+                                                <i class="fas fa-trash me-1"></i>Quitar todos
                                             </button>
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        <!-- Position filters -->
                                         <div class="mb-3">
                                             <div class="btn-group" role="group" id="positionFilters">
                                                 <button type="button" class="btn btn-outline-primary btn-sm active" data-position="all">All</button>
@@ -186,7 +179,7 @@
                                         <div id="currentRosterDisplay">
                                             <div class="text-center text-muted p-5">
                                                 <i class="fas fa-users fa-2x mb-3"></i>
-                                                <p>No players selected yet. Start by selecting players in the Build Roster tab.</p>
+                                                <p>No se han seleccionado jugadores aún. Vaya a la pestaña de Edición de plantilla apra comenzar a seleccionar jugadores.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -195,17 +188,16 @@
                         </div>
                     </div>
 
-                    <!-- Phase 3: Formation & Starters -->
                     <div class="tab-pane fade" id="formation-phase" role="tabpanel">
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h5>Starting Lineup</h5>
+                                        <h5>Alineaciones y titulares</h5>
                                         <div class="btn-group btn-group-sm" role="group" id="formationSelector">
-                                            <button type="button" class="btn btn-outline-primary active" data-formation="offense">Offense</button>
-                                            <button type="button" class="btn btn-outline-primary" data-formation="defense">Defense</button>
-                                            <button type="button" class="btn btn-outline-primary" data-formation="special">Special Teams</button>
+                                            <button type="button" class="btn btn-outline-primary active" data-formation="offense">Ataque</button>
+                                            <button type="button" class="btn btn-outline-primary" data-formation="defense">Defensa</button>
+                                            <button type="button" class="btn btn-outline-primary" data-formation="special">Equipo Especial</button>
                                         </div>
 
                                         <div class="ms-3">
@@ -215,20 +207,18 @@
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        <!-- Field Display -->
                                         <div class="field-container mb-4">
                                             <div id="fieldDisplay" class="football-field">
                                                 <!-- Formation positions will be displayed here -->
                                             </div>
                                         </div>
                                         
-                                        <!-- Bench/Available Players -->
                                         <div class="bench-container">
                                             <div class="card">
                                                 <div class="card-header d-flex justify-content-between align-items-center">
-                                                    <h6 class="mb-0">Bench Players</h6>
+                                                    <h6 class="mb-0">Banquillo</h6>
                                                     <select class="form-select form-select-sm w-auto" id="benchPositionFilter">
-                                                        <option value="all">All Positions</option>
+                                                        <option value="all">Todas las posiciones</option>
                                                         <option value="QB">QB</option>
                                                         <option value="HB">HB</option>
                                                         <option value="WR">WR</option>
@@ -261,18 +251,18 @@
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h5>Team Trade History</h5>
+                                        <h5>Historial de Trueques del Equipo</h5>
                                         <button type="button" class="btn btn-primary btn-sm" id="newTradeOffer">
-                                            <i class="fas fa-plus me-1"></i>New Trade Offer
+                                            <i class="fas fa-plus me-1"></i>Nuevo Trueque
                                         </button>
                                     </div>
                                     <div class="card-body">
                                         <div id="tradesDisplay">
                                             <div class="text-center text-muted p-5" id="noTradesMessage">
                                                 <div class="spinner-border text-primary mb-3" role="status" id="tradesSpinner">
-                                                    <span class="visually-hidden">Loading...</span>
+                                                    <span class="visually-hidden">Cargando...</span>
                                                 </div>
-                                                <p>Loading trade history...</p>
+                                                <p>Cargando historial de trueques...</p>
                                             </div>
                                         </div>
                                     </div>
@@ -287,15 +277,15 @@
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h5>Draft History & Results</h5>
+										<h5>Resultados del Draft</h5>
                                     </div>
                                     <div class="card-body">
                                         <div id="draftResultsDisplay">
                                             <div class="text-center text-muted p-5" id="noDraftMessage">
                                                 <div class="spinner-border text-primary mb-3" role="status" id="draftSpinner">
-                                                    <span class="visually-hidden">Loading...</span>
+                                                    <span class="visually-hidden">Cargando...</span>
                                                 </div>
-                                                <p>Loading draft results...</p>
+                                                <p>Cargando resultados del draft...</p>
                                             </div>
                                         </div>
                                     </div>
@@ -311,18 +301,21 @@
                         <div class="d-flex justify-content-between">
                             <div>
                                 <a href="/Team/MyTeams" class="btn btn-outline-secondary">
-                                    <i class="fas fa-arrow-left me-2"></i>Back to My Teams
+                                    <i class="fas fa-arrow-left me-2"></i>Volver
                                 </a>
                             </div>
                             <div class="btn-group">
                                 <button type="submit" class="btn btn-primary" name="next">
-                                    <i class="fas fa-save me-2"></i>Save Progress
+                                    <i class="fas fa-save me-2"></i>Guardar Progreso
                                 </button>
-                                <button type="submit" class="btn btn-success" name="next" value="false">
-                                    <i class="fas fa-play me-2"></i>Save & Continue to Draft
-                                </button>
+                                @if(!Model.Players.Any(p => p.FranchiseId == 0))
+                                {
+                                    <button type="submit" class="btn btn-success" name="next" value="false">
+                                        <i class="fas fa-play me-2"></i>Guardar y continuar al draft
+                                    </button>
+                                }
                                 <button type="submit" class="btn btn-outline-success" name="next" value="true">
-                                    <i class="fas fa-check me-2"></i>Save & Return to Teams
+                                    <i class="fas fa-check me-2"></i>Guardar y Volver
                                 </button>
                             </div>
                         </div>
@@ -342,26 +335,23 @@
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
         // ===== STATE VARIABLES =====
-        // Core application state and configuration
         let protectedPlayersArray = @Html.Raw(Json.Serialize(Model.RosterSettingsProtectedPlayersIds));
         let rosterPlayersArray = [];
         let currentFranchiseId = null;
         let maxPerFranchise = @Model.RosterSettingsMaxPerTeam;
         let salaryCapPercentage = @Model.RosterSettingsCap;
-        let viewMode = 'all'; // 'all' or 'available'
+        let viewMode = 'all';
         let startersConfiguration = {};
-        let totalCapUsed = 0; // Common variable for total cap used
+        let totalCapUsed = 0;
         let teamId = @Model.Id;
         let tradesLoaded = false;
         let draftResultsLoaded = false;
         
-        // Calculate max available cap
-        const baseSalaryCap = 224; // NFL salary cap in millions
+        const baseSalaryCap = 224;
         const maxCapAvailable = Math.round(baseSalaryCap * salaryCapPercentage / 100);
 
-        // Franchise data cache
         const franchisePlayersCache = {};
-        const allRosterPlayersCache = {}; // Cache for all selected players
+        const allRosterPlayersCache = {};
         let currentFormation = 'offense';
         let currentPositionFilter = 'all';
 
@@ -371,12 +361,11 @@
         let specialStartersConfiguration = {};
 
         let tradedPlayersIds = @Html.Raw(Json.Serialize(Model.TradedPlayers.Select(p => p.Id)));
-        let lineupsData = {}; // Store loaded lineups data
+        let lineupsData = {};
 
         // ===== REFERENCE DATA =====
-        // Static data for franchise names and formation templates
-        
-        // Franchise names mapping
+        const totalAtRound = @Html.Raw(Json.Serialize(DraftPicks.TotalAtRound));
+
         const franchiseNames = {
             1: { name: "Arizona Cardinals", abbreviation: "ARI" },
             2: { name: "Atlanta Falcons", abbreviation: "ATL" },
@@ -412,7 +401,6 @@
             32: { name: "Washington Commanders", abbreviation: "WAS" }
         };
 
-        // Formation templates with field positions
         const formations = {
             offense: {
                 ZeroOne: {
@@ -456,7 +444,7 @@
                         { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                         { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                         { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                        { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
                         { id: "LWRX", name: "X-WR", position: "WR", x: 10, y: 45},
                         { id: "RWRX", name: "X-WR", position: "WR", x: 90, y: 45},
                         { id: "WRZ", name: "Z-WR", position: "WR", x: 20, y: 50},
@@ -472,7 +460,7 @@
                         { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                         { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                         { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                        { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
                         { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                         { id: "WRZ", name: "Z-WR", position: "WR", x: 83, y: 45},
                         { id: "WRS", name: "Slot", position: "WR", x: 73, y: 55},
@@ -488,7 +476,7 @@
                         { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                         { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                         { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                        { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
                         { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                         { id: "WRZ", name: "Z-WR", position: "WR", x: 90, y: 45},
                         { id: "LTE", name: "TE", position: "TE", x: 25, y: 58},
@@ -504,7 +492,7 @@
                         { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                         { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                         { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
+                        { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
                         { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                         { id: "LTE", name: "TE", position: "TE", x: 29, y: 50},
                         { id: "RTE", name: "TE", position: "TE", x: 71, y: 45},
@@ -520,8 +508,8 @@
                         { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                         { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                         { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
-                        { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                        { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
+                        { id: "FB", name: "FB", position: "HB", x: 58, y: 72},
                         { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                         { id: "WRZ", name: "Z-WR", position: "WR", x: 85, y: 45},
                         { id: "WRS", name: "Slot", position: "WR", x: 75, y: 50}
@@ -536,8 +524,8 @@
                         { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                         { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                         { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
-                        { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                        { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
+                        { id: "FB", name: "FB", position: "HB", x: 58, y: 72},
                         { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                         { id: "WRZ", name: "Z-WR", position: "WR", x: 80, y: 45},
                         { id: "TE", name: "TE", position: "TE", x: 25, y: 58}
@@ -552,8 +540,8 @@
                         { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                         { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                         { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
-                        { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                        { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
+                        { id: "FB", name: "FB", position: "HB", x: 58, y: 72},
                         { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                         { id: "LTE", name: "TE", position: "TE", x: 25, y: 58},
                         { id: "RTE", name: "TE", position: "TE", x: 80, y: 45}
@@ -569,8 +557,8 @@
                         { id: "RG", name: "RG", position: "OL", x: 57, y: 44},
                         { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                         { id: "QB", name: "QB", position: "QB", x: 50, y: 70},
-                        { id: "RB", name: "RB", position: "RB", x: 42, y: 75},
-                        { id: "FB", name: "FB", position: "RB", x: 58, y: 72},
+                        { id: "RB", name: "RB", position: "HB", x: 42, y: 75},
+                        { id: "FB", name: "FB", position: "HB", x: 58, y: 72},
                         { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                         { id: "TE", name: "TE", position: "TE", x: 71, y: 45},
                     ]
@@ -585,7 +573,7 @@
                         { id: "RT", name: "RT", position: "OL", x: 64, y: 45},
                         { id: "LQB", name: "QB", position: "QB", x: 46, y: 72},
                         { id: "RQB", name: "QB", position: "QB", x: 54, y: 72},
-                        { id: "RB", name: "RB", position: "RB", x: 62, y: 78},
+                        { id: "RB", name: "RB", position: "HB", x: 62, y: 78},
                         { id: "WRX", name: "X-WR", position: "WR", x: 10, y: 45},
                         { id: "WRZ", name: "Z-WR", position: "WR", x: 90, y: 45},
                         { id: "TE", name: "TE", position: "TE", x: 25, y: 58}
@@ -705,36 +693,25 @@
 
 
         // ===== CORE ROSTER MANAGEMENT FUNCTIONS =====
-        // Functions that handle basic roster operations and data management
-
-        // Initialize roster from server data on page load
         function initializeRosterFromServerData() {
-            // Get the server data from the model
             const serverPlayers = @Html.Raw(Json.Serialize(Model.Players));
 
-            // Process each rostered player
             serverPlayers.forEach(rosteredPlayer => {
                 const playerId = rosteredPlayer.id;
 
-                // Add to roster array
                 if (!rosterPlayersArray.includes(playerId)) {
                     rosterPlayersArray.push(playerId);
                 }
 
-                // Add to all players cache for global access
                 allRosterPlayersCache[playerId] = rosteredPlayer;
-
-                // DON'T populate franchisePlayersCache here - let API calls load complete data
             });
 
-            // Update UI
             updateRosterPlayersHiddenFields();
             updateSalaryCapDisplay();
             populateFranchisesList();
             refreshRosterDisplay();
         }
 
-        // Initialize roster players from existing hidden form fields
         function initializeRosterPlayers() {
             const container = document.getElementById('rosterPlayersContainer');
             const existingInputs = container.querySelectorAll('input[name*="SelectedIds"]');
@@ -755,12 +732,10 @@
             updateRosterCount();
         }
 
-        // Update the roster count badge in the navigation
         function updateRosterCount() {
             document.getElementById('roster-count').textContent = rosterPlayersArray.length;
         }
 
-        // Update hidden form fields that contain the selected player IDs
         function updateRosterPlayersHiddenFields() {
             const container = document.getElementById('rosterPlayersContainer');
             container.innerHTML = '';
@@ -776,7 +751,6 @@
             updateRosterCount();
         }
 
-        // Calculate current total salary cap usage from selected players
         function calculateCurrentCapUsed() {
             return rosterPlayersArray.reduce((total, playerId) => {
                 const player = allRosterPlayersCache[playerId];
@@ -784,7 +758,6 @@
             }, 0);
         }
 
-        // Update the salary cap progress bar and display
         function updateSalaryCapDisplay() {
             totalCapUsed = calculateCurrentCapUsed();
 
@@ -810,16 +783,12 @@
         }
 
         // ===== TAB 1: BUILD ROSTER FUNCTIONS =====
-        // Functions for franchise selection and player selection interface
-
-        // Get count of players selected from a specific franchise
         function getFranchiseSelectedCount(franchiseId) {
             const franchise = franchisePlayersCache[franchiseId];
             if (!franchise) return 0;
             return rosterPlayersArray.filter(playerId => franchise.players.some(p => p.id === playerId)).length;
         }
 
-        // Update the selected count badge for current franchise
         function updateFranchiseSelectedCount() {
             if (currentFranchiseId) {
                 const count = getFranchiseSelectedCount(currentFranchiseId);
@@ -847,7 +816,6 @@
             }
         }
 
-        // Update the progress indicator showing how many franchises have selections
         function updateSelectionProgress() {
             const franchisesWithSelections = Array.from({ length: 32 }, (_, i) => i + 1).filter(franchiseId => {
                 return getFranchiseSelectedCount(franchiseId) > 0;
@@ -857,8 +825,7 @@
             const percentage = (franchisesWithSelections / 32) * 100;
             document.getElementById('selectionProgress').style.width = `${percentage}%`;
         }
-
-        // Populate the sidebar list of all 32 NFL franchises with selection counts
+        
         function populateFranchisesList() {
             const franchisesList = document.getElementById('franchisesList');
             franchisesList.innerHTML = '';
@@ -897,7 +864,6 @@
             updateSelectionProgress();
         }
 
-        // Load and display players for a selected franchise
         function selectFranchise(franchiseId) {
             currentFranchiseId = franchiseId;
             document.querySelectorAll('.franchise-item').forEach(item => item.classList.remove('active'));
@@ -905,16 +871,16 @@
 
             const franchiseInfo = franchiseNames[franchiseId] || { name: `Franchise ${franchiseId}`, abbreviation: `F${franchiseId}` };
 
-            document.getElementById('currentFranchiseName').textContent = `Loading ${franchiseInfo.name}...`;
+            document.getElementById('currentFranchiseName').textContent = `Cargando ${franchiseInfo.name}...`;
             document.getElementById('maxPerFranchise').textContent = maxPerFranchise;
 
             const container = document.getElementById('playerSelectionArea');
             container.innerHTML = `
                 <div class="text-center p-5">
                     <div class="spinner-border text-primary mb-3" role="status">
-                        <span class="visually-hidden">Loading...</span>
+                        <span class="visually-hidden">Cargando...</span>
                     </div>
-                    <p class="text-muted">Loading available players...</p>
+                    <p class="text-muted">Cargando jugadores disponibles...</p>
                 </div>
             `;
 
@@ -945,7 +911,6 @@
                     displayPlayersForSelection(franchiseData);
                     updateFranchiseSelectedCount();
 
-                    // Re-apply selected state to previously selected players
                     reapplySelectedStates();
                 })
                 .catch(error => {
@@ -962,15 +927,12 @@
                 });
         }
 
-        // Create franchise data object from API JSON response
         function createFranchiseDataFromJson(playersData, franchiseId) {
             const franchiseInfo = franchiseNames[franchiseId] || { name: `Franchise ${franchiseId}`, abbreviation: `F${franchiseId}` };
 
-            // Merge API data with any existing cached players (from server initialization)
             let mergedPlayers = [...playersData];
 
             if (franchisePlayersCache[franchiseId]) {
-                // Add any cached players that aren't in the API response
                 franchisePlayersCache[franchiseId].players.forEach(cachedPlayer => {
                     if (!mergedPlayers.some(p => p.id === cachedPlayer.id)) {
                         mergedPlayers.push(cachedPlayer);
@@ -986,14 +948,12 @@
             };
         }
 
-        // Re-apply selected visual state to players that are in rosterPlayersArray
         function reapplySelectedStates() {
             rosterPlayersArray.forEach(playerId => {
                 const playerCard = document.querySelector(`[data-player-id="${playerId}"]`);
                 if (playerCard && !playerCard.classList.contains('selected')) {
                     playerCard.classList.add('selected');
             
-                    // Add selected overlay if not already there
                     if (!playerCard.querySelector('.selected-overlay')) {
                         const selectedOverlay = document.createElement('div');
                         selectedOverlay.className = 'selected-overlay';
@@ -1004,7 +964,6 @@
             });
         }
 
-        // Display player cards for selection, handling protected and selected states
         function displayPlayersForSelection(franchise) {
             const container = document.getElementById('playerSelectionArea');
             container.innerHTML = '';
@@ -1023,7 +982,7 @@
                 container.innerHTML = `
                     <div class="text-center text-muted p-5">
                         <i class="fas fa-users-slash fa-2x mb-3"></i>
-                        <p>${viewMode === 'available' ? 'No available players from this franchise' : 'No players to display'}</p>
+                        <p>${viewMode === 'available' ? 'No hay jugadores disponibles para esta franquicia' : 'Sin jugadores que mostrar'}</p>
                     </div>
                 `;
                 return;
@@ -1060,7 +1019,7 @@
                                         <small class="player-details">${player.height} | ${player.weight}</small>
                                     </div>
                                     <div class="player-stats">
-                                        <small class="player-cap">Cap: ${player.apy || ''}</small>
+                                        <small class="player-cap">Salario: ${player.apy || ''}</small>
                                         <br>${player.stats || ''}
                                     </div>
                                 </div>
@@ -1077,8 +1036,8 @@
                         playerCard.appendChild(protectedOverlay);
 
                         playerCard.setAttribute('title', isTraded 
-                            ? 'This player is not available since he was previously traded away'
-                            : 'This player is protected and cannot be selected'
+                            ? 'Este jugador no está disponible puesto que fue intercambiado en un trueque'
+                            : 'Este jugador fue protegido y no puede ser seleccionado'
                         );
                     } else {
                         if (isSelected) {
@@ -1119,11 +1078,10 @@
                                     const formationsList = [...new Set(assignedFormations)].join(', ');
                                     const playerName = allRosterPlayersCache[playerId]?.name || 'This player';
 
-                                    if (!confirm(`${playerName} is currently assigned to positions: ${positionsList} in ${formationsList}. Remove from starting lineup and roster?`)) {
-                                        return; // Cancel deselection
+                                    if (!confirm(`${playerName} es el actual jugador asignado a la posiciones: ${positionsList} en ${formationsList}. ¿Retirar de la alineación y del equipo?`)) {
+                                        return;
                                     }
 
-                                    // Remove from all assigned positions in all configurations
                                     allStarterConfigs.forEach(({ config }) => {
                                         Object.keys(config).forEach(key => {
                                             if (config[key] && config[key].id === playerId) {
@@ -1137,7 +1095,6 @@
                                     updateBenchPlayers();
                                 }
 
-                                // Continue with normal deselection...
                                 rosterPlayersArray = rosterPlayersArray.filter(id => id !== playerId);
                                 this.classList.remove('selected');
 
@@ -1229,14 +1186,14 @@
             const summaryDiv = document.createElement('div');
             summaryDiv.className = 'alert alert-secondary mb-4';
             summaryDiv.innerHTML = `
-                <h6 class="mb-2">Roster Summary</h6>
+                <h6 class="mb-2">Resumen de la plantilla</h6>
                 <div class="row">
                     <div class="col-md-6">
-                        <strong>Total Players:</strong> ${rosterPlayersArray.length}<br>
-                        <strong>Total Cap Used:</strong> ${calculateCurrentCapUsed().toFixed(1)}M
+                        <strong>Total de jugadores:</strong> ${rosterPlayersArray.length}<br>
+                        <strong>Salario Total Empleado:</strong> ${calculateCurrentCapUsed().toFixed(1)}M
                     </div>
                     <div class="col-md-6">
-                        <strong>Positions:</strong> ${Object.keys(playersByPosition).map(pos => `${pos} (${playersByPosition[pos].length})`).join(', ')}
+                        <strong>Posiciones:</strong> ${Object.keys(playersByPosition).map(pos => `${pos} (${playersByPosition[pos].length})`).join(', ')}
                     </div>
                 </div>
             `;
@@ -1274,12 +1231,12 @@
                                 <h6 class="card-title">${player.name}</h6>
                                 <p class="card-text">
                                     <small class="text-muted">${player.position} | ${franchiseName}</small><br>
-                                    <small class="text-muted">Age: ${player.age} | ${player.height} | ${player.weight}</small><br>
+                                    <small class="text-muted">Edad: ${player.age} | ${player.height} | ${player.weight}</small><br>
                                     <small class="text-success">${player.apy}</small><br>
-                                    <small class="text-info">Cap: ${player.apy || '0M'}</small>
+                                    <small class="text-info">Salario: ${player.apy || '0M'}</small>
                                 </p>
                                 <button type="button" ${player.franchiseId == 0 ? 'hidden' : ''} class="btn btn-sm btn-outline-danger w-100" onclick="removeFromRoster(${player.id})">
-                                    <i class="fas fa-times me-1"></i>Remove
+                                    <i class="fas fa-times me-1"></i>Quitar
                                 </button>
                             </div>
                         </div>
@@ -1292,7 +1249,6 @@
             });
         }
 
-        // Filter roster display by position (triggered by position filter buttons)
         function filterRosterByPosition(position) {
             const positionGroups = document.querySelectorAll('.position-group');
             
@@ -1303,10 +1259,8 @@
                 if (position === 'all') {
                     shouldShow = true;
                 } else if (positionMappings[position]) {
-                    // Check if the group's position is included in the selected category
                     shouldShow = positionMappings[position].includes(groupPosition);
                 } else {
-                    // Fallback to exact match for any unmapped positions
                     shouldShow = groupPosition === position;
                 }
 
@@ -1314,10 +1268,8 @@
             });
         }
 
-        // Handle position filter button clicks
         document.getElementById('positionFilters').addEventListener('click', function(e) {
             if (e.target.tagName === 'BUTTON') {
-                // Update active button
                 this.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
                 e.target.classList.add('active');
                 
@@ -1326,13 +1278,11 @@
             }
         });
 
-        // Clear entire roster with confirmation
         document.getElementById('clearAllRoster').addEventListener('click', function() {
             if (confirm('Are you sure you want to clear your entire roster? This action cannot be undone.')) {
                 rosterPlayersArray = [];
                 totalCapUsed = 0;
 
-                // Clear all starter configurations
                 startersConfiguration = {};
                 offenseStartersConfiguration = {};
                 defenseStartersConfiguration = {};
@@ -1346,7 +1296,6 @@
                 updateFormationDisplay();
                 updateBenchPlayers();
 
-                // Clear visual selection in current franchise if displayed
                 if (currentFranchiseId && franchisePlayersCache[currentFranchiseId]) {
                     displayPlayersForSelection(franchisePlayersCache[currentFranchiseId]);
                 }
@@ -1355,12 +1304,10 @@
             }
         });
 
-        // Remove individual player from roster (called from HTML onclick)
         window.removeFromRoster = function(playerId) {
             if (confirm('Are you sure you want to remove this player from your roster?')) {
                 rosterPlayersArray = rosterPlayersArray.filter(id => id !== playerId);
 
-                // Remove from starters in all configurations
                 [startersConfiguration, offenseStartersConfiguration, defenseStartersConfiguration, specialStartersConfiguration].forEach(config => {
                     Object.keys(config).forEach(key => {
                         if (config[key] && config[key].id === playerId) {
@@ -1377,7 +1324,6 @@
                 updateBenchPlayers();
                 updateStartersHiddenFields();
 
-                // Refresh current franchise display if open
                 if (currentFranchiseId && franchisePlayersCache[currentFranchiseId]) {
                     displayPlayersForSelection(franchisePlayersCache[currentFranchiseId]);
                 }
@@ -1386,14 +1332,10 @@
 
 
         // ===== TAB 3: FORMATION & STARTERS FUNCTIONS =====
-        // Functions for managing starting lineups and formations
-        
-        // Load lineups from Model data (no API call needed)
         function loadLineups() {
             try {
                 lineupsData = {};
 
-                // Load Offense lineup
                 const offLineup = @Html.Raw(Json.Serialize(Model.OffLineup));
                 if (offLineup && offLineup.formation) {
                     if (!lineupsData.offense) lineupsData.offense = {};
@@ -1411,8 +1353,7 @@
 
                     lineupsData.offense[offLineup.formation] = lineupPositions;
                 }
-
-                // Load Defense lineup
+                
                 const defLineup = @Html.Raw(Json.Serialize(Model.DefLineup));
                 if (defLineup && defLineup.formation) {
                     if (!lineupsData.defense) lineupsData.defense = {};
@@ -1431,7 +1372,6 @@
                     lineupsData.defense[defLineup.formation] = lineupPositions;
                 }
 
-                // Load Special Teams lineup
                 const spLineup = @Html.Raw(Json.Serialize(Model.SPLineup));
                 if (spLineup && spLineup.formation) {
                     if (!lineupsData.special) lineupsData.special = {};
@@ -1450,7 +1390,6 @@
                     lineupsData.special[spLineup.formation] = lineupPositions;
                 }
 
-                // Load into current formation if applicable
                 loadStartersFromLineupData();
 
             } catch (error) {
@@ -1495,9 +1434,7 @@
             const container = document.getElementById('lineupsContainer');
             container.innerHTML = '';
 
-            // Create hidden fields for offense lineup
             if (offenseStartersConfiguration && Object.keys(offenseStartersConfiguration).length > 0) {
-                // Get the formation name from lineupsData or current formation
                 let offenseFormation = '';
                 if (currentFormation === 'offense' && currentFormationType) {
                     offenseFormation = currentFormationType;
@@ -1524,9 +1461,7 @@
                 }
             }
 
-            // Create hidden fields for defense lineup
             if (defenseStartersConfiguration && Object.keys(defenseStartersConfiguration).length > 0) {
-                // Get the formation name from lineupsData or current formation
                 let defenseFormation = '';
                 if (currentFormation === 'defense' && currentFormationType) {
                     defenseFormation = currentFormationType;
@@ -1553,9 +1488,7 @@
                 }
             }
 
-            // Create hidden fields for special teams lineup
             if (specialStartersConfiguration && Object.keys(specialStartersConfiguration).length > 0) {
-                // Get the formation name from lineupsData or current formation
                 let specialFormation = '';
                 if (currentFormation === 'special' && currentFormationType) {
                     specialFormation = currentFormationType;
@@ -1583,14 +1516,12 @@
             }
         }
 
-        // Initialize formation display when tab is activated
         function initializeFormationDisplay() {
             populateFormationTypeSelector();
             updateFormationDisplay();
             updateBenchPlayers();
         }
 
-        // Populate the formation type dropdown based on current formation category
         function populateFormationTypeSelector() {
             const selector = document.getElementById('formationTypeSelector');
             const formationTypes = formations[currentFormation];
@@ -1604,7 +1535,6 @@
                 selector.appendChild(option);
             });
     
-            // Set default selection if none exists
             if (!currentFormationType || !formationTypes[currentFormationType]) {
                 currentFormationType = Object.keys(formationTypes)[0];
             }
@@ -1612,7 +1542,6 @@
             selector.value = currentFormationType;
         }
 
-        // Update the football field visual with current formation and assigned players
         function updateFormationDisplay() {
             const fieldDisplay = document.getElementById('fieldDisplay');
             fieldDisplay.className = `football-field ${currentFormation}`;
@@ -1623,7 +1552,6 @@
                 return;
             }
 
-            // Set default formation type if none selected
             if (!currentFormationType || !formationTypes[currentFormationType]) {
                 currentFormationType = Object.keys(formationTypes)[0];
             }
@@ -1671,7 +1599,6 @@
                         </div>
                     `;
 
-                    // Add drag event listener to assigned player
                     const assignedPlayerElement = positionDiv.querySelector('.assigned-player');
                     assignedPlayerElement.addEventListener('dragstart', handlePlayerDragStart);
                 } else {
@@ -1684,7 +1611,6 @@
                     `;
                 }
 
-                // Add drop event handlers
                 positionDiv.addEventListener('dragover', handleDragOver);
                 positionDiv.addEventListener('drop', handleDrop);
 
@@ -1692,7 +1618,6 @@
             });
         }
 
-        // Display available players on the bench for assignment to starting positions
         function updateBenchPlayers() {
             const benchContainer = document.getElementById('benchPlayers');
             const availablePlayers = getAvailablePlayers();
@@ -1708,22 +1633,19 @@
             }
 
             benchContainer.innerHTML = '';
-            // Add drop zone properties to bench container
             benchContainer.addEventListener('dragover', handleBenchDragOver);
             benchContainer.addEventListener('drop', handleBenchDrop);
             benchContainer.addEventListener('dragleave', handleBenchDragLeave);
 
-            // Create a row container for the grid layout
             const rowContainer = document.createElement('div');
             rowContainer.className = 'row';
 
             availablePlayers.forEach(player => {
-                // Create column wrapper for each player
                 const colDiv = document.createElement('div');
-                colDiv.className = 'col-md-6 col-lg-4 mb-2'; // 2 per row on medium screens, 3 per row on large screens
+                colDiv.className = 'col-md-6 col-lg-4 mb-2';
 
                 const playerDiv = document.createElement('div');
-                playerDiv.className = 'available-player p-2 border rounded h-100'; // Added h-100 for equal height
+                playerDiv.className = 'available-player p-2 border rounded h-100';
                 playerDiv.draggable = true;
                 playerDiv.setAttribute('data-player-id', player.id);
 
@@ -1734,8 +1656,7 @@
                             <br><small class="text-muted">${player.position}</small>
                         </div>
                         <div class="text-end">
-                            <small class="text-success">${player.apy}</small>
-                            <br><small class="text-info">Cap: ${player.apy || '0M'}</small>
+                            <br><small class="text-info">Salario: ${player.apy || '0M'}</small>
                         </div>
                     </div>
                 `;
@@ -1748,23 +1669,19 @@
             benchContainer.appendChild(rowContainer);
         }
 
-        // Handle drag over bench area
         function handleBenchDragOver(e) {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
-            e.currentTarget.classList.add('drag-over'); // Add visual feedback
+            e.currentTarget.classList.add('drag-over');
         }
 
-        // Handle drop on bench (remove from starting position)
         function handleBenchDrop(e) {
             e.preventDefault();
     
             const playerId = parseInt(e.dataTransfer.getData('text/plain'));
             const sourcePosition = e.dataTransfer.getData('source-position');
     
-            // Only handle drops from formation positions
             if (sourcePosition) {
-                // Remove player from starting position
                 if (startersConfiguration[sourcePosition]) {
                     delete startersConfiguration[sourcePosition];
             
@@ -1775,12 +1692,10 @@
             }
         }
 
-        // Handle drag leave bench area (remove visual feedback)
         function handleBenchDragLeave(e) {
             e.currentTarget.classList.remove('drag-over');
         }
 
-        // Get roster players that are not currently assigned to starting positions
         function getAvailablePlayers() {
             const assignedPlayerIds = Object.values(startersConfiguration).map(p => p.id);
             
@@ -1794,7 +1709,6 @@
                 });
         }
 
-        // Update hidden form fields with current starting lineup configuration
         function updateStartersHiddenFields() {
             const container = document.getElementById('startersContainer');
             container.innerHTML = '';
@@ -1816,11 +1730,9 @@
                 }
             });
         }
-
-        // Handle formation selector button clicks (Offense/Defense/Special Teams)
+        
         document.getElementById('formationSelector').addEventListener('click', function(e) {
             if (e.target.tagName === 'BUTTON') {
-                // Save current starters to category-specific configuration
                 saveCurrentStartersToCategory();
 
                 this.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
@@ -1828,11 +1740,9 @@
 
                 const newFormation = e.target.getAttribute('data-formation');
 
-                // If switching within same category, clear starters
                 if (newFormation === currentFormation) {
                     currentFormationType = null;
                 } else {
-                    // Switching to different category, load saved starters
                     currentFormation = newFormation;
                     loadStartersFromCategory();
                 }
@@ -1867,12 +1777,10 @@
             loadStartersFromLineupData();
         }
 
-        // Update formation type selector to clear starters when changing within category:
         document.getElementById('formationTypeSelector').addEventListener('change', function(e) {
             const previousFormationType = currentFormationType;
             const newFormationType = e.target.value;
 
-            // If changing formation type within same category, clear starters with confirmation
             if (previousFormationType && previousFormationType !== newFormationType) {
                 if (Object.keys(startersConfiguration).length > 0) {
                     if (confirm('Changing formation will clear current starting lineup. Continue?')) {
@@ -1880,7 +1788,6 @@
                         updateStartersHiddenFields();
                         currentFormationType = newFormationType;
                     } else {
-                        // Revert selection
                         this.value = previousFormationType;
                         return;
                     }
@@ -1895,30 +1802,24 @@
             updateBenchPlayers();
         });
 
-        // Add this new event handler for the formation type dropdown
         document.getElementById('formationTypeSelector').addEventListener('change', function(e) {
             currentFormationType = e.target.value;
             updateFormationDisplay();
             updateBenchPlayers();
         });
 
-        // Handle bench position filter dropdown changes
         document.getElementById('benchPositionFilter').addEventListener('change', function(e) {
             currentPositionFilter = e.target.value;
             updateBenchPlayers();
         });
 
         // ===== DRAG AND DROP HANDLERS =====
-        // Functions for handling drag and drop of players to formation positions
-
-        // Handle start of drag operation
         function handleDragStart(e) {
             const playerId = e.target.getAttribute('data-player-id');
             e.dataTransfer.setData('text/plain', playerId);
             e.dataTransfer.effectAllowed = 'move';
         }
 
-        // Handle drag start from assigned position back to bench
         function handlePlayerDragStart(e) {
             const playerId = e.target.getAttribute('data-player-id');
             const positionDiv = e.target.closest('.formation-position');
@@ -1929,37 +1830,32 @@
             e.dataTransfer.effectAllowed = 'move';
         }
 
-        // Handle drag over formation position (required for drop to work)
         function handleDragOver(e) {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
         }
 
-        // Handle dropping player onto formation position
         function handleDrop(e) {
             e.preventDefault();
             
             const playerId = parseInt(e.dataTransfer.getData('text/plain'));
             const player = allRosterPlayersCache[playerId];
             const positionId = e.currentTarget.getAttribute('data-position-id');
-            const requiredPositionType = e.currentTarget.getAttribute('data-position-type');
+            const requiredPositionTypes = positionMappings[e.currentTarget.getAttribute('data-position-type')];
             
             if (!player || !positionId) return;
 
-            // Check if player position matches required position
-            if (player.position !== requiredPositionType) {
-                alert(`This position requires a ${requiredPositionType}, but ${player.name} is a ${player.position}.`);
+            if (!requiredPositionTypes.includes(player.position)) {
+                alert(`Esta posición requiere ${requiredPositionTypes.join(', ')}, pero ${player.name} es ${player.position}.`);
                 return;
             }
 
-            // Remove player from any existing starter position
             Object.keys(startersConfiguration).forEach(key => {
                 if (startersConfiguration[key] && startersConfiguration[key].id === playerId) {
                     delete startersConfiguration[key];
                 }
             });
 
-            // Assign player to new position
             startersConfiguration[positionId] = player;
             
             updateFormationDisplay();
@@ -1969,16 +1865,12 @@
         }
 
         // ===== TAB 4: TRADES FUNCTIONS =====
-        // Functions for managing and displaying trade history
-
-        // Load trade history data via AJAX when tab is first activated
         function loadTradeHistory() {
             const tradesDisplay = document.getElementById('tradesDisplay');
             
             fetch('/Team/GetTeamTrades?TeamId='+@Model.Id)
             .then(response => {
                 if (!response.ok) {
-                    // If endpoint doesn't exist (404), show empty state
                     if (response.status === 404) {
                         throw new Error('ENDPOINT_NOT_IMPLEMENTED');
                     }
@@ -1993,7 +1885,6 @@
             .catch(error => {
                 console.error('Error loading trades:', error);
                 if (error.message === 'ENDPOINT_NOT_IMPLEMENTED') {
-                    // Show that feature is not implemented yet
                     tradesDisplay.innerHTML = `
                         <div class="text-center text-muted p-5">
                             <i class="fas fa-exchange-alt fa-2x mb-3"></i>
@@ -2012,7 +1903,6 @@
             });
         }
 
-        // Display trade history cards with details of completed trades
         function displayTrades(trades) {
             const tradesDisplay = document.getElementById('tradesDisplay');
             
@@ -2032,22 +1922,22 @@
                 tradesHtml += `
                     <div class="mb-3">
                         <div class="card border-info" style="display: flex; flex-direction: row;">
-                            <div class="col-md-2 card-header bg-info text-white">
-                                <h6 class="mb-0">Trade #${index + 1}</h6>
-                                <small>Date: ${new Date(trade.date).toLocaleDateString()}</small></br>
-                                <small><bold>With: ${franchiseNames[trade.franchiseId].name}</bold></small>
+                            <div class="col-md-3 card-header bg-info text-white">
+                                <h6 class="mb-0">Trueque #${index + 1}</h6>
+                                <small>Fecha: ${new Date(trade.date).toLocaleDateString()}</small></br>
+                                <small><bold>Con Franquicia: ${franchiseNames[trade.franchiseId].name}</bold></small>
                             </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-6">
-                                        <h6 class="text-success">Received:</h6>
+                                        <h6 class="text-success">Recibido:</h6>
                                         <ul class="list-unstyled small">
                                             ${trade.franchisePlayers ? trade.franchisePlayers.map(p => `<li><i class="fas fa-user me-1"></i>${p.name}</li>`).join('') : ''}
                                             ${trade.franchisePicks ? trade.franchisePicks.map(p => `<li><i class="fas fa-trophy me-1"></i>Pick ${p}</li>`).join('') : ''}
                                         </ul>
                                     </div>
                                     <div class="col-6">
-                                        <h6 class="text-danger">Traded Away:</h6>
+                                        <h6 class="text-danger">Enviado:</h6>
                                         <ul class="list-unstyled small">
                                             ${trade.teamPlayers ? trade.teamPlayers.map(p => `<li><i class="fas fa-user me-1"></i>${p.name}</li>`).join('') : ''}
                                             ${trade.teamPicks ? trade.teamPicks.map(p => `<li><i class="fas fa-trophy me-1"></i>Pick ${p}</li>`).join('') : ''}
@@ -2064,12 +1954,10 @@
             tradesDisplay.innerHTML = tradesHtml;
         }
 
-        // Update the trades count badge in navigation
         function updateTradesCount(count) {
             document.getElementById('trades-count').textContent = count;
         }
 
-        // Show trade modal for creating new trade offers
         function openTradeModal() {
             showFranchiseSelectionModal();
         }
@@ -2097,13 +1985,8 @@
             const modalElement = document.getElementById('tradeModal');
             const modal = new bootstrap.Modal(modalElement);
     
-            // modalElement.removeAttribute('aria-hidden');
             modal.show();
     
-            // modalElement.addEventListener('hidden.bs.modal', function () {
-            //     modalElement.setAttribute('aria-hidden', 'true');
-            // });
-            
             loadFranchiseList();
         }
 
@@ -2117,7 +2000,6 @@
 
             const formData = new FormData(document.getElementById('teamRosterForm'));
 
-            // Save roster using fetch
             fetch(document.getElementById('teamRosterForm').action, {
                 method: 'POST',
                 body: formData
@@ -2127,20 +2009,17 @@
                     throw new Error('Failed to save roster');
                 }
 
-		        // Update loading message
 		        document.getElementById('tradeModal').querySelector('.modal-body').innerHTML = `
 			        <div class="text-center p-4">
 				        <div class="spinner-border text-primary mb-3"></div>
-				        <p>Loading trade interface with ${franchiseNames[franchiseId].name}...</p>
+				        <p>Cargando trade interface with ${franchiseNames[franchiseId].name}...</p>
 			        </div>
 		        `;
 
-		        // Load trade modal content using fetch
                 return fetch(`/Team/GetTradePartialAsString?TeamId=@Model.Id&FranchiseId=${franchiseId}&CurrentPick=-1`);
             })
             .then(result => {
                 if (!result.ok) {
-                    // Handle error case
                     throw new Error(`Unable to load the trade interface with ${franchiseNames[franchiseId].name}`);
                 }
                 else {
@@ -2149,7 +2028,6 @@
             })
             .then(json => {
                 if (json.message && json.message != "") {
-                    // Handle error case
                     throw new Error(`Unable to load the trade interface with ${franchiseNames[franchiseId].name}`);
                 }
                 else {
@@ -2205,9 +2083,6 @@
         }
 
         // ===== TAB 5: DRAFT RESULTS FUNCTIONS =====
-        // Functions for loading and displaying draft results
-
-        // Load draft results data via AJAX when tab is first activated
         function loadDraftResults() {
             const draftDisplay = document.getElementById('draftResultsDisplay');
             
@@ -2232,7 +2107,6 @@
             });
         }
 
-        // Display draft results with prospect cards showing pick details
         function displayDraftResults(prospects, selections) {
             const draftDisplay = document.getElementById('draftResultsDisplay');
             
@@ -2247,28 +2121,24 @@
                 return;
             }
 
-            // Create a map of player ID to pick number from selections
-            const pickMap = {};
-            if (selections && selections.length > 0) {
-                selections.forEach(selection => {
-                    if (selection.playerId && selection.pick) {
-                        pickMap[selection.playerId] = selection.pick;
-                    }
-                });
-            }
-
             let draftHtml = '<div class="row">';
-            prospects.forEach((prospect, index) => {
-                // Get the actual pick number from selections, or use index + 1 as fallback
-                const draftPick = pickMap[prospect.id] || (index + 1);
-                const round = Math.ceil(draftPick / 32);
+            Object.entries(selections).forEach((selection, index) => {
+                let prospect = prospects.find(prospect => selection[1] == prospect.id);
+                let pick = selection[0];
+                let round = 0;
+                let pos = 0;
+                totalAtRound.forEach(total => {
+                    if (pick > total) round++;
+                    else return;
+                });
+                pos = pick-totalAtRound[round-1];
                 
                 draftHtml += `
                     <div class="col-md-4 mb-3">
                         <div class="card border-success">
                             <div class="card-header bg-success text-white">
-                                <h6 class="mb-0">Pick #${draftPick}</h6>
-                                <small>Round ${round}</small>
+                                <h6 class="mb-0">Pick #${index+1}</h6>
+                                <small>Ronda ${round}, Pick ${pos}</small>
                             </div>
                             <div class="card-body">
                                 <div class="d-flex align-items-center mb-2">
@@ -2279,15 +2149,15 @@
                                 </div>
                                 <div class="row text-center">
                                     <div class="col-4">
-                                        <small class="text-muted">Height</small>
+                                        <small class="text-muted">Altura</small>
                                         <div>${prospect.height || 0}"</div>
                                     </div>
                                     <div class="col-4">
-                                        <small class="text-muted">Weight</small>
+                                        <small class="text-muted">Peso</small>
                                         <div>${prospect.weight || 0} lbs</div>
                                     </div>
                                     <div class="col-4">
-                                        <small class="text-muted">Consensus</small>
+                                        <small class="text-muted">Consenso</small>
                                         <div>#${prospect.consensus || 'N/A'}</div>
                                     </div>
                                 </div>
@@ -2295,7 +2165,7 @@
                                     <div class="progress" style="height: 6px;">
                                         <div class="progress-bar bg-info" style="width: ${(prospect.athScore || 0)}%"></div>
                                     </div>
-                                    <small class="text-muted">Athletic Score: ${prospect.athScore || 0}</small>
+                                    <small class="text-muted">Val. Athética: ${prospect.athScore || 0}</small>
                                 </div>
                             </div>
                         </div>
@@ -2307,15 +2177,11 @@
             draftDisplay.innerHTML = draftHtml;
         }
 
-        // Update the draft picks count badge in navigation
         function updateDraftPicksCount(count) {
             document.getElementById('draft-picks-count').textContent = count;
         }
 
         // ===== TAB EVENT HANDLERS =====
-        // Event handlers for tab navigation and lazy loading
-
-        // Load trades when trades tab is first clicked
         document.getElementById('trades-tab').addEventListener('click', function() {
             if (!tradesLoaded) {
                 loadTradeHistory();
@@ -2323,7 +2189,6 @@
             }
         });
         
-        // Load draft results when draft results tab is first clicked
         document.getElementById('draft-results-tab').addEventListener('click', function() {
             if (!draftResultsLoaded) {
                 loadDraftResults();
@@ -2331,49 +2196,29 @@
             }
         });
 
-        // Refresh roster display when review tab is clicked
         document.getElementById('review-tab').addEventListener('click', function() {
             refreshRosterDisplay();
         });
 
-        // Initialize formation display when formation tab is clicked
         document.getElementById('formation-tab').addEventListener('click', function() {
-            // if (!formationDraftLoaded) {
-            //     loadDraftResults();
-            //     formationDraftLoaded = true;
-            // }
             initializeFormationDisplay();
         });
 
-        // Handle new trade offer button clicks
         document.getElementById('newTradeOffer').addEventListener('click', function() {
             openTradeModal();
         });
 
         // ===== FORM SUBMISSION AND VALIDATION =====
-        // Handle form submission and final validation
-
-        // Validate roster before form submission
         document.getElementById('teamRosterForm').addEventListener('submit', function(e) {
-            if (rosterPlayersArray.length === 0) {
-                e.preventDefault();
-                alert('Please select at least one player before saving.');
-                return false;
-            }
-
             saveCurrentStartersToCategory();
             updateLineupsHiddenFields();
 
-            // Update hidden fields one final time
             updateRosterPlayersHiddenFields();
             updateStartersHiddenFields();
             updateSalaryCapDisplay();
         });
 
         // ===== INITIALIZATION =====
-        // Main initialization function and application startup
-
-        // Initialize the complete roster interface
         function initialize() {
             initializeRosterFromServerData();
             updateSalaryCapDisplay();
@@ -2385,12 +2230,10 @@
 </script>
 
 <style>
-    /* Updated CSS for overlays - add this to replace existing overlay styles */
-
     .player-card {
         transition: all 0.2s ease;
         cursor: pointer;
-        position: relative; /* Ensure relative positioning for absolute children */
+        position: relative;
     }
 
         .player-card:hover:not(.protected) {

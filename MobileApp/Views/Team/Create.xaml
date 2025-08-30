@@ -4,21 +4,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
              x:DataType="viewmodels:CreateViewModel"
-             Title="Create New Team">
+             Title="Crear Equipo">
 
     <ScrollView>
         <StackLayout Padding="20" Spacing="20" VerticalOptions="Center">
 
-            <!-- Loading State -->
             <StackLayout IsVisible="{Binding IsLoading}" Spacing="15">
                 <ActivityIndicator IsRunning="True" Color="#007bff" />
-                <Label Text="Creating team..." 
+                <Label Text="Creando equipo" 
                        HorizontalOptions="Center" 
                        FontSize="16" 
                        TextColor="#6c757d" />
             </StackLayout>
 
-            <!-- Create Team Form -->
             <Border BackgroundColor="White"
                     Stroke="#dee2e6"
                     StrokeThickness="1"
@@ -26,30 +24,27 @@
                     StrokeShape="RoundRectangle 12"
                     IsVisible="{Binding IsNotLoading}">
 
-                <!-- Header -->
                 <Grid RowDefinitions="Auto,*">
                     <Border Grid.Row="0"
                             BackgroundColor="#007bff"
                             Padding="20"
                             StrokeShape="RoundRectangle 12,12,0,0">
-                        <Label Text="Create New Team" 
+                        <Label Text="Crear Nuevo Equipo" 
                                FontSize="20" 
                                FontAttributes="Bold" 
                                TextColor="White"
                                HorizontalOptions="Center" />
                     </Border>
 
-                    <!-- Form Content -->
                     <StackLayout Grid.Row="1" Padding="20" Spacing="20">
 
-                        <!-- Location Field -->
                         <StackLayout Spacing="8">
-                            <Label Text="Location" 
+                            <Label Text="Ubicación" 
                                    FontSize="16" 
                                    FontAttributes="Bold" 
                                    TextColor="#333" />
                             <Entry Text="{Binding Location}" 
-                                   Placeholder="Enter team location (e.g., New York)"
+                                   Placeholder="Introduzca la ubicación(p.e., Valladolid)"
                                    FontSize="16"
                                    BackgroundColor="#f8f9fa"
                                    TextColor="#333" />
@@ -61,12 +56,12 @@
 
                         <!-- Mascot Field -->
                         <StackLayout Spacing="8">
-                            <Label Text="Mascot" 
+                            <Label Text="Mascota" 
                                    FontSize="16" 
                                    FontAttributes="Bold" 
                                    TextColor="#333" />
                             <Entry Text="{Binding Mascot}" 
-                                   Placeholder="Enter team mascot (e.g., Yankees)"
+                                   Placeholder="Introduzca la mascota(p.e., Pingüinos)"
                                    FontSize="16"
                                    BackgroundColor="#f8f9fa"
                                    TextColor="#333" />
@@ -78,12 +73,12 @@
 
                         <!-- Abbreviation Field -->
                         <StackLayout Spacing="8">
-                            <Label Text="Abbreviation" 
+                            <Label Text="Abreviatura" 
                                    FontSize="16" 
                                    FontAttributes="Bold" 
                                    TextColor="#333" />
                             <Entry Text="{Binding Abb}" 
-                                   Placeholder="Enter abbreviation (e.g., NYY)"
+                                   Placeholder="Introduzca la abreviatura(p.e., VLL)"
                                    MaxLength="3"
                                    FontSize="16"
                                    BackgroundColor="#f8f9fa"
@@ -92,7 +87,7 @@
                                    TextColor="#dc3545" 
                                    FontSize="12"
                                    IsVisible="{Binding HasAbbError}" />
-                            <Label Text="2-3 characters only" 
+                            <Label Text="2-3 caracteres solo" 
                                    FontSize="11" 
                                    TextColor="#6c757d" />
                         </StackLayout>
@@ -100,7 +95,7 @@
                         <!-- Action Buttons -->
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="15" Margin="0,10,0,0">
                             <Button Grid.Column="0"
-                                    Text="Cancel"
+                                    Text="Cancelar"
                                     Command="{Binding GoBackCommand}"
                                     BackgroundColor="Transparent"
                                     TextColor="#6c757d"
@@ -110,7 +105,7 @@
                                     Padding="15" />
 
                             <Button Grid.Column="1"
-                                    Text="Create Team"
+                                    Text="Crear equipo"
                                     Command="{Binding CreateTeamCommand}"
                                     BackgroundColor="#007bff"
                                     TextColor="White"
