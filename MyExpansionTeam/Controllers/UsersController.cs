@@ -50,7 +50,7 @@ namespace METAPI.Controllers
         /// </returns>
         [HttpPut("UpdateUser")]
         [Authorize]
-        public async Task<IActionResult> UpdateUser([FromBody] UserDto dto)
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto dto)
         {
             string? username = User?.Identity?.Name;
             if (String.IsNullOrWhiteSpace(username))

@@ -27,7 +27,7 @@
                         <div class="card-body">
                             <div class="row mb-2">
                                 <div class="col-4">
-                                    <small class="text-muted fw-bold">Created:</small>
+                                    <small class="text-muted fw-bold">Creado:</small>
                                 </div>
                                 <div class="col-8">
                                     <small>@team.Date.ToString("dd/MM/yyyy")</small>
@@ -38,7 +38,7 @@
                             {
                                 <div class="row mb-2">
                                     <div class="col-4">
-                                        <small class="text-muted fw-bold">Owner:</small>
+                                        <small class="text-muted fw-bold">Dueño:</small>
                                     </div>
                                     <div class="col-8">
                                         <small>
@@ -57,7 +57,7 @@
                                 </div>
                                 <div class="col-8">
                                     <span class="badge @(team.Complete ? "bg-success" : "bg-warning")">
-                                        @(team.Complete ? "Complete" : "In Progress")
+                                        @(team.Complete ? "Completado" : "En progreso")
                                     </span>
                                 </div>
                             </div>
@@ -67,13 +67,13 @@
                             <div class="d-grid gap-2">
                                 <a href="@Url.RouteUrl("TeamDetails", new { Id = team.Id })"
                                    class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-eye me-2"></i>View Details
+                                    <i class="fas fa-eye me-2"></i>Ver Detalles
                                 </a>
                                 @if (myTeams)
                                 {
                                     <a href="@Url.RouteUrl("EditTeam", new { Id = team.Id })"
                                        class="btn btn-outline-secondary btn-sm">
-                                        <i class="fas fa-edit me-2"></i>Edit Team
+                                        <i class="fas fa-edit me-2"></i>Editar Equipo
                                     </a>
                                 }
                             </div>

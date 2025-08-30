@@ -75,7 +75,6 @@ namespace MobileApp
             #endregion Tabs
 
             #region Views.Account
-            Routing.RegisterRoute(AppRoutes.EditProfile, typeof(Views.Account.EditProfile));
             Routing.RegisterRoute(AppRoutes.SignUp, typeof(Views.Account.SignUp));
             Routing.RegisterRoute(AppRoutes.UpdateCredentials, typeof(Views.Account.UpdateCredentials));
             Routing.RegisterRoute(AppRoutes.UpdateUser, typeof(Views.Account.UpdateUser));
@@ -92,7 +91,6 @@ namespace MobileApp
             Routing.RegisterRoute(AppRoutes.TeamDetails, typeof(Views.Team.Details));
             Routing.RegisterRoute(AppRoutes.Draft, typeof(Views.Team.Draft));
             Routing.RegisterRoute(AppRoutes.EditTeam, typeof(Views.Team.Edit));
-            Routing.RegisterRoute(AppRoutes.ReviewRoster, typeof(Views.Team.ReviewRoster));
             Routing.RegisterRoute(AppRoutes.Roster, typeof(Views.Team.Roster));
             Routing.RegisterRoute(AppRoutes.RosterSettings, typeof(Views.Team.RosterSettings));
             Routing.RegisterRoute(AppRoutes.Trade, typeof(Views.Team.Trade));
@@ -112,7 +110,6 @@ namespace MobileApp
             builder.Services.AddTransient<Views.Account.ProfileTab>();
 
             #region Views.Account
-            builder.Services.AddTransient<Views.Account.EditProfile>();
             builder.Services.AddTransient<Views.Account.SignUp>();
             builder.Services.AddTransient<Views.Account.UpdateCredentials>();
             builder.Services.AddTransient<Views.Account.UpdateUser>();
@@ -130,7 +127,6 @@ namespace MobileApp
 
             #region Views.Shared
             builder.Services.AddSingleton<Views.Shared.AppShell>();
-            builder.Services.AddSingleton<Views.Shared.Error>();
             #endregion Views.Shared
 
             #region Views.Team
@@ -143,7 +139,6 @@ namespace MobileApp
             builder.Services.AddTransient<Views.Team.Roster>();
             builder.Services.AddTransient<Views.Team.RosterSettings>();
             builder.Services.AddTransient<Views.Team.Trade>();
-            builder.Services.AddTransient<Views.Team.TradeError>();
             builder.Services.AddTransient<Views.Team.Trades>();
             #endregion Views.Team
             #endregion Views
@@ -153,7 +148,6 @@ namespace MobileApp
             builder.Services.AddTransient<Models.Account.ProfileTabViewModel>();
 
             #region Models.Account
-            builder.Services.AddTransient<Models.Account.EditProfileViewModel>();
             builder.Services.AddTransient<Models.Account.SignUpViewModel>();
             builder.Services.AddTransient<Models.Account.UpdateCredentialsViewModel>();
             builder.Services.AddTransient<Models.Account.UpdateUserViewModel>();
@@ -171,7 +165,6 @@ namespace MobileApp
 
             #region Models.Shared
             builder.Services.AddSingleton<Models.Shared.AppShellViewModel>();
-            builder.Services.AddSingleton<Models.Shared.ErrorViewModel>();
             #endregion Models.Shared
 
             #region Models.Team

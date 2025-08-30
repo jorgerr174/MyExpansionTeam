@@ -21,12 +21,11 @@ namespace METCore.Services
 
             if (franchise is null) return [];
 
-            IList<ProtectableDto> aux = _mapper.Map<IList<ProtectableDto>>(franchise.PlayersToProtect);
-            aux.First().DefaultProtected = true;
-            aux.ElementAt(2).DefaultProtected = true;
-            aux.ElementAt(3).DefaultProtected = true;
+            int[] protectedIds = franchise.ProtectedPlayersIds;
+            IList<ProtectableDto> prot = _mapper.Map<IList<ProtectableDto>>(franchise.PlayersByPosition);
+            foreach (ProtectableDto player in prot) if (protectedIds.Contains(player.Id)) player.DefaultProtected = true;
 
-            return aux;
+            return prot;
         }
         #endregion Get Protectable Players
 

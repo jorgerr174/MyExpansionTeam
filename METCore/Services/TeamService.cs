@@ -317,8 +317,8 @@ namespace METCore.Services
                             franchisePlayers.Remove(fpl);
                     }
                 }
-            dto.TeamPicks = dto.TeamPicks.OrderBy(p => p).ToList();
-            dto.FranchisePicks = dto.FranchisePicks.OrderBy(p => p).ToList();
+            dto.TeamPicks = team.Selections is null ? [.. dto.TeamPicks.OrderBy(p => p)] : [];
+            dto.FranchisePicks = [.. dto.FranchisePicks.OrderBy(p => p)];
 
             foreach (int pId in teamPlayers)
                 franchisePlayers.Remove(pId);
@@ -445,11 +445,8 @@ namespace METCore.Services
             Team? team = await _teamRepository.GetTById(Id);
             if (team is null) return new ResultDto<TeamBasicInfoDto>("Team");
 
-            Team newTeam = (Team)((ICloneable)team).Clone();
-            newTeam.Id = 0;
+            Team newTeam = (Team)team.Clone();
             newTeam.User = user;
-            newTeam.Date = DateTime.Now;
-            newTeam.Complete = false;
 
             bool created = await _teamRepository.CreateT(newTeam) > 0;
             return new(

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using METCore.ValidationAttributes;
 
 namespace METCore.DTOs.Team
@@ -7,16 +8,16 @@ namespace METCore.DTOs.Team
     {
         #region RosterSettings
 
-        [Display(Name = "Salary Cap Percentage")]
-        [Range(60, 120, ErrorMessage = "Salary cap percentage must be between 60% and 120%")]
+        [Range(60, 120, ErrorMessage = "Número debe ser entre 60% y 120%")]
+        [DisplayName("Límite Salarial (%)")]
         public int RosterSettingsCap { get; set; }
 
-        [Display(Name = "Max # of Robbed players per Franchise")]
-        [Range(2, 10, ErrorMessage = "Must be between 2 and 10")]
+        [Range(2, 10, ErrorMessage = "Número debe ser entre 2 y 10")]
+        [DisplayName("Máx Jugadores Por Equipo")]
         public int RosterSettingsMaxPerTeam { get; set; }
 
-        [Display(Name = "Protected Players per Franchise")]
-        [Range(0, 6, ErrorMessage = "# of Protected Players per Franchise must be between 0 and 6")]
+        [Range(0, 6, ErrorMessage = "Número debe ser entre 0 y 6")]
+        [DisplayName("Protegidos por equipo")]
         public int RosterSettingsProtectedPerTeam { get; set; }
 
         [ProtectedPlayersValidation]

@@ -1,4 +1,6 @@
-﻿using METCore.DTOs.Player;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using METCore.DTOs.Player;
 using METCore.Models.Players;
 
 namespace METCore.Enums
@@ -54,24 +56,39 @@ namespace METCore.Enums
 
         public enum ImportEnum
         {
+            [Display(Name = "Ninguna")]
             None,
+            [Display(Name = "Jugadores")]
             Players,
+            [Display(Name = "Estadísticas")]
             Stats,
+            [Display(Name = "Contratos")]
             Contracts,
+            [Display(Name = "Prospectos")]
             Prospects
         }
 
         public enum StatsEnum
         {
+            [Display(Name = "Pasadores")]
             PassStats,
+            [Display(Name = "Recepciones")]
             RecStats,
+            [Display(Name = "Acarreos")]
             RushStats,
+            [Display(Name = "Intercepciones")]
             IntStats,
+            [Display(Name = "Placajes")]
             TackleStats,
+            [Display(Name = "Saques")]
             KOStats,
+            [Display(Name = "Retornos de saque")]
             KRStats,
+            [Display(Name = "Pateos")]
             PuntStats,
+            [Display(Name = "Retornos de pateos")]
             PRStats,
+            [Display(Name = "Goles de campo")]
             FGStats
         }
 

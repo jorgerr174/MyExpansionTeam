@@ -4,24 +4,21 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
              x:DataType="viewmodels:RosterSettingsViewModel"
-             Title="Roster Settings">
+             Title="Ajustes de Plantilla">
 
     <ScrollView>
         <StackLayout Padding="20" Spacing="20">
 
-            <!-- Loading State -->
             <StackLayout IsVisible="{Binding IsLoading}" Spacing="15">
                 <ActivityIndicator IsRunning="True" Color="#007bff" />
-                <Label Text="Loading roster settings..." 
+                <Label Text="Cargando Ajustes de Plantilla..." 
                        HorizontalOptions="Center" 
                        FontSize="16" 
                        TextColor="#6c757d" />
             </StackLayout>
 
-            <!-- Content -->
             <StackLayout IsVisible="{Binding IsNotLoading}" Spacing="20">
 
-                <!-- Team Header -->
                 <Border BackgroundColor="#007bff" 
                         Padding="20"
                         Stroke="Transparent"
@@ -33,7 +30,7 @@
                                TextColor="White"
                                HorizontalOptions="Center">
                             <Label.Text>
-                                <MultiBinding StringFormat="Roster Settings: {0}">
+                                <MultiBinding StringFormat="Ajustes de Plantilla: {0}">
                                     <Binding Path="TeamName" />
                                 </MultiBinding>
                             </Label.Text>
@@ -48,23 +45,21 @@
                     </Grid>
                 </Border>
 
-                <!-- Roster Configuration -->
                 <Border BackgroundColor="White"
                         Stroke="#dee2e6"
                         StrokeThickness="1"
                         Padding="20"
                         StrokeShape="RoundRectangle 12">
                     <StackLayout Spacing="20">
-                        <Label Text="⚙️ Roster Configuration" 
+                        <Label Text="⚙️ Ajustes" 
                                FontSize="18" 
                                FontAttributes="Bold" 
                                TextColor="#28a745" />
 
-                        <!-- Salary Cap % -->
                         <Grid ColumnDefinitions="*,*,*" ColumnSpacing="15">
                             <StackLayout  Grid.Column="0"
                                         Spacing="8">
-                                <Label Text="💰 Salary Cap %" 
+                                <Label Text="💰 Límite Salarial (%)" 
                                        FontSize="14" 
                                        FontAttributes="Bold" 
                                        TextColor="#333" 
@@ -78,16 +73,15 @@
                                        FontSize="16" 
                                        FontAttributes="Bold" 
                                        TextColor="#007bff" />
-                                <Label Text="Percentage of total salary cap to use" 
+                                <Label Text="Porcentaje del Límite Salarial Actual" 
                                        FontSize="11" 
                                        TextColor="#6c757d" 
                                        HorizontalOptions="Center" />
                             </StackLayout>
 
-                            <!-- Max Players Per Team -->
                             <StackLayout  Grid.Column="1" 
                                         Spacing="8">
-                                <Label Text="👥 Max Players Per Team" 
+                                <Label Text="👥 Máx Jugadores Por Equipo" 
                                        FontSize="14" 
                                        FontAttributes="Bold" 
                                        TextColor="#333" 
@@ -101,16 +95,15 @@
                                        FontSize="16" 
                                        FontAttributes="Bold" 
                                        TextColor="#007bff" />
-                                <Label Text="Maximum players from each NFL team" 
+                                <Label Text="Máx jugadores por cada franquicia" 
                                        FontSize="11" 
                                        TextColor="#6c757d" 
                                        HorizontalOptions="Center" />
                             </StackLayout>
 
-                            <!-- Protected Players Per Team -->
                             <StackLayout Grid.Column="2" 
                                         Spacing="8">
-                                <Label Text="🛡️ Protected Players Per Team" 
+                                <Label Text="🛡️ Jugadores Protegidos de cada Franquicia" 
                                        FontSize="14" 
                                        FontAttributes="Bold" 
                                        TextColor="#333" 
@@ -124,7 +117,7 @@
                                        FontSize="16" 
                                        FontAttributes="Bold" 
                                        TextColor="#007bff" />
-                                <Label Text="Players to protect per NFL team" 
+                                <Label Text="Jugadores a proteger por cada Franquicia" 
                                        FontSize="11" 
                                        TextColor="#6c757d" 
                                        HorizontalOptions="Center" />
@@ -133,27 +126,25 @@
                     </StackLayout>
                 </Border>
 
-                <!-- Protected Players Selection -->
                 <Border BackgroundColor="White"
                         Stroke="#dee2e6"
                         StrokeThickness="1"
                         Padding="20"
                         StrokeShape="RoundRectangle 12">
                     <StackLayout Spacing="20">
-                        <Label Text="🛡️ Protected Players Selection" 
+                        <Label Text="🛡️ Selección de Jugadores Protegidos" 
                                FontSize="18" 
                                FontAttributes="Bold" 
                                TextColor="#17a2b8" />
 
-                        <!-- Selection Method -->
                         <StackLayout Spacing="10">
-                            <Label Text="Selection Method" 
+                            <Label Text="Método de Selección" 
                                    FontSize="14" 
                                    FontAttributes="Bold" 
                                    TextColor="#333" />
 
                             <StackLayout Orientation="Horizontal" Spacing="20">
-                                <RadioButton Content="🤖 Automatic" 
+                                <RadioButton Content="🤖 Automático" 
                                              IsChecked="{Binding IsAutomaticProtection}" 
                                              FontSize="14" />
                                 <RadioButton Content="✋ Manual" 
@@ -162,18 +153,17 @@
                             </StackLayout>
 
                             <Label IsVisible="{Binding IsAutomaticProtection}"
-                                   Text="Protect highest-paid players automatically" 
+                                   Text="Jugadores protegidos por defecto" 
                                    FontSize="11" 
                                    TextColor="#6c757d" />
                             <Label IsVisible="{Binding IsManualProtection}"
-                                   Text="Select specific players to protect" 
+                                   Text="Selección manual de jugadores protegidos" 
                                    FontSize="11" 
                                    TextColor="#6c757d" />
                         </StackLayout>
 
-                        <!-- Manual Selection Progress -->
                         <StackLayout IsVisible="{Binding IsManualProtection}" Spacing="10">
-                            <Label Text="Protection Progress" 
+                            <Label Text="Progresión de Protecciones" 
                                    FontSize="14" 
                                    FontAttributes="Bold" 
                                    TextColor="#333" />
@@ -186,7 +176,7 @@
                                 <StackLayout Spacing="10">
                                     <Label FontSize="12" TextColor="#6c757d">
                                         <Label.Text>
-                                            <MultiBinding StringFormat="{}{0} of 32 teams selected">
+                                            <MultiBinding StringFormat="{}{0} de 32 franquicias">
                                                 <Binding Path="TeamsWithSelections" />
                                             </MultiBinding>
                                         </Label.Text>
@@ -198,7 +188,7 @@
 
                                     <Label FontSize="12" TextColor="#6c757d">
                                         <Label.Text>
-                                            <MultiBinding StringFormat="{}{0} players protected">
+                                            <MultiBinding StringFormat="{}{0} jugadores protegidos">
                                                 <Binding Path="TotalProtectedPlayers" />
                                             </MultiBinding>
                                         </Label.Text>
@@ -206,7 +196,7 @@
                                 </StackLayout>
                             </Border>
 
-                            <Button Text="📋 Select Protected Players" 
+                            <Button Text="📋 Selecciona Jugadores Protegidos" 
                                     Command="{Binding DisplayPlayerSelectionCommand}"
                                     BackgroundColor="#17a2b8"
                                     TextColor="White"
@@ -216,17 +206,15 @@
                     </StackLayout>
                 </Border>
 
-                <!-- Player Selection Modal -->
                 <StackLayout IsVisible="{Binding ShowPlayerSelection}" Spacing="15">
 
-                    <!-- Team Selection -->
                     <Border BackgroundColor="White"
                             Stroke="#ffc107"
                             StrokeThickness="2"
                             Padding="15"
                             StrokeShape="RoundRectangle 8">
                         <StackLayout Spacing="10">
-                            <Label Text="🏈 Select NFL Team" 
+                            <Label Text="🏈 Seleccione Franquicia" 
                                    FontSize="16" 
                                    FontAttributes="Bold" 
                                    TextColor="#333" />
@@ -240,7 +228,7 @@
                                    FontSize="12" 
                                    TextColor="#6c757d">
                                 <Label.Text>
-                                    <MultiBinding StringFormat="{}{0}/{1} players protected">
+                                    <MultiBinding StringFormat="{}{0}/{1} jugadores protegidos">
                                         <Binding Path="CurrentTeamProtectedCount" />
                                         <Binding Path="RosterSettingsProtectedPerTeam" />
                                     </MultiBinding>
@@ -249,7 +237,6 @@
                         </StackLayout>
                     </Border>
 
-                    <!-- Player List -->
                     <StackLayout IsVisible="{Binding HasSelectedTeam}" Spacing="10">
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                             <Label Grid.Column="0" 
@@ -336,7 +323,7 @@
                             </CollectionView.ItemTemplate>
                         </CollectionView>
 
-                        <Button Text="✅ Done Selecting" 
+                        <Button Text="✅ Selección Finalizada" 
                                 Command="{Binding HidePlayerSelectionCommand}"
                                 BackgroundColor="#28a745"
                                 TextColor="White"
@@ -345,10 +332,9 @@
                     </StackLayout>
                 </StackLayout>
 
-                <!-- Action Buttons -->
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
                     <Button Grid.Column="0"
-                            Text="⬅️ Back to Team"
+                            Text="⬅️ Volver al Equipo"
                             Command="{Binding GoBackToTeamCommand}"
                             BackgroundColor="Transparent"
                             TextColor="#6c757d"
@@ -358,7 +344,7 @@
                             Padding="12" />
 
                     <Button Grid.Column="1"
-                            Text="💾 Save Settings"
+                            Text="💾 Guardar Ajustes"
                             Command="{Binding SaveSettingsCommand}"
                             BackgroundColor="#28a745"
                             TextColor="White"

@@ -210,6 +210,7 @@ namespace WebApp.Controllers
                 return !next.HasValue ? RedirectToAction("Roster", dto.Id) : !next.Value ? RedirectToAction("Draft", new { dto.Id }) : RedirectToAction("MyTeams");
 
             MessageDto result = await GetResult<MessageDto>(response);
+            if (result.Message.Equals("User")) return RedirectToAction("MyTeams");
             if (result.Message.Equals("Username")) return RedirectToAction("LogOut", new RouteValueDictionary(new { ReturnUrl = Url.Action("MyTeams", "Team") }));
             else ModelState.AddModelError("", "No se pudieron guardar los cambios.");
 
@@ -303,19 +304,21 @@ namespace WebApp.Controllers
 
 
         #region DuplicateTeam
-        [HttpPost]
+        [HttpGet]
         [Authorize]
-        public async Task<IActionResult> DuplicateTeam(TeamBasicInfoDto Team)
+        public async Task<IActionResult> DuplicateTeam(int TeamId)
         {
-            HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "DuplicateTeam", new IdDto(Team.Id));
+            HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "DuplicateTeam", new IdDto(TeamId));
 
             ResultDto<TeamBasicInfoDto> result = await GetResult<ResultDto<TeamBasicInfoDto>>(response);
-            if (response.IsSuccessStatusCode && String.IsNullOrWhiteSpace(result.Message)) return View("Edit", result.Value);
+            if (response.IsSuccessStatusCode && String.IsNullOrWhiteSpace(result.Message)) return RedirectToAction("Edit", new { result.Value.Id });
 
-            if (result.Message.Equals("Username")) return RedirectToAction("LogOut", "Auth", new RouteValueDictionary(new { ReturnUrl = Url.Action("EditTeam", "Team", new { TeamId = Team.Id }) }));
+            if (result.Message.Equals("Username")) 
+                return RedirectToAction("LogOut", "Auth", 
+                    new RouteValueDictionary(new { ReturnUrl = Url.Action("EditTeam", "Team", new { TeamId }) }));
 
             ModelState.AddModelError("Edit", "Operación de borrado no completada.");
-            return View("Edit", Team);
+            return View();
         }
         #endregion DuplicateTeam
     }

@@ -1,21 +1,22 @@
-﻿@model METCore.DTOs.Team.DraftDto
+﻿@using static METCore.Enums.Types
+@model METCore.DTOs.Team.DraftDto
 
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
-            <h2>NFL Draft Configuration - @Model.Location @Model.Mascot</h2>
+			<h2>Configuración del Draft  - @Model.Location @Model.Mascot</h2>
 
             <!-- Phase Navigation -->
             <ul class="nav nav-pills mb-4" id="phaseNavigation" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="settings-tab" data-bs-toggle="pill" data-bs-target="#settings-phase" type="button" role="tab">
-                        <i class="fas fa-cog me-2"></i>Draft Settings
+                        <i class="fas fa-cog me-2"></i>Ajustes del Draft
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link disabled" id="draft-tab" data-bs-toggle="pill" data-bs-target="#draft-phase" type="button" role="tab" disabled>
-                        <i class="fas fa-trophy me-2"></i>Draft Simulation
-                        <span class="badge bg-secondary ms-2" id="current-pick">Pick 1</span>
+						<i class="fas fa-trophy me-2"></i>Simulación
+						<span class="badge bg-secondary ms-2" id="current-pick">Pick 1</span>
                     </button>
                 </li>
             </ul>
@@ -40,41 +41,38 @@
                 <input type="hidden" id="allPicksData" name="Picks" value="" />
 
                 <div class="tab-content">
-                    <!-- Phase 1: Draft Settings Configuration -->
                     <div class="tab-pane fade show active" id="settings-phase" role="tabpanel">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Configure Draft Participation</h4>
-                                <p class="text-muted mb-0">Set up how you want to participate in the NFL draft</p>
+                                <h4>Configurar el Draft</h4>
                             </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group mb-3">
-                                            @Html.LabelFor(m => m.Rounds, "Manual Rounds", new { @class = "form-label" })
+                                            @Html.LabelFor(m => m.Rounds, new { @class = "form-label" })
                                             @Html.TextBoxFor(m => m.Rounds, new { @class = "form-control", @type = "number", @min = "0", @max = "7" })
                                             @Html.ValidationMessageFor(m => m.Rounds, "", new { @class = "text-danger" })
-                                            <div class="form-text">Rounds you want to control manually (0 = full simulation, 7 = control all)</div>
+                                            <div class="form-text">Rondas que realizar manualmente <br/>(0 = simulación completa, 7 = todo)</div>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group mb-3">
-                                            <label for="Speed" class="form-label">Simulation Speed</label>
+                                            <label for="Speed" class="form-label">Velocidad de la simulación</label>
                                             <select id="Speed" name="Speed" class="form-select">
-                                                <option value="instant">Instant</option>
-                                                <option value="fast">Fast (0.5s per pick)</option>
-                                                <option value="normal" selected>Normal (1s per pick)</option>
-                                                <option value="slow">Slow (2s per pick)</option>
+                                                <option value="instant">Instantáneo</option>
+                                                <option value="fast">Rápido (0.5s por pick)</option>
+                                                <option value="normal" selected>Normal (1s por pick)</option>
+                                                <option value="slow">Lento (2s por pick)</option>
                                             </select>
-                                            <div class="form-text">Speed of automated picks during simulation</div>
+                                            <div class="form-text">Velocidad de los picks realizados por el sistema</div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Draft Control Method Selection -->
                                 <div class="card bg-light mb-4">
                                     <div class="card-header">
-                                        <h5 class="mb-0">Draft Control Method</h5>
+                                        <h5 class="mb-0">Método de Control</h5>
                                     </div>
                                     <div class="card-body">
                                         <div class="row">
@@ -82,8 +80,8 @@
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="draftMethod" id="draftMethodFull" value="full" checked>
                                                     <label class="form-check-label" for="draftMethodFull">
-                                                        <strong>Full Simulation</strong><br>
-                                                        <small class="text-muted">Watch the entire draft unfold automatically</small>
+                                                        <strong>Simulación Completa</strong><br>
+                                                        <small class="text-muted">Mire como el draft se simula por completo</small>
                                                     </label>
                                                 </div>
                                             </div>
@@ -91,8 +89,8 @@
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="draftMethod" id="draftMethodMyTeam" value="myteam">
                                                     <label class="form-check-label" for="draftMethodMyTeam">
-                                                        <strong>Control My Team</strong><br>
-                                                        <small class="text-muted">Make picks for @Model.Location @Model.Mascot only</small>
+                                                        <strong>Controlar Mi Equipo</strong><br>
+                                                        <small class="text-muted">Solo controla los picks de tu equipo</small>
                                                     </label>
                                                 </div>
                                             </div>
@@ -100,8 +98,8 @@
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="draftMethod" id="draftMethodMultiple" value="multiple">
                                                     <label class="form-check-label" for="draftMethodMultiple">
-                                                        <strong>Control Multiple Teams</strong><br>
-                                                        <small class="text-muted">Select which teams you want to control</small>
+                                                        <strong>Controla Franquicias</strong><br>
+                                                        <small class="text-muted">Controla los picks de tu equipo y los de otras franquicias</small>
                                                     </label>
                                                 </div>
                                             </div>
@@ -109,10 +107,9 @@
                                     </div>
                                 </div>
 
-                                <!-- Multiple Team Selection (Hidden by default) -->
                                 <div id="multipleTeamSelection" class="card mb-4" style="display: none;">
                                     <div class="card-header">
-                                        <h5 class="mb-0">Select Teams to Control</h5>
+                                        <h5 class="mb-0">Seleccione franquicias que controlar</h5>
                                     </div>
                                     <div class="card-body">
                                         <div class="row" id="franchiseCheckboxes">
@@ -121,68 +118,62 @@
                                     </div>
                                 </div>
 
-                                <!-- Additional Settings -->
                                 <div class="card mb-4">
                                     <div class="card-header">
-                                        <h5 class="mb-0">Additional Settings</h5>
+                                        <h5 class="mb-0">Ajustes adicionales</h5>
                                     </div>
                                     <div class="card-body">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="enableTrading" checked>
                                             <label class="form-check-label" for="enableTrading">
-                                                Enable Draft Day Trading
+                                                Permitir Trueques durante el draft
                                             </label>
-                                            <div class="form-text">Allow trading picks and players during the draft</div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Draft Preview -->
                                 <div class="card mb-4">
                                     <div class="card-header">
-                                        <h5 class="mb-0">Draft Configuration Summary</h5>
+                                        <h5 class="mb-0">Resumen de la configuración</h5>
                                     </div>
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <p><strong>Control Method:</strong> <span id="manualDescription">Full simulation</span></p>
-                                                <p><strong>Trading:</strong> <span id="tradingStatus">Enabled</span></p>
+                                                <p><strong>Método de Control:</strong> <span id="manualDescription">Simulación completa</span></p>
+                                                <p><strong>Trueques permitidos:</strong> <span id="tradingStatus">Permitido</span></p>
                                             </div>
                                             <div class="col-md-6">
-                                                <p><strong>Your Draft Picks:</strong> <span id="teamPicksCount">Loading...</span></p>
-                                                <p><strong>Next Pick:</strong> <span id="nextPickInfo">Loading...</span></p>
+                                                <p><strong>Número de picks de tu equipo:</strong> <span id="teamPicksCount">Cargando...</span></p>
+                                                <p><strong>Siguiente Pick:</strong> <span id="nextPickInfo">Cargando...</span></p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Action Buttons -->
                                 <div class="d-flex justify-content-between">
                                     <button type="button" class="btn btn-secondary" onclick="history.back()">
-                                        <i class="fas fa-arrow-left me-2"></i>Back
+                                        <i class="fas fa-arrow-left me-2"></i>Volver
                                     </button>
                                     <button type="button" class="btn btn-primary btn-lg" id="startDraftButton">
-                                        <i class="fas fa-play me-2"></i>Start Draft Simulation
+                                        <i class="fas fa-play me-2"></i>Comenzar Draft
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Phase 2: Draft Simulation -->
                     <div class="tab-pane fade" id="draft-phase" role="tabpanel">
                         <div class="row">
-                            <!-- Draft Order Column -->
                             <div class="col-md-4">
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h5 class="mb-0">Draft Order</h5>
+                                        <h5 class="mb-0">Orden del Draft</h5>
                                         <button type="button" class="btn btn-primary btn-sm" id="newTradeOffer">
-                                            <i class="fas fa-plus me-1"></i>New Trade Offer
+                                            <i class="fas fa-plus me-1"></i>Nuevo Trueque
                                         </button>
                                         <button type="button" class="btn btn-warning btn-sm" id="simulationToggleButton" style="display: none;">
                                             <i class="fas fa-start me-1" id="simulationToggleIcon"></i>
-                                            <span id="simulationToggleText">Start</span>
+                                            <span id="simulationToggleText">Comenzar</span>
                                         </button>
                                     </div>
                                     <div class="card-body p-0">
@@ -198,16 +189,15 @@
                                 </div>
                             </div>
 
-                            <!-- Player Selection Column -->
                             <div class="col-md-8">
                                 <div class="card">
                                     <div class="card-header">
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <h5 class="mb-0">Available Players</h5>
+                                            <h5 class="mb-0">Prospectos disponibles</h5>
                                             <div class="d-flex align-items-center">
-                                                <label for="positionFilter" class="form-label me-2 mb-0">Filter:</label>
+                                                <label for="positionFilter" class="form-label me-2 mb-0">Filtro:</label>
                                                 <select id="positionFilter" class="form-select form-select-sm" style="width: auto;">
-                                                    <option value="all">All Positions</option>
+                                                    <option value="all">Todos</option>
                                                     <option value="QB">QB</option>
                                                     <option value="HB">HB</option>
                                                     <option value="WR">WR</option>
@@ -239,10 +229,9 @@
                     </div>
                 </div>
 
-                <!-- Save Button -->
                 <div class="mt-4 text-center" style="display: none;" id="saveSection">
                     <button type="submit" class="btn btn-success btn-lg">
-                        <i class="fas fa-save me-2"></i>Save Draft Results
+                        <i class="fas fa-save me-2"></i>Guardar resultados
                     </button>
                 </div>
             </form>
@@ -250,11 +239,10 @@
     </div>
 </div>
 
-<!-- Draft Summary Section (Hidden by default) -->
 <div id="draftSummarySection" class="card mt-4" style="display: none;">
     <div class="card-header bg-success text-white">
         <h5 class="mb-0">
-            <i class="fas fa-trophy me-2"></i>Your Draft Summary - @Model.Location @Model.Mascot
+            <i class="fas fa-trophy me-2"></i>Resumen de tu draft- @Model.Location @Model.Mascot
         </h5>
     </div>
     <div class="card-body">
@@ -264,16 +252,13 @@
     </div>
 </div>
 
-<!-- Trade Modal Container -->
 <div id="tradeModalContainer"></div>
 
-<!-- Bootstrap and jQuery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
-        // State variables
-        let selectedFranchises = []; // Array of franchise IDs for multiple team control
+        let selectedFranchises = [];
         let draftMethod = 'full';
         let draftOrder = [];
         let currentPickIndex = 0;
@@ -284,15 +269,14 @@
         let currentPositionFilter = 'all';
         let simulationSpeed = 'normal';
         let isDraftActive = false;
-        let teamDraftSelections = new Map(); // Team selections: pickNumber -> playerId
-        let userControlledPicks = []; // List of picks user needs to make
-        let franchiseControlledPicks = []; // List of picks for other franchises user controls
-        let franchiseDraftOrder = []; // Array of 32 franchises with draft positions and needs
-        let allPicksData = []; // IList<int>[] containing picks for all 33 entities (0=team, 1-32=franchises)
+        let teamDraftSelections = new Map();
+        let userControlledPicks = [];
+        let franchiseControlledPicks = [];
+        let franchiseDraftOrder = [];
+        let allPicksData = [];
         let automaticScroll = true;
         let stopSimulation = true;
 
-        // NFL Franchises using enum values (1-32)
         const franchiseNames = {
             1: { name: "Arizona Cardinals", abbreviation: "ARI" },
             2: { name: "Atlanta Falcons", abbreviation: "ATL" },
@@ -346,20 +330,18 @@
 
         const ROUND_START_PICKS = { 1: 1, 2: 34, 3: 67, 4: 106, 5: 143, 6: 182, 7: 223 };
 
-        // Convert rpp format (r1p1 -> 101) to overall pick number
         function rppToOverall(rppNumber) {
             const round = Math.floor(rppNumber / 100);
             const pickInRound = rppNumber % 100;
 
             if (!ROUND_START_PICKS[round]) {
-                console.error(`Invalid round: ${round}`);
+                console.error(`Ronda inválida: ${round}`);
                 return 0;
             }
 
             return ROUND_START_PICKS[round] + pickInRound - 1;
         }
 
-        // Convert overall pick number to round number
         function overallToRound(overallPick) {
             return overallPick < 1
                 ? 0 : overallPick <= 33
@@ -390,7 +372,6 @@
             return 0;
         }
 
-        // Initialize page
         initializeSelections();
         initializeAllPicksData();
         initializeSelectedFranchises();
@@ -398,11 +379,9 @@
         setupEventHandlers();
         displayTeamPicksInfo();
 
-        // Initialize team draft selections from model
         function initializeSelections() {
             teamDraftSelections.clear();
             
-            // Parse Selections dictionary from model if it exists
             if (@Html.Raw(Json.Serialize(Model.Selections)) && Object.keys(@Html.Raw(Json.Serialize(Model.Selections))).length > 0) {
                 const selections = @Html.Raw(Json.Serialize(Model.Selections));
                 Object.entries(selections).forEach(([pickNumber, playerId]) => {
@@ -411,50 +390,39 @@
             }
         }
 
-        // Initialize all picks data from model
         function initializeAllPicksData() {
-            // Parse Picks array from model if it exists
             if (@Html.Raw(Json.Serialize(Model.Picks))) {
                 allPicksData = @Html.Raw(Json.Serialize(Model.Picks));
             } else {
-                // If no picks data, initialize with empty arrays
                 allPicksData = new Array(33).fill(null).map(() => []);
             }
         }
 
-        // Update hidden fields with current selections and picks data
         function updateHiddenFields() {
-            // Update Selections hidden field (IDictionary<int,int>)
             const selectionsObj = {};
             teamDraftSelections.forEach((playerId, pickNumber) => {
                 selectionsObj[pickNumber] = playerId;
             });
             document.getElementById('draftSelections').value = JSON.stringify(selectionsObj);
 
-            // Update Picks hidden field (IList<int>[])
             document.getElementById('allPicksData').value = JSON.stringify(allPicksData);
         }
 
-        // Initialize selected franchises
         function initializeSelectedFranchises() {
             const hiddenField = document.getElementById('selectedFranchises');
             const value = hiddenField.value.trim();
             selectedFranchises = value ? value.split(',').map(id => parseInt(id)) : [];
             
-            // Update checkboxes if they exist
             selectedFranchises.forEach(franchiseId => {
                 const checkbox = document.getElementById(`franchise_${franchiseId}`);
                 if (checkbox) checkbox.checked = true;
             });
         }
 
-        // Setup event handlers
         function setupEventHandlers() {
-            // Settings event handlers
             document.getElementById('Rounds').addEventListener('change', function() {
                 updateDraftPreview();
 
-                // If draft is active, refresh the display
                 if (isDraftActive) {
                     displayDraftOrder();
                 }
@@ -474,43 +442,39 @@
                 updateDraftPreview();
             });
 
-            // Start draft button
             document.getElementById('startDraftButton').addEventListener('click', function () {
                 if (validateSettings()) {
                     startDraftSimulation();
                 }
             });
 
-            // Position filter
             document.getElementById('positionFilter').addEventListener('change', function() {
                 currentPositionFilter = this.value;
                 displayAvailablePlayers();
             });
         }
 
-        // Display team picks information
         function displayTeamPicksInfo() {
-            const teamPicks = allPicksData[0] || []; // Team picks are at index 0
+            const teamPicks = allPicksData[0] || [];
 
             if (teamPicks && teamPicks.length > 0) {
                 document.getElementById('teamPicksCount').textContent = teamPicks.length;
 
                 if (teamPicks.length > 0) {
-                    const nextPickRpp = teamPicks[0]; // rpp format
+                    const nextPickRpp = teamPicks[0];
                     const round = Math.floor(nextPickRpp / 100);
                     const pickInRound = nextPickRpp % 100;
-                    const overallPick = rppToOverall(nextPickRpp); // FIXED: Use correct conversion
-                    document.getElementById('nextPickInfo').textContent = `Round ${round}, Pick ${pickInRound} (Overall #${overallPick})`;
+                    const overallPick = rppToOverall(nextPickRpp);
+                    document.getElementById('nextPickInfo').textContent = `Ronda ${round}, Pick ${pickInRound} (Total #${overallPick})`;
                 } else {
-                    document.getElementById('nextPickInfo').textContent = 'No picks available';
+                    document.getElementById('nextPickInfo').textContent = 'Sin picks disponibles';
                 }
             } else {
-                document.getElementById('teamPicksCount').textContent = 'Loading...';
-                document.getElementById('nextPickInfo').textContent = 'Loading...';
+                document.getElementById('teamPicksCount').textContent = 'Cargando...';
+                document.getElementById('nextPickInfo').textContent = 'Cargando...';
             }
         }
 
-        // Toggle multiple team selection visibility
         function toggleMultipleTeamSelection() {
             const multipleSection = document.getElementById('multipleTeamSelection');
             if (draftMethod === 'multiple') {
@@ -521,7 +485,6 @@
             }
         }
 
-        // Generate franchise checkboxes
         function generateFranchiseCheckboxes() {
             const container = document.getElementById('franchiseCheckboxes');
             container.innerHTML = '';
@@ -564,53 +527,48 @@
             });
         }
 
-        // Update selected franchises hidden field
         function updateSelectedFranchisesHiddenField() {
             document.getElementById('selectedFranchises').value = selectedFranchises.join(',');
         }
 
-        // Update draft preview
         function updateDraftPreview() {
             manualRounds = parseInt(document.getElementById('Rounds').value) || 0;
             simulationSpeed = document.getElementById('Speed').value || 'normal';
 
             let manualDescription = '';
             if (draftMethod === 'full') {
-                manualDescription = 'Full simulation - watch the entire draft';
+                manualDescription = 'Simulación completa - ver el draft por completo';
             } else if (draftMethod === 'myteam') {
-                manualDescription = manualRounds === 0 ? 'Auto-pick for your team' :
-                                 manualRounds === 7 ? 'Manual control for all your picks' :
-                                 `Manual control for ${manualRounds} rounds`;
+                manualDescription = manualRounds === 0 ? 'Simulación completa - ver el draft por completo' :
+                                 manualRounds === 7 ? 'Control de todos tus picks' :
+                                 `Control manual de tus picks en las primeras ${manualRounds} rondas`;
             } else if (draftMethod === 'multiple') {
-                manualDescription = `Manual control for ${selectedFranchises.length} selected teams (${manualRounds} rounds)`;
+                manualDescription = `Control manual de los picks de tu equipo y de ${selectedFranchises.length} franquicias durante (${manualRounds} rondas)`;
             }
 
             document.getElementById('manualDescription').textContent = manualDescription;
-            document.getElementById('tradingStatus').textContent = enableTrading ? 'Enabled' : 'Disabled';
+            document.getElementById('tradingStatus').textContent = enableTrading ? 'Permitido' : 'No permitido';
 
-            // Update the draft order display if we're already in draft mode
             if (isDraftActive && draftOrder.length > 0) {
                 displayDraftOrder();
             }
         }
 
-        // Validate settings
         function validateSettings() {
             const rounds = parseInt(document.getElementById('Rounds').value);
             if (rounds < 0 || rounds > 7) {
-                alert('Manual rounds must be between 0 and 7');
+                alert('Rondas manuales deben ser entre 0 y 7');
                 return false;
             }
 
             if (draftMethod === 'multiple' && selectedFranchises.length === 0) {
-                alert('Please select at least one team to control');
+                alert('Por favor, seleccione al menos una franquicia que controlar');
                 return false;
             }
 
             return true;
         }
 
-        // Start draft simulation
         function startDraftSimulation() {
             isDraftActive = true;
             simulationSpeed = document.getElementById('Speed').value || 'normal';
@@ -619,7 +577,6 @@
             settingsTab.classList.add('disabled');
             settingsTab.disabled = true;
 
-            // Enable draft tab
             const draftTab = document.getElementById('draft-tab');
             draftTab.classList.remove('disabled');
             draftTab.disabled = false;
@@ -627,23 +584,17 @@
             const tabDraft = new bootstrap.Tab(draftTab);
             tabDraft.show();
 
-            // Show/hide trading button based on settings
             document.getElementById('newTradeOffer').style.display = enableTrading ? 'inline-block' : 'none';
 
-            // Show simulation toggle button
             const simulationToggleButton = document.getElementById('simulationToggleButton');
             simulationToggleButton.style.display = 'inline-block';
 
-            // Initialize draft data
             initializeDraftData();
         }
 
-        // Initialize draft data
         function initializeDraftData() {
-            // Use the picks data we already have from the model
             loadDraftOrderFromPicksData();
 
-            // Load prospects
             fetch('/Team/GetDraftProspects')
             .then(response => response.json())
             .then(prospects => {
@@ -652,25 +603,21 @@
             });
         }
 
-        // Load draft order from picks data
         function loadDraftOrderFromPicksData() {
             draftOrder = [];
 
-            // Create a map of all picks to see the order
             const allPicks = [];
 
-            // Add all picks from all entities (team + 32 franchises)
             for (let i = 0; i < allPicksData.length; i++) {
                 if (allPicksData[i] && allPicksData[i].length > 0) {
                     allPicksData[i].forEach(pickNum => {
-                        // Convert rpp format to overall pick number
                         const round = Math.floor(pickNum / 100);
                         const pickInRound = pickNum % 100;
-                        const overallPick = rppToOverall(pickNum); // FIXED: Use correct conversion
+                        const overallPick = rppToOverall(pickNum);
 
                         allPicks.push({
                             pickNumber: overallPick,
-                            rppNumber: pickNum, // Keep original rpp format
+                            rppNumber: pickNum,
                             round: round,
                             pickInRound: pickInRound,
                             entityIndex: i,
@@ -681,14 +628,12 @@
                 }
             }
 
-            // Sort by overall pick number
             allPicks.sort((a, b) => a.pickNumber - b.pickNumber);
 
-            // Create draft order
             allPicks.forEach(pick => {
                 draftOrder.push({
                     overall: pick.pickNumber,
-                    rppFormat: pick.rppNumber, // Store rpp format for reference
+                    rppFormat: pick.rppNumber,
                     round: pick.round,
                     pickInRound: pick.pickInRound,
                     teamId: pick.teamId,
@@ -696,32 +641,28 @@
                     teamAbbr: pick.isTeam ? '@Model.Abb' : franchiseNames[pick.teamId].abbreviation,
                     isUserControlled: shouldControlPick(pick),
                     selectedPlayer: null,
-                    neededPositions: [] // This could be enhanced with actual team needs
+                    neededPositions: []
                 });
             });
 
             displayDraftOrder();
         }
 
-        // Determine if user should control this pick
         function shouldControlPick(pick) {
             return draftMethod !== 'full' 
                 && (pick.isTeam || (draftMethod === 'multiple' && selectedFranchises.includes(pick.teamId)));
         }
 
-        // Display draft order
         function displayDraftOrder() {
             const container = document.getElementById('draftOrderList');
             container.innerHTML = '';
 
-            // Filter picks to only show those in the selected number of rounds
             const filteredPicks = draftOrder.filter(pick => {
                 const pickRound = overallToRound(pick.overall);
-                return pickRound <= manualRounds || manualRounds === 0; // Show all if manualRounds is 0
+                return pickRound <= manualRounds || manualRounds === 0;
             });
 
             filteredPicks.forEach((pick, index) => {
-                // Find the actual index in the full draftOrder array
                 const actualIndex = draftOrder.findIndex(p => p.overall === pick.overall);
 
                 const pickDiv = document.createElement('div');
@@ -736,12 +677,12 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <strong>#${pick.overall}</strong> - ${pick.teamAbbr}
-                            <br><small>Round ${pick.round}, Pick ${pick.pickInRound}</small>
-                            ${pick.isUserControlled ? '<br><span class="badge bg-warning text-dark">Your Control</span>' : ''}
+                            <br><small>Ronda ${pick.round}, Pick ${pick.pickInRound}</small>
+                            ${pick.isUserControlled ? '<br><span class="badge bg-warning text-dark">Tu Control</span>' : ''}
                         </div>
                         <div class="text-end">
                             ${isSelected ? `<strong>${playerName}</strong><br><small>${playerPosition}</small>` :
-                              actualIndex === currentPickIndex ? '<span class="badge bg-light text-dark">On the Clock</span>' : ''}
+                              actualIndex === currentPickIndex ? '<span class="badge bg-light text-dark">Su turno</span>' : ''}
                         </div>
                     </div>
                 `;
@@ -750,17 +691,15 @@
             });
         }
 
-        // Display available players
         function displayAvailablePlayers() {
             const container = document.getElementById('availablePlayersList');
             container.innerHTML = '';
 
             if (!availablePlayersData || availablePlayersData.length === 0) {
-                container.innerHTML = '<div class="text-center p-4"><div class="spinner-border" role="status"></div><p class="mt-2">Loading players...</p></div>';
+                container.innerHTML = '<div class="text-center p-4"><div class="spinner-border" role="status"></div><p class="mt-2">Cargando jugadores...</p></div>';
                 return;
             }
 
-            // Filter players by position
             let filteredPlayers = availablePlayersData;
             if (currentPositionFilter !== 'all') {
                 filteredPlayers = availablePlayersData.filter(player =>
@@ -785,7 +724,6 @@
                 cardDiv.className = 'card player-card';
                 cardDiv.setAttribute('data-player-id', player.id);
 
-                // Add selectable styling if user can pick
                 if (isUserControlled) {
                     cardDiv.classList.add('selectable');
                     cardDiv.style.cursor = 'pointer';
@@ -795,7 +733,6 @@
                     cardDiv.style.opacity = '0.6';
                 }
 
-                // Format height from inches to feet'inches
                 const heightFeet = Math.floor((player.height || 0) / 12);
                 const heightInches = (player.height || 0) % 12;
                 const heightDisplay = `${heightFeet}'${heightInches}"`;
@@ -809,15 +746,13 @@
                                     <div class="player-basic-info mb-2">
                                         <span class="badge bg-primary me-2">${player.position || 'N/A'}</span>
                                         <span class="text-muted">${player.college || 'Unknown College'}</span>
-                                        <span class="text-muted mx-2">|</span>
-                                        <span class="text-muted">${player.year || 'N/A'} Year</span>
                                     </div>
                                     <div class="player-physical mb-2">
                                         <small class="text-muted">
-                                            <strong>Physical:</strong> ${heightDisplay} | ${player.weight || 0} lbs
-                                            ${player.handSize ? ` | Hands: ${player.handSize}"` : ''}
-                                            ${player.armLength ? ` | Arms: ${player.armLength}"` : ''}
-                                            ${player.wingspan ? ` | Wingspan: ${player.wingspan}"` : ''}
+                                            <strong>Medidas:</strong> ${heightDisplay} | ${player.weight || 0} lbs
+                                            ${player.handSize ? ` | Manos: ${player.handSize}"` : ''}
+                                            ${player.armLength ? ` | Brazos: ${player.armLength}"` : ''}
+                                            ${player.wingspan ? ` | Envergadura: ${player.wingspan}"` : ''}
                                         </small>
                                     </div>
                                     <div class="player-combine">
@@ -825,9 +760,9 @@
                                             <strong>Combine:</strong>
                                             ${player.fortyYardDash ? ` 40yd: ${player.fortyYardDash}` : ''}
                                             ${player.vertJump ? ` | Vert: ${player.vertJump}"` : ''}
-                                            ${player.broadJump ? ` | Broad: ${player.broadJump}"` : ''}
-                                            ${player.benchPress ? ` | Bench: ${player.benchPress}` : ''}
-                                            ${player.threeConeDrill ? ` | 3-Cone: ${player.threeConeDrill}` : ''}
+                                            ${player.broadJump ? ` | Largo: ${player.broadJump}"` : ''}
+                                            ${player.benchPress ? ` | Banca: ${player.benchPress}` : ''}
+                                            ${player.threeConeDrill ? ` | 3-Conos: ${player.threeConeDrill}` : ''}
                                             ${player.twentyYardShuttle ? ` | 20yd: ${player.twentyYardShuttle}` : ''}
                                         </small>
                                     </div>
@@ -836,10 +771,10 @@
                             <div class="col-md-4 text-end">
                                 <div class="player-scores">
                                     <div class="mb-2">
-                                        <span class="badge bg-success fs-6">Ath: ${player.athScore || 0}</span>
+                                        <span class="badge bg-success fs-6">Atl: ${player.athScore || 0}</span>
                                     </div>
                                     <div>
-                                        <span class="badge bg-warning text-dark">Consensus: ${player.consensus || 0}</span>
+                                        <span class="badge bg-warning text-dark">Consenso: ${player.consensus || 0}</span>
                                     </div>
                                 </div>
                             </div>
@@ -847,7 +782,6 @@
                     </div>
                 `;
 
-                // Add click handler for player selection
                 cardDiv.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -861,7 +795,6 @@
                     }
                 });
 
-                // Add hover effects for better UX
                 cardDiv.addEventListener('mouseenter', function() {
                     if (isUserControlled) {
                         this.classList.add('bg-light');
@@ -877,15 +810,13 @@
             });
         }
     
-        // Process current draft pick
         function processDraftPick() {
             if (stopSimulation) {
-                console.log('Simulation paused, waiting for resume...');
+                console.log('Simulación pausada, esperando para continuar...');
                 return;
             }   
 
             if (currentPickIndex >= draftOrder.length) {
-                // Draft is complete
                 completeDraft();
                 return;
             }
@@ -893,106 +824,87 @@
             const currentPick = draftOrder[currentPickIndex];
             const currentPickRound = overallToRound(currentPick.overall);
 
-            // Update current pick display
             document.getElementById('current-pick').textContent = `Pick ${currentPick.overall}`;
 
-            // Show current pick info
             const pickInfo = document.getElementById('currentPickInfo');
             pickInfo.style.display = 'block';
             pickInfo.innerHTML = `
                 <strong>Pick #${currentPick.overall}</strong> - ${currentPick.teamName}
-                <br>Round ${currentPick.round}, Pick ${currentPick.pickInRound}
-                ${currentPick.isUserControlled ? '<br><span class="badge bg-warning text-dark">Your Turn!</span>' : ''}
+                <br>Ronda ${currentPick.round}, Pick ${currentPick.pickInRound}
+                ${currentPick.isUserControlled ? '<br><span class="badge bg-warning text-dark">Tu Turno!</span>' : ''}
             `;
 
-            // Scroll to current pick in draft order (only if it's visible in filtered list)
             const pickElement = document.getElementById(`pick-${currentPickIndex}`);
             if (automaticScroll && pickElement) {
                 pickElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
 
-            // Determine if user should control this pick
             if (currentPick.isUserControlled && currentPickRound <= manualRounds) {
-                // User needs to make this pick (within manual rounds)
                 isUserControlled = true;
                 enablePlayerSelection();
             } else {
-                // Auto-pick for this team
                 isUserControlled = false;
                 disablePlayerSelection();
                 makeAutoPick();
             }
         }
 
-        // Enable player selection for user
         function enablePlayerSelection() {
             const playerCards = document.querySelectorAll('.player-card');
             playerCards.forEach(card => {
                 card.style.cursor = 'pointer';
                 card.style.opacity = '1';
-                card.title = 'Click to draft this player';
+                card.title = 'Clica para seleccionar a este jugador';
             });
         }
 
-        // Disable player selection
         function disablePlayerSelection() {
             const playerCards = document.querySelectorAll('.player-card');
             playerCards.forEach(card => {
                 card.style.cursor = 'not-allowed';
                 card.style.opacity = '0.6';
-                card.title = 'Cannot select - not your turn';
+                card.title = 'No puede seleccionar - no es su turno';
             });
         }
 
-        // Select a player (user pick)
         function selectPlayer(player) {
             if (!isUserControlled) return;
 
             const currentPick = draftOrder[currentPickIndex];
             
-            // Confirm selection
-            if (!confirm(`Draft ${player.name} (${player.position}) with pick #${currentPick.overall}?`)) {
+            if (!confirm(`Elegir ${player.name} (${player.position}) con el pick #${currentPick.overall}?`)) {
                 return;
             }
 
-            // Record the selection
             currentPick.selectedPlayer = player;
             
-            // If this is a team pick, record it in selections
             if (currentPick.teamId === 0) {
                 teamDraftSelections.set(currentPick.overall, player.id);
             }
 
-            // Remove player from available list
             availablePlayersData = availablePlayersData.filter(p => p.id !== player.id);
 
-            // Move to next pick
             currentPickIndex++;
             
-            // Update displays
             displayDraftOrder();
             displayAvailablePlayers();
             updateHiddenFields();
             
-            // Process next pick
             processDraftPick();
         }
 
-        // Make automatic pick
         function makeAutoPick() {
             const pickInfo = document.getElementById('currentPickInfo');
             pickInfo.innerHTML += `
                 <div class="mt-2">
                     <div class="spinner-border text-primary mb-2" role="status"></div>
-                    <p>Making selection...</p>
+                    <p>Simulando elección...</p>
                 </div>
             `;
 
-            // Determine speed based on whether we're past the manual rounds
             const currentPickRound = overallToRound(draftOrder[currentPickIndex].overall);
             let actualSpeed = simulationSpeed;
 
-            // If we're past the manual rounds, use instant speed
             if (currentPickRound > manualRounds && manualRounds > 0) {
                 actualSpeed = 'instant';
             }
@@ -1003,14 +915,12 @@
             }, delays[actualSpeed] || 1000);
         }
 
-        // Make AI pick locally
         function makeLocalAIPick() {
             const currentPick = draftOrder[currentPickIndex];
             const neededPositions = currentPick.neededPositions || [];
 
             let selectedPlayer = null;
 
-            // First try to fill needed positions
             if (neededPositions.length > 0) {
                 let positionPlayers = [];
                 for (let position of neededPositions) {
@@ -1019,9 +929,7 @@
                 }
 
                 if (positionPlayers.length > 0) {
-                    // Among position players, pick the one with lowest consensus (best ranking)
                     selectedPlayer = positionPlayers.reduce((prev, current) => {
-                        // Handle cases where consensus might be 0 or undefined
                         const prevConsensus = prev.consensus || 999;
                         const currentConsensus = current.consensus || 999;
                         return (prevConsensus < currentConsensus) ? prev : current;
@@ -1029,14 +937,11 @@
                 }
             }
 
-            // If no needed position player found, pick best available by consensus
             if (!selectedPlayer && availablePlayersData.length > 0) {
                 selectedPlayer = availablePlayersData.reduce((prev, current) => {
-                    // Lower consensus number = better pick (1st is better than 20th)
                     const prevConsensus = prev.consensus || 999;
                     const currentConsensus = current.consensus || 999;
 
-                    // If consensus is the same, fall back to athScore as tiebreaker
                     if (prevConsensus === currentConsensus) {
                         return (prev.athScore > current.athScore) ? prev : current;
                     }
@@ -1046,39 +951,32 @@
             }
 
             if (selectedPlayer) {
-                // Record the selection
                 currentPick.selectedPlayer = selectedPlayer;
 
                 if (currentPick.teamId === 0) {
                     teamDraftSelections.set(currentPick.overall, selectedPlayer.id);
                 }
 
-                // Remove player from available list
                 availablePlayersData = availablePlayersData.filter(p => p.id !== selectedPlayer.id);
 
-                // Move to next pick
                 currentPickIndex++;
 
-                // Update displays
                 displayDraftOrder();
                 displayAvailablePlayers();
 
-                // Process next pick
                 processDraftPick();
             } else {
-                // No players available - this shouldn't happen
-                console.error('No players available for pick');
+                console.error('Sin jugadores disponibles para la elección');
                 currentPickIndex++;
                 processDraftPick();
             }
         }
 
-        // Complete draft
         function completeDraft() {
             document.getElementById('currentPickInfo').innerHTML = `
                 <div class="alert alert-success">
-                    <h5><i class="fas fa-trophy me-2"></i>Draft Complete!</h5>
-                    <p>All picks have been made. Review your selections below and save the results.</p>
+                    <h5><i class="fas fa-trophy me-2"></i>Draft Completado!</h5>
+                    <p>Todos las elecciones han sido completadas. Revise sus elecciones y guarde los resultados.</p>
                 </div>
             `;
 
@@ -1089,28 +987,22 @@
             $('#backToCurrent').css("display", "none");
             showDraftSummary();
 
-            // Show save section
             document.getElementById('saveSection').style.display = 'block';
             
-            // Update hidden fields one final time
             updateHiddenFields();
             teamDraftSelections.forEach((playerId, pickNumber) => {
                 $('#draftSelections').append(`<input type="hidden" name="Selections[${pickNumber}]" value="${playerId}" />`);
             });
 
-            // Scroll to top
             document.getElementById('draftSummarySection').scrollIntoView({ behavior: 'smooth' });
             automaticScroll = false;
         }
 
-        // Form submission handler
         document.getElementById('draftForm').addEventListener('submit', function(e) {
-            // Update hidden fields before submission
             updateHiddenFields();
         });
 
 
-        // Toggle simulation pause/resume
         function toggleSimulation() {
             stopSimulation = !stopSimulation;
 
@@ -1119,14 +1011,12 @@
             const toggleText = document.getElementById('simulationToggleText');
 
             if (stopSimulation) {
-                // Simulation is now paused
                 toggleButton.classList.remove('btn-warning');
                 toggleButton.classList.add('btn-success');
                 toggleIcon.classList.remove('fa-pause');
                 toggleIcon.classList.add('fa-play');
-                toggleText.textContent = 'Resume';
+                toggleText.textContent = 'Continuar';
 
-                // Update current pick info to show paused state
                 const pickInfo = document.getElementById('currentPickInfo');
                 if (pickInfo.style.display !== 'none') {
                     const currentContent = pickInfo.innerHTML;
@@ -1134,24 +1024,21 @@
                         pickInfo.innerHTML = currentContent + `
                             <div class="mt-2">
                                 <span class="badge bg-warning text-dark">
-                                    <i class="fas fa-pause me-1"></i>SIMULATION PAUSED
+                                    <i class="fas fa-pause me-1"></i>Simulación pausada
                                 </span>
                             </div>
                         `;
                     }
                 }
             } else {
-                // Simulation is now resumed
                 toggleButton.classList.remove('btn-success');
                 toggleButton.classList.add('btn-warning');
                 toggleIcon.classList.remove('fa-play');
                 toggleIcon.classList.add('fa-pause');
-                toggleText.textContent = 'Pause';
+                toggleText.textContent = 'Pausa';
 
-                // Remove paused indicator and continue simulation
                 updateCurrentPickInfo();
 
-                // Continue with the current pick if it's not user controlled
                 if (!isUserControlled) {
                     processDraftPick();
                 }
@@ -1165,12 +1052,11 @@
             pickInfo.style.display = 'block';
             pickInfo.innerHTML = `
                 <strong>Pick #${currentPick.overall}</strong> - ${currentPick.teamName}
-                <br>Round ${currentPick.round}, Pick ${currentPick.pickInRound}
+                <br>Ronda ${currentPick.round}, Pick ${currentPick.pickInRound}
                 ${currentPick.isUserControlled ? '<br><span class="badge bg-warning text-dark">Your Turn!</span>' : ''}
             `;
         }
 
-        // Add this to your setupEventHandlers() function
         document.getElementById('simulationToggleButton').addEventListener('click', function() {
             toggleSimulation();
         });
@@ -1180,7 +1066,6 @@
             automaticScroll = false;
         });
 
-        // When the user clicks on the button, scroll to the top of the document
         $('#backToCurrent').click(function () {
             $('#backToCurrent').css("display", "none");
             automaticScroll = true;
@@ -1188,29 +1073,26 @@
         });
 
 
-        // Show draft summary for the team
         function showDraftSummary() {
             const summarySection = document.getElementById('draftSummarySection');
             const summaryContent = document.getElementById('draftSummaryContent');
 
-            // Get all picks made by the team
             const teamPicks = draftOrder.filter(pick => pick.teamId === 0 && pick.selectedPlayer !== null);
 
             if (teamPicks.length === 0) {
                 summaryContent.innerHTML = `
                     <div class="text-center text-muted p-4">
                         <i class="fas fa-info-circle fa-2x mb-3"></i>
-                        <p>No picks were made by your team during this draft.</p>
+                        <p>Tu equipo no realizó ninguna elección durante este draft.</p>
                     </div>
                 `;
             } else {
-                // Sort picks by overall pick number
                 teamPicks.sort((a, b) => a.overall - b.overall);
 
                 let summaryHtml = `
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <p class="mb-1"><strong>Total Picks:</strong> ${teamPicks.length}</p>
+                            <p class="mb-1"><strong>Picks Totales:</strong> ${teamPicks.length}</p>
                         </div>
                     </div>
                     <div class="row">
@@ -1219,7 +1101,6 @@
                 teamPicks.forEach((pick, index) => {
                     const player = pick.selectedPlayer;
 
-                    // Format height from inches to feet'inches
                     const heightFeet = Math.floor((player.height || 0) / 12);
                     const heightInches = (player.height || 0) % 12;
                     const heightDisplay = `${heightFeet}'${heightInches}"`;
@@ -1230,18 +1111,18 @@
                                 <div class="card-header bg-success text-white py-2">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="mb-0">Pick #${pick.overall}</h6>
-                                        <small>Round ${pick.round}</small>
+                                        <small>Ronda ${pick.round}</small>
                                     </div>
                                 </div>
                                 <div class="card-body">
                                     <h6 class="card-title text-success">${player.name}</h6>
                                     <div class="mb-2">
                                         <span class="badge bg-primary me-2">${player.position}</span>
-                                        <small class="text-muted">${player.college || 'Unknown College'}</small>
+                                        <small class="text-muted">${player.college || 'Colegio desconocido'}</small>
                                     </div>
                                     <div class="mb-2">
                                         <small class="text-muted">
-                                            <strong>Physical:</strong> ${heightDisplay} | ${player.weight || 0} lbs
+                                            <strong>Medidas:</strong> ${heightDisplay} | ${player.weight || 0} lbs
                                         </small>
                                     </div>
                                     <div class="mb-2">
@@ -1251,8 +1132,8 @@
                                         </small>
                                     </div>
                                     <div class="d-flex justify-content-between">
-                                        <span class="badge bg-success">Ath: ${player.athScore || 0}</span>
-                                        <span class="badge bg-warning text-dark">Rank: ${player.consensus || 'N/A'}</span>
+                                        <span class="badge bg-success">Atl: ${player.athScore || 0}</span>
+                                        <span class="badge bg-warning text-dark">Consenso: ${player.consensus || 'N/A'}</span>
                                     </div>
                                 </div>
                             </div>
@@ -1264,14 +1145,8 @@
                 summaryContent.innerHTML = summaryHtml;
             }
 
-            // Show the summary section
             summarySection.style.display = 'block';
         }
-
-
-
-
-
 
         document.getElementById('newTradeOffer').addEventListener('click', function() {
             openTradeModal();
@@ -1289,7 +1164,7 @@
                     <div class="modal-dialog modal-xl">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title">Select Franchise to Trade With</h5>
+                                <h5 class="modal-title">Seleccione Franquicia con quien realizar trueque</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
@@ -1305,32 +1180,24 @@
             const modalElement = document.getElementById('tradeModal');
             const modal = new bootstrap.Modal(modalElement);
 
-            // modalElement.removeAttribute('aria-hidden');
             modal.show();
-
-            // modalElement.addEventListener('hidden.bs.modal', function () {
-            //     modalElement.setAttribute('aria-hidden', 'true');
-            // });
 
             loadFranchiseList();
         }
 
         function selectFranchiseForTrade(franchiseId) {
 
-            // Update loading message
             document.getElementById('tradeModal').querySelector('.modal-body').innerHTML = `
                 <div class="text-center p-4">
                     <div class="spinner-border text-primary mb-3"></div>
-                    <p>Loading trade interface with ${franchiseNames[franchiseId].name}...</p>
+                    <p>Cargando vista del trueque con ${franchiseNames[franchiseId].name}...</p>
                 </div>
             `;
 
-            // Load trade modal content using fetch
             fetch(`/Team/GetTradePartialAsString?TeamId=@Model.Id&FranchiseId=${franchiseId}&CurrentPick=${draftOrder[currentPickIndex].rppFormat}`)
             .then(result => {
                 if (!result.ok) {
-                    // Handle error case
-                    throw new Error(`Unable to load the trade interface with ${franchiseNames[franchiseId].name}`);
+                    throw new Error(`Error durante la carga de la vista del trueque con ${franchiseNames[franchiseId].name}`);
                 }
                 else {
                     return result.json();
@@ -1338,8 +1205,7 @@
             })
             .then(json => {
                 if (json.message != undefined) {
-                    // Handle error case
-                    throw new Error(`Unable to load the trade interface with ${franchiseNames[franchiseId].name}`);
+                    throw new Error(`Error durante la carga de la vista del trueque con ${franchiseNames[franchiseId].name}`);
                 }
                 else {
                     return json.value;
@@ -1361,8 +1227,8 @@
                     <div class="modal-body">
                         <div class="alert alert-danger">
                             <h6>Network Error</h6>
-                            <p>Failed to load trade interface: ${error.message}</p>
-                            <button class="btn btn-primary btn-sm" onclick="selectFranchiseForTrade(${franchiseId})">Try Again</button>
+                            <p>Error durante la carga de la vista del trueque con : ${error.message}</p>
+                            <button class="btn btn-primary btn-sm" onclick="selectFranchiseForTrade(${franchiseId})">Probar de nuevo</button>
                         </div>
                     </div>
                 `);
@@ -1394,7 +1260,6 @@
         }
 
 
-        // Add this function to handle trade completion from draft context
         window.onTradeCompleted = function(tradeResult) {
             debugger;
 
@@ -1403,13 +1268,11 @@
             allPicksData[0].sort();
             allPicksData[tradeResult.franchiseId].sort();
 
-            // Refresh the draft order display with updated picks
             updateHiddenFields();
             displayDraftOrder();
         };
 
-        let totalAtRound = [0, 33, 66, 103, 140, 178, 219]
-        // Function to update draft picks after a trade
+        let totalAtRound = @Html.Raw(Json.Serialize(DraftPicks.TotalAtRound));
         function updateDraftPickAfterTrade(pick, origin, destiny) {
 
             allPicksData[origin].filter(p => p !== pick);
@@ -1470,7 +1333,6 @@
         }
     }
 
-    /* Player card styles for draft view */
     .player-card {
         transition: all 0.3s ease;
         border-left: 3px solid transparent;
@@ -1511,7 +1373,6 @@
             padding: 0.5rem 0.75rem;
         }
 
-    /* Responsive adjustments */
     media (max-width: 768px) {
         .player-card .col-md-8, .player-card .col-md-4 {
             flex: 0 0 100%;
@@ -1529,7 +1390,6 @@
         }
     }
 
-    /* Enhanced hover states */
     .player-card.selectable {
         cursor: pointer;
     }
@@ -1538,13 +1398,11 @@
             color: #007bff;
         }
 
-    /* Loading and empty states */
     .text-center .spinner-border {
         width: 2rem;
         height: 2rem;
     }
 
-    /* Position filter integration */
     .players-container {
         border: 1px solid #dee2e6;
         border-radius: 0.375rem;
@@ -1584,7 +1442,6 @@
             padding: 0.75rem 0.5rem;
         }
 
-    /* Draft Summary Styles */
     #draftSummarySection .card-header {
         background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
     }
@@ -1606,7 +1463,6 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
 
-    /* Responsive adjustments for draft summary */
     media (max-width: 768px) {
         #draftSummarySection .col-lg-4 {
             flex: 0 0 100%;

@@ -5,32 +5,29 @@
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Home"
              xmlns:metcore="clr-namespace:METCore.DTOs.Team;assembly=METCore"
              x:DataType="viewmodels:IndexViewModel"
-             Title="Home">
+             Title="Pantalla inicial">
 
     <ScrollView>
         <StackLayout Padding="20" Spacing="20">
 
-            <!-- Welcome Section -->
             <Border BackgroundColor="#1b6ec2" 
                     Padding="20"
                     Stroke="Transparent"
                     StrokeShape="RoundRectangle 10">
                 <StackLayout Spacing="10">
-                    <Label Text="Welcome" 
+                    <Label Text="Bienvenid@" 
                            FontSize="28" 
                            FontAttributes="Bold" 
                            TextColor="White"
                            HorizontalOptions="Center" />
-                    <Label Text="Fantasy Football Team Management System" 
+                    <Label Text="Sistema de Gestión de Equipos de Expansión Fantasy"
                            FontSize="16" 
                            TextColor="White"
                            HorizontalOptions="Center" />
                 </StackLayout>
             </Border>
 
-            <!-- Authenticated User Section -->
             <StackLayout IsVisible="{Binding IsAuthenticated}" Spacing="15">
-                <!-- User Welcome Card -->
                 <Border BackgroundColor="#28a745" 
                         Padding="15"
                         Stroke="Transparent"
@@ -42,7 +39,7 @@
                         </Grid.ColumnDefinitions>
 
                         <Label Grid.Column="0"
-                               Text="{Binding Username, StringFormat='Welcome back, {0}'}" 
+                               Text="{Binding Username, StringFormat='Bienvenid@ de nuevo, {0}'}" 
                                FontSize="18" 
                                FontAttributes="Bold"
                                TextColor="White"
@@ -50,10 +47,9 @@
                     </Grid>
                 </Border>
 
-                <!-- Quick Actions -->
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                     <Button Grid.Column="0"
-                            Text="My Teams" 
+                            Text="Mis equipos" 
                             Command="{Binding GoToMyTeamsCommand}"
                             BackgroundColor="#007bff"
                             TextColor="White"
@@ -61,7 +57,7 @@
                             Padding="15" />
 
                     <Button Grid.Column="1"
-                            Text="Create Team" 
+                            Text="Crear Equipo" 
                             Command="{Binding GoToCreateTeamCommand}"
                             BackgroundColor="#28a745"
                             TextColor="White"
@@ -70,16 +66,15 @@
                 </Grid>
             </StackLayout>
 
-            <!-- Not Authenticated Section -->
             <StackLayout IsVisible="{Binding IsNotAuthenticated}" Spacing="15">
-                <Label Text="Please log in to access all features" 
+                <Label Text="Por favor, inicie sesión para tener acceso a más funcionalidades" 
                        FontSize="16" 
                        HorizontalOptions="Center"
                        TextColor="#6c757d" />
 
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                     <Button Grid.Column="0"
-                            Text="Log In" 
+                            Text="Inicio de Sesión" 
                             Command="{Binding GoToLogInCommand}"
                             BackgroundColor="#007bff"
                             TextColor="White"
@@ -87,7 +82,7 @@
                             Padding="15" />
 
                     <Button Grid.Column="1"
-                            Text="Sign Up" 
+                            Text="Crear Cuenta" 
                             Command="{Binding GoToSignUpCommand}"
                             BackgroundColor="#28a745"
                             TextColor="White"
@@ -96,26 +91,22 @@
                 </Grid>
             </StackLayout>
 
-            <!-- All Teams Section -->
             <StackLayout Spacing="15">
-                <Label Text="All Teams" 
+                <Label Text="Equipos" 
                        FontSize="20" 
                        FontAttributes="Bold"
                        TextColor="#333" />
 
-                <!-- Loading Indicator -->
                 <ActivityIndicator IsVisible="{Binding IsLoading}"
                                  IsRunning="{Binding IsLoading}"
                                  Color="#007bff" />
 
-                <!-- No Teams Message -->
-                <Label Text="No teams available" 
+                <Label Text="No hay equipos disponibles" 
                        FontSize="16"
                        TextColor="#6c757d"
                        HorizontalOptions="Center"
                        IsVisible="{Binding HasNoTeams}" />
 
-                <!-- Teams List -->
                 <CollectionView ItemsSource="{Binding AllTeams}"
                                BackgroundColor="Transparent"
                                IsVisible="{Binding HasTeams}">
@@ -152,13 +143,13 @@
                                     </Label>
 
                                     <Label Grid.Row="1"
-                                           Text="{Binding UserUsername, StringFormat='Owner: {0}'}"
+                                           Text="{Binding UserUsername, StringFormat='Dueño: {0}'}"
                                            FontSize="14"
                                            TextColor="#6c757d"
                                            LineBreakMode="TailTruncation"/>
 
                                     <Label Grid.Row="2"
-                                           Text="{Binding Date, StringFormat='Date: {0}'}"
+                                           Text="{Binding Date, StringFormat='Fecha: {0:MM/dd/yyyy}'}"
                                            FontSize="14"
                                            TextColor="#28a745"
                                            FontAttributes="Bold"
