@@ -1,4 +1,5 @@
-﻿@model WebApp.Models.Account.UserViewModel
+﻿@using System.Security.Claims
+@model WebApp.Models.Account.UserViewModel
 
 @{
     ViewData["Title"] = "Profile";
@@ -14,12 +15,13 @@
                     </h4>
                 </div>
 
-                @if (User.Identities.First().RoleClaimType == "Admin")
-                {
+                @if (User.Claims.ToList().FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value == "Admin")
+@*                     @if (User.Identities.First().RoleClaimType == "Admin")
+ *@                {
                     <div class="card-body border-bottom bg-light">
                         <div class="text-center">
                             <a asp-controller="Admin" asp-action="Index" class="btn btn-danger">
-                                <i class="fas fa-cog me-2"></i>Admin Control Center
+                                <i class="fas fa-cog me-2"></i>Panel del Admin
                             </a>
                         </div>
                     </div>
@@ -30,7 +32,7 @@
 
                     <div class="row mb-3">
                         <div class="col-sm-4">
-                            <strong><i class="fas fa-user me-2"></i>First Name:</strong>
+                            <strong><i class="fas fa-user me-2"></i>@Html.LabelFor(m => m.FirstName):</strong>
                         </div>
                         <div class="col-sm-8">
                             @Html.DisplayFor(m => m.FirstName)
@@ -39,7 +41,7 @@
 
                     <div class="row mb-3">
                         <div class="col-sm-4">
-                            <strong><i class="fas fa-user me-2"></i>Last Name:</strong>
+                            <strong><i class="fas fa-user me-2"></i>@Html.LabelFor(m => m.LastName):</strong>
                         </div>
                         <div class="col-sm-8">
                             @Html.DisplayFor(m => m.LastName)
@@ -48,7 +50,7 @@
 
                     <div class="row mb-3">
                         <div class="col-sm-4">
-                            <strong><i class="fas fa-envelope me-2"></i>Email:</strong>
+                            <strong><i class="fas fa-envelope me-2"></i>@Html.LabelFor(m => m.Email):</strong>
                         </div>
                         <div class="col-sm-8">
                             @Html.DisplayFor(m => m.Email)
@@ -57,7 +59,7 @@
 
                     <div class="row mb-3">
                         <div class="col-sm-4">
-                            <strong><i class="fas fa-phone me-2"></i>Phone:</strong>
+                            <strong><i class="fas fa-phone me-2"></i>@Html.LabelFor(m => m.Tlf):</strong>
                         </div>
                         <div class="col-sm-8">
                             @Html.DisplayFor(m => m.Tlf)
@@ -69,22 +71,22 @@
                     <div class="row g-2">
                         <div class="col-md-6">
                             <a asp-action="EditProfile" class="btn btn-primary w-100">
-                                <i class="fas fa-edit me-2"></i>Edit Profile
+                                <i class="fas fa-edit me-2"></i>Editar perfil
                             </a>
                         </div>
                         <div class="col-md-6">
                             <a asp-controller="Team" asp-action="MyTeams" class="btn btn-success w-100">
-                                <i class="fas fa-users me-2"></i>My Teams
+                                <i class="fas fa-users me-2"></i>Mis equipos
                             </a>
                         </div>
                         <div class="col-md-6">
                             <button onclick="confirmDelete(event)" class="btn btn-danger w-100">
-                                <i class="fas fa-trash me-2"></i>Delete Account
+                                <i class="fas fa-trash me-2"></i>Borrar cuenta
                             </button>
                         </div>
                         <div class="col-md-6">
                             <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary w-100">
-                                <i class="fas fa-arrow-left me-2"></i>Go Back
+                                <i class="fas fa-arrow-left me-2"></i>Volver
                             </a>
                         </div>
                     </div>
@@ -100,7 +102,7 @@
 <script>
     function confirmDelete(event) {
         event.preventDefault();
-        if (confirm('Are you sure you want to delete your account?')) {
+        if (confirm('Estás seguro que desea borrar su cuenta? Esta acción no podrá ser deshecha.')) {
             window.location.href = '@Url.Action("DeleteUser", "Account")';
         }
     }

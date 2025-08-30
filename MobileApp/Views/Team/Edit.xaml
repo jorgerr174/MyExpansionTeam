@@ -5,7 +5,7 @@
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
              xmlns:local="clr-namespace:MobileApp.Converters"
              x:DataType="viewmodels:EditViewModel"
-             Title="Edit Team">
+             Title="Editar Equipo">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -16,19 +16,16 @@
     <ScrollView>
         <StackLayout Padding="20" Spacing="20">
 
-            <!-- Loading State -->
             <StackLayout IsVisible="{Binding IsLoading}" Spacing="15">
                 <ActivityIndicator IsRunning="True" Color="#007bff" />
-                <Label Text="Loading team..." 
+                <Label Text="Cargando Equipo..." 
                        HorizontalOptions="Center" 
                        FontSize="16" 
                        TextColor="#6c757d" />
             </StackLayout>
 
-            <!-- Content -->
             <StackLayout IsVisible="{Binding HasTeam}" Spacing="20">
 
-                <!-- Team Header Card -->
                 <Border BackgroundColor="#007bff" 
                         Padding="20"
                         Stroke="Transparent"
@@ -41,7 +38,7 @@
                                    TextColor="White"
                                    VerticalOptions="Center">
                                 <Label.Text>
-                                    <MultiBinding StringFormat="Edit Team: {0} {1}">
+                                    <MultiBinding StringFormat="Editar Equipo: {0} {1}">
                                         <Binding Path="OriginalLocation" />
                                         <Binding Path="OriginalMascot" />
                                     </MultiBinding>
@@ -62,7 +59,7 @@
 
                         <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="15">
                             <StackLayout Grid.Column="0">
-                                <Label Text="Owner:" 
+                                <Label Text="Dueño:" 
                                        TextColor="White" 
                                        FontSize="12" 
                                        Opacity="0.8" />
@@ -72,11 +69,11 @@
                             </StackLayout>
 
                             <StackLayout Grid.Column="1">
-                                <Label Text="Created:" 
+                                <Label Text="Fecha:" 
                                        TextColor="White" 
                                        FontSize="12" 
                                        Opacity="0.8" />
-                                <Label Text="{Binding Team.Date, StringFormat='{0:MMM dd, yyyy}'}" 
+                                <Label Text="{Binding Team.Date, StringFormat='{0:dd-MM-yyyy}'}" 
                                        TextColor="White" 
                                        FontSize="14" />
                             </StackLayout>
@@ -84,21 +81,19 @@
                     </Grid>
                 </Border>
 
-                <!-- Edit Team Information Card -->
                 <Border BackgroundColor="White"
                         Stroke="#dee2e6"
                         StrokeThickness="1"
                         Padding="20"
                         StrokeShape="RoundRectangle 12">
                     <StackLayout Spacing="20">
-                        <Label Text="Team Information" 
+                        <Label Text="Información del Equipo" 
                                FontSize="18" 
                                FontAttributes="Bold" 
                                TextColor="#28a745" />
 
-                        <!-- Location Field -->
                         <StackLayout Spacing="8">
-                            <Label Text="Location" 
+                            <Label Text="Ubicación" 
                                    FontSize="14" 
                                    FontAttributes="Bold" 
                                    TextColor="#333" />
@@ -112,9 +107,8 @@
                                    IsVisible="{Binding HasLocationError}" />
                         </StackLayout>
 
-                        <!-- Mascot Field -->
                         <StackLayout Spacing="8">
-                            <Label Text="Mascot" 
+                            <Label Text="Mascota" 
                                    FontSize="14" 
                                    FontAttributes="Bold" 
                                    TextColor="#333" />
@@ -128,9 +122,8 @@
                                    IsVisible="{Binding HasMascotError}" />
                         </StackLayout>
 
-                        <!-- Abbreviation Field -->
                         <StackLayout Spacing="8">
-                            <Label Text="Abbreviation" 
+                            <Label Text="Abreviatura" 
                                    FontSize="14" 
                                    FontAttributes="Bold" 
                                    TextColor="#333" />
@@ -143,15 +136,14 @@
                                    TextColor="#dc3545" 
                                    FontSize="12"
                                    IsVisible="{Binding HasAbbError}" />
-                            <Label Text="2-3 characters only" 
+                            <Label Text="2-3 caracteres solo" 
                                    FontSize="11" 
                                    TextColor="#6c757d" />
                         </StackLayout>
 
-                        <!-- Action Buttons -->
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
                             <Button Grid.Column="0"
-                                    Text="Cancel"
+                                    Text="Cancelar"
                                     Command="{Binding CancelCommand}"
                                     BackgroundColor="Transparent"
                                     TextColor="#6c757d"
@@ -168,7 +160,7 @@
                                     Padding="15"
                                     IsEnabled="{Binding CanSave}">
                                 <Button.Text>
-                                    <MultiBinding StringFormat="{}{0} Save Changes">
+                                    <MultiBinding StringFormat="{}{0} Guardar Cambios">
                                         <Binding Path="IsSaving" Converter="{StaticResource BoolToLoadingTextConverter}" />
                                     </MultiBinding>
                                 </Button.Text>
@@ -177,21 +169,20 @@
                     </StackLayout>
                 </Border>
 
-                <!-- Team Management Actions -->
                 <Border BackgroundColor="White"
                         Stroke="#dee2e6"
                         StrokeThickness="1"
                         Padding="20"
                         StrokeShape="RoundRectangle 12">
                     <StackLayout Spacing="15">
-                        <Label Text="Team Management" 
+                        <Label Text="Administración del Equipo" 
                                FontSize="18" 
                                FontAttributes="Bold" 
                                TextColor="#17a2b8" />
 
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
                             <Button Grid.Column="0"
-                                    Text="⚙️ Edit Settings"
+                                    Text="⚙️ Editar Ajustes"
                                     Command="{Binding EditSettingsCommand}"
                                     BackgroundColor="#17a2b8"
                                     TextColor="White"
@@ -199,7 +190,7 @@
                                     Padding="12" />
 
                             <Button Grid.Column="1"
-                                    Text="👥 Edit Roster"
+                                    Text="👥 Editar Plantilla"
                                     Command="{Binding EditRosterCommand}"
                                     BackgroundColor="#17a2b8"
                                     TextColor="White"
@@ -209,14 +200,13 @@
                     </StackLayout>
                 </Border>
 
-                <!-- Advanced Actions -->
                 <Border BackgroundColor="White"
                         Stroke="#dee2e6"
                         StrokeThickness="1"
                         Padding="20"
                         StrokeShape="RoundRectangle 12">
                     <StackLayout Spacing="15">
-                        <Label Text="Advanced Actions" 
+                        <Label Text="Opciones Avanzadas" 
                                FontSize="18" 
                                FontAttributes="Bold" 
                                TextColor="#ffc107" />
@@ -230,7 +220,7 @@
                                     Padding="12"
                                     IsEnabled="{Binding CanDuplicate}">
                                 <Button.Text>
-                                    <MultiBinding StringFormat="{}{0} Duplicate Team">
+                                    <MultiBinding StringFormat="{}{0} Duplicar Equipo">
                                         <Binding Path="IsDuplicating" Converter="{StaticResource BoolToLoadingTextConverter}" />
                                     </MultiBinding>
                                 </Button.Text>
@@ -244,14 +234,14 @@
                                     Padding="12"
                                     IsEnabled="{Binding CanDelete}">
                                 <Button.Text>
-                                    <MultiBinding StringFormat="{}{0} Delete Team">
+                                    <MultiBinding StringFormat="{}{0} Borrar Equipo">
                                         <Binding Path="IsDeleting" Converter="{StaticResource BoolToLoadingTextConverter}" />
                                     </MultiBinding>
                                 </Button.Text>
                             </Button>
                         </Grid>
 
-                        <Label Text="⚠️ Warning: These actions cannot be undone. Please proceed with caution." 
+                        <Label Text="⚠️ Atención: Estas acciones no podrán ser deshechas. Proceder con precaución." 
                                FontSize="12"
                                TextColor="#6c757d"
                                HorizontalTextAlignment="Center" />

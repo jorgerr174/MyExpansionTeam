@@ -70,8 +70,13 @@ namespace MobileApp.Models.Account
             }
         }
 
+        [RelayCommand] public static async Task GoToSignUp() => await BaseService.GoToAsync(AppRoutes.SignUp, null);
+        [RelayCommand] public static async Task GoToUpdateUser() => await BaseService.GoToAsync(AppRoutes.UpdateUser, null);
+        [RelayCommand] public static async Task GoToUpdateCredentials() => await BaseService.GoToAsync(AppRoutes.UpdateCredentials, null);
+        [RelayCommand] public static async Task GoToAdmin() => await BaseService.GoToAsync(AppRoutes.Admin, null);
+
         [RelayCommand]
-        public async Task Login()
+        public async Task LogIn()
         {
             if (string.IsNullOrWhiteSpace(Identifier) || string.IsNullOrWhiteSpace(Password))
             {
@@ -137,9 +142,6 @@ namespace MobileApp.Models.Account
             }
         }
 
-        [RelayCommand] public static async Task GoToEditProfile() => await BaseService.GoToAsync(AppRoutes.EditProfile, null);
-        [RelayCommand] public static async Task GoToAdmin() => await BaseService.GoToAsync(AppRoutes.Admin, null);
-
         [RelayCommand]
         public async Task LogOut()
         {
@@ -151,9 +153,9 @@ namespace MobileApp.Models.Account
         public async Task DeleteUser()
         {
             bool confirm = await Shell.Current.DisplayAlert(
-                "Delete Account",
-                "Are you sure you want to delete your account? This action cannot be undone.",
-                "Yes", "No");
+                "Borrar Cuenta",
+                "Estás seguro que desea borrar su cuenta? Esta acción no podrá ser deshecha.",
+                "Sí", "No");
 
             if (!confirm) return;
 

@@ -4,7 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
              x:DataType="viewmodels:TradeViewModel"
-             Title="Trade">
+             Title="Trueque">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -14,13 +14,12 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Header with Back Button and Trade Partner -->
         <Border Grid.Row="0" 
                 BackgroundColor="#007bff" 
                 Padding="15,10">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
                 <Button Grid.Column="0"
-                        Text="← Back"
+                        Text="← Volver"
                         BackgroundColor="Transparent"
                         TextColor="White"
                         FontSize="14"
@@ -36,7 +35,7 @@
                        HorizontalOptions="Center" />
 
                 <Button Grid.Column="2"
-                        Text="Change"
+                        Text="Cambiar"
                         BackgroundColor="Transparent"
                         TextColor="White"
                         FontSize="12"
@@ -45,14 +44,13 @@
             </Grid>
         </Border>
 
-        <!-- Trade Value Progress Bar -->
         <Border Grid.Row="1" 
                 BackgroundColor="White" 
                 Padding="15,10"
                 Stroke="#dee2e6"
                 StrokeThickness="1">
             <StackLayout Spacing="8">
-                <Label Text="Trade Balance" 
+                <Label Text="Balance del Trueque" 
                        FontSize="14" 
                        FontAttributes="Bold"
                        HorizontalOptions="Center" />
@@ -77,7 +75,6 @@
                            HorizontalOptions="End" />
                 </Grid>
 
-                <!-- Progress Bar -->
                 <Border BackgroundColor="#f8f9fa"
                         HeightRequest="20"
                         StrokeShape="RoundRectangle 10">
@@ -101,50 +98,45 @@
             </StackLayout>
         </Border>
 
-        <!-- Tabs -->
         <Grid Grid.Row="2" RowDefinitions="Auto,*">
-            <!-- Tab Headers -->
             <StackLayout Grid.Row="0"
                      Orientation="Horizontal" 
                      BackgroundColor="#f8f9fa"
                      Spacing="0">
-                <Button Text="Summary"
+                <Button Text="Resumen"
                         BackgroundColor="{Binding SummaryTabColor}"
                         TextColor="{Binding SummaryTabTextColor}"
                         FontSize="14"
                         Padding="20,10"
                         Command="{Binding ShowSummaryTabCommand}"
-                        HorizontalOptions="FillAndExpand" />
-                <Button Text="Your Items"
+                        HorizontalOptions="Fill" />
+                <Button Text="Tus Items"
                         BackgroundColor="{Binding UserTabColor}"
                         TextColor="{Binding UserTabTextColor}"
                         FontSize="14"
                         Padding="20,10"
                         Command="{Binding ShowUserTabCommand}"
-                        HorizontalOptions="FillAndExpand" />
-                <Button Text="Their Items"
+                        HorizontalOptions="Fill" />
+                <Button Text="Sus Items"
                         BackgroundColor="{Binding FranchiseTabColor}"
                         TextColor="{Binding FranchiseTabTextColor}"
                         FontSize="14"
                         Padding="20,10"
                         Command="{Binding ShowFranchiseTabCommand}"
-                        HorizontalOptions="FillAndExpand" />
+                        HorizontalOptions="Fill" />
             </StackLayout>
 
-            <!-- Tab Content -->
             <ScrollView Grid.Row="1" BackgroundColor="White">
                 <StackLayout>
-                    <!-- Summary Tab -->
                     <StackLayout IsVisible="{Binding IsSummaryTabVisible}" Padding="15" Spacing="20">
 
-                        <!-- Your Offering -->
                         <Border BackgroundColor="#f8f9fa"
                                 Stroke="#007bff"
                                 StrokeThickness="1"
                                 Padding="15"
                                 StrokeShape="RoundRectangle 8">
                             <StackLayout Spacing="10">
-                                <Label Text="You are offering:" 
+                                <Label Text="Estás Ofreciendo:" 
                                        FontSize="16"
                                        FontAttributes="Bold"
                                        TextColor="#007bff" />
@@ -160,14 +152,13 @@
                             </StackLayout>
                         </Border>
 
-                        <!-- Their Offering -->
                         <Border BackgroundColor="#f8f9fa"
                                 Stroke="#dc3545"
                                 StrokeThickness="1"
                                 Padding="15"
                                 StrokeShape="RoundRectangle 8">
                             <StackLayout Spacing="10">
-                                <Label Text="You will receive:" 
+                                <Label Text="Ellos Ofrecen:" 
                                        FontSize="16"
                                        FontAttributes="Bold"
                                        TextColor="#dc3545" />
@@ -184,14 +175,12 @@
                         </Border>
                     </StackLayout>
 
-                    <!-- User Items Tab -->
                     <StackLayout IsVisible="{Binding IsUserTabVisible}"
                                  Padding="15"
                                  Spacing="15">
 
-                        <!-- Draft Picks Section -->
                         <StackLayout IsVisible="{Binding HasUserPicks}">
-                            <Label Text="Your Draft Picks" 
+                            <Label Text="Tus Picks del Draft" 
                                    FontSize="16" 
                                    FontAttributes="Bold"
                                    TextColor="#495057" />
@@ -231,9 +220,8 @@
                             </CollectionView>
                         </StackLayout>
 
-                        <!-- Players Section -->
                         <StackLayout IsVisible="{Binding HasUserPlayers}">
-                            <Label Text="Your Players" 
+                            <Label Text="Tus Jugadores" 
                                    FontSize="16" 
                                    FontAttributes="Bold"
                                    TextColor="#495057" />
@@ -277,14 +265,12 @@
                         </StackLayout>
                     </StackLayout>
 
-                    <!-- Franchise Items Tab -->
                     <StackLayout IsVisible="{Binding IsFranchiseTabVisible}"
                                  Padding="15"
                                  Spacing="15">
 
-                        <!-- Draft Picks Section -->
                         <StackLayout IsVisible="{Binding HasFranchisePicks}">
-                            <Label Text="Their Draft Picks" 
+                            <Label Text="Sus Picks del Draft" 
                                    FontSize="16" 
                                    FontAttributes="Bold"
                                    TextColor="#495057" />
@@ -324,9 +310,8 @@
                             </CollectionView>
                         </StackLayout>
 
-                        <!-- Players Section -->
                         <StackLayout IsVisible="{Binding HasFranchisePlayers}">
-                            <Label Text="Their Players" 
+                            <Label Text="Sus Jugadores" 
                                    FontSize="16" 
                                    FontAttributes="Bold"
                                    TextColor="#495057" />
@@ -373,7 +358,6 @@
             </ScrollView>
         </Grid>
 
-        <!-- Action Buttons -->
         <Border Grid.Row="3" 
                 BackgroundColor="White"
                 Stroke="#dee2e6"
@@ -381,41 +365,40 @@
                 Padding="15,10">
             <StackLayout Orientation="Horizontal" 
                          Spacing="10">
-                <Button Text="Cancel"
+                <Button Text="Cancelar"
                         BackgroundColor="#6c757d"
                         TextColor="White"
                         FontSize="14"
                         Padding="15,8"
                         Command="{Binding CancelTradeCommand}"
-                        HorizontalOptions="FillAndExpand" />
-                <Button Text="Force Trade"
+                        HorizontalOptions="Fill" />
+                <Button Text="Forzar Trueque"
                         BackgroundColor="#ffc107"
                         TextColor="Black"
                         FontSize="14"
                         Padding="15,8"
                         Command="{Binding ForceTradeCommand}"
                         IsVisible="{Binding CanTrade}"
-                        HorizontalOptions="FillAndExpand" />
-                <Button Text="Propose Trade"
+                        HorizontalOptions="Fill" />
+                <Button Text="Solicitar Trueque"
                         BackgroundColor="#28a745"
                         TextColor="White"
                         FontSize="14"
                         Padding="15,8"
                         Command="{Binding ProposeTradeCommand}"
                         IsEnabled="{Binding CanTrade}"
-                        HorizontalOptions="FillAndExpand" />
+                        HorizontalOptions="Fill" />
             </StackLayout>
         </Border>
 
-        <!-- Loading Overlay -->
         <StackLayout Grid.Row="0" Grid.RowSpan="4"
                      BackgroundColor="#80000000"
                      IsVisible="{Binding IsLoading}"
-                     VerticalOptions="FillAndExpand"
-                     HorizontalOptions="FillAndExpand">
+                     VerticalOptions="Fill"
+                     HorizontalOptions="Fill">
             <ActivityIndicator IsRunning="True" 
                                Color="White" 
-                               VerticalOptions="CenterAndExpand" />
+                               VerticalOptions="Center" />
             <Label Text="{Binding LoadingMessage}"
                    TextColor="White"
                    FontSize="16"

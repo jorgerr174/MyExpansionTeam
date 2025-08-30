@@ -170,7 +170,7 @@
   },
   {
     "ContainingType": "METAPI.Controllers.TeamsController",
-    "Method": "DeleteUser",
+    "Method": "DeleteTeam",
     "RelativePath": "api/Teams/DeleteTeam",
     "HttpMethod": "DELETE",
     "IsController": true,
@@ -442,7 +442,7 @@
     "Parameters": [
       {
         "Name": "dto",
-        "Type": "METCore.DTOs.User.UserDto",
+        "Type": "METCore.DTOs.User.UpdateUserDto",
         "IsRequired": true
       }
     ],

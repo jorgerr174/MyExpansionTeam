@@ -89,9 +89,6 @@
 	  <Compile Update="Views\Account\SignUp.xaml.cs">
 	    <DependentUpon>SignUp.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views\Account\EditProfile.xaml.cs">
-	    <DependentUpon>EditProfile.xaml</DependentUpon>
-	  </Compile>
 	  <Compile Update="Views\Admin\AssignRoles.xaml.cs">
 	    <DependentUpon>AssignRoles.xaml</DependentUpon>
 	  </Compile>
@@ -103,21 +100,6 @@
 	  </Compile>
 	  <Compile Update="Views\Home\Index.xaml.cs">
 	    <DependentUpon>Index.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\Home\Privacy.xaml.cs">
-	    <DependentUpon>Privacy.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\Shared\Error.xaml.cs">
-	    <DependentUpon>Error.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\Shared\_ValidationScriptsPartial.xaml.cs">
-	    <DependentUpon>_ValidationScriptsPartial.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\Shared\_TeamList.xaml.cs">
-	    <DependentUpon>_TeamList.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\Shared\_Layout.xaml.cs">
-	    <DependentUpon>_Layout.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\Team\Create.xaml.cs">
 	    <DependentUpon>Create.xaml</DependentUpon>
@@ -131,23 +113,11 @@
 	  <Compile Update="Views\Team\Edit.xaml.cs">
 	    <DependentUpon>Edit.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views\Team\ProspectSelectionModal.xaml.cs">
-	    <DependentUpon>ProspectSelectionModal.xaml</DependentUpon>
-	  </Compile>
 	  <Compile Update="Views\Team\Trades.xaml.cs">
 	    <DependentUpon>Trades.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views\Team\List.xaml.cs">
-	    <DependentUpon>List.xaml</DependentUpon>
-	  </Compile>
 	  <Compile Update="Views\Team\MyTeams.xaml.cs">
 	    <DependentUpon>MyTeams.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\Team\ReviewRoster.xaml.cs">
-	    <DependentUpon>ReviewRoster.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\Team\TradeError.xaml.cs">
-	    <DependentUpon>TradeError.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\Team\Trade.xaml.cs">
 	    <DependentUpon>Trade.xaml</DependentUpon>
@@ -173,9 +143,6 @@
 	  <MauiXaml Update="Views\Account\SignUp.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\Account\EditProfile.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
 	  <MauiXaml Update="Views\Admin\AssignRoles.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -186,21 +153,6 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Home\Index.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Home\Privacy.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Shared\Error.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Shared\_ValidationScriptsPartial.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Shared\_TeamList.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Shared\_Layout.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Team\Create.xaml">
@@ -215,22 +167,10 @@
 	  <MauiXaml Update="Views\Team\Edit.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\Team\ProspectSelectionModal.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
 	  <MauiXaml Update="Views\Team\Trades.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\Team\List.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
 	  <MauiXaml Update="Views\Team\MyTeams.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Team\ReviewRoster.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Team\TradeError.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Team\Trade.xaml">

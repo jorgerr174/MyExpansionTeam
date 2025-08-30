@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using METCore.DTOs.Player;
 using static METCore.Enums.Types;
 
@@ -9,6 +10,7 @@ namespace METCore.DTOs.Team
         #region Attributes
         [Required]
         [Range(0, 7)]
+        [DisplayName("Rondas Manuales")]
         public int Rounds { get; set; }
 
         [Required]

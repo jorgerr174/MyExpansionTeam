@@ -25,13 +25,10 @@ namespace METCore.Models
         */
 
         [NotMapped]
-        public virtual IList<Player> ProtectedPlayers => [this.Protected1, this.Protected2, this.Protected3];
+        public virtual int[] ProtectedPlayersIds => [this.Protected1.Id, this.Protected2.Id, this.Protected3.Id];
 
         [NotMapped]
-        public virtual IList<Player> PlayersToProtect => [.. this.ProtectedPlayers.Concat(this.Players).Distinct()];
-
-        [NotMapped]
-        public virtual IList<Player> PlayersByPosition => [.. this.PlayersToProtect.OrderBy(p => (int)p.Position)];
+        public virtual IList<Player> PlayersByPosition => [.. this.Players.OrderBy(p => (int)p.Position).ThenByDescending(p => p.APY)];
 
         [NotMapped]
         public virtual FranchiseEnum Abb { get { return (FranchiseEnum)this.Id; } }

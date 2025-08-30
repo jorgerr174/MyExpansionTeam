@@ -68,7 +68,7 @@
             name: "Offensive Formation - I-Formation",
             positions: [
                 { id: "QB", name: "QB", position: "QB", x: 50, y: 65, required: true },
-                { id: "RB", name: "RB", position: "RB", x: 50, y: 75, required: true },
+                { id: "RB", name: "RB", position: "HB", x: 50, y: 75, required: true },
                 { id: "FB", name: "FB", position: "FB", x: 50, y: 70, required: false },
                 { id: "WR1", name: "WR", position: "WR", x: 10, y: 55, required: true },
                 { id: "WR2", name: "WR", position: "WR", x: 90, y: 55, required: true },
@@ -518,16 +518,16 @@
 
         const franchiseInfo = franchiseNames[franchiseId] || { name: `Franchise ${franchiseId}`, abbreviation: `F${franchiseId}` };
 
-        document.getElementById('currentFranchiseName').textContent = `Loading ${franchiseInfo.name}...`;
+        document.getElementById('currentFranchiseName').textContent = `Cargando ${franchiseInfo.name}...`;
         document.getElementById('maxPerFranchise').textContent = maxPerFranchise;
 
         const container = document.getElementById('playerSelectionArea');
         container.innerHTML = `
             <div class="text-center p-5">
                 <div class="spinner-border text-primary mb-3" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden">Cargando...</span>
                 </div>
-                <p class="text-muted">Loading available players...</p>
+                <p class="text-muted">Cargando available players...</p>
             </div>
         `;
 
