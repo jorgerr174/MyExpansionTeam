@@ -240,7 +240,6 @@ C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compress
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\4pib2z1n44-h0vb1wxk4y.gz
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\25zilipajc-61p3e63ckn.gz
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\5wk3qh7byk-xtxxf3hu2r.gz
-C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\k7o4f5pkkh-8zx5r9tvm4.gz
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\y1iq0brb9j-bqjiyaj88i.gz
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\1w1et0ajvv-c2jlpeoesf.gz
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\2z7chssowl-erw9l3u2r3.gz
@@ -313,3 +312,4 @@ C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\refint\W
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.pdb
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.genruntimeconfig.cache
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\ref\WebApp.dll
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\k7o4f5pkkh-pcqc59hrry.gz

@@ -9,15 +9,15 @@
        xmlns:account="clr-namespace:MobileApp.Views.Account">
 
     <TabBar>
-        <Tab Title="Home" Icon="home.png" Route="HomeTab">
+        <Tab Title="Inicio" Icon="home.png" Route="HomeTab">
             <ShellContent Route="HomeMain" ContentTemplate="{DataTemplate home:Index}" />
         </Tab>
 
-        <Tab Title="My Teams" Icon="myteams.png" Route="MyTeamsTab">
+        <Tab Title="Mis Equipos" Icon="myteams.png" Route="MyTeamsTab">
             <ShellContent Route="MyTeamsList" ContentTemplate="{DataTemplate team:MyTeams}" />
         </Tab>
 
-        <Tab Title="Profile" Icon="profile.png" Route="ProfileTab">
+        <Tab Title="Cuenta" Icon="profile.png" Route="ProfileTab">
             <ShellContent Route="ProfileMain" ContentTemplate="{DataTemplate account:ProfileTab}" />
         </Tab>
     </TabBar>

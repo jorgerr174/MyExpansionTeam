@@ -4,27 +4,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Account"
              x:DataType="viewmodels:UpdateUserViewModel"
-             Title="Edit Profile">
+             Title="Editar Perfil">
 
     <ScrollView>
         <StackLayout Padding="20" Spacing="15">
 
-            <!-- Header -->
             <Border BackgroundColor="#1b6ec2" 
                     Padding="15"
                     Stroke="Transparent"
                     StrokeShape="RoundRectangle 10">
-                <Label Text="Edit Profile Information" 
+                <Label Text="Editar Información de Cuenta" 
                        FontSize="20" 
                        FontAttributes="Bold" 
                        TextColor="White"
                        HorizontalOptions="Center" />
             </Border>
 
-            <!-- First Name Row -->
             <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                 <StackLayout Grid.Column="0">
-                    <Label Text="Current First Name" FontAttributes="Bold" />
+                    <Label Text="Nombre" FontAttributes="Bold" />
                     <Border BackgroundColor="LightGray" 
                             Padding="10"
                             Stroke="Gray"
@@ -34,17 +32,16 @@
                     </Border>
                 </StackLayout>
                 <StackLayout Grid.Column="1">
-                    <Label Text="New First Name" FontAttributes="Bold" />
+                    <Label Text="Nuevo Nombre" FontAttributes="Bold" />
                     <Entry Text="{Binding NewFirstName}" 
-                           Placeholder="Enter new first name"
+                           Placeholder="Introduzca su nuevo nombre"
                            IsEnabled="{Binding IsFormEnabled}" />
                 </StackLayout>
             </Grid>
 
-            <!-- Last Name Row -->
             <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                 <StackLayout Grid.Column="0">
-                    <Label Text="Current Last Name" FontAttributes="Bold" />
+                    <Label Text="Apellidos" FontAttributes="Bold" />
                     <Border BackgroundColor="LightGray" 
                             Padding="10"
                             Stroke="Gray"
@@ -54,17 +51,16 @@
                     </Border>
                 </StackLayout>
                 <StackLayout Grid.Column="1">
-                    <Label Text="New Last Name" FontAttributes="Bold" />
+                    <Label Text="Nuevos Apellidos" FontAttributes="Bold" />
                     <Entry Text="{Binding NewLastName}" 
-                           Placeholder="Enter new last name"
+                           Placeholder="Introduzca sus nuevos apellidos"
                            IsEnabled="{Binding IsFormEnabled}" />
                 </StackLayout>
             </Grid>
 
-            <!-- Email Row -->
             <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                 <StackLayout Grid.Column="0">
-                    <Label Text="Current Email" FontAttributes="Bold" />
+                    <Label Text="Email" FontAttributes="Bold" />
                     <Border BackgroundColor="LightGray" 
                             Padding="10"
                             Stroke="Gray"
@@ -74,18 +70,17 @@
                     </Border>
                 </StackLayout>
                 <StackLayout Grid.Column="1">
-                    <Label Text="New Email" FontAttributes="Bold" />
+                    <Label Text="Nuevo Email" FontAttributes="Bold" />
                     <Entry Text="{Binding NewEmail}" 
-                           Placeholder="Enter new email"
+                           Placeholder="Introduzca su nuevo email"
                            Keyboard="Email"
                            IsEnabled="{Binding IsFormEnabled}" />
                 </StackLayout>
             </Grid>
 
-            <!-- Phone Row -->
             <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                 <StackLayout Grid.Column="0">
-                    <Label Text="Current Phone" FontAttributes="Bold" />
+                    <Label Text="Teléfono" FontAttributes="Bold" />
                     <Border BackgroundColor="LightGray" 
                             Padding="10"
                             Stroke="Gray"
@@ -95,22 +90,20 @@
                     </Border>
                 </StackLayout>
                 <StackLayout Grid.Column="1">
-                    <Label Text="New Phone" FontAttributes="Bold" />
+                    <Label Text="Nuevo teléfono" FontAttributes="Bold" />
                     <Entry Text="{Binding NewTlf}" 
-                           Placeholder="Enter new phone"
+                           Placeholder="Introduzca su nuevo teléfono"
                            Keyboard="Telephone"
                            IsEnabled="{Binding IsFormEnabled}" />
                 </StackLayout>
             </Grid>
 
-            <!-- Error Message -->
             <Label Text="{Binding ErrorMessage}" 
                    TextColor="Red" 
                    IsVisible="{Binding HasError}"
                    HorizontalOptions="Center" />
 
-            <!-- Update Button -->
-            <Button Text="Update Information" 
+            <Button Text="Actualizar Información" 
                     Command="{Binding UpdateUserCommand}"
                     IsEnabled="{Binding IsFormEnabled}"
                     BackgroundColor="#28a745"
@@ -119,13 +112,11 @@
                     HeightRequest="50"
                     CornerRadius="10" />
 
-            <!-- Loading Indicator -->
             <ActivityIndicator IsRunning="{Binding IsLoading}" 
                                IsVisible="{Binding IsLoading}"
                                HorizontalOptions="Center" />
 
-            <!-- Go Back Button -->
-            <Button Text="Go Back" 
+            <Button Text="Volver" 
                     Command="{Binding GoBackCommand}"
                     BackgroundColor="LightGray"
                     TextColor="Black"

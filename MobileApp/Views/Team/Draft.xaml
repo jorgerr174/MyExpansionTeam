@@ -5,7 +5,7 @@
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Team"
              x:DataType="viewmodels:DraftViewModel"
              x:Name="DraftPage"
-             Title="NFL Draft">
+             Title="Draft">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -29,7 +29,7 @@
                                FontAttributes="Bold"
                                TextColor="White"
                                HorizontalOptions="Center" />
-                        <Label Text="NFL Draft Simulation" 
+                        <Label Text="Simulación del Draft" 
                                FontSize="16"
                                TextColor="White"
                                HorizontalOptions="Center" />
@@ -43,17 +43,17 @@
                         Padding="20"
                         StrokeShape="RoundRectangle 8">
                     <StackLayout Spacing="10">
-                        <Label Text="Number of Rounds to Control" 
+                        <Label Text="Número de rondas a controlar" 
                                     FontSize="16" 
                                     FontAttributes="Bold"
                                     TextColor="#495057"
                                     HorizontalOptions="Center" />
-                        <Label Text="Remaining rounds will be auto-simulated"
+                        <Label Text="Resto de rondas serán simuladas"
                                FontSize="12"
                                TextColor="#6c757d"
                                HorizontalOptions="Center" />
                         <Entry Text="{Binding ManualRounds}" 
-                                Placeholder="Enter rounds (1-7)"
+                                Placeholder="Introduzca rondas(1-7)"
                                 Keyboard="Numeric"
                                 HorizontalOptions="Center"
                                 WidthRequest="100" />
@@ -70,7 +70,7 @@
                                  Spacing="15"
                                  HorizontalOptions="Center">
                         <CheckBox IsChecked="{Binding AllowTrades}" />
-                        <Label Text="Enable trading during draft" 
+                        <Label Text="Permitir trueques durante el draft" 
                                FontSize="16"
                                VerticalOptions="Center" />
                     </StackLayout>
@@ -83,7 +83,7 @@
                         Padding="20"
                         StrokeShape="RoundRectangle 8">
                     <StackLayout Spacing="15">
-                        <Label Text="Draft Control Method" 
+                        <Label Text="Método de Control" 
                                FontSize="18" 
                                FontAttributes="Bold"
                                TextColor="#495057"
@@ -98,12 +98,12 @@
                                         <RadioButton x:Name="AutoRadio"
                                                      IsChecked="{Binding IsAutoDraft}"
                                                      GroupName="DraftMethod" />
-                                        <Label Text="Auto Draft" 
+                                        <Label Text="Automático" 
                                                FontSize="16"
                                                FontAttributes="Bold"
                                                VerticalOptions="Center" />
                                     </StackLayout>
-                                    <Label Text="CPU controls all picks automatically"
+                                    <Label Text="Sistema realiza todos las elecciones"
                                            FontSize="14"
                                            TextColor="#6c757d"
                                            Margin="30,0,0,0" />
@@ -118,12 +118,12 @@
                                         <RadioButton x:Name="ManualRadio"
                                                      IsChecked="{Binding IsOnlyTeam}"
                                                      GroupName="DraftMethod" />
-                                        <Label Text="Manual Draft" 
+                                        <Label Text="Draft Manual" 
                                                FontSize="16"
                                                FontAttributes="Bold"
                                                VerticalOptions="Center" />
                                     </StackLayout>
-                                    <Label Text="You control only you team's picks"
+                                    <Label Text="Controlas solo los picks de tu equipo"
                                            FontSize="14"
                                            TextColor="#6c757d"
                                            Margin="30,0,0,0" />
@@ -138,12 +138,12 @@
                                         <RadioButton x:Name="MultipleRadio"
                                                      IsChecked="{Binding IsMultipleDraft}"
                                                      GroupName="DraftMethod" />
-                                        <Label Text="Multiple Teams" 
+                                        <Label Text="Multiples equipos" 
                                                FontSize="16"
                                                FontAttributes="Bold"
                                                VerticalOptions="Center" />
                                     </StackLayout>
-                                    <Label Text="Control multiple teams during the draft"
+                                    <Label Text="Controla tu equipos y las franquicias seleccionadas"
                                            FontSize="14"
                                            TextColor="#6c757d"
                                            Margin="30,0,0,0" />
@@ -161,7 +161,7 @@
                         StrokeShape="RoundRectangle 8"
                         IsVisible="{Binding IsMultipleDraft}">
                     <StackLayout Spacing="15">
-                        <Label Text="Select Additional Franchises to Control" 
+                        <Label Text="Seleccione las franquicias que controlar" 
                                FontSize="16" 
                                FontAttributes="Bold"
                                TextColor="#495057"
@@ -204,7 +204,7 @@
                 </Border>
 
                 <!-- Start Draft Button -->
-                <Button Text="Start Draft"
+                <Button Text="Empezar Draft"
                         BackgroundColor="#28a745"
                         TextColor="White"
                         FontSize="18"
@@ -226,7 +226,7 @@
                     Padding="15,10">
                 <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
                     <Button Grid.Column="0"
-                            Text="← Back"
+                            Text="← Volver"
                             BackgroundColor="Transparent"
                             TextColor="White"
                             FontSize="14"
@@ -263,7 +263,7 @@
                     <StackLayout Spacing="0">
                         <Border BackgroundColor="#007bff" 
                                 Padding="10">
-                            <Label Text="Draft Order" 
+                            <Label Text="Orden del Draft" 
                                    FontSize="14"
                                    FontAttributes="Bold"
                                    TextColor="White"
@@ -331,7 +331,7 @@
                     <StackLayout Spacing="0">
                         <Border BackgroundColor="#6c757d" 
                                 Padding="10">
-                            <Label Text="Available Prospects" 
+                            <Label Text="Prospectos Disponibles" 
                                    FontSize="14"
                                    FontAttributes="Bold"
                                    TextColor="White"
@@ -395,7 +395,7 @@
                                             <StackLayout Grid.Column="1" 
                                                          Spacing="2"
                                                          HorizontalOptions="End">
-                                                <Label Text="{Binding ConsensusText, StringFormat='OVR: {0}'}" 
+                                                <Label Text="{Binding ConsensusText, StringFormat='TOTAL: {0}'}" 
                                                        FontSize="10"
                                                        TextColor="#007bff"
                                                        HorizontalOptions="End" />
@@ -429,14 +429,14 @@
                             Padding="10,6"
                             Command="{Binding TogglePauseCommand}"
                             IsVisible="{Binding ShowPauseButton}" />
-                    <Button Text="Trade"
+                    <Button Text="Nuevo Trueque"
                             BackgroundColor="#17a2b8"
                             TextColor="White"
                             FontSize="12"
                             Padding="10,6"
                             Command="{Binding TradeCommand}"
                             IsVisible="{Binding AllowTrades}" />
-                    <Button Text="Save Draft"
+                    <Button Text="Guardar Draft"
                             BackgroundColor="#28a745"
                             TextColor="White"
                             FontSize="12"
@@ -447,7 +447,6 @@
             </Border>
         </Grid>
 
-        <!-- Loading Overlay -->
         <StackLayout Grid.Row="0"
                      BackgroundColor="#80000000"
                      IsVisible="{Binding IsLoading}"

@@ -14,7 +14,7 @@ namespace MobileApp.Models.Team
     {
         private readonly TeamService _teamService = teamService;
 
-        [ObservableProperty] private string loadingMessage = "Loading...";
+        [ObservableProperty] private string loadingMessage = "Cargando...";
 
         // Draft Setup
         [ObservableProperty] private bool showDraftInterface = false;
@@ -104,7 +104,7 @@ namespace MobileApp.Models.Team
         {
             try
             {
-                UpdateLoadingState(true, "Loading draft data...");
+                UpdateLoadingState(true, "Cargando draft data...");
 
                 if (await _teamService.GetTeamDraftAsync(teamId) is DraftDto draft)
                 {
@@ -201,7 +201,7 @@ namespace MobileApp.Models.Team
 
 
         #region Extra functionality
-        private void UpdateLoadingState(bool loading, string message = "Loading...")
+        private void UpdateLoadingState(bool loading, string message = "Cargando...")
         {
             IsLoading = loading;
             LoadingMessage = message;

@@ -4,17 +4,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Admin"
              x:DataType="viewmodels:AdminViewModel"
-             Title="Admin Control Center">
+             Title="Centro de Control del Admin">
 
     <ScrollView>
         <StackLayout Padding="20" Spacing="20">
 
-            <Label Text="Admin actions" FontSize="28" FontAttributes="Bold" HorizontalOptions="Center" />
+            <Label Text="Centro de Control del Admin" FontSize="28" FontAttributes="Bold" HorizontalOptions="Center" />
 
             <Border BackgroundColor="LightGray" Padding="20" Stroke="Gray" StrokeThickness="1" StrokeShape="RoundRectangle 10">
                 <StackLayout Spacing="20">
 
-                    <Button Text="Assign Roles" 
+                    <Button Text="Asignar Roles" 
                             Command="{Binding GoToAssignRolesCommand}"
                             BackgroundColor="Orange"
                             TextColor="White"
@@ -22,7 +22,7 @@
                             HeightRequest="60"
                             CornerRadius="10" />
 
-                    <Button Text="Import" 
+                    <Button Text="Importar Datos" 
                             Command="{Binding GoToImportCommand}"
                             BackgroundColor="Blue"
                             TextColor="White"
@@ -41,7 +41,7 @@
                    IsVisible="{Binding HasError}"
                    HorizontalOptions="Center" />
 
-            <Button Text="Back" 
+            <Button Text="Volver" 
                     Command="{Binding GoBackCommand}"
                     BackgroundColor="Gray"
                     TextColor="White"

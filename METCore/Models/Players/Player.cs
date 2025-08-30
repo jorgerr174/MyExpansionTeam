@@ -65,7 +65,7 @@ namespace METCore.Models.Players
         public string StatsHtml()
         {
             SeasonStats? last = this.Stats.OrderByDescending(s => s.Season).FirstOrDefault();
-            if (last is null) return "<br><small class='text-muted'>No relevant stats</small>";
+            if (last is null) return "<br><small class='text-muted'>Sin estadísticas relevantes</small>";
 
             return "<small class='text-info'>" +
                 this.Position switch

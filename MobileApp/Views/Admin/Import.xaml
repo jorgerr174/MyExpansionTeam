@@ -5,7 +5,7 @@
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Admin"
              xmlns:converters="clr-namespace:MobileApp.Converters"
              x:DataType="viewmodels:ImportViewModel"
-             Title="Import Data">
+             Title="Importar Datos">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -16,39 +16,36 @@
     <ScrollView>
         <StackLayout Padding="20" Spacing="20">
 
-            <Label Text="Import Data" 
+            <Label Text="Importar Datos" 
                    FontSize="24" 
                    FontAttributes="Bold" 
                    HorizontalOptions="Center" />
 
-            <!-- Error Messages (at top for visibility) -->
             <Label Text="{Binding ErrorMessage}" 
                    TextColor="Red" 
                    IsVisible="{Binding HasError}"
                    HorizontalOptions="Center"
                    FontAttributes="Bold" />
 
-            <!-- Import Type Selection -->
             <Border BackgroundColor="LightBlue" Padding="15" Stroke="Blue"  StrokeThickness="1" StrokeShape="RoundRectangle 10">
                 <StackLayout>
-                    <Label Text="Import Type" 
+                    <Label Text="Tipo de Importación" 
                            FontSize="16" 
                            FontAttributes="Bold" />
 
                     <Picker ItemsSource="{Binding ImportTypes}" 
                             SelectedItem="{Binding SelectedImportType}"
                             ItemDisplayBinding="{Binding DisplayName}"
-                            Title="Select import type" />
+                            Title="Seleccionar Tipo de Importación" />
                 </StackLayout>
             </Border>
 
-            <!-- Year Selection (for Stats) -->
             <Border BackgroundColor="LightGreen" Padding="15" Stroke="Green" StrokeThickness="1" StrokeShape="RoundRectangle 10" IsVisible="{Binding ShowYearSelection}">
                 <StackLayout>
-                    <Label Text="Year" 
+                    <Label Text="Año" 
                            FontSize="16" 
                            FontAttributes="Bold" />
-                    <Label Text="Choose a year (from last three) to import to" 
+                    <Label Text="Elija un año (de los últimos 3) sobre los que importar datos" 
                            FontSize="12" 
                            TextColor="Gray" />
 
@@ -58,13 +55,12 @@
                 </StackLayout>
             </Border>
 
-            <!-- Stats Type Selection (for Stats) -->
             <Border BackgroundColor="LightYellow" Padding="15" Stroke="Yellow" StrokeThickness="1" StrokeShape="RoundRectangle 10" IsVisible="{Binding ShowStatsTypeSelection}">
                 <StackLayout>
-                    <Label Text="Stats Type" 
+                    <Label Text="Tipo de Estadísticas" 
                            FontSize="16" 
                            FontAttributes="Bold" />
-                    <Label Text="Choose the type of stats to import" 
+                    <Label Text="Selecciona que tipo de Estadísticas a importar" 
                            FontSize="12" 
                            TextColor="Gray" />
 
@@ -75,14 +71,13 @@
                 </StackLayout>
             </Border>
 
-            <!-- File Selection -->
             <Border BackgroundColor="LightCoral" Padding="15" Stroke="Coral" StrokeThickness="1" StrokeShape="RoundRectangle 10">
                 <StackLayout>
-                    <Label Text="File Selection" 
+                    <Label Text="Selección del archivo" 
                            FontSize="16" 
                            FontAttributes="Bold" />
 
-                    <Button Text="Select CSV File" 
+                    <Button Text="Seleccione archivo CSV" 
                             Command="{Binding SelectFileCommand}"
                             BackgroundColor="Blue"
                             TextColor="White"
@@ -95,8 +90,7 @@
                 </StackLayout>
             </Border>
 
-            <!-- Import Button -->
-            <Button Text="Upload CSV" 
+            <Button Text="Cargar CSV" 
                     Command="{Binding ImportDataCommand}"
                     BackgroundColor="Green"
                     TextColor="White"
@@ -105,24 +99,21 @@
                     CornerRadius="10"
                     IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}" />
 
-            <!-- Loading Indicator -->
             <StackLayout IsVisible="{Binding IsLoading}" 
                          HorizontalOptions="Center">
                 <ActivityIndicator IsRunning="{Binding IsLoading}" 
                                  Color="Blue" />
-                <Label Text="Importing data..." 
+                <Label Text="Importando datos..." 
                        HorizontalOptions="Center" />
             </StackLayout>
 
-            <!-- Import Result -->
             <Border BackgroundColor="LightGreen" Padding="15" Stroke="Green" StrokeThickness="1" StrokeShape="RoundRectangle 10" IsVisible="{Binding HasImportResult}">
                 <StackLayout>
                     <Label Text="{Binding ImportResult}" 
                            FontSize="14"
                            FontAttributes="Bold" />
 
-                    <!-- Error File Download -->
-                    <Button Text="Download Error Report" 
+                    <Button Text="Descargar Archivo de Errores" 
                             Command="{Binding DownloadErrorFileCommand}"
                             IsVisible="{Binding HasErrorFile}"
                             BackgroundColor="Orange"
@@ -132,8 +123,7 @@
                 </StackLayout>
             </Border>
 
-            <!-- Back Button -->
-            <Button Text="Back" 
+            <Button Text="Volver" 
                     Command="{Binding GoBackCommand}"
                     BackgroundColor="Gray"
                     TextColor="White"

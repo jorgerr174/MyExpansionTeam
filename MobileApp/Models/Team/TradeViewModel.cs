@@ -17,7 +17,7 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private int currentPick = -1; // -1 = from roster, >=0 = from draft
         [ObservableProperty] private int selectedFranchiseId;
         [ObservableProperty] private string tradePartnerName = "Select Franchise";
-        [ObservableProperty] private string loadingMessage = "Loading...";
+        [ObservableProperty] private string loadingMessage = "Cargando...";
 
         // Tab Management
         [ObservableProperty] private bool isSummaryTabVisible = true;
@@ -77,7 +77,7 @@ namespace MobileApp.Models.Team
             TeamId = teamId;
             try
             {
-                UpdateLoadingState(true, "Loading trade interface...");
+                UpdateLoadingState(true, "Cargando trade interface...");
 
                 if (SelectedFranchiseId == 0)
                     await SelectFranchise();
@@ -184,7 +184,7 @@ namespace MobileApp.Models.Team
 
             try
             {
-                UpdateLoadingState(true, $"Loading trade data with {TradePartnerName}...");
+                UpdateLoadingState(true, $"Cargando trade data with {TradePartnerName}...");
 
                 _currentTradeData = await _teamService.GetTradeDataAsync(TeamId, SelectedFranchiseId);
 
@@ -463,7 +463,7 @@ namespace MobileApp.Models.Team
             _availableFranchises = FranchiseInfo.GetAllFranchises().ToList();
         }
 
-        private void UpdateLoadingState(bool loading, string message = "Loading...")
+        private void UpdateLoadingState(bool loading, string message = "Cargando...")
         {
             IsLoading = loading;
             LoadingMessage = message;

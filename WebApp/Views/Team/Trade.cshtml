@@ -10,14 +10,12 @@
 
 
 <div class="container-fluid">
-    <!-- Hidden form for trade submission -->
     <form id="tradeForm">
         <input type="hidden" name="Id" value="@Model.Id" />
         <input type="hidden" name="TeamId" value="@Model.TeamId" />
         <input type="hidden" name="FranchiseId" value="@Model.FranchiseId" />
         <input type="hidden" name="Force" id="Force" value="false" />
 
-        <!-- Hidden containers for dynamic form fields -->
 		<div id="teamPicksContainer"></div>
 		<div id="teamPlayersContainer"></div>
 		<div id="franchisePicksContainer"></div>
@@ -25,26 +23,24 @@
     </form>
 
 
-    <!-- Action Buttons -->
     <div class="d-flex justify-content-between mt-3 pb-2">
         <button type="button" class="btn btn-outline-secondary btn-cancel" data-bs-dismiss="modal">
-            <i class="fas fa-times me-2"></i>Cancel
+            <i class="fas fa-times me-2"></i>Cancelar
         </button>
 
         <div>
             <button type="button" id="requestTradeBtn" class="btn btn-primary">
-                <i class="fas fa-handshake me-2"></i>Request Trade
+                <i class="fas fa-handshake me-2"></i>Solicitar Trueque
             </button>
             <button type="button" id="forceTradeBtn" class="btn btn-outline-warning ms-2">
-                <i class="fas fa-bolt me-2"></i>Force Trade
+                <i class="fas fa-bolt me-2"></i>Forzar Trueque
             </button>
         </div>
     </div>
     
-    <!-- Trade Value Comparison Bar -->
     <div class="card mb-3">
         <div class="card-body">
-            <h6 class="mb-2">Trade Value Comparison</h6>
+            <h6 class="mb-2">Valoración del truque</h6>
             <div class="progress" style="height: 25px;">
                 <div class="progress-bar bg-primary" id="userSideBar" style="width: 50%;">
                     <span id="userSideValue">0</span>
@@ -54,50 +50,45 @@
                 </div>
             </div>
             <div class="d-flex justify-content-between mt-2">
-                <small class="text-muted">Your Side: <span id="userTotalValue">0</span> pts</small>
-                <small class="text-muted">Their Side: <span id="franchiseTotalValue">0</span> pts</small>
+                <small class="text-muted">Tu equipo: <span id="userTotalValue">0</span> pts</small>
+                <small class="text-muted">Franquicia: <span id="franchiseTotalValue">0</span> pts</small>
             </div>
             <div class="text-center mt-2">
-                <span class="badge bg-secondary" id="equalityBadge">No Items Selected</span>
+                <span class="badge bg-secondary" id="equalityBadge">Sin Items Seleccionados</span>
             </div>
         </div>
     </div>
 
-    <!-- Trade Builder -->
     <div class="row pb-3">
-        <!-- Your Side (Team) -->
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0">Your Offer (Team @Model.TeamId)</h6>
+                    <h6 class="mb-0">Tu oferta (Team @Model.TeamId)</h6>
                 </div>
                 <div class="card-body">
-                    <!-- Selected Items -->
                     <div class="mb-3">
-                        <h6>Items You're Trading Away</h6>
+                        <h6>Items que vas a mandar</h6>
                         <div id="userSelectedItems" class="selected-items-container">
                             <div class="empty-state">
                                 <i class="fas fa-plus-circle fa-2x mb-2"></i>
-                                <p>Select items below to trade away</p>
+                                <p>Selecciona items que mandar</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Available Items Tabs -->
                     @{
                         int numTeamPicks = Model.TeamPicks?.Count ?? 0;
                         int numTeamPlayers = Model.TeamPlayers?.Count ?? 0;
                     }
-
                     <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item">
                             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#user-picks">
-                                Draft Picks (@(numTeamPicks))
+                                Picks del Draft (@(numTeamPicks))
                             </button>
                         </li>
                         <li class="nav-item">
                             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#user-players">
-                                Players (@(numTeamPlayers))
+                                Jugadores (@(numTeamPlayers))
                             </button>
                         </li>
                     </ul>
@@ -108,7 +99,7 @@
 
                                 @if (numTeamPicks == 0)
                                 {
-                                <div class="text-center text-muted p-3">No picks available</div>
+                                <div class="text-center text-muted p-3">No hay picks disponibles</div>
                                 }
                                 else
                                 {
@@ -119,8 +110,8 @@
                                 <div class="trade-item">
                                     <div class="trade-item-card @(already ? "unselectable-overlay" : string.Empty)" data-type="pick" data-id="@pick" data-side="user" data-value="@value">
 										<div class="item-info">
-                                            <strong>Round @(pick/100), Pick @(pick%100)</strong>
-                                            <small>Overall: @(DraftPicks.TotalAtRound[(pick/100)-1]+pick%100)</small>
+                                            <strong>Ronda @(pick/100), Pick @(pick%100)</strong>
+                                            <small>Total: @(DraftPicks.TotalAtRound[(pick/100)-1]+pick%100)</small>
                                             <span class="badge bg-primary">@value pts</span>
                                         </div>
                                     </div>
@@ -135,7 +126,7 @@
 
                             @if (numTeamPlayers == 0)
                             {
-                                <div class="text-center text-muted p-3">No players available</div>
+                                <div class="text-center text-muted p-3">No hay jugadores disponibles</div>
                             }
                             else
                             {
@@ -149,12 +140,14 @@
                                     <h6 class="text-muted mb-3">@player.Position</h6>
                                 </div>
                                 }
+                                int value = DraftPicks.GetPlayerValue(player);
                                 <div class="trade-item">
-                                    <div class="trade-item-card" data-type="player" data-id="@player.Id" data-side="user" data-value="0">
+                                    <div class="trade-item-card" data-type="player" data-id="@player.Id" data-side="user" data-value="@value">
                                         <div class="item-info">
                                             <strong>@player.Name</strong>
                                             <small>@player.Position | @player.APY</small>
-										</div>
+                                            <span class="badge bg-success">@value pts</span>
+                                        </div>
                                     </div>
                                 </div>
                                 }
@@ -167,34 +160,31 @@
             </div>
         </div>
 
-        <!-- Their Side (Franchise) -->
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header bg-success text-white">
-                    <h6 class="mb-0">Request From <span id="franchiseName"></span></h6>
+                    <h6 class="mb-0">Solicitar a <span id="franchiseName"></span></h6>
                 </div>
                 <div class="card-body">
-                    <!-- Selected Items -->
                     <div class="mb-3">
-                        <h6>Items You're Requesting</h6>
+                        <h6>Items que solicitar</h6>
                         <div id="franchiseSelectedItems" class="selected-items-container">
                             <div class="empty-state">
                                 <i class="fas fa-plus-circle fa-2x mb-2"></i>
-                                <p>Select items below to request</p>
+                                <p>Seleccione items que solicitar</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Available Items Tabs -->
                     <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item">
                             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#franchise-picks">
-                                Draft Picks (@(numFranchisePicks))
+								Picks del Draft (@(numFranchisePicks))
                             </button>
                         </li>
                         <li class="nav-item">
                             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#franchise-players">
-                                Players (@(numFranchisePlayers))
+                                Jugadores (@(numFranchisePlayers))
                             </button>
                         </li>
                     </ul>
@@ -205,7 +195,7 @@
 
                                 @if (numFranchisePicks == 0)
                                 {
-                                <div class="text-center text-muted p-3">No picks available</div>
+                                <div class="text-center text-muted p-3">No hay picks disponibles</div>
                                 }
                                 else
                                 {
@@ -216,8 +206,8 @@
                                 <div class="trade-item">
                                     <div class="trade-item-card @(already ? "unselectable-overlay" : string.Empty)" data-type="pick" data-id="@pick" data-side="franchise" data-value="@value">
 										<div class="item-info">
-                                            <strong>Round @(pick/100), Pick @(pick%100)</strong>
-                                            <small>Overall: @(DraftPicks.TotalAtRound[(pick/100)-1]+pick%100)</small>
+                                            <strong>Ronda @(pick/100), Pick @(pick%100)</strong>
+                                            <small>Total: @(DraftPicks.TotalAtRound[(pick/100)-1]+pick%100)</small>
                                             <span class="badge bg-success">@value pts</span>
                                         </div>
                                     </div>
@@ -232,7 +222,7 @@
 
                                 @if (numFranchisePlayers == 0)
                                 {
-                                <div class="text-center text-muted p-3">No players available</div>
+                                <div class="text-center text-muted p-3">No hay jugadores disponibles</div>
                                 }
                                 else
                                 {
@@ -246,12 +236,14 @@
                                     <h6 class="text-muted mb-3">@player.Position</h6>
                                 </div>
                                 }
+                                int value = DraftPicks.GetPlayerValue(player);
                                 <div class="trade-item">
-                                    <div class="trade-item-card" data-type="player" data-id="@player.Id" data-side="franchise" data-value="0">
+                                    <div class="trade-item-card" data-type="player" data-id="@player.Id" data-side="franchise" data-value="@value">
                                         <div class="item-info">
                                             <strong>@player.Name</strong>
                                             <small>@player.Position | @player.APY</small>
-										</div>
+                                            <span class="badge bg-success">@value pts</span>
+                                        </div>
                                     </div>
                                 </div>
                                 }
@@ -431,13 +423,13 @@
 
                 const diff = Math.abs(userTotalValue - franchiseTotalValue);
                 if (diff <= 5) {
-                    badge.textContent = 'Fair Trade';
+                    badge.textContent = 'Trueque justo';
                     badge.className = 'badge bg-success';
                 } else if (diff <= 15) {
-                    badge.textContent = 'Slightly Uneven';
+                    badge.textContent = 'Trueque relativamente justo';
                     badge.className = 'badge bg-warning';
                 } else {
-                    badge.textContent = 'Unfair Trade';
+                    badge.textContent = 'Trueque injusto';
                     badge.className = 'badge bg-danger';
                 }
             }

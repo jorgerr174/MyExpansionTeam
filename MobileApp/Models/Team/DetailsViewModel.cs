@@ -137,6 +137,8 @@ namespace MobileApp.Models.Team
                     positionGroup.Players.Add(player);
                 }
                 RosterByPosition.Add(positionGroup);
+
+                PositionBreakdown = string.Empty;
                 foreach (PositionGroup group in RosterByPosition)
                     PositionBreakdown += $"{group.PositionName} ({group.Players.Count}), ";
             }

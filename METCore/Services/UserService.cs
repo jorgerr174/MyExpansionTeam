@@ -43,11 +43,17 @@ namespace METCore.Services
         /// Error (No se guardaron los cambios en la BBDD).
         /// "" (Todo bien).
         /// </returns>
-        public async Task<string> UpdateUser(string username, UserDto dto)
+        public async Task<string> UpdateUser(string username, UpdateUserDto dto)
         {
             User? user = await _userRepository.GetUserByUsername(username);
-            return user == null ? "Username" :
-                await _userRepository.UpdateT(_mapper.Map<User>(dto)) < 1 ? "Error" : "";
+            if (user is null) return "Username";
+
+            if (!String.IsNullOrWhiteSpace(dto.FirstName)) user.FirstName = dto.FirstName;
+            if (!String.IsNullOrWhiteSpace(dto.LastName)) user.LastName = dto.LastName;
+            if (!String.IsNullOrWhiteSpace(dto.Email)) user.Email = dto.Email;
+            if (!String.IsNullOrWhiteSpace(dto.Tlf)) user.Tlf = dto.Tlf;
+            
+            return await _userRepository.UpdateT(user) < 1 ? "Error" : string.Empty;
         }
         #endregion Update
 

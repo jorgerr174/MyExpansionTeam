@@ -7,7 +7,7 @@
              xmlns:playerDtos="clr-namespace:METCore.DTOs.Player;assembly=METCore"
              xmlns:local="clr-namespace:MobileApp.Converters"
              x:DataType="viewmodels:DetailsViewModel"
-             Title="Team Details">
+             Title="Detalles de Equipo">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -19,16 +19,14 @@
     <ScrollView>
         <StackLayout Padding="20" Spacing="20">
 
-            <!-- Loading State -->
             <StackLayout IsVisible="{Binding IsLoading}" Spacing="15">
                 <ActivityIndicator IsRunning="True" Color="#007bff" />
-                <Label Text="Loading team details..." 
+                <Label Text="Cargando detalles del equipo..." 
                        HorizontalOptions="Center" 
                        FontSize="16" 
                        TextColor="#6c757d" />
             </StackLayout>
 
-            <!-- Error State -->
             <StackLayout IsVisible="{Binding HasError}" Spacing="15">
                 <Label Text="⚠️" 
                        HorizontalOptions="Center" 
@@ -38,17 +36,15 @@
                        FontSize="16" 
                        TextColor="Red"
                        HorizontalTextAlignment="Center" />
-                <Button Text="Try Again" 
+                <Button Text="Probar de nuevo" 
                         Command="{Binding LoadViewCommand}" 
                         BackgroundColor="#007bff" 
                         TextColor="White" 
                         HorizontalOptions="Center" />
             </StackLayout>
 
-            <!-- Content -->
             <StackLayout IsVisible="{Binding HasTeam}" Spacing="20">
 
-                <!-- Team Header Card -->
                 <Border BackgroundColor="#007bff" 
                         Padding="20"
                         Stroke="Transparent"
@@ -82,7 +78,7 @@
 
                         <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="15">
                             <StackLayout Grid.Column="0">
-                                <Label Text="Owner:" 
+                                <Label Text="Dueño:" 
                                        TextColor="White" 
                                        FontSize="12" 
                                        Opacity="0.8" />
@@ -92,11 +88,11 @@
                             </StackLayout>
 
                             <StackLayout Grid.Column="1">
-                                <Label Text="Created:" 
+                                <Label Text="Fecha:" 
                                        TextColor="White" 
                                        FontSize="12" 
                                        Opacity="0.8" />
-                                <Label Text="{Binding Team.Date, StringFormat='{0:MMM dd, yyyy}'}" 
+                                <Label Text="{Binding Team.Date, StringFormat='{0:dd-MM-yyyy}'}" 
                                        TextColor="White" 
                                        FontSize="14" />
                             </StackLayout>
@@ -104,7 +100,6 @@
                     </Grid>
                 </Border>
 
-                <!-- Team Status -->
                 <Border BackgroundColor="{Binding Team.Complete, Converter={StaticResource BoolToStatusColorConverter}}"
                         Stroke="Transparent"
                         Padding="15"
@@ -116,9 +111,7 @@
                            FontAttributes="Bold" />
                 </Border>
 
-                <!-- Team Information and Roster Settings Row -->
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
-                    <!-- Team Information Card -->
                     <Border Grid.Column="0"
                             BackgroundColor="White"
                             Stroke="#dee2e6"
@@ -126,14 +119,14 @@
                             Padding="15"
                             StrokeShape="RoundRectangle 12">
                         <StackLayout Spacing="12">
-                            <Label Text="Team Information" 
+                            <Label Text="Información del Equipo" 
                                    FontSize="16" 
                                    FontAttributes="Bold" 
                                    TextColor="#17a2b8" />
 
                             <StackLayout Spacing="8">
                                 <StackLayout>
-                                    <Label Text="Location" 
+                                    <Label Text="Ubicación" 
                                            FontSize="10" 
                                            FontAttributes="Bold" 
                                            TextColor="#6c757d" />
@@ -142,7 +135,7 @@
                                 </StackLayout>
 
                                 <StackLayout>
-                                    <Label Text="Mascot" 
+                                    <Label Text="Mascota" 
                                            FontSize="10" 
                                            FontAttributes="Bold" 
                                            TextColor="#6c757d" />
@@ -151,7 +144,7 @@
                                 </StackLayout>
 
                                 <StackLayout>
-                                    <Label Text="Abbreviation" 
+                                    <Label Text="Abreviatura" 
                                            FontSize="10" 
                                            FontAttributes="Bold" 
                                            TextColor="#6c757d" />
@@ -162,7 +155,6 @@
                         </StackLayout>
                     </Border>
 
-                    <!-- Roster Settings Card -->
                     <Border Grid.Column="1"
                             BackgroundColor="White"
                             Stroke="#dee2e6"
@@ -170,14 +162,14 @@
                             Padding="15"
                             StrokeShape="RoundRectangle 12">
                         <StackLayout Spacing="12">
-                            <Label Text="Roster Settings" 
+                            <Label Text="Ajustes del equipo" 
                                    FontSize="16" 
                                    FontAttributes="Bold" 
                                    TextColor="#28a745" />
 
                             <StackLayout Spacing="8">
                                 <StackLayout>
-                                    <Label Text="Salary Cap %" 
+                                    <Label Text="Limite salarial (%)" 
                                            FontSize="10" 
                                            FontAttributes="Bold" 
                                            TextColor="#6c757d" />
@@ -186,20 +178,20 @@
                                 </StackLayout>
 
                                 <StackLayout>
-                                    <Label Text="Max Players Per Team" 
+                                    <Label Text="Máx Jugadores por Equipo" 
                                            FontSize="10" 
                                            FontAttributes="Bold" 
                                            TextColor="#6c757d" />
-                                    <Label Text="{Binding Team.RosterSettingsMaxPerTeam, StringFormat='{0} players'}" 
+                                    <Label Text="{Binding Team.RosterSettingsMaxPerTeam, StringFormat='{0} jugadores'}" 
                                            FontSize="14" />
                                 </StackLayout>
 
                                 <StackLayout>
-                                    <Label Text="Protected Players Per Team" 
+                                    <Label Text="Jugadores Protegidos Por Equipo" 
                                            FontSize="10" 
                                            FontAttributes="Bold" 
                                            TextColor="#6c757d" />
-                                    <Label Text="{Binding Team.RosterSettingsProtectedPerTeam, StringFormat='{0} players'}" 
+                                    <Label Text="{Binding Team.RosterSettingsProtectedPerTeam, StringFormat='{0} jugadores'}" 
                                            FontSize="14" />
                                 </StackLayout>
                             </StackLayout>
@@ -207,7 +199,6 @@
                     </Border>
                 </Grid>
 
-                <!-- Action Buttons (Only if user owns team) -->
                 <Border BackgroundColor="White"
                         Stroke="#dee2e6"
                         StrokeThickness="1"
@@ -215,14 +206,14 @@
                         StrokeShape="RoundRectangle 12"
                         IsVisible="{Binding IsOwner}">
                     <StackLayout Spacing="15">
-                        <Label Text="Team Management" 
+                        <Label Text="Administración de Equipo" 
                                FontSize="18" 
                                FontAttributes="Bold" 
                                TextColor="#333" />
 
                         <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
                             <Button Grid.Row="0"
-                                    Text="Edit Team"
+                                    Text="Editar Equipo"
                                     Command="{Binding GoToEditTeamCommand}"
                                     BackgroundColor="#007bff"
                                     TextColor="White"
@@ -230,7 +221,7 @@
                                     Padding="15" />
 
                             <Button Grid.Row="1"
-                                    Text="Roster Settings"
+                                    Text="Ajustes del Equipo"
                                     Command="{Binding GoToRosterSettingsCommand}"
                                     BackgroundColor="#28a745"
                                     TextColor="White"
@@ -238,7 +229,7 @@
                                     Padding="15" />
 
                             <Button Grid.Row="2"
-                                    Text="Build Roster"
+                                    Text="Editar Plantilla"
                                     Command="{Binding GoToRosterCommand}"
                                     BackgroundColor="#17a2b8"
                                     TextColor="White"
@@ -248,37 +239,35 @@
                     </StackLayout>
                 </Border>
 
-                <!-- Team Roster Overview -->
                 <Border BackgroundColor="White"
                         Stroke="#dee2e6"
                         StrokeThickness="1"
                         Padding="20"
                         StrokeShape="RoundRectangle 12">
                     <StackLayout Spacing="15">
-                        <Label Text="🏈 Team Roster Overview" 
+                        <Label Text="🏈 Plantilla" 
                                FontSize="18" 
                                FontAttributes="Bold" 
                                TextColor="#ffc107" />
 
-                        <!-- Roster Summary -->
                         <Border BackgroundColor="#f8f9fa"
                                 Stroke="#dee2e6"
                                 StrokeThickness="1"
                                 Padding="15"
                                 StrokeShape="RoundRectangle 8">
                             <StackLayout Spacing="8">
-                                <Label Text="Roster Summary" 
+                                <Label Text="Resumen de plantilla" 
                                        FontSize="14" 
                                        FontAttributes="Bold" />
                                 <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                                     <StackLayout Grid.Column="0">
-                                        <Label Text="{Binding Team.Players.Count, StringFormat='Total Players: {0}'}" 
+                                        <Label Text="{Binding Team.Players.Count, StringFormat='Número de Jugadores: {0}'}" 
                                                FontSize="12" />
-                                        <Label Text="{Binding TotalCap, StringFormat='Total Cap Used: {0:F1}M'}" 
+                                        <Label Text="{Binding TotalCap, StringFormat='´Salario Total: {0:F1}M'}" 
                                                FontSize="12" />
                                     </StackLayout>
                                     <StackLayout Grid.Column="1">
-                                        <Label Text="{Binding PositionBreakdown, StringFormat='Positions: {0}'}" 
+                                        <Label Text="{Binding PositionBreakdown, StringFormat='Posiciones: {0}'}" 
                                                FontSize="12"
                                                LineBreakMode="WordWrap" />
                                     </StackLayout>
@@ -286,7 +275,6 @@
                             </StackLayout>
                         </Border>
 
-                        <!-- Roster by Position -->
                         <CollectionView ItemsSource="{Binding RosterByPosition}">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="viewmodels:PositionGroup">
@@ -336,56 +324,52 @@
                     </StackLayout>
                 </Border>
 
-                <!-- Current Formation Display -->
                 <Border BackgroundColor="White"
-        Stroke="#dee2e6"
-        StrokeThickness="1"
-        Padding="15"
-        StrokeShape="RoundRectangle 8">
+                        Stroke="#dee2e6"
+                        StrokeThickness="1"
+                        Padding="15"
+                        StrokeShape="RoundRectangle 8">
                     <StackLayout Spacing="12">
-                        <Label Text="🏈 Current Formation" 
-               FontSize="16" 
-               FontAttributes="Bold" 
-               TextColor="#495057" />
+                        <Label Text="🏈 Formación actual" 
+                               FontSize="16" 
+                               FontAttributes="Bold" 
+                               TextColor="#495057" />
 
-                        <!-- Formation Type Selector (View Only) -->
                         <StackLayout Orientation="Horizontal" 
-                     Spacing="5" 
-                     HorizontalOptions="Center">
-                            <Button Text="Offense" 
-                    BackgroundColor="{Binding OffenseViewColor}"
-                    TextColor="{Binding OffenseViewTextColor}"
-                    FontSize="12"
-                    Padding="10,6"
-                    CornerRadius="4"
-                    Command="{Binding ViewFormationCommand}"
-                    CommandParameter="offense" />
-                            <Button Text="Defense" 
-                    BackgroundColor="{Binding DefenseViewColor}"
-                    TextColor="{Binding DefenseViewTextColor}"
-                    FontSize="12"
-                    Padding="10,6"
-                    CornerRadius="4"
-                    Command="{Binding ViewFormationCommand}"
-                    CommandParameter="defense" />
-                            <Button Text="Special" 
-                    BackgroundColor="{Binding SpecialViewColor}"
-                    TextColor="{Binding SpecialViewTextColor}"
-                    FontSize="12"
-                    Padding="10,6"
-                    CornerRadius="4"
-                    Command="{Binding ViewFormationCommand}"
-                    CommandParameter="special" />
+                                     Spacing="5" 
+                                     HorizontalOptions="Center">
+                            <Button Text="Ataque" 
+                                    BackgroundColor="{Binding OffenseViewColor}"
+                                    TextColor="{Binding OffenseViewTextColor}"
+                                    FontSize="12"
+                                    Padding="10,6"
+                                    CornerRadius="4"
+                                    Command="{Binding ViewFormationCommand}"
+                                    CommandParameter="offense" />
+                            <Button Text="Defensa" 
+                                    BackgroundColor="{Binding DefenseViewColor}"
+                                    TextColor="{Binding DefenseViewTextColor}"
+                                    FontSize="12"
+                                    Padding="10,6"
+                                    CornerRadius="4"
+                                    Command="{Binding ViewFormationCommand}"
+                                    CommandParameter="defense" />
+                            <Button Text="Equipo Especial" 
+                                    BackgroundColor="{Binding SpecialViewColor}"
+                                    TextColor="{Binding SpecialViewTextColor}"
+                                    FontSize="12"
+                                    Padding="10,6"
+                                    CornerRadius="4"
+                                    Command="{Binding ViewFormationCommand}"
+                                    CommandParameter="special" />
                         </StackLayout>
 
-                        <!-- Current Formation Name -->
                         <Label Text="{Binding CurrentFormationDisplayName}" 
                FontSize="14" 
                FontAttributes="Bold"
                TextColor="#007bff"
                HorizontalOptions="Center" />
 
-                        <!-- Formation Fields (Pre-generated, Show/Hide) -->
                         <Border BackgroundColor="#228B22" 
                 Stroke="#fff"
                 StrokeThickness="1"
@@ -502,7 +486,7 @@
                         Padding="20"
                         StrokeShape="RoundRectangle 12">
                     <StackLayout Spacing="15">
-                        <Label Text="🔄 Trade History" 
+                        <Label Text="🔄 Historial de Trueques" 
                                FontSize="18" 
                                FontAttributes="Bold" 
                                TextColor="#dc3545" />
@@ -519,14 +503,14 @@
                                         <StackLayout Spacing="10">
                                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                                                 <Label Grid.Column="1"
-                                                       Text="{Binding Date, StringFormat='Date: {0:M/d/yyyy}'}"
+                                                       Text="{Binding Date, StringFormat='Fecha: {0:M/d/yyyy}'}"
                                                        FontSize="12"
                                                        TextColor="#6c757d" />
                                             </Grid>
 
                                             <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
                                                 <StackLayout Grid.Column="0">
-                                                    <Label Text="Received:" 
+                                                    <Label Text="Recibido:" 
                                                            FontSize="12" 
                                                            FontAttributes="Bold" 
                                                            TextColor="#28a745" />
@@ -551,7 +535,7 @@
                                                 </StackLayout>
 
                                                 <StackLayout Grid.Column="1">
-                                                    <Label Text="Sent:" 
+                                                    <Label Text="Enviado:" 
                                                            FontSize="12" 
                                                            FontAttributes="Bold" 
                                                            TextColor="#dc3545" />
@@ -590,7 +574,7 @@
                         Padding="20"
                         StrokeShape="RoundRectangle 12">
                     <StackLayout Spacing="15">
-                        <Label Text="🏆 Draft Results" 
+                        <Label Text="🏆 Resultados del Draft" 
                                FontSize="18" 
                                FontAttributes="Bold" 
                                TextColor="#17a2b8" />
@@ -621,7 +605,7 @@
 
                                             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="5">
                                                 <StackLayout Grid.Column="0">
-                                                    <Label Text="Position" 
+                                                    <Label Text="Posición" 
                                                            FontSize="10" 
                                                            TextColor="#6c757d" />
                                                     <Label Text="{Binding Player.Position}" 
@@ -630,7 +614,7 @@
                                                 </StackLayout>
 
                                                 <StackLayout Grid.Column="1">
-                                                    <Label Text="College" 
+                                                    <Label Text="Universidad" 
                                                            FontSize="10" 
                                                            TextColor="#6c757d" />
                                                     <Label Text="{Binding Player.College}" 
@@ -638,7 +622,7 @@
                                                 </StackLayout>
 
                                                 <StackLayout Grid.Column="2">
-                                                    <Label Text="Consensus" 
+                                                    <Label Text="Consenso" 
                                                            FontSize="10" 
                                                            TextColor="#6c757d" />
                                                     <Label Text="{Binding Player.Consensus, StringFormat='#{0}'}" 
@@ -650,7 +634,7 @@
                                                 <ProgressBar Progress="{Binding Player.AthScore}" 
                                                            ProgressColor="#17a2b8" 
                                                            BackgroundColor="#e9ecef" />
-                                                <Label Text="{Binding Player.AthScore, StringFormat='Athletic Score: {0}'}" 
+                                                <Label Text="{Binding Player.AthScore, StringFormat='Val. Atlética: {0}'}" 
                                                        FontSize="10" 
                                                        TextColor="#6c757d" />
                                             </StackLayout>
@@ -663,7 +647,7 @@
                 </Border>
 
                 <!-- Back Button -->
-                <Button Text="Back to Teams"
+                <Button Text="Volver"
                         Command="{Binding GoBackCommand}"
                         BackgroundColor="#6c757d"
                         TextColor="White"

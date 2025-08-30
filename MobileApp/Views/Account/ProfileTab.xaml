@@ -4,38 +4,43 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MobileApp.Models.Account"
              x:DataType="viewmodels:ProfileTabViewModel"
-             Title="Profile">
+             Title="Cuenta">
 
     <Grid>
-        <!-- Login Content - Shown when not authenticated -->
         <ScrollView IsVisible="{Binding IsNotAuthenticated}">
             <StackLayout Padding="20" Spacing="20">
-                <Label Text="LogIn" 
+                <Label Text="Iniciar Sesión" 
                        FontSize="24" 
                        FontAttributes="Bold" 
                        HorizontalOptions="Center" />
 
                 <StackLayout>
-                    <Label Text="Identifier" />
+                    <Label Text="Identificador" />
                     <Entry Text="{Binding Identifier}" 
-                           Placeholder="Username or Email" />
+                           Placeholder="Nombre de usuario o Email" />
                 </StackLayout>
 
                 <StackLayout>
-                    <Label Text="Password" />
+                    <Label Text="Contraseña" />
                     <Entry Text="{Binding Password}" 
                            IsPassword="True"
-                           Placeholder="Password" />
+                           Placeholder="Contraseña" />
                 </StackLayout>
 
                 <Label Text="{Binding LoginErrorMessage}" 
                        TextColor="Red" 
                        IsVisible="{Binding HasLoginError}" />
 
-                <Button Text="Log In" 
-                        Command="{Binding LoginCommand}"
+                <Button Text="Iniciar Sesión" 
+                        Command="{Binding LogInCommand}"
                         IsEnabled="{Binding IsNotLoading}"
                         BackgroundColor="Blue"
+                        TextColor="White" />
+                
+                <Button Text="Crear Cuenta" 
+                        Command="{Binding SignUpCommand}"
+                        IsEnabled="{Binding IsNotLoading}"
+                        BackgroundColor="Green"
                         TextColor="White" />
 
                 <ActivityIndicator IsRunning="{Binding IsLoading}" 
@@ -43,64 +48,68 @@
             </StackLayout>
         </ScrollView>
 
-        <!-- Profile Content - Shown when authenticated -->
         <ScrollView IsVisible="{Binding IsAuthenticated}">
             <StackLayout Padding="20" Spacing="15">
 
-                <!-- Title with Username -->
                 <Label Text="{Binding Username}" 
                        FontSize="24" 
                        FontAttributes="Bold" 
                        HorizontalOptions="Center" />
 
-                <!-- Admin Control Center (if admin) -->
-                <Button Text="Admin Control Center" 
+                <Button Text="Centro de Control del Admin" 
                         Command="{Binding GoToAdminCommand}"
                         IsVisible="{Binding IsAdmin}"
                         BackgroundColor="Red"
                         TextColor="White" />
 
-                <!-- Profile Info Display -->
                 <Border BackgroundColor="LightGray" Padding="15" Stroke="Gray" StrokeThickness="1">
                     <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*">
 
-                        <Label Text="First Name:" Grid.Row="0" Grid.Column="0" FontAttributes="Bold" />
+                        <Label Text="Nombre:" Grid.Row="0" Grid.Column="0" FontAttributes="Bold" />
                         <Label Text="{Binding FirstName}" Grid.Row="0" Grid.Column="1" />
 
-                        <Label Text="Last Name:" Grid.Row="1" Grid.Column="0" FontAttributes="Bold" />
+                        <Label Text="Apellidos:" Grid.Row="1" Grid.Column="0" FontAttributes="Bold" />
                         <Label Text="{Binding LastName}" Grid.Row="1" Grid.Column="1" />
 
                         <Label Text="Email:" Grid.Row="2" Grid.Column="0" FontAttributes="Bold" />
                         <Label Text="{Binding Email}" Grid.Row="2" Grid.Column="1" />
 
-                        <Label Text="Phone:" Grid.Row="3" Grid.Column="0" FontAttributes="Bold" />
+                        <Label Text="Teléfono:" Grid.Row="3" Grid.Column="0" FontAttributes="Bold" />
                         <Label Text="{Binding Tlf}" Grid.Row="3" Grid.Column="1" />
 
                     </Grid>
                 </Border>
 
-                <!-- Action Buttons -->
-                <Button Text="Edit Profile" 
-                        Command="{Binding GoToEditProfileCommand}"
-                        BackgroundColor="Blue"
-                        TextColor="White" />
+                <Button Text="Editar Perfil" 
+                        Command="{Binding GoToUpdateUserCommand}"
+                        BackgroundColor="#28a745"
+                        TextColor="White"
+                        FontSize="16"
+                        HeightRequest="60"
+                        CornerRadius="10" />
 
-                <Button Text="LogOut" 
+                <Button Text="Editar Credenciales" 
+                        Command="{Binding GoToUpdateCredentialsCommand}"
+                        BackgroundColor="#28a745"
+                        TextColor="#ffc107"
+                        FontSize="16"
+                        HeightRequest="60"
+                        CornerRadius="10" />
+
+                <Button Text="Cerrar Sesión" 
                         Command="{Binding LogOutCommand}"
                         BackgroundColor="Orange"
                         TextColor="White" />
 
-                <Button Text="Delete Account" 
+                <Button Text="Borrar Cuenta" 
                         Command="{Binding DeleteUserCommand}"
                         BackgroundColor="Red"
                         TextColor="White" />
 
-                <!-- Profile Error Message -->
                 <Label Text="{Binding ProfileErrorMessage}" 
                        TextColor="Red" 
                        IsVisible="{Binding HasProfileError}" />
 
-                <!-- Profile Loading Indicator -->
                 <ActivityIndicator IsRunning="{Binding IsProfileLoading}" 
                                  IsVisible="{Binding IsProfileLoading}" />
 
