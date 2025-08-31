@@ -1,53 +1,61 @@
 @startuml DiagramaSecuencia_CU004
 !theme plain
-title CU004: Modificación de Credenciales
 
 actor "Actor Usuario" as usuario
-participant "Account Controller" as controller
-participant "User Service" as userService
-participant "User Repository" as userRepo
-participant "Password Hasher" as hasher
-participant "Database" as db
+participant "IC_Auth" as interfaz
+participant "G_Auth" as gestion
+collections "Users" as users
 
-usuario -> controller : GET /Account/Profile\nSolicitar modificación credenciales
-activate controller
-controller --> usuario : Formulario modificación credenciales
-deactivate controller
+usuario -> interfaz : 1. solicitarModificarCredenciales()
 
-usuario -> controller : POST /Account/UpdateCredentials\n(nuevo usuario, contraseña x2)
-activate controller
+activate interfaz
+interfaz -> gestion : 2. U1 := getUsuario(username)
+activate gestion
+gestion -> users : 3. U1 := getUsuario(username)
+gestion <-- users : 4. U1
+interfaz <-- gestion : 5. U1
+deactivate gestion
 
-controller -> controller : ValidateModel()\nValidar datos nuevos
-
-controller -> userService : UpdateUserCredentials(userId, newCredentials)
-activate userService
-
-userService -> userService : ValidateNewCredentials()\nComprobar credenciales adecuadas
-
-alt Credenciales válidas
-    userService -> hasher : HashPassword(newPassword)
-    activate hasher
-    hasher --> userService : nueva contraseña hasheada
-    deactivate hasher
+loop U2 IS NOT NULL
+    loop Antigua contraseña incorrecta
+        loop Datos inválidos
+            usuario <- interfaz : 6. modificarCredenciales := solicitarDatos()
+            deactivate interfaz
+            activate usuario
+            usuario --> interfaz : 7. modificarCredenciales
+            deactivate usuario
+            activate interfaz
+            
+            interfaz -> interfaz : 8. validarDatos(credenciales)
+        end
     
-    userService -> userRepo : UpdateUserCredentials(userId, newData)
-    activate userRepo
-    userRepo -> db : UPDATE Users SET Username = ?, Password = ?
-    activate db
-    db --> userRepo : actualización exitosa
-    deactivate db
-    userRepo --> userService : credenciales actualizadas
-    deactivate userRepo
-    
-    userService --> controller : Success("Credenciales modificadas")
-    deactivate userService
-    controller --> usuario : Mensaje éxito
-else Credenciales no adecuadas
-    userService --> controller : Error("Credenciales no válidas")
-    deactivate userService
-    controller --> usuario : Mensaje error + formulario
+        interfaz -> gestion : 9. validarCredenciales(credenciales)
+        deactivate interfaz
+        activate gestion
+        gestion -> gestion : 10. validarCredenciales(credenciales)
+
+        gestion --> interfaz : 11. error
+        interfaz --> usuario : 12. mostrarError("Contraseña actual incorrecta")
+    end
+
+    gestion -> users : 13. U2 := getUsuario(nuevoUsername)
+    activate users
+    users --> gestion : 14. U2
+    deactivate users
+    gestion --> interfaz : 15. error
+    interfaz --> usuario : 16. mostrarError("El nombre de usuario ya está en uso")
 end
 
-deactivate controller
+gestion -> users : 17. actualizarCredenciales(credenciales)
+users --> gestion : 18. ok
+deactivate users
+gestion --> interfaz : 19. ok
+deactivate gestion
+activate interfaz
+interfaz -> interfaz : 20. cerrarSesion()
+interfaz --> usuario : 21. redirigirInicioSesion()
+deactivate interfaz
+
+note right of usuario : El actor puede cancelar\nel proceso en cualquier momento
 
 @enduml

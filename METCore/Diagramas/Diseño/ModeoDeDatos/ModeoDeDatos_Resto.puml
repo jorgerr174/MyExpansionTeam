@@ -30,6 +30,9 @@ entity "Players" as players {
   College : nvarchar(max)
   Height : int
   Weight : int
+  DraftYear : int
+  Jersey : int
+  Madden : int
 }
 
 entity "Franchises" as franchises {
@@ -100,6 +103,7 @@ entity "Trades" as trades {
   FranchisePlayers : nvarchar(max)
   FranchisePicks : nvarchar(max)
   TeamId : int <<FK>>
+  Date : date
 }
 
 

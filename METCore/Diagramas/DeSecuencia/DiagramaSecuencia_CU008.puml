@@ -1,75 +1,37 @@
 @startuml DiagramaSecuencia_CU008
 !theme plain
-title CU008: Duplicado de Equipo
 
 actor "Actor Usuario" as usuario
-participant "Team Controller" as controller
-participant "Team Service" as teamService
-participant "Team Repository" as teamRepo
-participant "RosterSettings Service" as rosterService
-participant "Database" as db
+participant "IC_Teams" as interfaz
+participant "G_Teams" as gestion
+collections "Teams" as teams
 
-usuario -> controller : GET /Team/Duplicate/{teamId}\nElegir equipo a duplicar
-activate controller
+usuario -> interfaz : 1. duplicarEquipo(equipoId)
 
-controller -> teamService : GetTeamById(teamId, userId)
-activate teamService
-teamService -> teamRepo : GetTeamByIdAndUser(teamId, userId)
-activate teamRepo
-teamRepo -> db : SELECT FROM Teams WHERE Id = ? AND UserId = ?
-activate db
-db --> teamRepo : datos equipo original
-deactivate db
-teamRepo --> teamService : equipo original
-deactivate teamRepo
+activate interfaz
+interfaz -> gestion : 2. E1 := getEquipo(equipoId)
+activate gestion
+gestion -> teams : 3. E1 := getEquipoPorId(equipoId)
+activate teams
+teams --> gestion : 4. E1
+deactivate teams
 
-teamService -> rosterService : GetRosterSettings(teamId)
-activate rosterService
-rosterService -> db : SELECT FROM RosterSettings WHERE TeamId = ?
-activate db
-db --> rosterService : ajustes originales
-deactivate db
-rosterService --> teamService : configuración original
-deactivate rosterService
-
-teamService --> controller : equipo + ajustes originales
-deactivate teamService
-
-controller --> usuario : Vista ajustes definidos en equipo original
-deactivate controller
-
-usuario -> controller : POST /Team/Duplicate/{teamId}\nAceptar ajustes
-activate controller
-
-alt Usuario acepta ajustes
-    controller -> teamService : DuplicateTeam(originalTeamId, userId)
-    activate teamService
-    
-    teamService -> teamRepo : CreateTeamCopy(originalTeamData)
-    activate teamRepo
-    teamRepo -> db : INSERT INTO Teams (datos copiados)
-    activate db
-    db --> teamRepo : nuevo team ID
-    deactivate db
-    teamRepo --> teamService : equipo duplicado creado
-    deactivate teamRepo
-    
-    teamService -> rosterService : CopyRosterSettings(originalTeamId, newTeamId)
-    activate rosterService
-    rosterService -> db : INSERT INTO RosterSettings (ajustes copiados)
-    activate db
-    db --> rosterService : configuración copiada
-    deactivate db
-    rosterService --> teamService : ajustes duplicados
-    deactivate rosterService
-    
-    teamService --> controller : Success(newTeam)
-    deactivate teamService
-    controller --> usuario : Mensaje éxito + Nuevo equipo creado
-else Usuario cancela
-    controller --> usuario : Cancelar duplicación
+alt E1 IS NULL
+    gestion --> interfaz : 5. error
+    interfaz --> usuario : 6. mostrarError("El equipo no existe")
+    deactivate interfaz
 end
 
-deactivate controller
+gestion -> gestion : 7. E2 := duplicarEquipo(E1)
+gestion -> teams : 8. E2 := crearEquipo(E2)
+activate teams
+teams --> gestion : 9. E2
+deactivate teams
+gestion --> interfaz : 10. E2
+deactivate gestion
+interfaz --> usuario :11. E2
+deactivate interfaz
+
+note right of usuario : El actor puede cancelar\nel proceso en cualquier momento
 
 @enduml

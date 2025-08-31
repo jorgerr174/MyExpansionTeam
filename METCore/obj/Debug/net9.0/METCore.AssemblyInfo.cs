@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("METCore")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+04f2a508c5b4f0edd628b26684970e2e5d036757")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9e77a06752d7c28fd687513085d5dece26558827")]
 [assembly: System.Reflection.AssemblyProductAttribute("METCore")]
 [assembly: System.Reflection.AssemblyTitleAttribute("METCore")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

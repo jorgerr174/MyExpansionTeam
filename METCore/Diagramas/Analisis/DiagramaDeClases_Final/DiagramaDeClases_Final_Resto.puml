@@ -68,6 +68,10 @@ class Prospect {
     + ThreeConeDrill : string?
     + TwentyYardShuttle : string?
     + AthScore : int
+    + DraftYear : int
+    + Jersey : int
+    + Madden : int
+
 }
 
 class Contract {
@@ -84,6 +88,7 @@ class Trade {
     + Id : int {key}
     + Franchise : Franchise
     + Team : Team
+    + Date : DateTime
     + TeamPlayers : IList<int>
     + TeamPicks : IList<int>
     + FranchisePlayers : IList<int>

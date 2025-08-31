@@ -1,50 +1,35 @@
 @startuml DiagramaSecuencia_CU005
 !theme plain
-title CU005: Baja de Usuario
 
 actor "Actor Usuario" as usuario
-participant "Account Controller" as controller
-participant "User Service" as userService
-participant "User Repository" as userRepo
-participant "Team Service" as teamService
-participant "Database" as db
+participant "IC_Auth" as interfaz
+participant "G_Auth" as gestion
+collections "Users" as users
+collections "Teams" as teams
 
-usuario -> controller : GET /Account/Delete\nSolicitar baja de usuario
-activate controller
-controller --> usuario : Confirmación baja usuario
-deactivate controller
+usuario -> interfaz : 1. bajaUsuario()
+activate interfaz
 
-usuario -> controller : POST /Account/Delete\nConfirmar baja
-activate controller
+interfaz -> gestion : 2. eliminarUsuario(username)
+activate gestion
 
-controller -> userService : DeleteUserAccount(userId)
-activate userService
+gestion -> teams : 3. *eliminarEquiposDeUsuario(username)
+activate teams
+teams --> gestion : 6. ok
+deactivate teams
 
-userService -> teamService : DeleteUserTeams(userId)
-activate teamService
-teamService -> db : DELETE FROM Teams WHERE UserId = ?
-activate db
-db --> teamService : equipos eliminados
-deactivate db
-teamService --> userService : equipos del usuario eliminados
-deactivate teamService
+gestion -> users : 7. eliminarUsuario(username)
+activate users
+users --> gestion : 8. ok
+deactivate users
 
-userService -> userRepo : DeleteUser(userId)
-activate userRepo
-userRepo -> db : DELETE FROM Users WHERE Id = ?
-activate db
-db --> userRepo : usuario eliminado
-deactivate db
-userRepo --> userService : usuario dado de baja
-deactivate userRepo
+gestion --> interfaz : 9. ok
+deactivate gestion
 
-userService --> controller : Success("Usuario eliminado")
-deactivate userService
+interfaz -> interfaz : 10. cerrarSesion()
+interfaz --> usuario : 11. redirigeAInicio()
+deactivate interfaz
 
-controller -> controller : ClearAuthenticationCookie()\nLimpiar sesión
-
-controller --> usuario : Mensaje confirmación + Redirigir home\n(Actor Anónimo)
-
-deactivate controller
+note right of usuario : El actor puede cancelar\nel proceso en cualquier momento
 
 @enduml
