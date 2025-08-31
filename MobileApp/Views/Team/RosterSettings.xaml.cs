@@ -2,7 +2,7 @@
 
 namespace MobileApp.Views.Team
 {
-    [QueryProperty(nameof(TeamId), "teamId")]
+    [QueryProperty(nameof(TeamId), "TeamId")]
     public partial class RosterSettings : ContentPage, ITeamBase<RosterSettingsViewModel>
     {
         public int TeamId { get; set; }

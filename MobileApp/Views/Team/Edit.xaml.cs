@@ -2,7 +2,7 @@
 
 namespace MobileApp.Views.Team
 {
-    [QueryProperty(nameof(TeamId), "teamId")]
+    [QueryProperty(nameof(TeamId), "TeamId")]
     public partial class Edit : ContentPage, ITeamBase<EditViewModel>
     {
         public int TeamId { get; set; }
@@ -17,7 +17,7 @@ namespace MobileApp.Views.Team
         {
             base.OnAppearing();
             if (BindingContext is EditViewModel viewModel)
-                await viewModel.LoadViewAsync(TeamId);
+                viewModel.LoadViewAsync(TeamId);
         }
     }
 }

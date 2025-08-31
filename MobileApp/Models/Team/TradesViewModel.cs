@@ -82,7 +82,9 @@ namespace MobileApp.Models.Team
             ApplyYearFilter();
         }
 
-        [RelayCommand] public static async Task ViewTradeDetails(TradeDisplayInfo trade) => await Shell.Current.DisplayAlert("Trade Details", TradesViewModel.CreateTradeDetailsText(trade), "OK");
+        [RelayCommand]
+        public static async Task ViewTradeDetails(TradeDisplayInfo trade)
+            => await Shell.Current.DisplayAlert("Detalles del Trueque", TradesViewModel.CreateTradeDetailsText(trade), "OK");
 
         private void ApplyYearFilter()
             => FilteredTrades = SelectedYearFilter == "All" ? Trades
