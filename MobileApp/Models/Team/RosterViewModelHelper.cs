@@ -188,6 +188,7 @@ namespace MobileApp.Models.Team
             PlayerName = player;
             PlayerBackgroundColor = hasPlayer ? Color.FromArgb("#28a745") : Color.FromArgb("#dc3545");
             // Mobile-optimized coordinates (scaled for 300px height field)
+            //x = x ? <
             LayoutBounds = new Rect(x / 100.0, y / 100.0, 45, 45);
             //LayoutBounds = new Rect(0.1, 0.1, 20, 60);
         }

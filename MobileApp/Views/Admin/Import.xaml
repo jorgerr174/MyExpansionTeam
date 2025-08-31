@@ -40,22 +40,7 @@
                 </StackLayout>
             </Border>
 
-            <Border BackgroundColor="LightGreen" Padding="15" Stroke="Green" StrokeThickness="1" StrokeShape="RoundRectangle 10" IsVisible="{Binding ShowYearSelection}">
-                <StackLayout>
-                    <Label Text="Año" 
-                           FontSize="16" 
-                           FontAttributes="Bold" />
-                    <Label Text="Elija un año (de los últimos 3) sobre los que importar datos" 
-                           FontSize="12" 
-                           TextColor="Gray" />
-
-                    <Picker ItemsSource="{Binding AvailableYears}" 
-                            SelectedItem="{Binding SelectedYear}"
-                            Title="Select year" />
-                </StackLayout>
-            </Border>
-
-            <Border BackgroundColor="LightYellow" Padding="15" Stroke="Yellow" StrokeThickness="1" StrokeShape="RoundRectangle 10" IsVisible="{Binding ShowStatsTypeSelection}">
+            <Border BackgroundColor="LightYellow" Padding="15" Stroke="Yellow" StrokeThickness="1" StrokeShape="RoundRectangle 10" IsVisible="{Binding IsImportStatsSelected}">
                 <StackLayout>
                     <Label Text="Tipo de Estadísticas" 
                            FontSize="16" 
@@ -67,7 +52,22 @@
                     <Picker ItemsSource="{Binding StatsTypes}" 
                             SelectedItem="{Binding SelectedStatsType}"
                             ItemDisplayBinding="{Binding DisplayName}"
-                            Title="Select stats type" />
+                            Title="Tipo de estadística seleccionada" />
+                </StackLayout>
+            </Border>
+
+            <Border BackgroundColor="LightGreen" Padding="15" Stroke="Green" StrokeThickness="1" StrokeShape="RoundRectangle 10" IsVisible="{Binding IsImportStatsSelected}">
+                <StackLayout>
+                    <Label Text="Año" 
+                           FontSize="16" 
+                           FontAttributes="Bold" />
+                    <Label Text="Elija un año (de los últimos 3) sobre los que importar datos" 
+                           FontSize="12" 
+                           TextColor="Gray" />
+
+                    <Picker ItemsSource="{Binding AvailableYears}" 
+                            SelectedItem="{Binding SelectedYear}"
+                            Title="Seleccione un año" />
                 </StackLayout>
             </Border>
 

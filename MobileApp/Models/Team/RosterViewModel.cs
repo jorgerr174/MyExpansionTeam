@@ -53,7 +53,7 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private double capProgressWidth = 0;
         [ObservableProperty] private Color capProgressColor = Color.FromArgb("#007bff");
         [ObservableProperty] private string currentCapText = "$0M / $224M";
-        [ObservableProperty] private string rosterCountText = "0 players";
+        [ObservableProperty] private string rosterCountText = "0 jugadores";
 
         // Build Tab
         [ObservableProperty] private FranchiseModel? selectedFranchise;
@@ -91,9 +91,9 @@ namespace MobileApp.Models.Team
         public ObservableCollection<FormationPosition> FormationPositions { get; } = [];
         public ObservableCollection<DraggablePlayer> AvailablePlayersForFormation { get; } = [];
         // Formation Data Storage
-        public Thickness FDylMargin => new(IsDefenseViewSelected ? 90 : 10);
+        public Thickness FDylMargin => new(10, IsDefenseViewSelected ? 90 : 10);
         public LayoutOptions SylVo => new(IsDefenseViewSelected ? LayoutAlignment.End : LayoutAlignment.Start, true);
-        public Thickness SylMargin => new(IsDefenseViewSelected ? 60 : 95);
+        public Thickness SylMargin => new(10, IsDefenseViewSelected ? 60 : 95);
 
         private LineupDto _offenseLineup = new();
         private LineupDto _defenseLineup = new();
@@ -194,7 +194,7 @@ namespace MobileApp.Models.Team
                             if (Draft.Prospects.FirstOrDefault(p => p.Id == selection.Value) is ProspectDto prospect)
                             {
                                 (int round, int pos) = DraftPicks.GetPickRoundPosFromOverall(selection.Key);
-                                DraftResults.Add(new DraftSelection() { Pick = $"Round: {round}, Pick: {pos}", Player = prospect });
+                                DraftResults.Add(new DraftSelection() { Pick = $"Ronda: {round}, Pick: {pos}", Player = prospect });
                             }
                 }
             }
@@ -345,7 +345,7 @@ namespace MobileApp.Models.Team
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to load players: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error al cargar jugadores: {ex.Message}", "OK");
             }
         }
 
@@ -356,8 +356,8 @@ namespace MobileApp.Models.Team
             {
                 if (player.StatusAvailable && GetFranchiseSelectedCount(SelectedFranchise.FranchiseInfo.Id) >= _maxPerFranchise)
                 {
-                    await Shell.Current.DisplayAlert("Franchise Limit",
-                        $"You can only select {_maxPerFranchise} players from each franchise.", "OK");
+                    await Shell.Current.DisplayAlert("Límite por Franquicia",
+                        $"Solo puede seleccionar {_maxPerFranchise} jugadores por franquicia.", "OK");
                     return;
                 }
                 else
@@ -383,15 +383,15 @@ namespace MobileApp.Models.Team
             // Cannot remove protected players
             if (_protectedPlayerIds.Contains(player.Id))
             {
-                await Shell.Current.DisplayAlert("Protected Player",
-                    "This player is protected and cannot be removed.", "OK");
+                await Shell.Current.DisplayAlert("Jugador Protegido",
+                    "Este jugador fue obtenido via Trueque y no puede ser deseleccionado.", "OK");
                 return;
             }
 
             var confirm = await Shell.Current.DisplayAlert(
-                "Remove Player",
-                $"Remove {player.Player.Name} from roster?",
-                "Yes", "No");
+                "Quitar Jugador",
+                $"Quitar {player.Player.Name} de la plantilla?",
+                "Sí", "No");
 
             if (!confirm) return;
 
@@ -415,7 +415,7 @@ namespace MobileApp.Models.Team
                     rosterPlayers =
                         rosterPlayers.Concat(
                         _franchisePlayersCache.TryGetValue(i, out IList<SelectableDto> list)
-                        ? list : Team.Players.Where(p => p.FranchiseId == i).ToList())
+                        ? list.Where(p => _rosterPlayerIds.Contains(p.Id)) : Team.Players.Where(p => p.FranchiseId == i).ToList())
                         .ToList();
                 }
                 rosterPlayers = rosterPlayers.Concat(Team.Players.Where(p => p.FranchiseId == 0)).ToList();
@@ -436,23 +436,22 @@ namespace MobileApp.Models.Team
                 foreach (var group in playersByPosition)
                     RosterByPosition.Add(new([.. group.OrderBy(p => p.Player.Name)]));
 
-                RosterCountText = $"{allRosterPlayers.Count} players";
+                RosterCountText = $"{allRosterPlayers.Count} jugadores";
             }
             catch (Exception ex)
             {
-                Shell.Current.DisplayAlert("Error", $"Failed to load roster display: {ex.Message}", "OK");
+                Shell.Current.DisplayAlert("Error", $"Error al cargar la plantilla: {ex.Message}", "OK");
             }
         }
 
         private void UpdateSalaryCapDisplay()
         {
             var currentCapUsed = CalculateCurrentCapUsed();
-            var capPercentage = (currentCapUsed / (_salaryCapLimit / 1000000)) * 100;
+            var capPercentage = currentCapUsed / (_salaryCapLimit / 1000000);
 
             CapProgressWidth = Math.Min(capPercentage * 3, 300); // Max width for progress bar
             CurrentCapText = $"${currentCapUsed:F2}M / ${_salaryCapLimit / 1000000:F0}M";
 
-            // Update cap progress color based on usage
             if (capPercentage > 100)
             {
                 CapProgressColor = Color.FromArgb("#dc3545"); // Red
@@ -463,7 +462,7 @@ namespace MobileApp.Models.Team
             }
             else if (capPercentage > 90)
             {
-                CapProgressColor = Color.FromArgb("#ffc107"); // Yellow
+                CapProgressColor = Color.FromArgb("#ffc107");
                 HasSaveWarning = false;
                 CanSaveRoster = true;
                 SaveButtonColor = Color.FromArgb("#28a745");
@@ -495,7 +494,7 @@ namespace MobileApp.Models.Team
 
             return totalCap;
         }
-        private double ParseAPY(string pureAPY) => double.TryParse(pureAPY.Replace(".", ","), out double value) ? value : 0;
+        private double ParseAPY(string pureAPY) => double.TryParse(pureAPY.Replace(".", ","), out double value) ? value / 100 : 0;
 
         [RelayCommand]
         public async Task SaveRoster()
@@ -516,16 +515,16 @@ namespace MobileApp.Models.Team
                 var success = await _teamService.UpdateRosterAsync(Team);
                 if (success)
                 {
-                    await Shell.Current.DisplayAlert("Success", "Roster saved successfully!", "OK");
+                    await Shell.Current.DisplayAlert("Éxito", "!Plantilla guardada con éxito!", "OK");
                 }
                 else
                 {
-                    await Shell.Current.DisplayAlert("Error", "Failed to save roster.", "OK");
+                    await Shell.Current.DisplayAlert("Error", "Error al guardar la plantilla.", "OK");
                 }
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Error saving roster: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error al guardar la plantilla: {ex.Message}", "OK");
             }
             finally
             {
@@ -537,9 +536,9 @@ namespace MobileApp.Models.Team
         public async Task ClearRoster()
         {
             var confirm = await Shell.Current.DisplayAlert(
-                "Clear Roster",
-                "This will remove all non-protected players from your roster. Protected players will remain. Are you sure?",
-                "Yes", "No");
+                "Vaciar Plantilla",
+                "Esto quitará a todos los jugadores de la plantilla. ¿Estás seguro?",
+                "Sí", "No");
 
             if (!confirm) return;
 
@@ -553,32 +552,17 @@ namespace MobileApp.Models.Team
                 LoadRosterDisplay();
                 UpdateFranchisesCounts();
 
-                await Shell.Current.DisplayAlert("Success", "Roster cleared successfully! Protected players remain.", "OK");
+                await Shell.Current.DisplayAlert("Éxito", "Plantilla vaciada con éxito!", "OK");
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to clear roster: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error vaciando la plantilla: {ex.Message}", "OK");
             }
         }
 
         [RelayCommand]
         public async Task NewTrade()
-        {
-            if (Team == null) return;
-
-            await BaseService.GoToAsync(AppRoutes.Trade, new Dictionary<string, object> { ["teamId"] = Team.Id, ["context"] = "roster" });
-        }
-
-        [RelayCommand]
-        public async Task GoToFormation()
-        {
-            if (Team == null) return;
-
-            await BaseService.GoToAsync(AppRoutes.Formation, new Dictionary<string, object>
-            {
-                ["TeamId"] = Team.Id
-            });
-        }
+            => await BaseService.GoToAsync(AppRoutes.Trade, new() { ["TeamId"] = Team.Id, ["CurrentPick"] = -1 });
 
         [RelayCommand]
         public async Task GoToDraft()
@@ -588,7 +572,6 @@ namespace MobileApp.Models.Team
             await BaseService.GoToAsync(AppRoutes.Draft, new Dictionary<string, object> { ["TeamId"] = Team.Id });
         }
 
-        // Property change handlers for filters
         partial void OnSelectedPositionFilterChanged(string value)
         {
             if (HasSelectedFranchise && SelectedFranchise is FranchiseModel && SelectedFranchise.FranchiseInfo is FranchiseInfo franchiseInfo)
@@ -602,9 +585,6 @@ namespace MobileApp.Models.Team
             LoadRosterDisplay();
         }
 
-
-        // Commands
-        // Formation Commands
         [RelayCommand]
         public void SelectFormationType(string formationType)
         {
@@ -620,8 +600,8 @@ namespace MobileApp.Models.Team
 
             if (!eligiblePlayers.Any())
             {
-                await Shell.Current.DisplayAlert("No Players",
-                    $"No {position.RequiredPosition} players available in your roster.", "OK");
+                await Shell.Current.DisplayAlert("Sin Jugadores",
+                    $"Sin {position.RequiredPosition} jugadores disponibles en la plantilla.", "OK");
                 return;
             }
 
@@ -653,8 +633,8 @@ namespace MobileApp.Models.Team
             // Check if player is eligible for this position
             if (!IsPlayerEligibleForPosition(player.Player, position.RequiredPosition))
             {
-                Shell.Current.DisplayAlert("Invalid Position",
-                    $"{player.Player.Player.Name} cannot play {position.RequiredPosition}", "OK");
+                Shell.Current.DisplayAlert("Position Inválida",
+                    $"{player.Player.Player.Name} no puede jugar de {position.RequiredPosition}", "OK");
                 return;
             }
 

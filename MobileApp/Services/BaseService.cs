@@ -114,10 +114,7 @@ namespace MobileApp.Services
         public const string CreateTeam = "CreateTeam";
         public const string TeamDetails = "TeamDetails";
         public const string Draft = "Draft";
-        public const string DraftResults = "DraftResults";
         public const string EditTeam = "EditTeam";
-        public const string Formation = "Formation";
-        public const string ReviewRoster = "ReviewRoster";
         public const string Roster = "Roster";
         public const string RosterSettings = "RosterSettings";
         public const string Trade = "Trade";
@@ -126,7 +123,7 @@ namespace MobileApp.Services
         [
             SignUp, UpdateCredentials, UpdateUser,
             Admin, AssignRoles, Import,
-            CreateTeam, TeamDetails, Draft, EditTeam, Formation, ReviewRoster, Roster, RosterSettings, Trade
+            CreateTeam, TeamDetails, Draft, EditTeam, Roster, RosterSettings, Trade
         ];
 
         private static string GetParentTab(string route)
@@ -136,8 +133,7 @@ namespace MobileApp.Services
                 Admin or AssignRoles or Import or
                 SignUp or UpdateCredentials or UpdateUser => ProfileTab,
 
-                CreateTeam or TeamDetails or EditTeam or Formation or
-                ReviewRoster or Roster or RosterSettings or Trade => MyTeamsTab,
+                CreateTeam or TeamDetails or EditTeam or Roster or RosterSettings or Trade => MyTeamsTab,
 
                 _ => string.Empty
             };

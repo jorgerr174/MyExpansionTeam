@@ -42,7 +42,7 @@ namespace MobileApp.Models.Admin
             new PageSizeOption { Value = 50, Display = "50" }
         ];
 
-        public string PageInfo => TotalPages > 0 ? $"Page {CurrentPage} of {TotalPages}" : "";
+        public string PageInfo => TotalPages > 0 ? $"Página {CurrentPage} de {TotalPages}" : "";
         public int PreviousPage => CurrentPage - 1;
         public int NextPage => CurrentPage + 1;
         public bool CanGoPrevious => CurrentPage > 1;
@@ -104,12 +104,12 @@ namespace MobileApp.Models.Admin
                 }
                 else
                 {
-                    ErrorMessage = "Failed to load users";
+                    ErrorMessage = "Error al cargar usuarios";
                 }
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Error loading users: {ex.Message}";
+                ErrorMessage = $"Error cargando usuarios: {ex.Message}";
             }
             finally
             {
@@ -127,14 +127,13 @@ namespace MobileApp.Models.Admin
             }
         }
 
-        // Called when page size changes - matches web app behavior
         public async Task ChangePageSize(PageSizeOption option)
         {
             if (option.Value != PageSize)
             {
                 PageSize = option.Value;
                 SelectedPageSize = option;
-                CurrentPage = 1; // Reset to first page like web app
+                CurrentPage = 1;
                 await LoadUsers();
             }
         }
@@ -159,19 +158,18 @@ namespace MobileApp.Models.Admin
                     user.IsAdmin = user.SelectedRole == RoleEnum.Admin;
                     user.HasChanges = false;
 
-                    // Update UI properties
                     OnPropertyChanged(nameof(user.CanChangeRole));
                 }
                 else
                 {
-                    user.SelectedRole = user.CurrentRole; // Revert selection
-                    ErrorMessage = "Failed to update user role";
+                    user.SelectedRole = user.CurrentRole;
+                    ErrorMessage = "Error al actualizar el rol";
                 }
             }
             catch (Exception ex)
             {
-                user.SelectedRole = user.CurrentRole; // Revert selection
-                ErrorMessage = $"Error updating role: {ex.Message}";
+                user.SelectedRole = user.CurrentRole;
+                ErrorMessage = $"Error actualizando el rol: {ex.Message}";
             }
             finally
             {
@@ -190,13 +188,13 @@ namespace MobileApp.Models.Admin
         {
             if (TotalUsers == 0)
             {
-                ResultsInfo = "No users found";
+                ResultsInfo = "Ningún usuario encontrado";
                 return;
             }
 
             int startItem = (CurrentPage - 1) * PageSize + 1;
             int endItem = Math.Min(CurrentPage * PageSize, TotalUsers);
-            ResultsInfo = $"Showing {startItem}-{endItem} of {TotalUsers} users";
+            ResultsInfo = $"Mostrando {startItem}-{endItem} de {TotalUsers} usuarios";
         }
     }
 

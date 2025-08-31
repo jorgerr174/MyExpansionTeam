@@ -2,7 +2,7 @@
 
 namespace MobileApp.Views.Team
 {
-    //[QueryProperty(nameof(TeamId), "teamId")]
+    //[QueryProperty(nameof(TeamId), "TeamId")]
     public interface ITeamBase<T>
         where T : TeamBaseViewModel
     {

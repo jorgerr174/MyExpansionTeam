@@ -9,14 +9,5 @@ namespace MobileApp.Views.Admin
             InitializeComponent();
             BindingContext = viewModel;
         }
-
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
-            if (BindingContext is ImportViewModel vm)
-            {
-                vm.OnImportTypeChanged();
-            }
-        }
     }
 }
