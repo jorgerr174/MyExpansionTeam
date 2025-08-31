@@ -1,73 +1,111 @@
 @startuml DiagramaSecuencia_CU018
 !theme plain
-title CU018: Interacción entre Usuarios
 
-actor "Actor Usuario" as usuario
-participant "User Controller" as controller
-participant "User Service" as userService
-participant "User Repository" as userRepo
-participant "Team Service" as teamService
-participant "Database" as db
+actor "Actor Admin" as admin
+participant "IC_Admin" as interfaz
+participant "G_Admin" as gestion
+collections "Users" as users
 
-usuario -> controller : GET /User/Search\nSolicitar buscar usuario
-activate controller
-controller --> usuario : Formulario búsqueda usuarios
-deactivate controller
+admin -> interfaz : 1. solicitarModificarRoles()
+activate interfaz
 
-usuario -> controller : POST /User/Search\n(cadena identificativa)
-activate controller
+interfaz -> gestion : 2. validarRolAdmin(username)
+activate gestion
+gestion -> users : 3. U1 := getUsuario(username)
+users -> gestion : 4. U1
+gestion -> gestion : 4. verificarPermisos(U1)
 
-controller -> userService : SearchUsers(searchString)
-activate userService
-userService -> userRepo : GetUsersByUsername(searchString)
-activate userRepo
-userRepo -> db : SELECT FROM Users WHERE Username LIKE ?
-activate db
-db --> userRepo : usuarios coincidentes
-deactivate db
-userRepo --> userService : lista usuarios encontrados
-deactivate userRepo
-
-alt Usuarios encontrados
-    userService --> controller : usuarios cuyo nombre coincide
-    deactivate userService
-    controller --> usuario : Lista usuarios coincidentes
+alt Usuario no es admin
+    gestion --> interfaz : 4. error
+    interfaz --> admin : 5. mostrarError("Sin permisos de administrador")
+    interfaz -> interfaz : 6. redirigirPantallaInicial()
+else Es administrador
+    gestion --> interfaz : 4. rolValidado
+    deactivate gestion
     
-    usuario -> controller : GET /User/Profile/{userId}\nElegir usuario y acceder perfil
-    activate controller
+    loop Usuario quiere filtrar más
+        admin <- interfaz : 7. cadenaBusqueda := solicitarFiltro()
+        deactivate interfaz
+        activate admin
+        admin --> interfaz : 8. cadenaBusqueda
+        deactivate admin
+        activate interfaz
+        
+        interfaz -> gestion : 9. usuariosFiltrados := buscarUsuarios(cadenaBusqueda)
+        activate gestion
+        gestion -> users : 10. usuariosFiltrados := buscarPorCriterios(cadenaBusqueda)
+        activate users
+        users --> gestion : 11. usuariosFiltrados
+        deactivate users
+        gestion --> interfaz : 12. usuariosFiltrados
+        deactivate gestion
+        
+        interfaz --> admin : 13. mostrarUsuarios(usuariosFiltrados)
+        activate admin
+        
+        alt Usuario quiere aplicar más filtros
+            admin -> interfaz : 14. aplicarNuevoFiltro()
+            deactivate admin
+            note over interfaz : Continúa el loop de filtrado
+        else Usuario procede con selección
+            admin -> interfaz : 14. procederConSeleccion()
+            deactivate admin
+        end
+    end
     
-    controller -> userService : GetUserProfile(userId)
-    activate userService
-    userService -> userRepo : GetUserById(userId)
-    activate userRepo
-    userRepo -> db : SELECT FROM Users WHERE Id = ?
-    activate db
-    db --> userRepo : datos usuario
-    deactivate db
-    userRepo --> userService : perfil usuario
-    deactivate userRepo
+    loop Cambios de roles pendientes
+        admin <- interfaz : 15. usuarioSeleccionado := seleccionarUsuario()
+        activate admin
+        admin --> interfaz : 16. usuarioSeleccionado
+        deactivate admin
+        
+        admin <- interfaz : 17. nuevoRol := seleccionarNuevoRol()
+        activate admin
+        admin --> interfaz : 18. nuevoRol
+        deactivate admin
+        
+        interfaz -> interfaz : 19. registrarCambioRol(usuarioSeleccionado, nuevoRol)
+        interfaz --> admin : 20. mostrarCambioRegistrado()
+        
+        activate admin
+        alt Usuario quiere hacer más cambios
+            admin -> interfaz : 21. continuarModificando()
+            note over interfaz : Continúa el loop de cambios
+        else Usuario quiere guardar
+            admin -> interfaz : 21. solicitarGuardarCambios()
+        end
+        deactivate admin
+    end
     
-    userService -> teamService : GetUserTeams(userId)
-    activate teamService
-    teamService -> db : SELECT FROM Teams WHERE UserId = ?
-    activate db
-    db --> teamService : equipos del usuario
-    deactivate db
-    teamService --> userService : equipos públicos usuario
-    deactivate teamService
+    interfaz -> gestion : 22. validarYGuardarCambios(cambiosRoles)
+    activate gestion
     
-    userService --> controller : perfil completo + equipos
-    deactivate userService
+    loop Para cada cambio de rol
+        gestion -> users : 23. usuarioObjetivo := buscarPorId(username)
+        activate users
+        users --> gestion : 24. usuarioObjetivo
+        deactivate users
+        
+        alt Usuario objetivo es Admin
+            gestion --> interfaz : 25. error
+            interfaz --> admin : 26. mostrarError("No se puede cambiar el rol de otro administrador")
+            activate admin
+            admin -> interfaz : 27. continuarConOtrosCambios()
+            deactivate admin
+        else Usuario no es Admin
+            gestion -> users : 25. actualizarRol(username, nuevoRol)
+            activate users
+            users --> gestion : 26. confirmacion
+            deactivate users
+        end
+    end
     
-    controller --> usuario : Vista perfil usuario con equipos
-    deactivate controller
-    
-else No usuarios encontrados
-    userService --> controller : Error("No existe usuario")
-    deactivate userService
-    controller --> usuario : Mensaje "No existe usuario coincidente"
+    gestion --> interfaz : 27. cambiosCompletados
+    deactivate gestion
+    interfaz --> admin : 28. mostrarExito("Cambios de roles guardados exitosamente")
+    deactivate interfaz
 end
 
-deactivate controller
+note right of admin : El actor puede cancelar\nel proceso en cualquier momento
 
 @enduml

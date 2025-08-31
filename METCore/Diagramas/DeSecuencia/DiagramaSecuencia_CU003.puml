@@ -1,28 +1,16 @@
 @startuml DiagramaSecuencia_CU003
 !theme plain
-title CU003: Cerrado de Sesión
 
 actor "Actor Usuario" as usuario
-participant "Account Controller" as controller
-participant "Auth Service" as authService
-participant "Session Manager" as session
+participant "IC_Auth" as interfaz
 
-usuario -> controller : POST /Account/Logout\nSolicitar cerrar sesión
-activate controller
+usuario -> interfaz : 1. solicitarCerrarSesion()
 
-controller -> authService : InvalidateToken(userToken)
-activate authService
-authService -> session : ClearUserSession(userId)
-activate session
-session --> authService : sesión limpiada
-deactivate session
-authService --> controller : token invalidado
-deactivate authService
+activate interfaz
+interfaz -> interfaz : 2. cerrarSesion()
+interfaz --> usuario : 3. redireccionAInicio()
+deactivate interfaz
 
-controller -> controller : ClearAuthenticationCookie()\nLimpiar cookies autenticación
-
-controller --> usuario : Mensaje desconexión + Redirigir login\n(Actor Anónimo)
-
-deactivate controller
+note right of usuario : El actor puede cancelar\nel proceso en cualquier momento
 
 @enduml
