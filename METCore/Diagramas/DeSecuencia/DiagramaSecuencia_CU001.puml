@@ -1,59 +1,49 @@
 @startuml DiagramaSecuencia_CU001
 !theme plain
-title CU001: Registro de Usuario
 
 actor "Actor Anónimo" as anonimo
-participant "Account Controller" as controller
-participant "User Service" as userService
-participant "User Repository" as userRepo
-participant "Password Hasher" as hasher
-participant "Database" as db
+participant "IC_Auth" as interfaz
+participant "G_Auth" as gestion
+collections "Users" as users
 
-anonimo -> controller : GET /Account/Register\nSolicitar formulario registro
-activate controller
-controller --> anonimo : Vista formulario registro
-deactivate controller
+anonimo -> interfaz : 1. solicitarRegistro()
+activate interfaz
 
-anonimo -> controller : POST /Account/Register\n(datos personales)
-activate controller
-
-controller -> controller : ValidateModel()\nValidar datos entrada
-
-controller -> userService : CheckUserExists(username, email)
-activate userService
-userService -> userRepo : GetUserByUsername(username)
-activate userRepo
-userRepo -> db : SELECT FROM Users WHERE Username = ?
-activate db
-db --> userRepo : usuario existente o null
-deactivate db
-userRepo --> userService : existe usuario
-deactivate userRepo
-
-alt Usuario no existe
-    userService -> hasher : HashPassword(password)
-    activate hasher
-    hasher --> userService : password hasheada
-    deactivate hasher
+loop Datos inválidos OR usuario existe
+    loop Datos inválidos
+        anonimo <- interfaz : 2. nuevoUsuario := solicitarDatos()
+        deactivate interfaz
+        activate anonimo
+        anonimo --> interfaz : 3. nuevoUsuario
+        deactivate anonimo
+        
+        interfaz -> interfaz : 4. validarDatos(nuevoUsuario)
+        activate interfaz
+    end
     
-    userService -> userRepo : CreateUser(userData)
-    activate userRepo
-    userRepo -> db : INSERT INTO Users
-    activate db
-    db --> userRepo : nuevo usuario ID
-    deactivate db
-    userRepo --> userService : usuario creado
-    deactivate userRepo
-    
-    userService --> controller : Success(claves acceso)
-    deactivate userService
-    controller --> anonimo : Mensaje éxito + claves acceso
-else Usuario ya existe
-    userService --> controller : Error("Usuario ya registrado")
-    deactivate userService
-    controller --> anonimo : Mensaje error + vuelta al paso 1
+    interfaz -> gestion : 5. U1 := buscarUsuario(nuevoUsuario)
+    deactivate interfaz
+    activate gestion
+    gestion -> users : 6. U1 := buscarUsuario(nuevoUsuario)
+    activate users
+    users --> gestion : 7. U1
+    deactivate users
+
+    alt U1 IS NOT NULL
+        gestion --> interfaz : 8. U1
+        interfaz --> anonimo : 9. mostrarError("Usuario ya existe")
+    end
 end
 
-deactivate controller
+gestion -> users : 10. U2 := crearUsuario(nuevoUsuario)
+activate users
+users --> gestion : 11. U2
+deactivate users
+gestion --> interfaz : 12. U2
+deactivate gestion
+interfaz --> anonimo : 13. confirmarRegistro(U2)
+deactivate interfaz
+
+note right of anonimo : El actor puede cancelar\nel proceso en cualquier momento
 
 @enduml

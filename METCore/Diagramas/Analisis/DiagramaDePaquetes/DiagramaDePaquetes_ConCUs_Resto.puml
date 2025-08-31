@@ -1,4 +1,5 @@
 @startuml PaquetesConCasosDeUsoYRelaciones
+left to right direction
 
 actor User
 
@@ -20,17 +21,14 @@ package "Gestión de Equipos" {
     
     package "Gestión de Draft" {
         usecase "CU014: Realización draft" as UC014
-        usecase "CU015: Simulación draft" as UC015
-        usecase "CU016: Ajustes del draft" as UC016
+        usecase "CU015: Ajustes del draft" as UC016
+    }
+    
+    package "Análisis" {
+        usecase "CU016: Seguimiento rendimiento" as UC017
     }
 
 }
-
-package "Análisis" {
-    usecase "CU017: Seguimiento rendimiento" as UC017
-    usecase "CU018: Interacción usuarios" as UC018
-}
-
 
 User --> UC006
 User --> UC007
@@ -41,9 +39,7 @@ User --> UC011
 User --> UC012
 User --> UC013
 User --> UC014
-User --> UC015
 User --> UC016
 User --> UC017
-User --> UC018
 
 @enduml

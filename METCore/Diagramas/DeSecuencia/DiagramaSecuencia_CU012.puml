@@ -1,66 +1,99 @@
 @startuml DiagramaSecuencia_CU012
 !theme plain
-title CU012: Elección de Jugadores
 
 actor "Actor Usuario" as usuario
-participant "Team Controller" as controller
-participant "Player Service" as playerService
-participant "Player Repository" as playerRepo
-participant "Contract Service" as contractService
-participant "Database" as db
+participant "IC_Teams" as interfaz
+participant "G_Teams" as gestion
+collections "Teams" as teams
+collections "RosterSettings" as ajustes
+collections "Franchises" as franchises
+collections "Players" as players
 
-usuario -> controller : GET /Team/AddPlayers/{teamId}\nSolicitar añadir jugadores
-activate controller
+usuario -> interfaz : 1. modificarJugadoresEquipo(equipoId)
+activate interfaz
 
-controller -> playerService : GetAvailablePlayers()
-activate playerService
-playerService -> playerRepo : GetFreeAgents()
-activate playerRepo
-playerRepo -> db : SELECT FROM Players WHERE TeamId IS NULL
-activate db
-db --> playerRepo : jugadores disponibles
-deactivate db
-playerRepo --> playerService : lista jugadores libres
-deactivate playerRepo
-playerService --> controller : jugadores disponibles para selección
-deactivate playerService
+interfaz -> gestion : 2. E1 := getEquipo(equipoId)
+activate gestion
+gestion -> teams : 3. E1 := buscarPorId(equipoId)
+activate teams
+teams --> gestion : 4. E1
+deactivate teams
 
-controller --> usuario : Vista jugadores disponibles
-deactivate controller
+gestion -> ajustes : 5. A1 := buscarAjustesPorEquipoId(equipoId)
+activate ajustes
+ajustes --> gestion : 6. A1
+deactivate ajustes
 
-usuario -> controller : POST /Team/SelectPlayers\n(jugadores elegidos)
-activate controller
-
-controller -> controller : ValidateSelection()\nValidar selección
-
-controller -> playerService : AssignPlayersToTeam(teamId, selectedPlayers)
-activate playerService
-
-loop Para cada jugador seleccionado
-    playerService -> playerRepo : AssignPlayerToTeam(playerId, teamId)
-    activate playerRepo
-    playerRepo -> db : UPDATE Players SET TeamId = ? WHERE Id = ?
-    activate db
-    db --> playerRepo : jugador asignado
-    deactivate db
-    playerRepo --> playerService : asignación exitosa
-    deactivate playerRepo
+alt E1 IS NULL OR E1.propietario != usuario
+    gestion --> interfaz : 7. error
+    interfaz --> usuario : 8. mostrarError("No es propietario del equipo o no existe")
+    deactivate gestion
+    deactivate interfaz
+else Es propietario
+    gestion --> interfaz : 7. E1, A1
+    deactivate gestion
+    interfaz --> usuario : 8. E1.JugadoresSeleccionados
+    activate usuario
     
-    playerService -> contractService : CreateDefaultContract(playerId, teamId)
-    activate contractService
-    contractService -> db : INSERT INTO Contracts
-    activate db
-    db --> contractService : contrato creado
-    deactivate db
-    contractService --> playerService : contrato generado
-    deactivate contractService
+    interfaz -> gestion : 9. franquicias := getAll()
+    activate gestion
+    gestion -> franchises : 10. franquicias := getAll()
+    activate franchises
+    franchises --> gestion : 11. franquicias
+    deactivate franchises
+    gestion --> interfaz : 12. franquicias
+    deactivate gestion
+    interfaz --> usuario : 13. franquicias
+    
+    loop Para cada franquicia que el usuario quiera modificar
+        usuario -> interfaz : 14. jugadores := getJugadoresPorFranquicia(franquiciaId)
+        interfaz -> gestion : 15. jugadores := getJugadoresPorFranquicia(franquiciaId)
+        activate gestion
+        gestion -> players : 16. jugadores := getJugadoresPorFranquicia(franquiciaId)
+        activate players
+        players --> gestion : 17. jugadores
+        deactivate players
+        gestion --> interfaz : 18. jugadores
+        deactivate gestion
+        interfaz --> usuario : 19. jugadores
+        
+        loop Para cada jugador clicado
+            alt Seleccionar jugador
+                usuario -> interfaz : 20. seleccionarJugador(jugadorId)
+                interfaz -> interfaz : 21. validarJugadorSeleccionable(jugadorId, A1.JugadoresProtegidos)
+                
+                alt Jugador protegido
+                    interfaz --> usuario : 22. mostrarError("Jugador protegido - no seleccionable")
+                else Jugador seleccionable
+                    interfaz --> usuario : 22. confirmarSeleccion()
+                end
+            else Deseleccionar jugador
+                usuario -> interfaz : 23. deseleccionarJugador(jugadorId)
+                interfaz --> usuario : 24. confirmarDeseleccion()
+            end
+        end
+    end
+    
+    usuario -> interfaz : 25. guardarSelecciones()
+    deactivate usuario
+    interfaz -> interfaz : 26. validarRoster(E1, A1)
+    
+    alt Roster no cumple validaciones
+        interfaz --> usuario : 27. mostrarError("El conjunto de jugadores no cumple con las validaciones del equipo")
+    else Selección válida
+        interfaz -> gestion : 27. guardarSelecciones(E1)
+        activate gestion
+        gestion -> teams : 28. actualizarJugadores(E1)
+        activate teams
+        teams --> gestion : 29. ok
+        deactivate teams
+        gestion --> interfaz : 30. ok
+        deactivate gestion
+        interfaz --> usuario : 31. confirmarCambios("Jugadores del equipo actualizados")
+        deactivate interfaz
+    end
 end
 
-playerService --> controller : Success("Jugadores añadidos al equipo")
-deactivate playerService
-
-controller --> usuario : Mensaje confirmación + Roster actualizado
-
-deactivate controller
+note right of usuario : El actor puede cancelar\nel proceso en cualquier momento
 
 @enduml

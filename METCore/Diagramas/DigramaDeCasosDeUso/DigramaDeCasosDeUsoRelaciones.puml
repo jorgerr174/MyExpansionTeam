@@ -40,12 +40,11 @@ usecase CU014 [
     Ajustes del draft manuales
     Simulación del draft
 ]
-usecase "CU015\nSimulación del draft" as CU015
-usecase "CU016\nModificación de ajustes del draft" as CU016
-usecase "CU017\nSeguimiento de rendimiento de equipos" as CU017
+usecase "CU015\nModificación de ajustes del draft" as CU016
+usecase "CU016\nSeguimiento de rendimiento de equipos" as CU017
 
-usecase "CU018\nImportación de datos" as CU018
-usecase "CU019\nAlteración de roles de usuarios" as CU019
+usecase "CU017\nImportación de datos" as CU018
+usecase "CU018\nAlteración de roles de usuarios" as CU019
 
 ' Conexiones Actor Usuario
 CU002 .r.> CU001 : <<extends>>
@@ -66,13 +65,11 @@ CU013 -u-> CU002 : <<includes>>
 CU013 .d.> CU007 : <<extends>>
 CU014 -u-> CU002 : <<includes>>
 CU014 .d.> CU007 : <<extends>>
-CU015 -u-> CU002 : <<includes>>
-CU015 .d.> CU014 : <<extends>>
 CU016 -u-> CU002 : <<includes>>
 CU016 .d.> CU014 : <<extends>>
-CU017 -d-> CU002 : <<includes>>
 CU018 -d-> CU002 : <<includes>>
 CU019 -d-> CU002 : <<includes>>
+CU017 -d-> CU002 : <<includes>>
 
 
 @enduml

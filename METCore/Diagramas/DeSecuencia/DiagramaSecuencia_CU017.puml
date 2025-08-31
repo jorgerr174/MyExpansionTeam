@@ -1,67 +1,90 @@
 @startuml DiagramaSecuencia_CU017
 !theme plain
-title CU017: Seguimiento de Rendimiento de Equipos
 
-actor "Actor Usuario" as usuario
-participant "Team Controller" as controller
-participant "Team Service" as teamService
-participant "Stats Service" as statsService
-participant "Player Service" as playerService
-participant "Database" as db
+actor "Actor Admin" as admin
+participant "IC_Admin" as interfaz
+participant "G_Admin" as gestion
+collections "ImportService" as import
 
-usuario -> controller : GET /Team/Details/{teamId}\nAcceder al equipo
-activate controller
+admin -> interfaz : 1. solicitarImportarDatos()
+activate interfaz
 
-controller -> teamService : GetTeamById(teamId, userId)
-activate teamService
-teamService -> db : SELECT FROM Teams WHERE Id = ? AND UserId = ?
-activate db
-db --> teamService : datos del equipo
-deactivate db
-teamService --> controller : equipo accedido
-deactivate teamService
+interfaz -> gestion : 2. validarRolAdmin(userId)
+activate gestion
+gestion -> gestion : 3. verificarPermisos(userId)
 
-controller -> playerService : GetTeamPlayers(teamId)
-activate playerService
-playerService -> db : SELECT FROM Players WHERE TeamId = ?
-activate db
-db --> playerService : jugadores plantilla
-deactivate db
-playerService --> controller : lista jugadores equipo
-deactivate playerService
+alt Usuario no es admin
+    gestion --> interfaz : 4. error
+    interfaz --> admin : 5. mostrarError("Sin permisos de administrador")
+    interfaz -> interfaz : 6. redirigirPantallaInicial()
+    deactivate gestion
+else Es administrador
+    deactivate gestion
+    
+    loop Datos de importación incompletos
+        admin <- interfaz : 7. tipoImportacion := solicitarTipoImportacion()
+        deactivate interfaz
+        activate admin
+        admin --> interfaz : 8. tipoImportacion
+        deactivate admin
+        activate interfaz
+        
+        alt Tipo no seleccionado
+            interfaz --> admin : 9. mostrarError("Debe seleccionar tipo de importación")
+        else Es tipo estadísticas
+            alt Año o tipo estadísticas no especificado
+                admin <- interfaz : 10. detallesEstadisticas := solicitarDetallesEstadisticas()
+                deactivate interfaz
+                activate admin
+                admin --> interfaz : 11. año, tipoEstadisticas
+                deactivate admin
+                activate interfaz
+                
+                alt Faltan detalles
+                    interfaz --> admin : 12. mostrarError("Debe especificar año y tipo de estadísticas")
+                end
+            end
+        end
+        
+        loop Archivo inválido
+            admin <- interfaz : 13. archivo := solicitarArchivo()
+            deactivate interfaz
+            activate admin
+            admin --> interfaz : 14. archivo
+            deactivate admin
+            activate interfaz
+            
+            alt No seleccionó archivo
+                interfaz --> admin : 15. mostrarError("Debe seleccionar un archivo")
+            else Archivo no es CSV
+                interfaz -> interfaz : 16. validarTipoArchivo(archivo)
+                interfaz --> admin : 17. mostrarError("El archivo debe ser de tipo CSV")
+            end
+        end
+    end
+    
+    interfaz -> gestion : 18. procesarImportacion(tipoImportacion, archivo, detalles)
+    activate gestion
+    gestion -> import : 19. importarDatos(tipoImportacion, archivo, detalles)
+    activate import
+    import -> import : 20. procesarArchivo()
+    import --> gestion : 21. resultadoImportacion
+    deactivate import
+    
+    alt Todos los registros importados exitosamente
+        gestion --> interfaz : 22. importacionCompleta
+        deactivate gestion
+        interfaz --> admin : 23. mostrarExito("Todos los registros fueron importados correctamente")
+        deactivate interfaz
+    else Algunos registros fallaron
+        gestion -> gestion : 22. generarArchivoErrores(registrosFallidos)
+        gestion --> interfaz : 23. archivoErrores
+        deactivate gestion
+        interfaz --> admin : 24. mostrarErrores("Importación parcial - descargar archivo con errores", archivoErrores)
+        deactivate interfaz
+    end
+end
 
-controller --> usuario : Vista equipo con jugadores
-deactivate controller
-
-usuario -> controller : GET /Team/Stats/{teamId}\nVer estadísticas totales
-activate controller
-
-controller -> statsService : GetTeamStats(teamId)
-activate statsService
-statsService -> db : SELECT SUM(...) FROM SeasonStats WHERE PlayerId IN (SELECT Id FROM Players WHERE TeamId = ?)
-activate db
-db --> statsService : estadísticas totales plantilla
-deactivate db
-statsService --> controller : estadísticas totales agregadas
-deactivate statsService
-
-controller --> usuario : Estadísticas totales de todos los jugadores
-deactivate controller
-
-usuario -> controller : GET /Player/Stats/{playerId}\nSeleccionar tipo estadística individual
-activate controller
-
-controller -> statsService : GetPlayerStats(playerId, statType)
-activate statsService
-statsService -> db : SELECT FROM SeasonStats WHERE PlayerId = ? AND StatType = ?
-activate db
-db --> statsService : estadísticas individuales jugador
-deactivate db
-statsService --> controller : estadísticas individuales específicas
-deactivate statsService
-
-controller --> usuario : Estadísticas individuales jugador seleccionado
-
-deactivate controller
+note right of admin : El actor puede cancelar\nel proceso en cualquier momento
 
 @enduml

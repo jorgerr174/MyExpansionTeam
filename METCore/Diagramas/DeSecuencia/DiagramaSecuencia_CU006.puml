@@ -1,64 +1,36 @@
 @startuml DiagramaSecuencia_CU006
 !theme plain
-title CU006: Creación de Equipo
 
 actor "Actor Usuario" as usuario
-participant "Team Controller" as controller
-participant "Team Service" as teamService
-participant "Team Repository" as teamRepo
-participant "RosterSettings Service" as rosterService
-participant "Database" as db
+participant "IC_Teams" as interfaz
+participant "G_Teams" as gestion
+collections "Teams" as teams
 
-usuario -> controller : GET /Team/Create\nSolicitar creación equipo
-activate controller
-controller --> usuario : Formulario creación equipo
-deactivate controller
+usuario -> interfaz : 1. crearEquipo()
+activate interfaz
 
-usuario -> controller : POST /Team/Create\n(datos del equipo)
-activate controller
-
-controller -> controller : ValidateModel()\nValidar datos del equipo
-
-controller -> teamService : CreateTeam(teamData, userId)
-activate teamService
-
-teamService -> teamRepo : CheckTeamExists(teamName, userId)
-activate teamRepo
-teamRepo -> db : SELECT FROM Teams WHERE Name = ? AND UserId = ?
-activate db
-db --> teamRepo : equipo existe o null
-deactivate db
-teamRepo --> teamService : verificación existencia
-deactivate teamRepo
-
-alt Equipo no existe
-    teamService -> teamRepo : CreateTeam(teamData)
-    activate teamRepo
-    teamRepo -> db : INSERT INTO Teams
-    activate db
-    db --> teamRepo : nuevo team ID
-    deactivate db
-    teamRepo --> teamService : equipo creado
-    deactivate teamRepo
+loop Datos inválidos o incompletos
+    usuario <- interfaz : 2. equipo := solicitarDatos()
+    deactivate interfaz
+    activate usuario
+    usuario --> interfaz : 3. equipo
+    deactivate usuario
+    activate interfaz
     
-    teamService -> rosterService : CreateDefaultRosterSettings(teamId)
-    activate rosterService
-    rosterService -> db : INSERT INTO RosterSettings
-    activate db
-    db --> rosterService : configuración roster creada
-    deactivate db
-    rosterService --> teamService : roster configurado
-    deactivate rosterService
+    interfaz -> interfaz : 4. validarDatos(equipo)
+    usuario <-- interfaz : 5. mostrarError("Datos inválidos o incompletos")
     
-    teamService --> controller : Success(team)
-    deactivate teamService
-    controller --> usuario : Redirigir a /Team/Details/{teamId}
-else Equipo ya existe
-    teamService --> controller : Error("Equipo ya existe")
-    deactivate teamService
-    controller --> usuario : Mensaje error + formulario
 end
 
-deactivate controller
+interfaz -> gestion : 5. crearEquipo(datosEquipo)
+activate gestion
+gestion -> teams : 10. T1 := crearEquipo(datosEquipo)
+teams --> gestion : 11. T1
+gestion --> interfaz : 12. T1
+deactivate gestion
+interfaz --> usuario : 13. ok
+deactivate interfaz
+
+note right of usuario : El actor puede cancelar\nel proceso en cualquier momento
 
 @enduml

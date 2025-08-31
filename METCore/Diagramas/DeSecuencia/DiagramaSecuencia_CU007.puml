@@ -1,69 +1,51 @@
 @startuml DiagramaSecuencia_CU007
 !theme plain
-title CU007: Modificación de Equipo
 
 actor "Actor Usuario" as usuario
-participant "Team Controller" as controller
-participant "Team Service" as teamService
-participant "Team Repository" as teamRepo
-participant "Database" as db
+participant "IC_Teams" as interfaz
+participant "G_Teams" as gestion
+collections "Teams" as teams
 
-usuario -> controller : GET /Team/Index\nVer equipos del usuario
-activate controller
+usuario -> interfaz : 1. solicitarModificarEquipo(equipoId)
 
-controller -> teamService : GetUserTeams(userId)
-activate teamService
-teamService -> teamRepo : GetTeamsByUserId(userId)
-activate teamRepo
-teamRepo -> db : SELECT FROM Teams WHERE UserId = ?
-activate db
-db --> teamRepo : lista equipos usuario
-deactivate db
-teamRepo --> teamService : equipos del usuario
-deactivate teamRepo
-teamService --> controller : lista equipos
-deactivate teamService
+activate interfaz
+interfaz -> gestion : 2. E1 := obtenerEquipo(equipoId)
+activate gestion
+gestion -> teams : 3. E1 := buscarPorId(equipoId)
+activate teams
+teams --> gestion : 4. E1
+deactivate teams
 
-controller --> usuario : Vista con equipos disponibles
-deactivate controller
+alt E1 IS NULL OR E1.propietario != usuario
+    gestion --> interfaz : 5. error
+    interfaz --> usuario : 6. mostrarError("No es propietario")
+end    
 
-usuario -> controller : GET /Team/Edit/{teamId}\nElegir equipo a modificar
-activate controller
+gestion --> interfaz : 7. E1
+deactivate gestion
 
-controller -> teamService : GetTeamById(teamId, userId)
-activate teamService
-teamService -> teamRepo : GetTeamByIdAndUser(teamId, userId)
-activate teamRepo
-teamRepo -> db : SELECT FROM Teams WHERE Id = ? AND UserId = ?
-activate db
-db --> teamRepo : datos del equipo
-deactivate db
-teamRepo --> teamService : equipo seleccionado
-deactivate teamRepo
-teamService --> controller : ficha del equipo
-deactivate teamService
+loop Datos incompletos o inválidos
+    usuario <-- interfaz : 8. editarEquipo(E1)
+    deactivate interfaz
+    activate usuario
+    usuario --> interfaz : 9. cambios
+    deactivate usuario
+    activate interfaz
+    interfaz -> interfaz : 10. validarDatos(cambios)
+end
+    
+interfaz -> gestion : 11. actualizarEquipo(E1, cambios)
+activate gestion
+gestion -> teams : 12. actualizarEquipo(E1, cambios)
+activate teams
+teams --> gestion : 13. ok
+deactivate teams
+gestion --> interfaz : 14. ok
+deactivate gestion
+interfaz --> usuario : 15. ok
+deactivate interfaz
 
-controller --> usuario : Formulario modificación equipo
-deactivate controller
 
-usuario -> controller : POST /Team/Edit/{teamId}\n(cambios realizados)
-activate controller
-
-controller -> teamService : UpdateTeam(teamId, newData, userId)
-activate teamService
-teamService -> teamRepo : UpdateTeam(teamData)
-activate teamRepo
-teamRepo -> db : UPDATE Teams SET ... WHERE Id = ?
-activate db
-db --> teamRepo : equipo actualizado
-deactivate db
-teamRepo --> teamService : modificación exitosa
-deactivate teamRepo
-teamService --> controller : Success("Equipo modificado")
-deactivate teamService
-
-controller --> usuario : Mensaje éxito + Vista equipo modificado
-
-deactivate controller
+note right of usuario : El actor puede cancelar\nel proceso en cualquier momento
 
 @enduml

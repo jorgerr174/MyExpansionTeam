@@ -1,52 +1,57 @@
 @startuml DiagramaSecuencia_CU010
 !theme plain
-title CU010: Modificación de Ajustes de Juego
 
 actor "Actor Usuario" as usuario
-participant "Team Controller" as controller
-participant "RosterSettings Service" as rosterService
-participant "Database" as db
+participant "IC_Teams" as interfaz
+participant "G_Teams" as gestion
+collections "Teams" as teams
 
-usuario -> controller : GET /Team/RosterSettings/{teamId}\nSolicitar ajustes
-activate controller
-
-controller -> rosterService : GetRosterSettings(teamId)
-activate rosterService
-rosterService -> db : SELECT FROM RosterSettings WHERE TeamId = ?
-activate db
-db --> rosterService : ajustes actuales
-deactivate db
-rosterService --> controller : menú ajustes con valores predeterminados
-deactivate rosterService
-
-controller --> usuario : Vista ajustes con valores actuales
-deactivate controller
-
-usuario -> controller : POST /Team/RosterSettings/{teamId}\n(ajustes modificados)
-activate controller
-
-controller -> controller : ValidateSettings()\nValidar nuevos ajustes
-
-controller -> rosterService : UpdateRosterSettings(teamId, newSettings)
-activate rosterService
-
-rosterService -> rosterService : ValidateSettingsValues()\nValidar valores ajustes
-
-alt Ajustes válidos
-    rosterService -> db : UPDATE RosterSettings SET ... WHERE TeamId = ?
-    activate db
-    db --> rosterService : ajustes actualizados
-    deactivate db
+alt Invocación de usuario
+    usuario -> interfaz : 1. modificarAjustes(equipoId)
     
-    rosterService --> controller : Success("Ajustes guardados")
-    deactivate rosterService
-    controller --> usuario : Mensaje confirmación + Ajustes guardados
-else Ajustes inválidos
-    rosterService --> controller : Error("Valores no válidos")
-    deactivate rosterService
-    controller --> usuario : Mensaje error + Formulario ajustes
+    activate interfaz
+    interfaz -> gestion : 2. E1 := obtenerEquipo(equipoId)
+    activate gestion
+    gestion -> teams : 3. E1 := buscarPorId(equipoId)
+    activate teams
+    teams --> gestion : 4. E1
+    deactivate teams
+    
+    alt equipoActual IS NULL OR equipoActual.propietario != usuario
+        gestion --> interfaz : 5. error
+        interfaz --> usuario : 6. mostrarError("No es propietario del equipo o no existe")
+    end
+    gestion --> interfaz : 7. E1
+    deactivate gestion
+    usuario <-- interfaz : 8. cambios:= mostrarAjustes(E1.ajustes)
+    activate usuario
+
+else Invocación desde creación de equipo (CU006)
+    note over interfaz : Equipo recién creado ya disponible\ndesde CU006
+    usuario <-- interfaz : 9. cambios:= mostrarAjustes(E1.ajustes)
+    deactivate interfaz
 end
 
-deactivate controller
+loop Modificaciones válidas
+    deactivate interfaz
+    usuario --> interfaz : 10. cambios
+    deactivate usuario
+    activate interfaz
+    
+    interfaz -> interfaz : 11. validarAjustes(cambios)
+end
+    
+interfaz -> gestion : 12. guardarAjustes(E1, cambios)
+activate gestion
+gestion -> teams : 13. guardarAjustes(E1, cambios)
+activate teams
+teams --> gestion : 14. ok
+deactivate teams
+gestion --> interfaz : 15. ok
+deactivate gestion
+interfaz --> usuario : 16. ok
+deactivate interfaz
+
+note right of usuario : El actor puede cancelar\nel proceso en cualquier momento
 
 @enduml

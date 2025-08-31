@@ -1,74 +1,85 @@
 @startuml DiagramaSecuencia_CU014
 !theme plain
-title CU014: Realización del Draft
 
 actor "Actor Usuario" as usuario
-participant "Draft Controller" as controller
-participant "Draft Service" as draftService
-participant "Player Service" as playerService
-participant "Team Service" as teamService
-participant "Database" as db
+participant "IC_Teams" as interfaz
+participant "G_Teams" as gestion
+collections "Teams" as teams
+collections "Players" as players
 
-usuario -> controller : POST /api/Draft/Execute\nSolicitar draft manual
-activate controller
+usuario -> interfaz : 1. iniciarDraft(equipoId)
+activate interfaz
 
-controller -> controller : CompletesCU016()\nModificación ajustes draft
+interfaz -> gestion : 2. E1 := getEquipo(equipoId)
+activate gestion
+gestion -> teams : 3. E1 := buscarPorId(equipoId)
+activate teams
+teams --> gestion : 4. E1
+deactivate teams
 
-controller -> draftService : InitializeDraft(draftConfig)
-activate draftService
-
-draftService -> playerService : GetAvailablePlayers()
-activate playerService
-playerService -> db : SELECT FROM Players WHERE Available = true
-activate db
-db --> playerService : jugadores disponibles
-deactivate db
-playerService --> draftService : pool jugadores
-deactivate playerService
-
-draftService -> teamService : GetParticipatingTeams()
-activate teamService
-teamService -> db : SELECT FROM Teams WHERE Participating = true
-activate db
-db --> teamService : equipos participantes
-deactivate db
-teamService --> draftService : lista equipos
-deactivate teamService
-
-draftService -> draftService : CreateDraftOrder()\nCrear orden draft
-
-loop Para cada ronda hasta rondas seleccionadas
-    loop Para cada equipo en orden
-        alt Turno del usuario
-            draftService --> controller : PlayerSelectionTurn(availablePlayers)
-            deactivate draftService
-            controller --> usuario : Seleccionar jugador a draftear
+alt E1 IS NULL OR E1.propietario != usuario OR E1.Draft IS NOT NULL
+    gestion --> interfaz : 5. error
+    interfaz --> usuario : 6. mostrarError("Equipo no existe, no es propietario o ya tiene draft")
+else Es propietario
+    gestion --> interfaz : 7. E1
+    note over interfaz : Incluye CU016 - Modificación de ajustes del draft
+    interfaz -> interfaz : 8. AD1 := ejecutarCU016_ModificarAjustesDraft(E1)
+    
+    interfaz -> gestion : 9. D1 := inicializarDraft(equipoId, AD1)
+    gestion -> gestion : 10. D1 := inicializarDraft(E1, AD1)
+    gestion --> interfaz : 11. D1
+    interfaz --> usuario : 12. D1
+    gestion -> players : 13. prospectos := getProspectos()
+    activate players
+    gestion <-- players : 14. prospectos
+    deactivate players
+    gestion --> interfaz : 15. prospectos
+    deactivate gestion
+    interfaz --> usuario : 16. prospectos
+    
+    loop Para cada elección de las rondas seleccionadas
+        alt Es turno del usuario
+            deactivate gestion
             
-            usuario -> controller : SelectPlayer(playerId)
-            controller -> draftService : UserPlayerSelection(playerId)
-            activate draftService
-        else Turno automático
-            draftService -> draftService : AutoSelectBestPlayer(team, available)
+            loop Prospecto no disponible
+                interfaz --> usuario : 17. mostrarProspectosDisponibles()
+                activate usuario
+                usuario -> interfaz : 18. seleccionarProspecto(P1)
+                deactivate usuario
+                
+                interfaz -> interfaz : 19. validarEleccion(P1)
+                
+                alt Prospecto ya seleccionado
+                    interfaz --> usuario : 20. mostrarError("Prospecto ya seleccionado")
+                    activate usuario
+                else Prospecto disponible
+                    interfaz --> usuario : 21. ok
+                end
+            end
+        else No es turno del usuario
+            interfaz -> interfaz : 22. eleccionSimulada := simular()
+            usuario <-- interfaz : 23. eleccionSimulada
+            deactivate usuario
         end
-        
-        draftService -> playerService : AssignPlayerToTeam(playerId, teamId)
-        activate playerService
-        playerService -> db : UPDATE Players SET TeamId = ?
-        activate db
-        db --> playerService : jugador asignado
-        deactivate db
-        playerService --> draftService : jugador drafteado
-        deactivate playerService
+        interfaz -> interfaz : 24. siguientePick()
     end
+    
+    interfaz --> usuario : 25. confirmarDraftCompleto("Draft completado exitosamente")
+    activate usuario
+    usuario -> interfaz : 26. guardarDraft()
+    deactivate usuario
+    interfaz -> gestion : 27. guardarDraft(E1, D1)
+    activate gestion
+    gestion -> teams : 28. guardarDraft(E1, D1)
+    activate teams
+    gestion <-- teams : 29. ok
+    deactivate teams
+    interfaz <-- gestion : 30. ok
+    deactivate gestion
+    usuario <-- interfaz : 31. ok
+    deactivate interfaz
 end
 
-draftService -> draftService : ContinueWithCU015()\nSimulación rondas restantes
-
-draftService --> controller : DraftCompleted(results)
-deactivate draftService
-
-controller --> usuario : Resultados draft completado
-
-deactivate controller
+note right of usuario : El actor puede cancelar\nel proceso en cualquier momento
 
 @enduml
