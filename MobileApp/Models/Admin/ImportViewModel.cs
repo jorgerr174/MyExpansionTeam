@@ -18,13 +18,12 @@ namespace MobileApp.Models.Admin
             InitializeData();
         }
 
-        [ObservableProperty] private string selectedFileName = "No file selected";
+        [ObservableProperty] private string selectedFileName = "No hay archivo seleccionado";
         [ObservableProperty] private FileResult? selectedFile;
         [ObservableProperty] private ImportTypeItem? selectedImportType;
         [ObservableProperty] private StatsTypeItem? selectedStatsType;
         [ObservableProperty] private int selectedYear = DateTime.Now.Year - 1;
-        [ObservableProperty] private bool showYearSelection = false;
-        [ObservableProperty] private bool showStatsTypeSelection = false;
+        [ObservableProperty] private bool isImportStatsSelected = false;
         [ObservableProperty] private string importResult = string.Empty;
         [ObservableProperty] private bool hasImportResult = false;
         [ObservableProperty] private bool hasErrorFile = false;
@@ -38,22 +37,22 @@ namespace MobileApp.Models.Admin
         private void InitializeData()
         {
             // Import types
-            ImportTypes.Add(new ImportTypeItem { Type = Types.ImportEnum.Players, DisplayName = "Players" });
-            ImportTypes.Add(new ImportTypeItem { Type = Types.ImportEnum.Stats, DisplayName = "Stats" });
-            ImportTypes.Add(new ImportTypeItem { Type = Types.ImportEnum.Contracts, DisplayName = "Contracts" });
-            ImportTypes.Add(new ImportTypeItem { Type = Types.ImportEnum.Prospects, DisplayName = "Prospects" });
+            ImportTypes.Add(new ImportTypeItem { Type = Types.ImportEnum.Players, DisplayName = "Jugadores" });
+            ImportTypes.Add(new ImportTypeItem { Type = Types.ImportEnum.Stats, DisplayName = "Estadísticas" });
+            ImportTypes.Add(new ImportTypeItem { Type = Types.ImportEnum.Contracts, DisplayName = "Contratos" });
+            ImportTypes.Add(new ImportTypeItem { Type = Types.ImportEnum.Prospects, DisplayName = "Prospectos" });
 
             // Stats types
-            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.PassStats, DisplayName = "Pass Stats" });
-            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.RecStats, DisplayName = "Rec Stats" });
-            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.RushStats, DisplayName = "Rush Stats" });
-            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.IntStats, DisplayName = "Int Stats" });
-            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.TackleStats, DisplayName = "Tackle Stats" });
-            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.KOStats, DisplayName = "KO Stats" });
-            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.KRStats, DisplayName = "KR Stats" });
-            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.PuntStats, DisplayName = "Punt Stats" });
-            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.PRStats, DisplayName = "PR Stats" });
-            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.FGStats, DisplayName = "FG Stats" });
+            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.PassStats, DisplayName = "Pasador" });
+            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.RecStats, DisplayName = "Receptor" });
+            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.RushStats, DisplayName = "Corredor" });
+            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.IntStats, DisplayName = "Intercepciones" });
+            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.TackleStats, DisplayName = "Placajes" });
+            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.KOStats, DisplayName = "Saques" });
+            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.KRStats, DisplayName = "Retornos de saque" });
+            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.PuntStats, DisplayName = "Pateos" });
+            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.PRStats, DisplayName = "Retornos de pateo" });
+            StatsTypes.Add(new StatsTypeItem { Type = Types.StatsEnum.FGStats, DisplayName = "Goles de campo" });
 
             // Available years (last 3 years)
             var currentYear = DateTime.Now.Year;
@@ -74,8 +73,8 @@ namespace MobileApp.Models.Admin
                 FilePickerFileType customFileType = new(
                     new Dictionary<DevicePlatform, IEnumerable<string>>
                     {
-                        { DevicePlatform.iOS, new[] { "public.comma-separated-values-text" } },
-                        { DevicePlatform.Android, new[] { "text/csv" } },
+                        { DevicePlatform.iOS, new[] { "public.comma-separated-values-text", ".csv" } },
+                        { DevicePlatform.Android, new[] { "text/csv", "text/plain", "application/vnd.ms-excel", ".csv" } },
                         { DevicePlatform.WinUI, new[] { ".csv" } },
                         { DevicePlatform.Tizen, new[] { "*/*" } },
                         { DevicePlatform.macOS, new[] { "csv" } },
@@ -83,11 +82,11 @@ namespace MobileApp.Models.Admin
 
                 PickOptions options = new()
                 {
-                    PickerTitle = "Please select a CSV file",
+                    PickerTitle = "Por favor, seleccione un archivo CSV",
                     FileTypes = customFileType,
                 };
 
-                if (await FilePicker.Default.PickAsync(options) is FileResult result)
+                if (await FilePicker.Default.PickAsync(null) is FileResult result)
                 {
                     SelectedFile = result;
                     SelectedFileName = result.FileName;
@@ -95,19 +94,15 @@ namespace MobileApp.Models.Admin
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to select file: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error al elegir archivo: {ex.Message}", "OK");
             }
         }
 
-        public void OnImportTypeChanged()
+        partial void OnSelectedImportTypeChanged(ImportTypeItem? value)
         {
-            ShowYearSelection = SelectedImportType?.Type == Types.ImportEnum.Stats;
-            ShowStatsTypeSelection = SelectedImportType?.Type == Types.ImportEnum.Stats;
-
-            // Reset import result when changing type
+            IsImportStatsSelected = value?.Type == Types.ImportEnum.Stats;
             ImportResult = string.Empty;
             HasImportResult = false;
-            HasErrorFile = false;
         }
 
         [RelayCommand]
@@ -117,40 +112,40 @@ namespace MobileApp.Models.Admin
             {
                 if (SelectedFile == null)
                 {
-                    await Shell.Current.DisplayAlert("Error", "Please select a file first", "OK");
+                    await Shell.Current.DisplayAlert("Error", "Por favor, seleccione un archivo", "OK");
                     return;
                 }
 
                 if (SelectedImportType == null)
                 {
-                    await Shell.Current.DisplayAlert("Error", "Please select an import type", "OK");
+                    await Shell.Current.DisplayAlert("Error", "Por favor, seleccione un tipo de importación", "OK");
                     return;
                 }
 
                 if (SelectedImportType.Type == Types.ImportEnum.Stats && (SelectedYear < DateTime.Now.Year - 3 || SelectedYear > DateTime.Now.Year - 1))
                 {
-                    await Shell.Current.DisplayAlert("Error", "Please select a valid year for stats import", "OK");
+                    await Shell.Current.DisplayAlert("Error", "Por favor, seleccione una temporada válida (3 últimas)", "OK");
                     return;
                 }
 
                 if (SelectedImportType.Type == Types.ImportEnum.Stats && SelectedStatsType == null)
                 {
-                    await Shell.Current.DisplayAlert("Error", "Please select a stats type", "OK");
+                    await Shell.Current.DisplayAlert("Error", "Por favor, seleccione un tipo de estadísticas", "OK");
                     return;
                 }
 
                 IsLoading = true;
                 ErrorMessage = string.Empty;
 
-                // Create ImportDto
-                ImportDto importDto = new()
+                ImportDto importDto = new();
+                importDto.Type = SelectedImportType.Type;
+                if (IsImportStatsSelected)
                 {
-                    Type = SelectedImportType.Type,
-                    StatsType = SelectedStatsType?.Type ?? Types.StatsEnum.PassStats,
-                    Year = ShowYearSelection ? SelectedYear : null
-                };
+                    importDto.StatsType = SelectedStatsType.Type;
+                    importDto.Year = SelectedYear;
+                }
+                ;
 
-                // Read file content
                 using Stream stream = await SelectedFile.OpenReadAsync();
                 using MemoryStream memoryStream = new();
                 await stream.CopyToAsync(memoryStream);
@@ -161,7 +156,7 @@ namespace MobileApp.Models.Admin
                     if (result.Content?.Length > 0)
                     {
                         // There were errors
-                        ImportResult = $"Import partially completed. Some records from {SelectedFile.FileName} failed to import.";
+                        ImportResult = $"Importación parcialmente completa. Algunos registros de {SelectedFile.FileName} no pudieron ser importados.";
                         HasErrorFile = true;
                         ErrorFileContent = result.Content;
                         ErrorFileName = $"Error_{SelectedFile.FileName}";
@@ -169,17 +164,17 @@ namespace MobileApp.Models.Admin
                     else
                     {
                         // Success
-                        ImportResult = $"{SelectedFile.FileName} imported successfully!";
+                        ImportResult = $"{SelectedFile.FileName} importado exitosamente!";
                         HasErrorFile = false;
                     }
                     HasImportResult = true;
                 }
                 else
-                    ErrorMessage = "Import failed. Please check your file and try again.";
+                    ErrorMessage = "Importación fallida. Por favor, revise su archivo y pruebe de nuevo.";
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Import failed: {ex.Message}";
+                ErrorMessage = $"Importación fallida: {ex.Message}";
             }
             finally
             {
@@ -194,7 +189,7 @@ namespace MobileApp.Models.Admin
             {
                 if (ErrorFileContent == null || ErrorFileContent.Length == 0)
                 {
-                    await Shell.Current.DisplayAlert("Error", "No error file available", "OK");
+                    await Shell.Current.DisplayAlert("Error", "No hay fallo de errores disponible", "OK");
                     return;
                 }
 
@@ -202,7 +197,7 @@ namespace MobileApp.Models.Admin
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to save error file: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error al guardar el archivo de errores: {ex.Message}", "OK");
             }
         }
 
@@ -219,15 +214,14 @@ namespace MobileApp.Models.Admin
                 {
                     var filePath = Path.Combine(documentsPath, fileName);
                     await File.WriteAllTextAsync(filePath, content);
-                    await Shell.Current.DisplayAlert("Success", $"Error file saved to Downloads: {fileName}", "OK");
+                    await Shell.Current.DisplayAlert("Éxito", $"Archivo de errores guardado en Descargas: {fileName}", "OK");
                 }
 #elif IOS
                 var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 var filePath = Path.Combine(documentsPath, fileName);
                 await File.WriteAllTextAsync(filePath, content);
-                await Shell.Current.DisplayAlert("Success", $"Error file saved to Documents: {fileName}", "OK");
+                await Shell.Current.DisplayAlert("Éxito", $"Archivo de errores guardado en Documentos: {fileName}", "OK");
 #else
-                // For other platforms, just show content
                 await Shell.Current.DisplayAlert("Error File Content",
                     $"File: {fileName}\n\nContent:\n{content[..Math.Min(content.Length, 1000)]}...",
                     "OK");
@@ -235,7 +229,7 @@ namespace MobileApp.Models.Admin
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to save file: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error al guardar archivo: {ex.Message}", "OK");
             }
         }
     }

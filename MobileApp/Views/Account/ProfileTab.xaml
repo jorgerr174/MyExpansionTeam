@@ -38,7 +38,7 @@
                         TextColor="White" />
                 
                 <Button Text="Crear Cuenta" 
-                        Command="{Binding SignUpCommand}"
+                        Command="{Binding GoToSignUpCommand}"
                         IsEnabled="{Binding IsNotLoading}"
                         BackgroundColor="Green"
                         TextColor="White" />

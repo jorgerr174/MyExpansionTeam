@@ -101,8 +101,8 @@ namespace MobileApp.Models.Team
                 // Add protection (check limit)
                 if (SelectedNflTeam.ProtectedCount >= RosterSettingsProtectedPerTeam)
                 {
-                    await Shell.Current.DisplayAlert("Limit Reached",
-                        $"You can only protect {RosterSettingsProtectedPerTeam} players per team.", "OK");
+                    await Shell.Current.DisplayAlert("Límite Alcanzado",
+                        $"Solo puedes proteger {RosterSettingsProtectedPerTeam} jugadores por equipo.", "OK");
                     return;
                 }
 

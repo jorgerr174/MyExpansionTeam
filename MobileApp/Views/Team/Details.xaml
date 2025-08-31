@@ -342,7 +342,7 @@
                                     BackgroundColor="{Binding OffenseViewColor}"
                                     TextColor="{Binding OffenseViewTextColor}"
                                     FontSize="12"
-                                    Padding="10,6"
+                                    Padding="10"
                                     CornerRadius="4"
                                     Command="{Binding ViewFormationCommand}"
                                     CommandParameter="offense" />
@@ -350,7 +350,7 @@
                                     BackgroundColor="{Binding DefenseViewColor}"
                                     TextColor="{Binding DefenseViewTextColor}"
                                     FontSize="12"
-                                    Padding="10,6"
+                                    Padding="10"
                                     CornerRadius="4"
                                     Command="{Binding ViewFormationCommand}"
                                     CommandParameter="defense" />
@@ -358,31 +358,29 @@
                                     BackgroundColor="{Binding SpecialViewColor}"
                                     TextColor="{Binding SpecialViewTextColor}"
                                     FontSize="12"
-                                    Padding="10,6"
+                                    Padding="10"
                                     CornerRadius="4"
                                     Command="{Binding ViewFormationCommand}"
                                     CommandParameter="special" />
                         </StackLayout>
 
                         <Label Text="{Binding CurrentFormationDisplayName}" 
-               FontSize="14" 
-               FontAttributes="Bold"
-               TextColor="#007bff"
-               HorizontalOptions="Center" />
+                               FontSize="14" 
+                               FontAttributes="Bold"
+                               TextColor="#007bff"
+                               HorizontalOptions="Center" />
 
                         <Border BackgroundColor="#228B22" 
-                Stroke="#fff"
-                StrokeThickness="1"
-                HeightRequest="300"
-                Padding="8"
-                StrokeShape="RoundRectangle 6">
+                                Stroke="#fff"
+                                StrokeThickness="1"
+                                HeightRequest="300"
+                                Padding="4,8"
+                                StrokeShape="RoundRectangle 6">
 
                             <Grid>
-                                <!-- Yard lines -->
                                 <BoxView Color="Coral" HeightRequest="1" VerticalOptions="Start" Margin="{Binding FDylMargin}" />
                                 <BoxView Color="Yellow" HeightRequest="2" VerticalOptions="{Binding SylVo}" Margin="{Binding SylMargin}"/>
 
-                                <!-- Offense Formation -->
                                 <AbsoluteLayout x:Name="OffenseFormationField" IsVisible="{Binding IsOffenseViewSelected}">
                                     <BindableLayout.ItemsSource>
                                         <Binding Path="OffensePositions" />
@@ -404,9 +402,9 @@
                                                            TextColor="White"
                                                            HorizontalOptions="Center" />
                                                     <Label Text="{Binding PlayerName}"
-                                                           FontSize="7"
+                                                           FontSize="8"
                                                            TextColor="White"
-                                                           HorizontalOptions="Center" />
+                                                           HorizontalOptions="End" />
                                                 </StackLayout>
                                             </Border>
                                         </DataTemplate>
@@ -503,7 +501,7 @@
                                         <StackLayout Spacing="10">
                                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                                                 <Label Grid.Column="1"
-                                                       Text="{Binding Date, StringFormat='Fecha: {0:M/d/yyyy}'}"
+                                                       Text="{Binding Date, StringFormat='Fecha: {0:dd-MM-yyyy}'}"
                                                        FontSize="12"
                                                        TextColor="#6c757d" />
                                             </Grid>

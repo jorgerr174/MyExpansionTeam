@@ -134,7 +134,6 @@ namespace MobileApp
             builder.Services.AddTransient<Views.Team.Details>();
             builder.Services.AddTransient<Views.Team.Draft>();
             builder.Services.AddTransient<Views.Team.Edit>();
-            //builder.Services.AddTransient<Views.Team.List>();
             builder.Services.AddTransient<Views.Team.MyTeams>();
             builder.Services.AddTransient<Views.Team.Roster>();
             builder.Services.AddTransient<Views.Team.RosterSettings>();
