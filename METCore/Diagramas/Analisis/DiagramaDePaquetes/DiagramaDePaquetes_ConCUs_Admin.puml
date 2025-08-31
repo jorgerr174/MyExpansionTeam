@@ -3,8 +3,8 @@
 actor Admin
 
 package "Administración" {
-    usecase "CU019: Importación datos" as UC019
-    usecase "CU020: Gestión roles" as UC020
+    usecase "CU017: Importación datos" as UC019
+    usecase "CU018: Gestión roles" as UC020
 }
 
 Admin --> UC019

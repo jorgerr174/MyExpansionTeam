@@ -15,9 +15,7 @@ usecase "CU011\nElección de jugadores protegidos" as CU011
 usecase "CU012\nElección de jugadores" as CU012
 usecase "CU013\nRealización de trueques" as CU013
 usecase "CU014\nRealización del draft" as CU014
-usecase "CU015\nSimulación del draft" as CU015
-usecase "CU016\nModificación de ajustes del draft" as CU016
-usecase "CU017\nSeguimiento de rendimiento de equipos" as CU017
+usecase "CU015\nModificación de ajustes del draft" as CU016
 
 ' Conexiones Actor Usuario
 Usuario -l- CU003
@@ -35,11 +33,7 @@ Usuario -u- CU011
 CU011 -r[hidden]- CU013
 Usuario -d- CU012
 Usuario -u- CU013
-CU013 -r[hidden]- CU015
 Usuario -d- CU014
-Usuario -u- CU015
 Usuario -r- CU016
-CU016 -r[hidden]- CU017
-Usuario -r- CU017
 
 @enduml

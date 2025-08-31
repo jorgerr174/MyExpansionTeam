@@ -2,15 +2,6 @@
 
 package PlayerManagement <<designSubsystem>> {
     
-    object PlayerControl <<control>>
-
-    object PlayerService {
-        + configuration : IConfiguration
-        + playerRepository : IPlayerRepository
-        + mapper : IMapper
-        + GetDraftProspects(int year) : Task<IList<ProspectDto>>
-    }
-    
     object Player <<entity>> {
         + Id : int {key}
         + Name : string
@@ -25,6 +16,9 @@ package PlayerManagement <<designSubsystem>> {
         + Prospect : Prospect?
         + College : string
         + Retired : bool
+        + DraftYear : int
+        + Jersey : int
+        + Madden : int
     }
     
     object Prospect <<entity>> {
@@ -193,35 +187,5 @@ package PlayerManagement <<designSubsystem>> {
     }
 }
 
-PlayerControl - PlayerService
-PlayerControl -d- Player
-PlayerControl -d- Prospect
-PlayerControl -d- Contract
-PlayerControl -d- SeasonStats
-PlayerControl -d- FGStats
-PlayerControl -d- IntStats
-PlayerControl -d- TackleStats
-PlayerControl -d- KOStats
-PlayerControl -d- PuntStats
-PlayerControl -d- KRStats
-PlayerControl -d- PRStats
-PlayerControl -d- PassStats
-PlayerControl -d- RecStats
-PlayerControl -d- RushStats
-
-PlayerService -u|> Player
-PlayerService -u|> Prospect
-PlayerService -u|> Contract
-PlayerService -u|> SeasonStats
-PlayerService -u|> FGStats
-PlayerService -u|> IntStats
-PlayerService -u|> TackleStats
-PlayerService -u|> KOStats
-PlayerService -u|> PuntStats
-PlayerService -u|> KRStats
-PlayerService -u|> PRStats
-PlayerService -u|> PassStats
-PlayerService -u|> RecStats
-PlayerService -u|> RushStats
 
 @enduml

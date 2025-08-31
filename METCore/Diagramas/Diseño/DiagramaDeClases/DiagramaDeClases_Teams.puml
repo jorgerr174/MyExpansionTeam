@@ -52,6 +52,7 @@ package TeamManagement <<designSubsystem>> {
         + FranchisePlayers : IList<int>
         + FranchisePicks : IList<int>
         + Complete : bool
+        + Date : DateTime
     }
     
     object RosterSettings <<entity>> {
