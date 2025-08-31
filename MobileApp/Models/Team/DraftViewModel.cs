@@ -22,13 +22,18 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private bool isOnlyTeam = true;
         [ObservableProperty] private bool isMultipleDraft = false;
 
+        [ObservableProperty] private bool isFastSpeed = false;
+        [ObservableProperty] private bool isNormalSpeed = true;
+        [ObservableProperty] private bool isSlowSpeed = false;
+        public int PickTimeOut = 0;
+
         // Draft State
         [ObservableProperty] private int currentPickIndex = 0;
         [ObservableProperty] private string currentPickText = "";
 
         [ObservableProperty] private bool isPaused = true;
         [ObservableProperty] private bool showPauseButton = true;
-        [ObservableProperty] private string pauseResumeText = "Start";
+        [ObservableProperty] private string pauseResumeText = "Comenzar";
 
         // Current Pick Info
         [ObservableProperty] private string currentPickInfoTitle = "";
@@ -44,6 +49,9 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private ObservableCollection<FranchiseItem> franchises = [];
 
         public ObservableCollection<ProspectItem> FilteredProspects => new(Prospects.Where(p => p.IsVisible));
+
+        [ObservableProperty] private bool showDraftSummary = false;
+        [ObservableProperty] private ObservableCollection<DraftSelection> draftResults = [];
 
         [ObservableProperty] private int manualRounds = 3;
         [ObservableProperty] private bool allowTrades = true;
@@ -122,14 +130,14 @@ namespace MobileApp.Models.Team
                 }
                 else
                 {
-                    await Shell.Current.DisplayAlert("Error", "Failed to load draft data", "OK");
+                    await Shell.Current.DisplayAlert("Error", "Error al cargar los datos del draft", "OK");
                     return;
                 }
 
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to load draft: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error al cargar el draft: {ex.Message}", "OK");
             }
             finally
             {
@@ -183,14 +191,18 @@ namespace MobileApp.Models.Team
         {
             try
             {
-                UpdateLoadingState(true, "Starting draft...");
+                UpdateLoadingState(true, "Comenzando draft...");
                 ShowDraftInterface = true;
 
                 await ConvertPicksToPickItem(Draft.Picks);
+                PickTimeOut =
+                    IsFastSpeed ? 0
+                    : IsSlowSpeed ? 2000
+                    : 1000;
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to start draft: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error al comenzar el draft: {ex.Message}", "OK");
             }
             finally
             {
@@ -250,12 +262,28 @@ namespace MobileApp.Models.Team
         {
             IsDraftComplete = true;
             ShowPauseButton = false;
-
             AllowTrades = false;
             IsPaused = true;
-            CurrentPickText = "Draft Complete";
+            CurrentPickText = "Draft Completado";
 
-            await Shell.Current.DisplayAlert("Draft Complete", "The draft has been completed! Save your results to continue.", "OK");
+            GenerateDraftSummary();
+            ShowDraftSummary = true;
+
+            await Shell.Current.DisplayAlert("Draft Completado", "!El draft ha sido completado! Guarde tus resultados para continuar.", "OK");
+        }
+
+        private void GenerateDraftSummary()
+        {
+            DraftResults.Clear();
+
+            foreach (DraftPickItem pick in DraftOrder.Where(p => p.TeamId == 0 && p.HasSelection).OrderBy(p => p.Overall))
+            {
+                DraftResults.Add(new DraftSelection
+                {
+                    Pick = $"Ronda {pick.Round}, Pick #{pick.PickInRound} (#{pick.Overall} Total)",
+                    Player = pick.Prospect.Prospect
+                });
+            }
         }
         #endregion Extra functionality
 
@@ -276,16 +304,16 @@ namespace MobileApp.Models.Team
 
             if (!CurrentPick.IsUserControlled)
             {
-                CurrentPickInfoTitle = $"{CurrentPick.TeamAbb} Turn";
-                CurrentPickInfoText = $"Analyzing prospects for pick #{CurrentPick.Overall}";
+                CurrentPickInfoTitle = $"Turno de {CurrentPick.TeamAbb}";
+                CurrentPickInfoText = $"Analizando prospectos para el pick #{CurrentPick.Overall}";
 
-                await Task.Delay(500);
+                await Task.Delay(PickTimeOut);
                 await MakeSelection(Prospects.OrderBy(p => p.Consensus).FirstOrDefault());
             }
             else
             {
-                CurrentPickInfoTitle = "Your Turn";
-                CurrentPickInfoText = $"Select a player for pick #{CurrentPick.Overall}";
+                CurrentPickInfoTitle = "Tu Turno";
+                CurrentPickInfoText = $"Seleccione un Prospecto para el pick #{CurrentPick.Overall}";
                 ShowPauseButton = false;
             }
         }
@@ -293,8 +321,8 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         private async Task SelectProspect(ProspectItem prospect)
         {
-            if (CurrentPickIndex <= DraftOrder.Count && CurrentPick.IsUserControlled &&
-                await Shell.Current.DisplayAlert("Confirm Selection", $"Draft {prospect.Name} ({prospect.Position}) with pick #{CurrentPick.Overall}?", "Draft Player", "Cancel"))
+            if (CurrentPickIndex > 0 && CurrentPickIndex <= DraftOrder.Count && CurrentPick.IsUserControlled &&
+                await Shell.Current.DisplayAlert("Confirmar Selección", $"Elegir {prospect.Name} ({prospect.Position}) con pick #{CurrentPick.Overall}?", "Selccionar", "Cancelar"))
             {
                 ShowPauseButton = true;
                 await MakeSelection(prospect);
@@ -388,15 +416,15 @@ namespace MobileApp.Models.Team
 
                 if (success)
                 {
-                    await Shell.Current.DisplayAlert("Success", "Draft saved successfully!", "OK");
+                    await Shell.Current.DisplayAlert("Success", "!Draft guardado con éxito!", "OK");
                     await GoToRoster();
                 }
                 else
-                    await Shell.Current.DisplayAlert("Error", "Failed to save draft", "OK");
+                    await Shell.Current.DisplayAlert("Error", "Error al guardar draft", "OK");
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to save draft: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error al guardar draft: {ex.Message}", "OK");
             }
             finally
             {
@@ -409,7 +437,7 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         private async Task Return()
         {
-            if (await Shell.Current.DisplayAlert("Exit Draft", "Are you sure you want to exit? Unsaved progress will be lost.", "Exit", "Stay"))
+            if (await Shell.Current.DisplayAlert("Salir del Draft", "¿Está seguro de que desea salir? El progreso se perderá.", "Salir", "Quedar"))
             {
                 IsPaused = true;
                 await GoToRoster();
@@ -434,7 +462,7 @@ namespace MobileApp.Models.Team
         public bool IsUserControlled { get; private set; }
         public string ControlText { get; set; } = "";
 
-        public string Pickround => $"Round: {this.Round} PicK: {this.PickInRound}";
+        public string Pickround => $"Ronda: {this.Round} PicK: {this.PickInRound}";
         private bool isCurrentPick(int currentPick) => currentPick == Overall;
         public bool HasSelection => Prospect is ProspectItem;
         private string SelectedPlayerName => Prospect?.Name ?? string.Empty;

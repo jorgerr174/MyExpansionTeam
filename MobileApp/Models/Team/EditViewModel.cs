@@ -28,14 +28,12 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private bool isDuplicating = false;
         [ObservableProperty] private bool isDeleting = false;
 
-        public string OriginalLocation = string.Empty;
-        public string OriginalMascot = string.Empty;
-        public string OriginalAbb = string.Empty;
+        [ObservableProperty] private string originalLocation = string.Empty;
+        [ObservableProperty] private string originalMascot = string.Empty;
+        [ObservableProperty] private string originalAbb = string.Empty;
         public bool HasTeam => Team is TeamInfoDto;
 
-        public bool CanSave => !IsSaving && !IsLoading;
-        public bool CanDuplicate => !IsDuplicating && !IsLoading;
-        public bool CanDelete => !IsDeleting && !IsLoading;
+        public bool CanAction => !IsDeleting && !IsDuplicating && !IsSaving && !IsLoading;
 
 
 
@@ -75,6 +73,8 @@ namespace MobileApp.Models.Team
             {
                 IsLoading = false;
             }
+            OnPropertyChanged(nameof(HasTeam));
+            OnPropertyChanged(nameof(CanAction));
         }
 
         [RelayCommand]
@@ -84,6 +84,7 @@ namespace MobileApp.Models.Team
                 return;
 
             IsSaving = true;
+            OnPropertyChanged(nameof(CanAction));
 
             try
             {
@@ -91,19 +92,19 @@ namespace MobileApp.Models.Team
                     GetEffectiveValue(Mascot, Team.Mascot), Team.UserUsername, Team.Date, false)))
                 {
                     await LoadViewAsync(Team.Id);
-                    await Shell.Current.DisplayAlert("Success", "Team updated successfully!", "OK");
+                    await Shell.Current.DisplayAlert("Success", "!Equipo guardado con éxito!", "OK");
                 }
                 else
-                    await Shell.Current.DisplayAlert("Error", "Failed to update team. Please try again.", "OK");
+                    await Shell.Current.DisplayAlert("Error", "Error al guardar el equipo. Por favor, pruebe de nuevo.", "OK");
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Error updating team: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error guardando el equipo: {ex.Message}", "OK");
             }
             finally
             {
                 IsSaving = false;
-                OnPropertyChanged(nameof(CanSave));
+                OnPropertyChanged(nameof(CanAction));
             }
         }
 
@@ -111,13 +112,13 @@ namespace MobileApp.Models.Team
         public async Task Duplicate()
         {
             var confirm = await Shell.Current.DisplayAlert(
-                "Duplicate Team",
-                $"Are you sure you want to duplicate {Team.Location} {Team.Mascot}?",
-                "Yes", "No");
+                "Duplicar Equipo",
+                $"¿Estás seguro que quieres duplicar {Team.Location} {Team.Mascot}?",
+                "Sí", "No");
 
             if (!confirm) return;
-
             IsDuplicating = true;
+            OnPropertyChanged(nameof(CanAction));
 
             try
             {
@@ -125,16 +126,16 @@ namespace MobileApp.Models.Team
                     && String.IsNullOrWhiteSpace(result.Message) && result.Value is TeamBasicInfoDto newTeam)
                     await BaseService.GoToAsync(AppRoutes.TeamDetails, new() { ["TeamId"] = newTeam.Id });
                 else
-                    await Shell.Current.DisplayAlert("Error", "Failed to duplicate team. Please try again.", "OK");
+                    await Shell.Current.DisplayAlert("Error", "Duplicado fallido. Por favor, pruebe de nuevo.", "OK");
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Error duplicating team: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error durante el duplicado: {ex.Message}", "OK");
             }
             finally
             {
                 IsDuplicating = false;
-                OnPropertyChanged(nameof(CanDuplicate));
+                OnPropertyChanged(nameof(CanAction));
             }
         }
 
@@ -142,43 +143,28 @@ namespace MobileApp.Models.Team
         public async Task Delete()
         {
             var confirm = await Shell.Current.DisplayAlert(
-                "Delete Team",
-                $"Are you sure you want to delete {Team.Location} {Team.Mascot}? This action cannot be undone.",
-                "Delete", "Cancel");
+                "Borrado de Equipo",
+                $"¿Estás seguro que quieres borrar {Team.Location} {Team.Mascot}? Esta acción no se podrá deshacer.",
+                "Borrar", "Cancel");
 
             if (!confirm) return;
-
             IsDeleting = true;
+            OnPropertyChanged(nameof(CanAction));
 
             try
             {
-                var success = await _teamService.DeleteTeamAsync(Team.Id);
-
-                if (success)
-                {
-                    // Navigate back to MyTeams
-                    await Shell.Current.GoToAsync("//MyTeamsTab");
-                }
-                else
-                {
-                    await Shell.Current.DisplayAlert("Error", "Failed to delete team. Please try again.", "OK");
-                }
+                if (await _teamService.DeleteTeamAsync(Team.Id)) BaseService.GoToMyTeamsTabAsync();
+                else await Shell.Current.DisplayAlert("Error", "Error al borrar el equipo. Por favor, pruebe de nuevo.", "OK");
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Error deleting team: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error borrando el equipo: {ex.Message}", "OK");
             }
             finally
             {
                 IsDeleting = false;
-                OnPropertyChanged(nameof(CanDelete));
+                OnPropertyChanged(nameof(CanAction));
             }
-        }
-
-        [RelayCommand]
-        public async Task EditRoster()
-        {
-            await Shell.Current.GoToAsync($"//Roster?teamId={Team.Id}");
         }
 
         private bool ValidateFields()

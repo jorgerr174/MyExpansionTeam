@@ -91,9 +91,9 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         public async Task ClearAllRoster()
         {
-            bool confirm = await Shell.Current.DisplayAlert("Confirm Clear",
-                "Are you sure you want to remove all players from the roster?",
-                "Yes", "No");
+            bool confirm = await Shell.Current.DisplayAlert("Confirmación",
+                "¿Está seguro de que desea quitar a todos los jugadores de la plantilla?",
+                "Sí", "No");
 
             if (confirm)
             {

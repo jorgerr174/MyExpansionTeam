@@ -2,9 +2,9 @@
 
 namespace MobileApp.Views.Team
 {
-    [QueryProperty(nameof(TeamId), "teamId")]
-    [QueryProperty(nameof(CurrentPick), "currentPick")]
-    public partial class Trade : ContentPage
+    [QueryProperty(nameof(TeamId), "TeamId")]
+    [QueryProperty(nameof(CurrentPick), "CurrentPick")]
+    public partial class Trade : ContentPage, ITeamBase<TradeViewModel>
     {
         public int TeamId { get; set; }
         public int CurrentPick { get; set; } = -1;

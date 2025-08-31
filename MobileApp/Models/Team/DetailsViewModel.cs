@@ -44,9 +44,9 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private bool isDefenseViewSelected = false;
         [ObservableProperty] private bool isSpecialViewSelected = false;
 
-        public Thickness FDylMargin => new(IsDefenseViewSelected ? 90 : 10);
+        public Thickness FDylMargin => new(10, IsDefenseViewSelected ? 90 : 10);
         public LayoutOptions SylVo => new(IsDefenseViewSelected ? LayoutAlignment.End : LayoutAlignment.Start, true);
-        public Thickness SylMargin => new(IsDefenseViewSelected ? 60 : 95);
+        public Thickness SylMargin => new(10, IsDefenseViewSelected ? 60 : 95);
 
 
         // Pre-generated Formation Collections (Load Once)
@@ -63,8 +63,9 @@ namespace MobileApp.Models.Team
 
         [RelayCommand] public async Task GoToRosterSettings() => await BaseService.GoToAsync(AppRoutes.RosterSettings, new() { ["TeamId"] = Team.Id });
         [RelayCommand] public async Task GoToRoster() => await BaseService.GoToAsync(AppRoutes.Roster, new() { ["TeamId"] = Team.Id });
-        [RelayCommand] public async Task GoToFormation() => await BaseService.GoToAsync(AppRoutes.Formation, new() { ["TeamId"] = Team.Id });
-        [RelayCommand] public async Task GoToTrade() => await BaseService.GoToAsync(AppRoutes.Trade, new() { ["TeamId"] = Team.Id });
+        [RelayCommand]
+        public async Task GoToTrade()
+            => await BaseService.GoToAsync(AppRoutes.Trade, new() { ["TeamId"] = Team.Id, ["CurrentPick"] = -1 });
         [RelayCommand] public async Task GoToDraft() => await BaseService.GoToAsync(AppRoutes.Draft, new() { ["TeamId"] = Team.Id });
 
 
@@ -148,7 +149,7 @@ namespace MobileApp.Models.Team
                     if (Draft.Prospects.FirstOrDefault(p => p.Id == selection.Value) is ProspectDto prospect)
                     {
                         (int round, int pos) = DraftPicks.GetPickRoundPosFromOverall(selection.Key);
-                        DraftResults.Add(new DraftSelection() { Pick = $"Round: {round}, Pick: {pos}", Player = prospect });
+                        DraftResults.Add(new DraftSelection() { Pick = $"Ronda: {round}, Pick: {pos}", Player = prospect });
                     }
 
             ShowErrorState = HasLoadError && !IsLoading;
@@ -176,38 +177,6 @@ namespace MobileApp.Models.Team
                 finally
                 {
                     IsLoading = false;
-                }
-            }
-        }
-
-        [RelayCommand]
-        public async Task DeleteTeam()
-        {
-            if (Team != null)
-            {
-                bool confirm = await Shell.Current.DisplayAlert(
-                    "Delete Team",
-                    $"Are you sure you want to delete {Team.Location} {Team.Mascot}?",
-                    "Yes", "No");
-
-                if (confirm)
-                {
-                    IsLoading = true;
-                    try
-                    {
-                        if (await _teamService.DeleteTeamAsync(Team.Id))
-                            await BaseService.GoToMyTeamsTabAsync();
-                        else
-                            ErrorMessage = "Failed to delete team";
-                    }
-                    catch (Exception ex)
-                    {
-                        ErrorMessage = $"Delete failed: {ex.Message}";
-                    }
-                    finally
-                    {
-                        IsLoading = false;
-                    }
                 }
             }
         }
@@ -309,7 +278,7 @@ namespace MobileApp.Models.Team
                     var pos = formation.Positions[i];
                     var player = Team?.Players?.FirstOrDefault(p => p.Id == GetPlayerIdFromLineup(lineup, i + 1));
 
-                    collection.Add(new FormationDisplayPosition(pos.Name, player?.Name ?? "Empty", pos.X, pos.Y, player != null));
+                    collection.Add(new FormationDisplayPosition(pos.Name, player?.Name ?? "Vacío", pos.X, pos.Y, player != null));
                 }
         }
 

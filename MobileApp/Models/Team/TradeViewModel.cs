@@ -31,9 +31,9 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private Color franchiseTabTextColor = Color.FromArgb("#6c757d");
 
         // Trade Value Display
-        [ObservableProperty] private string userTotalValueText = "Your Value: 0";
-        [ObservableProperty] private string franchiseTotalValueText = "Their Value: 0";
-        [ObservableProperty] private string tradeBalanceText = "Select items to trade";
+        [ObservableProperty] private string userTotalValueText = "Tu Valor: 0";
+        [ObservableProperty] private string franchiseTotalValueText = "Su valor: 0";
+        [ObservableProperty] private string tradeBalanceText = "Selecciona items que intercambiar";
         [ObservableProperty] private double userValueBarWidth = 0;
         [ObservableProperty] private double franchiseValueBarWidth = 0;
 
@@ -77,7 +77,7 @@ namespace MobileApp.Models.Team
             TeamId = teamId;
             try
             {
-                UpdateLoadingState(true, "Cargando trade interface...");
+                UpdateLoadingState(true, "Cargando pantalla de trueque...");
 
                 if (SelectedFranchiseId == 0)
                     await SelectFranchise();
@@ -86,7 +86,7 @@ namespace MobileApp.Models.Team
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to load trade data: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error al cargar los datos del trueque: {ex.Message}", "OK");
             }
             finally
             {
@@ -101,9 +101,9 @@ namespace MobileApp.Models.Team
             {
                 var franchiseNames = _availableFranchises.Select(f => f.Name).ToArray();
                 var selectedName = await Shell.Current.DisplayActionSheet(
-                    "Select franchise to trade with", "Cancel", null, franchiseNames);
+                    "Seleccione franquicia a quien solicitar trueque", "Cancelar", null, franchiseNames);
 
-                if (selectedName != "Cancel" && !string.IsNullOrEmpty(selectedName))
+                if (selectedName != "Cancelar" && !string.IsNullOrEmpty(selectedName))
                 {
                     var selectedFranchise = _availableFranchises.FirstOrDefault(f => f.Name == selectedName);
                     if (selectedFranchise != null)
@@ -116,7 +116,7 @@ namespace MobileApp.Models.Team
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to select franchise: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error al seleccionar franquicia: {ex.Message}", "OK");
             }
         }
 
@@ -161,8 +161,8 @@ namespace MobileApp.Models.Team
         [RelayCommand]
         private async Task ForceTradeAsync()
         {
-            var confirm = await Shell.Current.DisplayAlert("Force Trade",
-                "Force this trade even if values don't match?", "Yes", "No");
+            var confirm = await Shell.Current.DisplayAlert("Forzar Trueque",
+                "¿Forzar trueque aunque no sea justo?", "Sí", "No");
             if (confirm)
             {
                 await SubmitTrade(true);
@@ -184,13 +184,13 @@ namespace MobileApp.Models.Team
 
             try
             {
-                UpdateLoadingState(true, $"Cargando trade data with {TradePartnerName}...");
+                UpdateLoadingState(true, $"Cargando datos del truque con {TradePartnerName}...");
 
                 _currentTradeData = await _teamService.GetTradeDataAsync(TeamId, SelectedFranchiseId);
 
                 if (_currentTradeData == null)
                 {
-                    await Shell.Current.DisplayAlert("Error", "Failed to load trade data", "OK");
+                    await Shell.Current.DisplayAlert("Error", "Error al cargar datos del trueque", "OK");
                     return;
                 }
 
@@ -199,7 +199,7 @@ namespace MobileApp.Models.Team
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to load trade data: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error al cargar datos del trueque: {ex.Message}", "OK");
             }
             finally
             {
@@ -281,14 +281,14 @@ namespace MobileApp.Models.Team
             _franchiseTotalValue += FranchisePicks.Where(p => p.IsSelected).Sum(p => DraftPicks.GetPickValue(p.Pick));
 
             // Update display texts
-            UserTotalValueText = $"Your Value: {_userTotalValue}";
-            FranchiseTotalValueText = $"Their Value: {_franchiseTotalValue}";
+            UserTotalValueText = $"Tu Valor: {_userTotalValue}";
+            FranchiseTotalValueText = $"Su Valor: {_franchiseTotalValue}";
 
             // Update trade balance
             var totalValue = _userTotalValue + _franchiseTotalValue;
             if (totalValue == 0)
             {
-                TradeBalanceText = "Select items to trade";
+                TradeBalanceText = "Selecciona items que intercambiar";
                 UserValueBarWidth = 0;
                 FranchiseValueBarWidth = 0;
             }
@@ -412,17 +412,17 @@ namespace MobileApp.Models.Team
 
                 if (success)
                 {
-                    await Shell.Current.DisplayAlert("Success", "Trade completed successfully!", "OK");
+                    await Shell.Current.DisplayAlert("Éxito", "!Trueque completado con éxito!", "OK");
                     await ReturnToOrigin(tradeDto);
                 }
                 else
                 {
-                    await Shell.Current.DisplayAlert("Trade Failed", "Trade was not accepted. Try adjusting values or use Force Trade.", "OK");
+                    await Shell.Current.DisplayAlert("Error", "Trueque no aceptado. Pruebe ajustando valores or forzando el trueque.", "OK");
                 }
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to submit trade: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error al solicitar el trueque: {ex.Message}", "OK");
             }
             finally
             {
@@ -454,7 +454,7 @@ namespace MobileApp.Models.Team
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Navigation error: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error de Navigación: {ex.Message}", "OK");
             }
         }
 
@@ -476,7 +476,7 @@ namespace MobileApp.Models.Team
         public SelectableDto Player { get; }
         public string Name => Player.Name;
         public string Position => Player.Position;
-        public string ValueText => $"Value: {DraftPicks.GetPlayerValue(Player)}";
+        public string ValueText => $"Valor: {DraftPicks.GetPlayerValue(Player)}";
         public bool IsUserPlayer { get; }
 
         [ObservableProperty] private bool isSelected;
@@ -511,7 +511,7 @@ namespace MobileApp.Models.Team
     {
         public int Pick { get; }
         public string DisplayText => $"Pick #{Pick}";
-        public string ValueText => $"Value: {DraftPicks.GetPickValue(Pick)}";
+        public string ValueText => $"Valor: {DraftPicks.GetPickValue(Pick)}";
         public bool IsUserPick { get; }
 
         [ObservableProperty] private bool isSelected;

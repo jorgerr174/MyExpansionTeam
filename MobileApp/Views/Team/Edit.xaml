@@ -158,44 +158,13 @@
                                     TextColor="White"
                                     FontSize="16"
                                     Padding="15"
-                                    IsEnabled="{Binding CanSave}">
+                                    IsEnabled="{Binding CanAction}">
                                 <Button.Text>
                                     <MultiBinding StringFormat="{}{0} Guardar Cambios">
                                         <Binding Path="IsSaving" Converter="{StaticResource BoolToLoadingTextConverter}" />
                                     </MultiBinding>
                                 </Button.Text>
                             </Button>
-                        </Grid>
-                    </StackLayout>
-                </Border>
-
-                <Border BackgroundColor="White"
-                        Stroke="#dee2e6"
-                        StrokeThickness="1"
-                        Padding="20"
-                        StrokeShape="RoundRectangle 12">
-                    <StackLayout Spacing="15">
-                        <Label Text="Administración del Equipo" 
-                               FontSize="18" 
-                               FontAttributes="Bold" 
-                               TextColor="#17a2b8" />
-
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="15">
-                            <Button Grid.Column="0"
-                                    Text="⚙️ Editar Ajustes"
-                                    Command="{Binding EditSettingsCommand}"
-                                    BackgroundColor="#17a2b8"
-                                    TextColor="White"
-                                    FontSize="14"
-                                    Padding="12" />
-
-                            <Button Grid.Column="1"
-                                    Text="👥 Editar Plantilla"
-                                    Command="{Binding EditRosterCommand}"
-                                    BackgroundColor="#17a2b8"
-                                    TextColor="White"
-                                    FontSize="14"
-                                    Padding="12" />
                         </Grid>
                     </StackLayout>
                 </Border>
@@ -217,8 +186,7 @@
                                     BackgroundColor="#007bff"
                                     TextColor="White"
                                     FontSize="14"
-                                    Padding="12"
-                                    IsEnabled="{Binding CanDuplicate}">
+                                    Padding="12">
                                 <Button.Text>
                                     <MultiBinding StringFormat="{}{0} Duplicar Equipo">
                                         <Binding Path="IsDuplicating" Converter="{StaticResource BoolToLoadingTextConverter}" />
@@ -232,7 +200,7 @@
                                     TextColor="White"
                                     FontSize="14"
                                     Padding="12"
-                                    IsEnabled="{Binding CanDelete}">
+                                    IsEnabled="{Binding CanAction}">
                                 <Button.Text>
                                     <MultiBinding StringFormat="{}{0} Borrar Equipo">
                                         <Binding Path="IsDeleting" Converter="{StaticResource BoolToLoadingTextConverter}" />
