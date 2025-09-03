@@ -38,12 +38,12 @@ namespace MobileApp.Models.Account
                 }
                 else
                 {
-                    ErrorMessage = "Failed to load profile";
+                    ErrorMessage = "Error al cargar la cuenta";
                 }
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Load failed: {ex.Message}";
+                ErrorMessage = $"Error al cargar la cuenta: {ex.Message}";
             }
             finally
             {
@@ -54,11 +54,13 @@ namespace MobileApp.Models.Account
         [RelayCommand]
         public async Task UpdateUser()
         {
-            // Only update if at least one field has new data
             if (string.IsNullOrWhiteSpace(NewFirstName) && string.IsNullOrWhiteSpace(NewLastName) &&
                 string.IsNullOrWhiteSpace(NewEmail) && string.IsNullOrWhiteSpace(NewTlf))
+                return;
+
+            if (!IsValidEmail(NewEmail))
             {
-                ErrorMessage = "Please enter at least one field to update";
+                ErrorMessage = "Por favor, introduzca una dirección de correo válida";
                 return;
             }
 
@@ -67,7 +69,6 @@ namespace MobileApp.Models.Account
 
             try
             {
-                // Use new values if provided, otherwise keep current values
                 string firstName = string.IsNullOrWhiteSpace(NewFirstName) ? CurrentFirstName : NewFirstName;
                 string lastName = string.IsNullOrWhiteSpace(NewLastName) ? CurrentLastName : NewLastName;
                 string email = string.IsNullOrWhiteSpace(NewEmail) ? CurrentEmail : NewEmail;
@@ -76,15 +77,31 @@ namespace MobileApp.Models.Account
                 if (await _accountService.UpdateUserAsync(firstName, lastName, email, tlf))
                     await BaseService.GoToProfileTabAsync();
                 else
-                    ErrorMessage = "Failed to update profile";
+                    ErrorMessage = "Error al actualizar la cuenta";
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Update failed: {ex.Message}";
+                ErrorMessage = $"Error al actualizar la cuenta: {ex.Message}";
             }
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
             }
         }
     }

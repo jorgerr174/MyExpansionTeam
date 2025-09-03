@@ -194,7 +194,7 @@ namespace MobileApp
         public static string apiURL = "https://localhost:7087/api/";
 #endif
 #else
-        public static string apiURL = "https://192.168.1.39:7087/api/";
+        public static string apiURL = "http://192.168.1.39:5088/api/";
 #endif
     }
 }

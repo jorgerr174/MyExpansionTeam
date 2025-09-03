@@ -154,11 +154,7 @@ namespace METAPI.Controllers
             string result = await _teamService.UpdateRosterSettings(User?.Identity?.Name, dto);
 
             return !String.IsNullOrWhiteSpace(result)
-                ? BadRequest(
-                    result.Equals("ProtectedPlayersIds")
-                    ? new ResultDto<TeamInfoDto>(result, dto)
-                    : new MessageDto(result)
-                )
+                ? BadRequest(new ResultDto<TeamInfoDto>(result, dto))
                 : Ok();
         }
 

@@ -80,7 +80,7 @@ namespace MobileApp.Models.Account
         {
             if (string.IsNullOrWhiteSpace(Identifier) || string.IsNullOrWhiteSpace(Password))
             {
-                LoginErrorMessage = "Please enter both identifier and password";
+                LoginErrorMessage = "Por favor, introduzca el identificador y contraseña.";
                 return;
             }
 
@@ -92,17 +92,16 @@ namespace MobileApp.Models.Account
             {
                 if (await _accountService.LogInAsync(Identifier, Password))
                 {
-                    // Send message to update auth state
                     WeakReferenceMessenger.Default.Send(new AuthStateChangedMessage(true));
                 }
                 else
                 {
-                    LoginErrorMessage = "Invalid credentials";
+                    LoginErrorMessage = "Credenciales inválidas.";
                 }
             }
             catch (Exception ex)
             {
-                LoginErrorMessage = $"Login failed: {ex.Message}";
+                LoginErrorMessage = $"Identifiación fallida: {ex.Message}";
             }
             finally
             {
@@ -129,12 +128,12 @@ namespace MobileApp.Models.Account
                 }
                 else
                 {
-                    ProfileErrorMessage = "Failed to load profile";
+                    ProfileErrorMessage = "Error al cargar la cuenta";
                 }
             }
             catch (Exception ex)
             {
-                ProfileErrorMessage = $"Load failed: {ex.Message}";
+                ProfileErrorMessage = $"Carga fallida: {ex.Message}";
             }
             finally
             {
@@ -169,11 +168,11 @@ namespace MobileApp.Models.Account
                     WeakReferenceMessenger.Default.Send(new AuthStateChangedMessage(false));
                 }
                 else
-                    ProfileErrorMessage = "Failed to delete account";
+                    ProfileErrorMessage = "Error al borrar cuenta.";
             }
             catch (Exception ex)
             {
-                ProfileErrorMessage = $"Delete failed: {ex.Message}";
+                ProfileErrorMessage = $"Error al borrar cuenta: {ex.Message}";
             }
             finally
             {
@@ -200,6 +199,5 @@ namespace MobileApp.Models.Account
         }
     }
 
-    // Message for auth state changes
     public record AuthStateChangedMessage(bool IsAuthenticated);
 }

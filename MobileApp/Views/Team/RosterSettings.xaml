@@ -259,7 +259,7 @@
                                         BackgroundColor="Transparent">
                             <CollectionView.GroupHeaderTemplate>
                                 <DataTemplate>
-                                    <Label Text="{Binding Key}" 
+                                    <Label Text="{Binding Path=Key}" 
                                            FontSize="14" 
                                            FontAttributes="Bold" 
                                            TextColor="#6c757d" 
@@ -292,9 +292,6 @@
                                                 <Label Text="{Binding Player.Name}" 
                                                        FontSize="14" 
                                                        FontAttributes="Bold" />
-                                                <Label Text="{Binding Player.Position}" 
-                                                       FontSize="11" 
-                                                       TextColor="#007bff" />
                                             </StackLayout>
 
                                             <Label Grid.Column="1" 
@@ -350,7 +347,7 @@
                             TextColor="White"
                             FontSize="14"
                             Padding="12"
-                            IsEnabled="{Binding CanSave}" />
+                            IsEnabled="{Binding IsNotLoading}" />
                 </Grid>
 
             </StackLayout>

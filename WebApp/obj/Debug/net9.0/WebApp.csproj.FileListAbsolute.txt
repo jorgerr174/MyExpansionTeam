@@ -313,3 +313,4 @@ C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.p
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\WebApp.genruntimeconfig.cache
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\ref\WebApp.dll
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\obj\Debug\net9.0\compressed\k7o4f5pkkh-pcqc59hrry.gz
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\WebApp\bin\Debug\net9.0\web.config

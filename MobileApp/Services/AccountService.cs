@@ -98,15 +98,17 @@ namespace MobileApp.Services
 
 
         #region CU004 UpdateCredentials
-        public async Task<bool> UpdateCredentialsAsync(string currentPassword, string newUsername, string newPassword)
+        public async Task<string> UpdateCredentialsAsync(string currentPassword, string newUsername, string newPassword)
         {
             try
             {
                 var updateDto = new UpdateCredentialsDto(currentPassword, newUsername, newPassword);
                 HttpResponseMessage response = await SendRequest(HttpMethod.Put, "Auth", "UpdateCredentials", updateDto);
-                return response.IsSuccessStatusCode;
+                return response.IsSuccessStatusCode 
+                    ? string.Empty
+                    : (await GetResult<MessageDto>(response)).Message;
             }
-            catch { return false; }
+            catch { return "Error"; }
         }
         #endregion CU004 UpdateCredentials
 
