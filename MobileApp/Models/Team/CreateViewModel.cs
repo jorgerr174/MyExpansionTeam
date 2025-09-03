@@ -46,11 +46,11 @@ namespace MobileApp.Models.Team
                 if (await _teamService.CreateTeamAsync(teamDto) is TeamInfoDto result)
                     await BaseService.GoToAsync(AppRoutes.TeamDetails, new() { ["TeamId"] = result.Id });
                 else
-                    ErrorMessage = "Failed to create team. Please try again.";
+                    ErrorMessage = "Error al crear el nuevo equipo. Pruebe de nuevo.";
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Error creating team: {ex.Message}";
+                ErrorMessage = $"Error creando el equipo: {ex.Message}";
             }
             finally
             {
@@ -68,27 +68,27 @@ namespace MobileApp.Models.Team
 
             if (string.IsNullOrWhiteSpace(Location))
             {
-                LocationError = "Location is required";
+                LocationError = "Campo obligatorio";
                 HasLocationError = true;
                 isValid = false;
             }
 
             if (string.IsNullOrWhiteSpace(Mascot))
             {
-                MascotError = "Mascot is required";
+                MascotError = "Campo obligatorio";
                 HasMascotError = true;
                 isValid = false;
             }
 
             if (string.IsNullOrWhiteSpace(Abb))
             {
-                AbbError = "Abbreviation is required";
+                AbbError = "Campo obligatorio";
                 HasAbbError = true;
                 isValid = false;
             }
             else if (Abb.Length < 2 || Abb.Length > 3)
             {
-                AbbError = "Abbreviation must be 2-3 characters";
+                AbbError = "Abreviatura debe tener 2-3 caracteres";
                 HasAbbError = true;
                 isValid = false;
             }
