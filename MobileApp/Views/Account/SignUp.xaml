@@ -15,21 +15,21 @@
                HorizontalOptions="Center" />
 
             <StackLayout>
-                <Label Text="Nombre" />
+                <Label Text="Nombre *" />
                 <Entry Text="{Binding FirstName}" 
                    Placeholder="Introduzca su nombre"
                    IsEnabled="{Binding IsFormEnabled}" />
             </StackLayout>
 
             <StackLayout>
-                <Label Text="Apellidos" />
+                <Label Text="Apellidos *" />
                 <Entry Text="{Binding LastName}" 
                    Placeholder="Introduzca sus apellidos"
                    IsEnabled="{Binding IsFormEnabled}" />
             </StackLayout>
 
             <StackLayout>
-                <Label Text="Email" />
+                <Label Text="Email *" />
                 <Entry Text="{Binding Email}" 
                    Placeholder="Introduzca su email"
                    Keyboard="Email"
@@ -45,14 +45,14 @@
             </StackLayout>
 
             <StackLayout>
-                <Label Text="Nombre de usuario" />
+                <Label Text="Nombre de usuario *" />
                 <Entry Text="{Binding Username}" 
                    Placeholder="Introduzca su nombre de usuario"
                    IsEnabled="{Binding IsFormEnabled}" />
             </StackLayout>
 
             <StackLayout>
-                <Label Text="Contraseña" />
+                <Label Text="Contraseña *" />
                 <Entry Text="{Binding Password}" 
                    IsPassword="True"
                    Placeholder="Introduzca una contraseña"
@@ -60,7 +60,7 @@
             </StackLayout>
 
             <StackLayout>
-                <Label Text="Repetir contraseña" />
+                <Label Text="Repetir contraseña *" />
                 <Entry Text="{Binding ConfirmPassword}" 
                    IsPassword="True"
                    Placeholder="Repita la contraseña"

@@ -16,7 +16,7 @@ namespace WebApp.Models.Account
 
         [Required]
         [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "Passwords do not match.")]
+        [Compare("Password", ErrorMessage = "Contraseñas no coinciden.")]
         [DisplayName("Repetir Contraseña")]
         public string ConfirmPassword { get; set; } = string.Empty;
 

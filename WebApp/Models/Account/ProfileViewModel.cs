@@ -19,7 +19,7 @@ namespace WebApp.Models.Account
         public string? LastName { get; set; } = string.Empty;
 
         [DataType(DataType.EmailAddress)]
-        [DisplayName("Correo")]
+        [DisplayName("Email")]
         public string? Email { get; set; } = string.Empty;
 
         [DataType(DataType.PhoneNumber)]

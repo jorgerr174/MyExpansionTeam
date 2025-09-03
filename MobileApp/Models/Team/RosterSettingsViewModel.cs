@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.Team;
+using Microsoft.CodeAnalysis.Operations;
 using MobileApp.Services;
 
 namespace MobileApp.Models.Team
@@ -63,20 +64,22 @@ namespace MobileApp.Models.Team
                 else
                 {
                     HasLoadError = true;
-                    LoadErrorMessage = "Team not found";
+                    LoadErrorMessage = "Equipo no encontrado";
                 }
                 return;
             }
             catch (Exception ex)
             {
                 HasLoadError = true;
-                LoadErrorMessage = $"Failed to load team: {ex.Message}";
+                LoadErrorMessage = $"Error al cargar equipo: {ex.Message}";
             }
             finally
             {
                 IsLoading = false;
                 IsNotLoading = true;
             }
+
+            OnPropertyChanged(nameof(CanSave));
         }
 
         [RelayCommand] public async Task DisplayPlayerSelection() => ShowPlayerSelection = true;
@@ -165,34 +168,30 @@ namespace MobileApp.Models.Team
                     RosterSettingsProtectedPlayersIds = ProtectedPlayersIds
                 };
 
-                var success = await _teamService.UpdateRosterSettingsAsync(updateDto);
+                string message = await _teamService.UpdateRosterSettingsAsync(updateDto);
 
-                if (success)
+                if (String.IsNullOrWhiteSpace(message))
                 {
-                    await Shell.Current.DisplayAlert("Success", "Roster settings saved successfully!", "OK");
-                    await Shell.Current.GoToAsync($"//TeamDetails?teamId={Team.Id}");
+                    await Shell.Current.DisplayAlert("Éxito", "Ajustes de equipo guardados con éxito!", "OK");
+                    await GoBackToTeam();
                 }
                 else
-                {
-                    await Shell.Current.DisplayAlert("Error", "Failed to save settings. Please try again.", "OK");
-                }
+                    await Shell.Current.DisplayAlert("Error", "Error al guardar los ajustes. Pruebe de nuevo.", "OK");
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Error saving settings: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error al guardar los ajustes: {ex.Message}", "OK");
             }
             finally
             {
                 IsLoading = false;
             }
+            OnPropertyChanged(nameof(CanSave));
         }
 
         partial void OnSelectedNflTeamChanged(NflTeamViewModel? value)
         {
-            if (value != null)
-            {
-                LoadTeamPlayers(value.Id);
-            }
+            if (value != null)  LoadTeamPlayers(value.Id);
             OnPropertyChanged(nameof(HasSelectedTeam));
         }
 
@@ -207,10 +206,7 @@ namespace MobileApp.Models.Team
 
         partial void OnIsManualProtectionChanged(bool value)
         {
-            if (value)
-            {
-                IsAutomaticProtection = false;
-            }
+            if (value) IsAutomaticProtection = false;
         }
 
         private void InitializeNflTeams()

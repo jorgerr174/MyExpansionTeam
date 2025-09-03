@@ -138,14 +138,27 @@ namespace MobileApp.Services
 
 
         #region CU010 UpdateRosterSettings
-        public async Task<bool> UpdateRosterSettingsAsync(TeamInfoDto settings)
+        public async Task<string> UpdateRosterSettingsAsync(TeamInfoDto settings)
         {
+            string message = string.Empty;
             try
             {
                 HttpResponseMessage response = await SendRequest(HttpMethod.Put, "Teams", "UpdateRosterSettings", settings);
-                return response.IsSuccessStatusCode;
+                if(response.IsSuccessStatusCode) return string.Empty;
+
+                ResultDto<TeamInfoDto> result = await GetResult<ResultDto<TeamInfoDto>>(response);
+                if (result.Message.Equals("Username")) await  AccountService.LogOutAsync();
+                else if (result.Message.Equals("ProtectedPlayersIds"))
+                {
+                    settings.RosterSettingsProtectedPlayersIds = result.Value.RosterSettingsProtectedPlayersIds;
+                    message = "Error al guardar los jugadores protegidos. Pruebe de nuevo.";
+                }
+                else message = "No se pudieron guardar los cambios.";
+
             }
-            catch { return false; }
+            catch { message = string.Empty; }
+
+            return message;
         }
         #endregion CU010 UpdateRosterSettings
 
