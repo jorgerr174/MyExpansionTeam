@@ -45,7 +45,7 @@ namespace WebApp.Controllers
         [Authorize]
         public IActionResult Create()
         {
-            return View();
+            return View(new TeamBasicInfoDto(User.Identity.Name));
         }
 
         [HttpPost]
