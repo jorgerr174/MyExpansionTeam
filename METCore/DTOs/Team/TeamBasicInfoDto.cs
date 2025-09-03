@@ -43,6 +43,11 @@ namespace METCore.DTOs.Team
             this.Complete = false;
         }
 
+        public TeamBasicInfoDto(string username) : this()
+        {
+            this.UserUsername = username;
+        }
+
         public TeamBasicInfoDto(int Id, string Location, string Abb, string Mascot)
         {
             this.Id = Id;
