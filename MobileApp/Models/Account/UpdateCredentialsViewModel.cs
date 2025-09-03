@@ -20,19 +20,16 @@ namespace MobileApp.Models.Account
         {
             if (string.IsNullOrWhiteSpace(CurrentPassword))
             {
-                ErrorMessage = "Current password is required";
+                ErrorMessage = "Contraseña actual es obligatoria.";
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(NewUsername) && string.IsNullOrWhiteSpace(NewPassword))
-            {
-                ErrorMessage = "Please enter new username or new password";
                 return;
-            }
 
             if (!string.IsNullOrWhiteSpace(NewPassword) && NewPassword != ConfirmPassword)
             {
-                ErrorMessage = "New passwords don't match";
+                ErrorMessage = "Las nuevas contraseñas no coinciden.";
                 return;
             }
 
@@ -41,17 +38,18 @@ namespace MobileApp.Models.Account
 
             try
             {
-                if (await _accountService.UpdateCredentialsAsync(CurrentPassword, NewUsername, NewPassword))
+                string result = await _accountService.UpdateCredentialsAsync(CurrentPassword, NewUsername, NewPassword);
+                if (String.IsNullOrWhiteSpace(result))
                 {
                     AccountService.LogOutAsync();
                     await BaseService.GoToProfileTabAsync();
                 }
                 else
-                    ErrorMessage = "Failed to update credentials";
+                    ErrorMessage = "Error al actualizar las credenciales: " + result;
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Update failed: {ex.Message}";
+                ErrorMessage = $"Actualización fallida: {ex.Message}";
             }
             finally
             {

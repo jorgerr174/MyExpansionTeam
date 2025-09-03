@@ -45,7 +45,7 @@ namespace WebApp.Controllers
         [Authorize]
         public IActionResult Create()
         {
-            return View();
+            return View(new TeamBasicInfoDto(User.Identity.Name));
         }
 
         [HttpPost]
@@ -173,8 +173,13 @@ namespace WebApp.Controllers
             HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "UpdateRosterSettings", dto);
             if (response.IsSuccessStatusCode) return RedirectToAction("EditRoster", new { dto.Id });
 
-            MessageDto result = await GetResult<MessageDto>(response);
+            ResultDto<TeamInfoDto> result = await GetResult<ResultDto<TeamInfoDto>>(response);
             if (result.Message.Equals("Username")) return RedirectToAction("LogOut", new RouteValueDictionary(new { ReturnUrl = Url.Action("MyTeams", "Team") }));
+            else if (result.Message.Equals("ProtectedPlayersIds")) 
+            {
+                dto.RosterSettingsProtectedPlayersIds = result.Value.RosterSettingsProtectedPlayersIds;
+                ModelState.AddModelError("", "Error al guardar los jugadores protegidos. Pruebe de nuevo.");
+            }
             else ModelState.AddModelError("", "No se pudieron guardar los cambios.");
 
             return View("RosterSettings", dto);

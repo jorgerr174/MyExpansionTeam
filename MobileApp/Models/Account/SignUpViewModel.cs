@@ -23,13 +23,19 @@ namespace MobileApp.Models.Account
             if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password) || string.IsNullOrWhiteSpace(ConfirmPassword)
                 || string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(Email))
             {
-                ErrorMessage = "Please fill all required fields";
+                ErrorMessage = "Por favor, introduzca todos los campos requeridos.";
+                return;
+            }
+
+            if (!IsValidEmail(Email))
+            {
+                ErrorMessage = "Por favor, introduzca una dirección de correo válida";
                 return;
             }
 
             if (!Password.Equals(ConfirmPassword))
             {
-                ErrorMessage = "The passwords dont match";
+                ErrorMessage = "Las contraseñas no coinciden.";
                 return;
             }
 
@@ -41,15 +47,31 @@ namespace MobileApp.Models.Account
                 if (await _accountService.SignUpAsync(Username, Password, ConfirmPassword, FirstName, LastName, Email, Tlf))
                     await BaseService.GoToProfileTabAsync();
                 else
-                    ErrorMessage = "Sign up failed";
+                    ErrorMessage = "Creación de cuenta fallida";
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Sign up failed: {ex.Message}";
+                ErrorMessage = $"Creación de cuenta fallida: {ex.Message}";
             }
             finally
             {
                 IsLoading = false;
+            }
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
             }
         }
     }
