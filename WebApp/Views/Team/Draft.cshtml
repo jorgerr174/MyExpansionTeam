@@ -710,7 +710,7 @@
             if (filteredPlayers.length === 0) {
                 container.innerHTML = `
                     <div class="text-center p-4">
-                        <p class="text-muted">No players available for ${currentPositionFilter} position.</p>
+                        <p class="text-muted">No hay jugadores disponibles para la posición ${currentPositionFilter}.</p>
                     </div>
                 `;
                 return;
@@ -727,7 +727,7 @@
                 if (isUserControlled) {
                     cardDiv.classList.add('selectable');
                     cardDiv.style.cursor = 'pointer';
-                    cardDiv.title = 'Click to draft this player';
+                    cardDiv.title = 'Clica para draftear este prospecto';
                 } else {
                     cardDiv.style.cursor = 'not-allowed';
                     cardDiv.style.opacity = '0.6';
@@ -742,10 +742,10 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="player-header">
-                                    <h6 class="player-title mb-1">${player.name || 'Unknown'}</h6>
+                                    <h6 class="player-title mb-1">${player.name || ''}</h6>
                                     <div class="player-basic-info mb-2">
                                         <span class="badge bg-primary me-2">${player.position || 'N/A'}</span>
-                                        <span class="text-muted">${player.college || 'Unknown College'}</span>
+                                        <span class="text-muted">${player.college || ''}</span>
                                     </div>
                                     <div class="player-physical mb-2">
                                         <small class="text-muted">
@@ -872,7 +872,7 @@
 
             const currentPick = draftOrder[currentPickIndex];
             
-            if (!confirm(`Elegir ${player.name} (${player.position}) con el pick #${currentPick.overall}?`)) {
+            if (!confirm(`Elegir a ${player.name} (${player.position}) con el pick #${currentPick.overall}?`)) {
                 return;
             }
 
@@ -1053,7 +1053,7 @@
             pickInfo.innerHTML = `
                 <strong>Pick #${currentPick.overall}</strong> - ${currentPick.teamName}
                 <br>Ronda ${currentPick.round}, Pick ${currentPick.pickInRound}
-                ${currentPick.isUserControlled ? '<br><span class="badge bg-warning text-dark">Your Turn!</span>' : ''}
+                ${currentPick.isUserControlled ? '<br><span class="badge bg-warning text-dark">Tu turno!</span>' : ''}
             `;
         }
 
@@ -1118,7 +1118,7 @@
                                     <h6 class="card-title text-success">${player.name}</h6>
                                     <div class="mb-2">
                                         <span class="badge bg-primary me-2">${player.position}</span>
-                                        <small class="text-muted">${player.college || 'Colegio desconocido'}</small>
+                                        <small class="text-muted">${player.college || ''}</small>
                                     </div>
                                     <div class="mb-2">
                                         <small class="text-muted">

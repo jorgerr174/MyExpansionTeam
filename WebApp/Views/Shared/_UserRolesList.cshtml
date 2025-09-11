@@ -1,5 +1,5 @@
 ﻿@model IList<METCore.DTOs.User.UserDto>
-@using METCore.Enums
+@using static METCore.Enums.Types
 
 @foreach (var user in Model ?? [])
 {
@@ -9,34 +9,24 @@
         <td>@user.Email</td>
         <td>@user.Tlf</td>
         <td>
-            @if (user.Role == Types.RoleEnum.User)
+            @if (user.Role == RoleEnum.User)
             {
                 <select class="form-select role-select" data-original-role="User" data-username="@user.Username">
-                    <option value="@Types.RoleEnum.User" selected>User</option>
-                    <option value="@Types.RoleEnum.Manager">Manager</option>
-                    <option value="@Types.RoleEnum.Admin">Admin</option>
-                </select>
-            }
-            else if (user.Role == Types.RoleEnum.Manager)
-            {
-                <select class="form-select role-select" data-original-role="Manager" data-username="@user.Username">
-                    <option value="@Types.RoleEnum.User">User</option>
-                    <option value="@Types.RoleEnum.Manager" selected>Manager</option>
-                    <option value="@Types.RoleEnum.Admin">Admin</option>
+                    <option value="@RoleEnum.User" selected>User</option>
+                    <option value="@RoleEnum.Admin">Admin</option>
                 </select>
             }
             else
             {
                 <select class="form-select role-select" disabled data-original-role="Admin" data-username="@user.Username">
-                    <option value="@Types.RoleEnum.User">User</option>
-                    <option value="@Types.RoleEnum.Manager">Manager</option>
-                    <option value="@Types.RoleEnum.Admin" selected>Admin</option>
+                    <option value="@RoleEnum.User">User</option>
+                    <option value="@RoleEnum.Admin" selected>Admin</option>
                 </select>
             }
         </td>
         <td>
             <button type="button" class="btn btn-success btn-sm save-role-btn" style="display: none;" data-username="@user.Username">
-                Save New Role
+                Guardar nuevo rol
             </button>
         </td>
     </tr>

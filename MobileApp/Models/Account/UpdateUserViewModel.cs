@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using METCore.DTOs.User;
@@ -61,6 +62,12 @@ namespace MobileApp.Models.Account
             if (!IsValidEmail(NewEmail))
             {
                 ErrorMessage = "Por favor, introduzca una dirección de correo válida";
+                return;
+            }
+
+            if (!Regex.Match(NewTlf, @"^(\d{9})?$").Success)
+            {
+                ErrorMessage = "El teléfono debe tener nueve dígitos.";
                 return;
             }
 

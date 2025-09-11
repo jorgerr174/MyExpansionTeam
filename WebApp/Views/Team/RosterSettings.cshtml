@@ -33,7 +33,7 @@
                 </div>
             </div>
 
-            <form method="post" id="rosterSettingsForm">
+            <form asp-action="SaveRosterSettings" method="post" id="rosterSettingsForm">
                 @Html.HiddenFor(m => m.Id)
                 @Html.HiddenFor(m => m.Location)
                 @Html.HiddenFor(m => m.Mascot)
@@ -56,7 +56,7 @@
                                     <i class="fas fa-dollar-sign me-1"></i>@Html.LabelFor(m => m.RosterSettingsCap)
                                 </label>
                                 <input type="number" class="form-control" id="capInput" name="RosterSettingsCap" value="@Html.DisplayFor(m => m.RosterSettingsCap)" min="60" max="120" required>
-                                <div class="form-text">Porcentaje respecto al total actual</div>
+                                <div class="form-text">Porcentaje respecto al total actual ($224M)</div>
                             </div>
                             <div class="col-md-4">
                                 <label for="maxPerTeamInput" class="form-label fw-bold text-muted">
@@ -241,17 +241,14 @@
 
 <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
-        // State variables
         let protectedPlayersArray = [];
         let currentTeamId = null;
         let protectedPerTeam = parseInt(document.getElementById('protectedPerTeamInput').value) || 3;
         let isManualProtection = false;
 
-        // NFL teams data - will be populated from API
         const nflTeams = {};
-        const teamPlayersCache = {}; // Cache loaded team players
+        const teamPlayersCache = {};
 
-        // Team names mapping
         const teamNames = {
             1: { name: "Arizona Cardinals", abbreviation: "ARI" },
             2: { name: "Atlanta Falcons", abbreviation: "ATL" },
@@ -287,23 +284,17 @@
             32: { name: "Washington Commanders", abbreviation: "WAS" }
         };
 
-        // Initialize the page
         initializePage();
 
         function initializePage() {
-            // Load existing protected players
             const existingProtectedPlayers = @Html.Raw(Json.Serialize(Model.RosterSettingsProtectedPlayersIds));
             if (existingProtectedPlayers && existingProtectedPlayers.length > 0) {
                 protectedPlayersArray = existingProtectedPlayers;
             }
 
-            // Set up event listeners
             setupEventListeners();
-
-            // Populate teams list
             populateTeamsList();
 
-            // Update protected per team when input changes
             document.getElementById('protectedPerTeamInput').addEventListener('change', function() {
                 protectedPerTeam = parseInt(this.value) || 3;
                 updateSelectedCount();
@@ -312,7 +303,6 @@
         }
 
         function setupEventListeners() {
-            // Radio button change events
             document.querySelectorAll('input[name="protectionMethod"]').forEach(radio => {
                 radio.addEventListener('change', function() {
                     isManualProtection = this.value === 'manual';
@@ -323,21 +313,18 @@
                         populateTeamsList();
                     } else {
                         manualArea.style.display = 'none';
-                        // Clear manual selections when switching to auto
                         protectedPlayersArray = [];
                         updateProtectedPlayersHiddenFields();
                     }
                 });
             });
 
-            // Clear team selection button
             document.getElementById('clearTeamSelection').addEventListener('click', function() {
                 if (currentTeamId !== null) {
                     clearTeamSelection(currentTeamId);
                 }
             });
 
-            // Form submission
             document.getElementById('rosterSettingsForm').addEventListener('submit', function(e) {
                 updateProtectedPlayersHiddenFields();
             });
@@ -383,27 +370,22 @@
         function selectTeam(teamId) {
             currentTeamId = teamId;
 
-            // Update active state in sidebar
             document.querySelectorAll('#franchisesList .list-group-item').forEach(item => {
                 item.classList.remove('active');
             });
             document.querySelector(`[data-team-id="${teamId}"]`).classList.add('active');
 
-            // Update team name display
             const teamInfo = teamNames[teamId];
             document.getElementById('currentTeamName').textContent = `${teamInfo.name} (${teamInfo.abbreviation})`;
 
-            // Show clear button
             document.getElementById('clearTeamSelection').style.display = 'inline-block';
 
-            // Load team players
             loadTeamPlayers(teamId);
         }
 
         function loadTeamPlayers(teamId) {
             const container = document.getElementById('playerSelectionArea');
 
-            // Show loading state
             container.innerHTML = `
                 <div class="text-center p-4">
                     <div class="spinner-border text-primary" role="status">
@@ -413,13 +395,11 @@
                 </div>
             `;
 
-            // Check cache first
             if (teamPlayersCache[teamId]) {
                 displayPlayersForTeam(teamPlayersCache[teamId]);
                 return;
             }
 
-            // Load from API
             fetch(`/Team/GetProtectablePlayers?FranchiseId=${teamId}`)
                 .then(response => {
                     if (!response.ok) {
@@ -464,19 +444,10 @@
             const container = document.getElementById('playerSelectionArea');
             container.innerHTML = '';
 
-            // Process default protected players first
-            // team.players.forEach(player => {
-            //     if (player.defaultProtected && !protectedPlayersArray.includes(player.id)) {
-            //         protectedPlayersArray.push(player.id);
-            //     }
-            // });
-
-            // Update UI elements after processing default protected players
             updateProtectedPlayersHiddenFields();
             updateSelectedCount();
-            populateTeamsList(); // Refresh team status
+            populateTeamsList();
 
-            // Group players by position
             const playersByPosition = {};
             team.players.forEach(player => {
                 if (!playersByPosition[player.position]) {
@@ -485,7 +456,6 @@
                 playersByPosition[player.position].push(player);
             });
 
-            // Create position sections
             Object.keys(playersByPosition).forEach(position => {
                 const positionSection = document.createElement('div');
                 positionSection.className = 'mb-4';
@@ -521,7 +491,6 @@
                         </div>
                     `;
 
-                    // Add click event listener
                     const card = playerDiv.querySelector('.player-card');
                     card.addEventListener('click', function() {
                         togglePlayerSelection(player.id, team.id);
@@ -539,10 +508,8 @@
             const teamPlayers = protectedPlayersArray.filter(id => getPlayerTeamId(id) === teamId);
 
             if (playerIndex > -1) {
-                // Remove player
                 protectedPlayersArray.splice(playerIndex, 1);
             } else {
-                // Add player (check team limit)
                 if (teamPlayers.length >= protectedPerTeam) {
                     alert(`You can only protect ${protectedPerTeam} players per team.`);
                     return;
@@ -550,11 +517,10 @@
                 protectedPlayersArray.push(playerId);
             }
 
-            // Update UI
             updatePlayerCardAppearance(playerId);
             updateSelectedCount();
             updateProtectedPlayersHiddenFields();
-            populateTeamsList(); // Refresh team status
+            populateTeamsList();
         }
 
         function updatePlayerCardAppearance(playerId) {
@@ -566,7 +532,6 @@
         }
 
         function clearTeamSelection(teamId) {
-            // Remove all players from this team
             if(!teamPlayersCache[teamId]) return;
             
             teamPlayersCache[teamId].players.forEach(player => {
@@ -577,7 +542,6 @@
                 }
             });
 
-            // Update UI
             updateSelectedCount();
             updateProtectedPlayersHiddenFields();
             populateTeamsList();
@@ -603,11 +567,9 @@
         }
 
         function updateProtectedPlayersHiddenFields() {
-            // Remove existing hidden inputs for this field
             const existingInputs = document.querySelectorAll('input[name^="RosterSettingsProtectedPlayersIds["]');
             existingInputs.forEach(input => input.remove());
 
-            // Create individual hidden inputs for each player ID
             const form = document.getElementById('rosterSettingsForm');
             protectedPlayersArray.forEach((playerId, index) => {
                 const input = document.createElement('input');
@@ -618,23 +580,20 @@
             });
         }
 
-        // Helper function to determine which team a player belongs to
         function getPlayerTeamId(playerId) {
-            // Search through all cached teams to find which team this player belongs to
             for (const [teamId, teamData] of Object.entries(nflTeams)) {
                 if (teamData.players && teamData.players.some(player => player.id === playerId)) {
                     return parseInt(teamId);
                 }
             }
 
-            // Also check teamPlayersCache as fallback
             for (const [teamId, teamData] of Object.entries(teamPlayersCache)) {
                 if (teamData.players && teamData.players.some(player => player.id === playerId)) {
                     return parseInt(teamId);
                 }
             }
 
-            return null; // Player not found in any team
+            return null;
         }
     });
 </script>

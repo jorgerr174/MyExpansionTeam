@@ -61,13 +61,13 @@ namespace MobileApp.Models.Team
                 else
                 {
                     HasLoadError = true;
-                    LoadErrorMessage = "Team not found";
+                    LoadErrorMessage = "Equipo no encontrado";
                 }
             }
             catch (Exception ex)
             {
                 HasLoadError = true;
-                LoadErrorMessage = $"Failed to load team: {ex.Message}";
+                LoadErrorMessage = $"Error al cargar el equipo: {ex.Message}";
             }
             finally
             {
@@ -92,7 +92,7 @@ namespace MobileApp.Models.Team
                     GetEffectiveValue(Mascot, Team.Mascot), Team.UserUsername, Team.Date, false)))
                 {
                     await LoadViewAsync(Team.Id);
-                    await Shell.Current.DisplayAlert("Success", "!Equipo guardado con éxito!", "OK");
+                    await Shell.Current.DisplayAlert("Éxito", "!Equipo guardado con éxito!", "OK");
                 }
                 else
                     await Shell.Current.DisplayAlert("Error", "Error al guardar el equipo. Por favor, pruebe de nuevo.", "OK");
@@ -174,14 +174,14 @@ namespace MobileApp.Models.Team
 
             if (!string.IsNullOrWhiteSpace(Location) && string.IsNullOrWhiteSpace(Location.Trim()))
             {
-                LocationError = "Location cannot be empty";
+                LocationError = "Ubicación no puede estar vacía";
                 HasLocationError = true;
                 isValid = false;
             }
 
             if (!string.IsNullOrWhiteSpace(Mascot) && string.IsNullOrWhiteSpace(Mascot.Trim()))
             {
-                MascotError = "Mascot cannot be empty";
+                MascotError = "Mascota no puede estar vacía";
                 HasMascotError = true;
                 isValid = false;
             }
@@ -191,13 +191,13 @@ namespace MobileApp.Models.Team
                 var trimmedAbb = Abb.Trim();
                 if (string.IsNullOrWhiteSpace(trimmedAbb))
                 {
-                    AbbError = "Abbreviation cannot be empty";
+                    AbbError = "Abreviatura no puede estar vacía";
                     HasAbbError = true;
                     isValid = false;
                 }
                 else if (trimmedAbb.Length < 2 || trimmedAbb.Length > 3)
                 {
-                    AbbError = "Abbreviation must be 2-3 characters";
+                    AbbError = "Abreviatura de 2-3 caracteres";
                     HasAbbError = true;
                     isValid = false;
                 }

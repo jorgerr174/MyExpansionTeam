@@ -16,7 +16,6 @@ namespace MobileApp.Models.Team
 
         [ObservableProperty] private string loadingMessage = "Cargando...";
 
-        // Draft Setup
         [ObservableProperty] private bool showDraftInterface = false;
         [ObservableProperty] private bool isAutoDraft = false;
         [ObservableProperty] private bool isOnlyTeam = true;
@@ -27,7 +26,6 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private bool isSlowSpeed = false;
         public int PickTimeOut = 0;
 
-        // Draft State
         [ObservableProperty] private int currentPickIndex = 0;
         [ObservableProperty] private string currentPickText = "";
 
@@ -35,15 +33,12 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private bool showPauseButton = true;
         [ObservableProperty] private string pauseResumeText = "Comenzar";
 
-        // Current Pick Info
         [ObservableProperty] private string currentPickInfoTitle = "";
         [ObservableProperty] private string currentPickInfoText = "";
 
-        // Filters
         [ObservableProperty] private string selectedPositionFilter = "All";
         [ObservableProperty] private ObservableCollection<string> positionFilters = [];
 
-        // Collections
         [ObservableProperty] private ObservableCollection<DraftPickItem> draftOrder = [];
         [ObservableProperty] private ObservableCollection<ProspectItem> prospects = [];
         [ObservableProperty] private ObservableCollection<FranchiseItem> franchises = [];
@@ -57,7 +52,6 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private bool allowTrades = true;
         [ObservableProperty] private bool showCurrentPickInfo = false;
 
-        // Data
         [NotNull] private DraftDto Draft;
         [ObservableProperty] private string teamName = string.Empty;
 
@@ -65,21 +59,6 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private bool isDraftComplete = false;
 
         public DraftPickItem CurrentPick => DraftOrder[CurrentPickIndex - 1];
-
-        //public void ApplyQueryAttributes(IDictionary<string, object> query)
-        //{
-        //    if (query.ContainsKey("teamId") && query["teamId"] is int tId)
-        //        TeamId = tId;
-
-        //    // Check if returning from trade
-        //    if (query.ContainsKey("tradedFranchiseId") && query.ContainsKey("currentPick"))
-        //    {
-        //        HandleTradeReturn(query);
-        //        return;
-        //    }
-
-        //    _ = LoadViewCommand.ExecuteAsync(null);
-        //}
 
 
         #region OnLoad
@@ -112,7 +91,7 @@ namespace MobileApp.Models.Team
         {
             try
             {
-                UpdateLoadingState(true, "Cargando draft data...");
+                UpdateLoadingState(true, "Cargando draft...");
 
                 if (await _teamService.GetTeamDraftAsync(teamId) is DraftDto draft)
                 {
@@ -223,7 +202,7 @@ namespace MobileApp.Models.Team
         private async Task TogglePause()
         {
             IsPaused = !IsPaused;
-            PauseResumeText = IsPaused ? "Resume" : "Pause";
+            PauseResumeText = IsPaused ? "Resumir" : "Pausa";
 
             if (!IsPaused) await AdvanceToNextPick();
         }
@@ -401,7 +380,7 @@ namespace MobileApp.Models.Team
         {
             try
             {
-                UpdateLoadingState(true, "Saving draft...");
+                UpdateLoadingState(true, "Guardando draft...");
 
                 Dictionary<int, int> selections = [];
                 foreach (var pick in DraftOrder.Where(p => p.IsUserControlled && p.HasSelection))
@@ -416,7 +395,7 @@ namespace MobileApp.Models.Team
 
                 if (success)
                 {
-                    await Shell.Current.DisplayAlert("Success", "!Draft guardado con éxito!", "OK");
+                    await Shell.Current.DisplayAlert("Éxito", "!Draft guardado con éxito!", "OK");
                     await GoToRoster();
                 }
                 else

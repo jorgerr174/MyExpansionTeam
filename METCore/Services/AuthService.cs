@@ -114,7 +114,6 @@ namespace METCore.Services
                 new Claim(ClaimTypes.Name, user.Username)
             };
 
-            // Generate token
             var jwtSettings = _configuration.GetSection("JwtSettings");
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"] ?? ""));
             var creds = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
