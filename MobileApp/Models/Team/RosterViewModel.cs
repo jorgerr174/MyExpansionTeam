@@ -16,21 +16,17 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private TeamDto? team = null;
         [ObservableProperty] private bool hasTeam = false;
 
-        // Local state management
         private IList<int> _rosterPlayerIds = [];
         private IList<int> _protectedPlayerIds = [];
         private IList<int> _tradedPlayerIds = [];
         private double _salaryCapLimit = 224000000; // $224M base
         private int _maxPerFranchise = 3;
 
-        // Caching
         private Dictionary<int, IList<SelectableDto>?> _franchisePlayersCache = [];
 
-        // Tab Management
         [ObservableProperty] private string selectedTab = "build";
         [ObservableProperty] private double tabIndicatorPosition = 0;
 
-        // Tab Colors
         [ObservableProperty] private Color buildTabColor = Colors.White;
         [ObservableProperty] private Color buildTabTextColor = Color.FromArgb("#007bff");
         [ObservableProperty] private Color reviewTabColor = Color.FromArgb("#f8f9fa");
@@ -42,33 +38,28 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private Color draftTabColor = Color.FromArgb("#f8f9fa");
         [ObservableProperty] private Color draftTabTextColor = Color.FromArgb("#6c757d");
 
-        // Tab Visibility
         [ObservableProperty] private bool isBuildTabSelected = true;
         [ObservableProperty] private bool isReviewTabSelected = false;
         [ObservableProperty] private bool isFormationTabSelected = false;
         [ObservableProperty] private bool isTradesTabSelected = false;
         [ObservableProperty] private bool isDraftTabSelected = false;
 
-        // Salary Cap Display
         [ObservableProperty] private double capProgressWidth = 0;
         [ObservableProperty] private Color capProgressColor = Color.FromArgb("#007bff");
         [ObservableProperty] private string currentCapText = "$0M / $224M";
         [ObservableProperty] private string rosterCountText = "0 jugadores";
 
-        // Build Tab
         [ObservableProperty] private FranchiseModel? selectedFranchise;
         [ObservableProperty] private bool hasSelectedFranchise = false;
         [ObservableProperty] private string selectedFranchiseTitle = "";
         [ObservableProperty] private string selectedPositionFilter = "All";
         [ObservableProperty] private string selectedReviewPositionFilter = "All";
 
-        // Save functionality
         [ObservableProperty] private bool canSaveRoster = true;
         [ObservableProperty] private Color saveButtonColor = Color.FromArgb("#28a745");
         [ObservableProperty] private bool hasSaveWarning = false;
         [ObservableProperty] private string saveWarningText = "";
 
-        // Formation Management Properties
         [ObservableProperty] private string viewedFormationType = "offense";
         [ObservableProperty] private Color offenseViewColor = Color.FromArgb("#007bff");
         [ObservableProperty] private Color offenseViewTextColor = Colors.White;
@@ -81,16 +72,13 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private bool isDefenseViewSelected = false;
         [ObservableProperty] private bool isSpecialViewSelected = false;
 
-        // Collections
         public ObservableCollection<FranchiseModel> Franchises { get; } = [];
         public ObservableCollection<PositionGroupModel> PlayersByPosition { get; } = [];
         public ObservableCollection<PositionGroupModel> RosterByPosition { get; } = [];
 
-        // Formation Collections
         public ObservableCollection<string> AvailableFormations { get; } = [];
         public ObservableCollection<FormationPosition> FormationPositions { get; } = [];
         public ObservableCollection<DraggablePlayer> AvailablePlayersForFormation { get; } = [];
-        // Formation Data Storage
         public Thickness FDylMargin => new(10, IsDefenseViewSelected ? 90 : 10);
         public LayoutOptions SylVo => new(IsDefenseViewSelected ? LayoutAlignment.End : LayoutAlignment.Start, true);
         public Thickness SylMargin => new(10, IsDefenseViewSelected ? 60 : 95);
@@ -121,7 +109,6 @@ namespace MobileApp.Models.Team
 
             try
             {
-                // Load team data
                 Team = await _teamService.GetTeamAsync(teamId);
 
                 if (Team != null)
@@ -133,7 +120,7 @@ namespace MobileApp.Models.Team
                     _tradedPlayerIds = Team.TradedPlayers?.Select(p => p.Id).ToList() ?? [];
 
                     var capPercentage = Team.RosterSettingsCap;
-                    _salaryCapLimit = (capPercentage / 100.0) * 224000000; // $224M base
+                    _salaryCapLimit = (capPercentage / 100.0) * 224000000;
                     _maxPerFranchise = Team.RosterSettingsMaxPerTeam;
 
                     LoadFranchises();
@@ -146,13 +133,13 @@ namespace MobileApp.Models.Team
                 else
                 {
                     HasLoadError = true;
-                    LoadErrorMessage = "Team not found";
+                    LoadErrorMessage = "Equipo no encontrado";
                 }
             }
             catch (Exception ex)
             {
                 HasLoadError = true;
-                LoadErrorMessage = $"Failed to load roster: {ex.Message}";
+                LoadErrorMessage = $"Error al cargar la plantilla: {ex.Message}";
             }
             finally
             {
@@ -449,14 +436,14 @@ namespace MobileApp.Models.Team
             var currentCapUsed = CalculateCurrentCapUsed();
             var capPercentage = currentCapUsed / (_salaryCapLimit / 1000000);
 
-            CapProgressWidth = Math.Min(capPercentage * 3, 300); // Max width for progress bar
+            CapProgressWidth = Math.Min(capPercentage * 3, 300);
             CurrentCapText = $"${currentCapUsed:F2}M / ${_salaryCapLimit / 1000000:F0}M";
 
             if (capPercentage > 100)
             {
-                CapProgressColor = Color.FromArgb("#dc3545"); // Red
+                CapProgressColor = Color.FromArgb("#dc3545");
                 HasSaveWarning = true;
-                SaveWarningText = "⚠️ Salary cap exceeded! Reduce roster cost before saving.";
+                SaveWarningText = "⚠️ Límite salrial excedido! Reduce el salario total de la plantilla para guardar.";
                 CanSaveRoster = false;
                 SaveButtonColor = Color.FromArgb("#dc3545");
             }
@@ -469,7 +456,7 @@ namespace MobileApp.Models.Team
             }
             else
             {
-                CapProgressColor = Color.FromArgb("#28a745"); // Green
+                CapProgressColor = Color.FromArgb("#28a745");
                 HasSaveWarning = false;
                 CanSaveRoster = true;
                 SaveButtonColor = Color.FromArgb("#28a745");
@@ -504,6 +491,12 @@ namespace MobileApp.Models.Team
             try
             {
                 IsLoading = true;
+
+                if (Team.SelectedIds.Count > 53)
+                {
+                    ErrorMessage = "La plantilla no puede contener más de 53 jugadores";
+                    return;
+                }
 
                 Team.SelectedIds = _rosterPlayerIds;
                 Team.OffLineup = _offenseLineup;
@@ -544,10 +537,8 @@ namespace MobileApp.Models.Team
 
             try
             {
-                // Remove all non-protected players
                 _rosterPlayerIds = _rosterPlayerIds.Where(id => _protectedPlayerIds.Contains(id)).ToList();
 
-                // Update displays
                 UpdateSalaryCapDisplay();
                 LoadRosterDisplay();
                 UpdateFranchisesCounts();
@@ -608,15 +599,15 @@ namespace MobileApp.Models.Team
             // Add "Remove Player" option if position is occupied
             var options = eligiblePlayers.Select(p => p.Player.Player.Name).ToList();
             if (position.AssignedPlayer != null)
-                options.Insert(0, "🗑️ Remove Player");
+                options.Insert(0, "🗑️ Quitar Jugador");
 
             var selectedOption = await Shell.Current.DisplayActionSheet(
-                $"Select {position.PositionName} ({position.RequiredPosition})",
-                "Cancel", null, options.ToArray());
+                $"Seleccionar {position.PositionName} ({position.RequiredPosition})",
+                "Cancelar", null, options.ToArray());
 
-            if (selectedOption == "Cancel" || string.IsNullOrEmpty(selectedOption)) return;
+            if (selectedOption == "Cancelar" || string.IsNullOrEmpty(selectedOption)) return;
 
-            if (selectedOption == "🗑️ Remove Player")
+            if (selectedOption == "🗑️ Quitar Jugador")
             {
                 RemovePlayerFromPosition(position);
             }
@@ -633,7 +624,7 @@ namespace MobileApp.Models.Team
             // Check if player is eligible for this position
             if (!IsPlayerEligibleForPosition(player.Player, position.RequiredPosition))
             {
-                Shell.Current.DisplayAlert("Position Inválida",
+                Shell.Current.DisplayAlert("Posición inválida",
                     $"{player.Player.Player.Name} no puede jugar de {position.RequiredPosition}", "OK");
                 return;
             }
@@ -888,13 +879,8 @@ namespace MobileApp.Models.Team
 
         private void AssignPlayerToPosition(DraggablePlayer player, FormationPosition position)
         {
-            // Remove player from any other position first
             RemovePlayerFromAllPositions(player.Player);
-
-            // Assign to new position
             position.AssignPlayer(player.Player);
-
-            // Update lineup data
             SetCurrentPlayerForPosition(position.PlayerIndex, player.Player.Id);
         }
 
@@ -1037,7 +1023,7 @@ namespace MobileApp.Models.Team
                     break;
             }
 
-            CurrentFormationDisplayName = formations.FirstOrDefault(f => f.Key == formationKey)?.Name ?? "Unknown Formation";
+            CurrentFormationDisplayName = formations.FirstOrDefault(f => f.Key == formationKey)?.Name ?? "Alineación desconocida";
         }
     }
 }

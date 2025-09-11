@@ -1,5 +1,6 @@
 ﻿@model IList<METCore.DTOs.User.UserDto>
 @using METCore.Enums
+@using static METCore.Enums.Types
 
 @{
     ViewData["Title"] = "Assign Roles";
@@ -223,13 +224,11 @@
         const tableContainer = document.getElementById('tableContainer');
         const noResultsMessage = document.getElementById('noResultsMessage');
 
-        // Search functionality
         async function performSearch(page = 1, pageSize = null) {
             if (pageSize) currentPageSize = pageSize;
             currentPage = page;
             currentFilter = searchInput.value.trim();
 
-            // Show loading
             showLoading();
 
             try {
@@ -254,7 +253,7 @@
                 updatePagination();
                 updateResultsInfo();
             } catch (error) {
-                showError('Search failed. Please try again.');
+                showError('Búsqueda fallida. Pruebe de nuevo.');
             } finally {
                 hideLoading();
             }
@@ -264,7 +263,7 @@
             loadingSpinner.style.display = 'block';
             tableContainer.style.display = 'none';
             searchBtn.disabled = true;
-            searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Searching...';
+            searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Buscando...';
         }
 
         function hideLoading() {
@@ -284,7 +283,6 @@
             document.querySelector('.container-fluid').insertBefore(alert, document.querySelector('.card'));
         }
 
-        // Update table with new user data
         function updateUserTable(users) {
             if (users.length === 0) {
                 usersTableBody.innerHTML = '';
@@ -296,7 +294,7 @@
 
             let html = '';
             users.forEach(user => {
-                const isAdmin = user.role === 2;
+                const isAdmin = user.role === @((int)RoleEnum.Admin);
                 const isInactive = !user.active;
 
                 html += `
@@ -314,8 +312,7 @@
                                     data-original-role="${user.role}"
                                     data-username="${user.username}">
                                 <option value="0" ${user.role === 0 ? 'selected' : ''}>User</option>
-                                <option value="1" ${user.role === 1 ? 'selected' : ''}>Manager</option>
-                                <option value="2" ${user.role === 2 ? 'selected' : ''}>Admin</option>
+                                <option value="1" ${user.role === 1 ? 'selected' : ''}>Admin</option>
                             </select>
                             ${isAdmin ? '<small class="text-danger d-block">Rol de Admin protegido</small>' : ''}
                         </td>
@@ -335,9 +332,7 @@
             attachEventListeners();
         }
 
-        // Attach event listeners to dynamically created elements
         function attachEventListeners() {
-            // Role change detection
             document.querySelectorAll('.role-select').forEach(select => {
                 select.addEventListener('change', function() {
                     const username = this.dataset.username;
@@ -353,7 +348,6 @@
                 });
             });
 
-            // Save role functionality
             document.querySelectorAll('.save-role-btn').forEach(btn => {
                 btn.addEventListener('click', async function() {
                     const username = this.dataset.username;
@@ -361,7 +355,6 @@
                     const newRole = parseInt(roleSelect.value);
                     const originalRole = parseInt(roleSelect.dataset.originalRole);
 
-                    // Disable button during request
                     this.disabled = true;
                     this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Guardando...';
 
@@ -395,11 +388,11 @@
                                 alert.remove();
                             }, 2000);
                         } else {
-                            throw new Error(result.message || 'Role change failed');
+                            throw new Error(result.message || 'Cambio de rol fallido');
                         }
                     } catch (error) {
                         roleSelect.value = originalRole;
-                        showError(`Failed to update role for ${username}: ${error.message}`);
+                        showError(`Fallo al actualizar el rol de ${username}: ${error.message}`);
                     } finally {
                         this.disabled = false;
                         this.innerHTML = '<i class="fas fa-save me-1"></i>Save Role';
@@ -417,14 +410,12 @@
             paginationCard.style.display = 'block';
             let html = '';
 
-            // Previous button
             html += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
                 <a class="page-link" href="#" data-page="${currentPage - 1}">
                     <i class="fas fa-chevron-left me-1"></i>Previous
                 </a>
             </li>`;
 
-            // Page numbers with smart truncation
             const startPage = Math.max(1, currentPage - 2);
             const endPage = Math.min(totalPages, currentPage + 2);
 
@@ -448,7 +439,6 @@
                 html += `<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`;
             }
 
-            // Next button
             html += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
                 <a class="page-link" href="#" data-page="${currentPage + 1}">
                     Next<i class="fas fa-chevron-right ms-1"></i>
@@ -457,7 +447,6 @@
 
             paginationList.innerHTML = html;
 
-            // Attach pagination click events
             document.querySelectorAll('#paginationList .page-link').forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -475,7 +464,6 @@
             resultsInfo.textContent = `Mostrando ${start}-${end} de ${totalUsers} usuarios`;
         }
 
-        // Event listeners
         searchBtn.addEventListener('click', () => performSearch());
 
         searchInput.addEventListener('keypress', function(e) {
@@ -488,7 +476,6 @@
             performSearch(1, parseInt(this.value));
         });
 
-        // Initial load
         performSearch();
     });
 </script>

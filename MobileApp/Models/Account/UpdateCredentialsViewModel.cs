@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileApp.Models.Shared;
@@ -20,12 +21,25 @@ namespace MobileApp.Models.Account
         {
             if (string.IsNullOrWhiteSpace(CurrentPassword))
             {
-                ErrorMessage = "Contraseña actual es obligatoria.";
+                ErrorMessage = "Contraseña actual obligatoria.";
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(NewUsername) && string.IsNullOrWhiteSpace(NewPassword))
+            {
+                ErrorMessage = "no se introdujo ningún valor a actualizar.";
                 return;
+            }
+            if (!string.IsNullOrWhiteSpace(NewUsername) && !Regex.Match(NewUsername, @"^(?=.*[a-zA-Z])(?=.*\d).{8,}$").Success)
+            {
+                ErrorMessage = "El nombre de usuario, de mínimo 8, caracteres debe contener: una letra y un dígito.";
+                return;
+            }
+            if (!string.IsNullOrWhiteSpace(NewPassword) && !Regex.Match(NewPassword, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_?.,-]).{8,}$").Success)
+            {
+                ErrorMessage = "La nueva contraseña, de mínimo 8, caracteres debe contener: una minúscula, una mayúscula, un dígito y un símbolo.";
+                return;
+            }
 
             if (!string.IsNullOrWhiteSpace(NewPassword) && NewPassword != ConfirmPassword)
             {

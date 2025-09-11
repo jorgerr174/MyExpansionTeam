@@ -26,7 +26,7 @@ namespace MobileApp.Models.Team
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Failed to load teams: {ex.Message}";
+                ErrorMessage = $"Error al cargar los equipos: {ex.Message}";
             }
             finally
             {

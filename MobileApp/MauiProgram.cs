@@ -175,7 +175,6 @@ namespace MobileApp
             builder.Services.AddTransient<Models.Team.RosterViewModel>();
             builder.Services.AddTransient<Models.Team.RosterSettingsViewModel>();
             builder.Services.AddTransient<Models.Team.TradeViewModel>();
-            builder.Services.AddTransient<Models.Team.TradeErrorViewModel>();
             #endregion Models.Team
             #endregion Models
 

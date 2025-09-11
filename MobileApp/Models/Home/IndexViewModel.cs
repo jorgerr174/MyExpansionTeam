@@ -50,7 +50,7 @@ namespace MobileApp.Models.Home
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Failed to load data: {ex.Message}";
+                ErrorMessage = $"Error al cargar los datos: {ex.Message}";
             }
             finally
             {

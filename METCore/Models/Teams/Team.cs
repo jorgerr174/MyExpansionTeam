@@ -22,6 +22,7 @@ namespace METCore.Models.Teams
 
         public RosterSettings? RosterSettings { get; set; }
 
+        [MaxLength(53, ErrorMessage = "La plantilla no puede contener más de 53 jugadores")]
         public virtual IList<int> PlayersIds { get; set; }
 
         public virtual Lineup OffLineup { get; set; }
@@ -70,6 +71,16 @@ namespace METCore.Models.Teams
                 Mascot = this.Mascot,
                 Abb = this.Abb,
                 Complete = false,
+
+                PlayersIds = this.PlayersIds,
+                ProtectedPlayersIds = this.ProtectedPlayersIds,
+
+                OffLineup = this.OffLineup,
+                DefLineup = this.DefLineup,
+                SPLineup = this.SPLineup,
+
+                Trades = this.Trades,
+                Selections = this.Selections,
             };
         }
     }

@@ -14,9 +14,9 @@ namespace MobileApp.Models.Team
         private readonly TeamService _teamService;
 
         [ObservableProperty] private int teamId;
-        [ObservableProperty] private int currentPick = -1; // -1 = from roster, >=0 = from draft
+        [ObservableProperty] private int currentPick = -1;
         [ObservableProperty] private int selectedFranchiseId;
-        [ObservableProperty] private string tradePartnerName = "Select Franchise";
+        [ObservableProperty] private string tradePartnerName = "Seleccione franquicia";
         [ObservableProperty] private string loadingMessage = "Cargando...";
 
         // Tab Management
@@ -33,7 +33,7 @@ namespace MobileApp.Models.Team
         // Trade Value Display
         [ObservableProperty] private string userTotalValueText = "Tu Valor: 0";
         [ObservableProperty] private string franchiseTotalValueText = "Su valor: 0";
-        [ObservableProperty] private string tradeBalanceText = "Selecciona items que intercambiar";
+        [ObservableProperty] private string tradeBalanceText = "Selecciona ítems que intercambiar";
         [ObservableProperty] private double userValueBarWidth = 0;
         [ObservableProperty] private double franchiseValueBarWidth = 0;
 
@@ -169,14 +169,8 @@ namespace MobileApp.Models.Team
             }
         }
 
-        [RelayCommand]
-        private async Task CancelTrade()
-        {
-            await ReturnToOrigin();
-        }
-
-        [RelayCommand]
-        private async Task Return() => await ReturnToOrigin();
+        [RelayCommand] private async Task CancelTrade() => await ReturnToOrigin();
+        [RelayCommand] private async Task Return() => await ReturnToOrigin();
 
         private async Task LoadTradeData()
         {
@@ -211,57 +205,29 @@ namespace MobileApp.Models.Team
         {
             if (_currentTradeData == null) return;
 
-            // Clear existing items
             UserPlayers.Clear();
             UserPicks.Clear();
             FranchisePlayers.Clear();
             FranchisePicks.Clear();
 
-            // Load user team players
             if (_currentTradeData.TeamPlayers?.Any() ?? false)
-            {
                 foreach (var player in _currentTradeData.TeamPlayers)
-                {
                     UserPlayers.Add(new TradePlayerItem(player, true));
-                }
-            }
 
-            // Load user team picks (filter out already used picks if coming from draft)
             if (_currentTradeData.TeamPicks?.Any() ?? false)
-            {
                 foreach (var pick in _currentTradeData.TeamPicks)
-                {
-                    // If coming from draft, only show picks after current pick
                     if (CurrentPick == -1 || pick > CurrentPick)
-                    {
                         UserPicks.Add(new TradePickItem(pick, true));
-                    }
-                }
-            }
 
-            // Load franchise players
             if (_currentTradeData.FranchisePlayers?.Any() ?? false)
-            {
                 foreach (var player in _currentTradeData.FranchisePlayers)
-                {
                     FranchisePlayers.Add(new TradePlayerItem(player, false));
-                }
-            }
 
-            // Load franchise picks (filter out already used picks if coming from draft)
             if (_currentTradeData.FranchisePicks?.Any() ?? false)
-            {
                 foreach (var pick in _currentTradeData.FranchisePicks)
-                {
-                    // If coming from draft, only show picks after current pick
                     if (CurrentPick == -1 || pick > CurrentPick)
-                    {
                         FranchisePicks.Add(new TradePickItem(pick, false));
-                    }
-                }
-            }
 
-            // Update visibility flags
             HasUserPlayers = UserPlayers.Any();
             HasUserPicks = UserPicks.Any();
             HasFranchisePlayers = FranchisePlayers.Any();
@@ -270,25 +236,21 @@ namespace MobileApp.Models.Team
 
         private void UpdateTradeCalculations()
         {
-            // Calculate user total value
             _userTotalValue = 0;
             _userTotalValue += UserPlayers.Where(p => p.IsSelected).Sum(p => DraftPicks.GetPlayerValue(p.Player));
             _userTotalValue += UserPicks.Where(p => p.IsSelected).Sum(p => DraftPicks.GetPickValue(p.Pick));
 
-            // Calculate franchise total value
             _franchiseTotalValue = 0;
             _franchiseTotalValue += FranchisePlayers.Where(p => p.IsSelected).Sum(p => DraftPicks.GetPlayerValue(p.Player));
             _franchiseTotalValue += FranchisePicks.Where(p => p.IsSelected).Sum(p => DraftPicks.GetPickValue(p.Pick));
 
-            // Update display texts
             UserTotalValueText = $"Tu Valor: {_userTotalValue}";
             FranchiseTotalValueText = $"Su Valor: {_franchiseTotalValue}";
 
-            // Update trade balance
             var totalValue = _userTotalValue + _franchiseTotalValue;
             if (totalValue == 0)
             {
-                TradeBalanceText = "Selecciona items que intercambiar";
+                TradeBalanceText = "Selecciona ítems que intercambiar";
                 UserValueBarWidth = 0;
                 FranchiseValueBarWidth = 0;
             }
@@ -297,27 +259,25 @@ namespace MobileApp.Models.Team
                 var userPercentage = (double)_userTotalValue / totalValue;
                 var franchisePercentage = (double)_franchiseTotalValue / totalValue;
 
-                UserValueBarWidth = userPercentage * 300; // Max width of progress bar
+                UserValueBarWidth = userPercentage * 300;
                 FranchiseValueBarWidth = franchisePercentage * 300;
 
                 if (_userTotalValue > _franchiseTotalValue)
                 {
-                    TradeBalanceText = "You're giving more";
+                    TradeBalanceText = "Sales perdiendo";
                 }
                 else if (_franchiseTotalValue > _userTotalValue)
                 {
-                    TradeBalanceText = "You're getting more";
+                    TradeBalanceText = "Sales ganando";
                 }
                 else
                 {
-                    TradeBalanceText = "Balanced trade";
+                    TradeBalanceText = "Trueque justo";
                 }
             }
 
-            // Update selected items summaries
             UpdateSelectedItemsSummary();
 
-            // Update trade availability
             CanTrade = (_userTotalValue > 0 || _franchiseTotalValue > 0) &&
                        (UserPlayers.Any(p => p.IsSelected) || UserPicks.Any(p => p.IsSelected)) &&
                        (FranchisePlayers.Any(p => p.IsSelected) || FranchisePicks.Any(p => p.IsSelected));
@@ -328,34 +288,21 @@ namespace MobileApp.Models.Team
             SelectedUserItems.Clear();
             SelectedFranchiseItems.Clear();
 
-            // Add selected user players
             foreach (var player in UserPlayers.Where(p => p.IsSelected))
-            {
                 SelectedUserItems.Add(new TradeItemSummary($"🏃 {player.Name} ({player.Position})", DraftPicks.GetPlayerValue(player.Player)));
-            }
 
-            // Add selected user picks
             foreach (var pick in UserPicks.Where(p => p.IsSelected))
-            {
                 SelectedUserItems.Add(new TradeItemSummary($"🏆 Pick #{pick.Pick}", DraftPicks.GetPickValue(pick.Pick)));
-            }
 
-            // Add selected franchise players
             foreach (var player in FranchisePlayers.Where(p => p.IsSelected))
-            {
                 SelectedFranchiseItems.Add(new TradeItemSummary($"🏃 {player.Name} ({player.Position})", DraftPicks.GetPlayerValue(player.Player)));
-            }
 
-            // Add selected franchise picks
             foreach (var pick in FranchisePicks.Where(p => p.IsSelected))
-            {
                 SelectedFranchiseItems.Add(new TradeItemSummary($"🏆 Pick #{pick.Pick}", DraftPicks.GetPickValue(pick.Pick)));
-            }
         }
 
         private void UpdateTabVisibility(string activeTab)
         {
-            // Reset all tabs
             IsSummaryTabVisible = false;
             IsUserTabVisible = false;
             IsFranchiseTabVisible = false;
@@ -367,7 +314,6 @@ namespace MobileApp.Models.Team
             FranchiseTabColor = Color.FromArgb("#f8f9fa");
             FranchiseTabTextColor = Color.FromArgb("#6c757d");
 
-            // Set active tab
             switch (activeTab)
             {
                 case "summary":
@@ -392,12 +338,11 @@ namespace MobileApp.Models.Team
         {
             try
             {
-                UpdateLoadingState(true, "Submitting trade...");
+                UpdateLoadingState(true, "Guardando trueque...");
 
                 if (_currentTradeData == null) return;
 
-                // Build trade DTO
-                var tradeDto = new TradeDto
+                TradeDto tradeDto = new()
                 {
                     TeamId = TeamId,
                     FranchiseId = SelectedFranchiseId,
@@ -408,17 +353,13 @@ namespace MobileApp.Models.Team
                     FranchisePicks = FranchisePicks.Where(p => p.IsSelected).Select(p => p.Pick).ToList()
                 };
 
-                var success = await _teamService.SaveTradeAsync(tradeDto);
-
-                if (success)
+                if (await _teamService.SaveTradeAsync(tradeDto))
                 {
                     await Shell.Current.DisplayAlert("Éxito", "!Trueque completado con éxito!", "OK");
                     await ReturnToOrigin(tradeDto);
                 }
                 else
-                {
                     await Shell.Current.DisplayAlert("Error", "Trueque no aceptado. Pruebe ajustando valores or forzando el trueque.", "OK");
-                }
             }
             catch (Exception ex)
             {
@@ -438,10 +379,8 @@ namespace MobileApp.Models.Team
                     await BaseService.GoToAsync(AppRoutes.Roster, new() { ["TeamId"] = TeamId });
                 else
                 {
-                    // Coming from draft - return with trade data
                     Dictionary<string, object>? parameters = new() { ["teamId"] = TeamId, ["currentPick"] = CurrentPick };
 
-                    // Add trade result data if trade was completed
                     if (completedTrade != null)
                     {
                         parameters["tradedFranchiseId"] = completedTrade.FranchiseId;
