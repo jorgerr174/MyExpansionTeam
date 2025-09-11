@@ -66,7 +66,7 @@ namespace MobileApp.Models.Team
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Failed to load trades: {ex.Message}";
+                ErrorMessage = $"Error al cargar el historial de trueques: {ex.Message}";
                 HasNoTrades = true;
             }
             finally
@@ -93,46 +93,43 @@ namespace MobileApp.Models.Team
         private static string GetFranchiseName(int franchiseId)
         {
             var franchise = FranchiseInfo.GetAllFranchises()[franchiseId - 1];
-            return franchise?.Name ?? $"Franchise {franchiseId}";
+            return franchise?.Name ?? $"Franquicia {franchiseId}";
         }
 
         private static string CreateTradeDetailsText(TradeDisplayInfo trade)
         {
-            string details = $"Trade with {trade.FranchiseName}\n";
-            details += $"Date: {trade.Date:yyyy-MM-dd}\n";
-            details += $"Salary Cap Impact: ${trade.TeamCurrentCap:F1}M\n";
+            string details = $"Trueque con {trade.FranchiseName}\n";
+            details += $"Fecha: {trade.Date:dd-MM-yyyy}\n";
+            details += $"Salario : ${trade.TeamCurrentCap:F1}M\n";
 
-            if (trade.IsForced)
-                details += "⚠️ Forced Trade\n";
-
-            details += "\n--- Your Team Gave ---\n";
+            details += "\n--- Tu equipo envió ---\n";
 
             if (trade.TeamPlayers.Any())
             {
-                details += "Players:\n";
+                details += "Jugadores:\n";
                 foreach (SelectableDto player in trade.TeamPlayers)
                     details += $"• {player.Name} ({player.Position}) - {player.APY}\n";
             }
 
             if (trade.TeamPicks.Any())
             {
-                details += "Draft Picks:\n";
+                details += "Picks:\n";
                 foreach (int pick in trade.TeamPicks)
                     details += $"• Pick #{pick}\n";
             }
 
-            details += "\n--- Your Team Received ---\n";
+            details += "\n--- TuEquipo recivió---\n";
 
             if (trade.FranchisePlayers.Any())
             {
-                details += "Players:\n";
+                details += "Jugadores:\n";
                 foreach (SelectableDto player in trade.FranchisePlayers)
                     details += $"• {player.Name} ({player.Position}) - {player.APY}\n";
             }
 
             if (trade.FranchisePicks.Any())
             {
-                details += "Draft Picks:\n";
+                details += "Picks:\n";
                 foreach (int pick in trade.FranchisePicks)
                     details += $"• Pick #{pick}\n";
             }
@@ -154,13 +151,13 @@ namespace MobileApp.Models.Team
         public decimal TeamCurrentCap { get; set; }
         public bool IsForced { get; set; }
 
-        public string DateString => Date.ToString("yyyy-MM-dd");
-        public string TradeTitle => $"Trade with {FranchiseName}";
-        public string TradeSubtitle => $"{Date:MMM dd, yyyy} • Cap: ${TeamCurrentCap:F1}M";
+        public string DateString => Date.ToString("dd-MM-yyyy");
+        public string TradeTitle => $"Trueque con {FranchiseName}";
+        public string TradeSubtitle => $"{Date:dd-MM-yyyy} • Límite salarial: ${TeamCurrentCap:F1}M";
 
         public int TotalItemsGiven => TeamPlayers.Count + TeamPicks.Count;
         public int TotalItemsReceived => FranchisePlayers.Count + FranchisePicks.Count;
 
-        public string TradeSummary => $"Gave {TotalItemsGiven} items • Received {TotalItemsReceived} items";
+        public string TradeSummary => $"Dió {TotalItemsGiven} ítems • Recivió {TotalItemsReceived} ítems";
     }
 }

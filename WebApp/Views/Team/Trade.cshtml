@@ -63,7 +63,7 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0">Tu oferta (Team @Model.TeamId)</h6>
+                    <h6 class="mb-0">Tu oferta</h6>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
@@ -260,7 +260,6 @@
 
 <script type="text/javascript">
     (function initializeTradeModal() {
-    // DECLARE VARIABLES IN GLOBAL SCOPE
     let userSelectedPicks = [];
     let userSelectedPlayers = [];
     let franchiseSelectedPicks = [];
@@ -269,7 +268,6 @@
     let franchiseTotalValue = 0;
     let DraftCurrentPick = @CurrentPick;
 
-        // Franchise names mapping
         const franchiseNames = {
             1: { name: "Arizona Cardinals", abbreviation: "ARI" },
             2: { name: "Atlanta Falcons", abbreviation: "ATL" },
@@ -311,24 +309,20 @@
             alert("hello");
         }
 
-        // NFL Teams
         document.getElementById('franchiseName').textContent = `${franchiseNames[@Model.FranchiseId].name}`;
 
-        // Data from Model
         let teamPicks = @Html.Raw(Json.Serialize(Model.TeamPicks));
         let teamPlayers = @Html.Raw(Json.Serialize(Model.TeamPlayers));
         let franchisePicks = @Html.Raw(Json.Serialize(Model.FranchisePicks));
         let franchisePlayers = @Html.Raw(Json.Serialize(Model.FranchisePlayers));
         let franchiseId = @Model.FranchiseId;
 
-        // Convert pick integer to readable format
         window.formatPick = function(pickInt) {
             const round = Math.floor(pickInt / 100);
             const pick = pickInt % 100;
             return { round, pick };
         }
 
-        // Add to selection
         window.addToSelection = function(type, id, side, value, playerObj) {
             if (side === 'user') {
                 if (type === 'pick') {
@@ -349,7 +343,6 @@
             }
         }
 
-        // Remove from selection
         window.removeFromSelection = function(type, id, side, value) {
             if (side === 'user') {
                 if (type === 'pick') {
@@ -368,12 +361,10 @@
             }
         }
 
-        // Update selected items display
         window.updateSelectedDisplay = function() {
-            // User selected
             let html;
             if (userSelectedPicks.length === 0 && userSelectedPlayers.length === 0) {
-                html = '<div class="empty-state"><i class="fas fa-plus-circle fa-2x mb-2"></i><p>Select items below to trade away</p></div>';
+                html = '<div class="empty-state"><i class="fas fa-plus-circle fa-2x mb-2"></i><p>Seleccione ítems a enviar</p></div>';
             } else {
                 html = '<div class="selected-items">';
                 userSelectedPicks.forEach(pick => {
@@ -387,9 +378,8 @@
             }
             $('#userSelectedItems').html(html);
 
-            // Franchise selected
             if (franchiseSelectedPicks.length === 0 && franchiseSelectedPlayers.length === 0) {
-                html = '<div class="empty-state"><i class="fas fa-plus-circle fa-2x mb-2"></i><p>Select items below to request</p></div>';
+                html = '<div class="empty-state"><i class="fas fa-plus-circle fa-2x mb-2"></i><p>Seleccione ítems a recibir</p></div>';
             } else {
                 html = '<div class="selected-items">';
                 franchiseSelectedPicks.forEach(pick => {
@@ -404,7 +394,6 @@
             $('#franchiseSelectedItems').html(html);
         }
 
-        // Update value bar
         window.updateValueBar = function() {
             const total = userTotalValue + franchiseTotalValue;
             const badge = document.getElementById('equalityBadge');
@@ -412,7 +401,7 @@
             if (total === 0) {
                 document.getElementById('userSideBar').style.width = '50%';
                 document.getElementById('franchiseSideBar').style.width = '50%';
-                badge.textContent = 'No Items Selected';
+                badge.textContent = 'Sin ítems seleccionados';
                 badge.className = 'badge bg-secondary';
             } else {
                 const userPercent = (userTotalValue / total) * 100;
@@ -440,30 +429,25 @@
             document.getElementById('franchiseTotalValue').textContent = franchiseTotalValue.toFixed(1);
         }
 
-        // Update hidden form fields
         window.updateHiddenFields = function() {
-            // Picks sent (from team) - convert to "r1p1" format
             let html = '';
             userSelectedPicks.forEach((pick, i) => {
                 html += `<input type="hidden" name="TeamPicks[${i}]" value="${pick}" />`;
             });
             document.getElementById('teamPicksContainer').innerHTML = html;
 
-            // Players sent (from team)
             html = '';
             userSelectedPlayers.forEach((player, i) => {
                 html += `<input type="hidden" name="TeamPlayers[${i}].Id" value="${player.id}" />`;
             });
             document.getElementById('teamPlayersContainer').innerHTML = html;
 
-            // Picks taken (from franchise) - convert to "r1p1" format
             html = '';
             franchiseSelectedPicks.forEach((pick, i) => {
                 html += `<input type="hidden" name="FranchisePicks[${i}]" value="${pick}" />`;
             });
             document.getElementById('franchisePicksContainer').innerHTML = html;
     
-            // Players taken (from franchise)
             html = '';
             franchiseSelectedPlayers.forEach((player, i) => {
                 html += `<input type="hidden" name="FranchisePlayers[${i}].Id" value="${player.id}" />`;
@@ -471,11 +455,10 @@
             document.getElementById('franchisePlayersContainer').innerHTML = html;
         }
 
-        // Add click handlers to all trade items
         document.querySelectorAll('.trade-item-card').forEach(card => {
             if(card.classList.contains('unselectable-overlay'))
             {
-                 card.title = "This pick was already selected during the current draft";
+                 card.title = "Este pick ya fue empleado en el draft en curso";
             }
             else
             {
@@ -509,23 +492,22 @@
             }
         });        
 
-    // Helper function to process trade requests
     function processTrade(forceMode) {
         debugger;
 
         if (typeof userSelectedPicks === 'undefined' || typeof userSelectedPlayers === 'undefined' ||
             typeof franchiseSelectedPicks === 'undefined' || typeof franchiseSelectedPlayers === 'undefined') {
-            alert('Trade interface not fully loaded. Please try again.');
+            alert('Interfaz de trueque no completa. Pruebe de nuevo.');
             return;
         }
 
         if (userSelectedPicks.length === 0 && userSelectedPlayers.length === 0) {
-            alert('Please select items to trade away');
+            alert('Por favor, seleccione ítems que enviar');
             return;
         }
 
         if (franchiseSelectedPicks.length === 0 && franchiseSelectedPlayers.length === 0) {
-            alert('Please select items to request');
+            alert('Por favor, seleccione ítems que solicitar');
             return;
         }
 
@@ -533,7 +515,6 @@
 
         updateHiddenFields();
         
-        // Submit trade using fetch
         const tradeFormData = new FormData(document.getElementById('tradeForm'));
         fetch('/Team/RequestTrade', {
             method: 'POST',
@@ -543,13 +524,11 @@
         .then(response => {
             if (!response.message || response.message.trim() === '') {
                 debugger;
-                alert('Trade completed successfully!');
+                alert('!Trueque completado con éxito!');
 
                 if (DraftCurrentPick > -1)
                 {
-                    // Draft context - return draft picks data to parent
                     if (window.parent && window.parent.onTradeCompleted) {
-                        // Return the updated picks data and any other relevant info
                         const tradeResult = {
                             teamTraded: userSelectedPicks,
                             franchiseTraded: franchiseSelectedPicks,
@@ -560,32 +539,29 @@
                 } 
                 else 
                 {
-                    // Roster context - reload the page
                     if (window.parent && window.parent.location) {
                         window.parent.location.reload();
                     } else {
-                        // Fallback if not in modal
                         window.location.reload();
                     }
                 }
 
-                // Close the modal
                 const modal = bootstrap.Modal.getInstance(document.getElementById('tradeModal'));
                 if (modal) modal.hide();
             } else {
-                alert('Trade rejected: ' + response.message);
+                alert('Trueque rechazado: ' + response.message);
             }
         })
         .catch(error => {
             console.error('Trade submission error:', error);
-            alert('Error submitting trade');
+            alert('Solicitud de trueque errónea');
         });
     }
 
     $('#requestTradeBtn').click ( function() { processTrade(false); });
     $('#forceTradeBtn').click( function() { processTrade(true); });
 
-    })(); // Execute immediately
+    })(); 
 
 </script>
 

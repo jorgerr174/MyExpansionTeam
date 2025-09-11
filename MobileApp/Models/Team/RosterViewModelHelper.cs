@@ -18,11 +18,11 @@ namespace MobileApp.Models.Team
 
     public static class StatusRegistry
     {
-        public static readonly StatusType TradedAway = new(Color.FromArgb("#f8d7da"), Color.FromArgb("#f5c6cb"), "TRADED AWAY", Color.FromArgb("#721c24"), Color.FromArgb("#f8d7da"), "🔒", Color.FromArgb("#dc3545"));
-        public static readonly StatusType TradedFor = new(Color.FromArgb("#d4edda"), Color.FromArgb("#28a745"), "TRADED FOR", Color.FromArgb("#155724"), Color.FromArgb("#d4edda"), "✓", Color.FromArgb("#28a745"));
-        public static readonly StatusType Protected = new(Color.FromArgb("#fff3cd"), Color.FromArgb("#ffeaa7"), "Protected player - cannot be added", Color.FromArgb("#856404"), Color.FromArgb("#fff3cd"), "🔒", Color.FromArgb("#856404"));
-        public static readonly StatusType Selected = new(Color.FromArgb("#d4edda"), Color.FromArgb("#28a745"), "SELECTED", Color.FromArgb("#155724"), Color.FromArgb("#d4edda"), "✓", Color.FromArgb("#28a745"));
-        public static readonly StatusType Available = new(Colors.White, Color.FromArgb("#dee2e6"), "AVAILABLE", Colors.Black, Colors.Transparent, string.Empty, Colors.Transparent);
+        public static readonly StatusType TradedAway = new(Color.FromArgb("#f8d7da"), Color.FromArgb("#f5c6cb"), "Enviado en trueque", Color.FromArgb("#721c24"), Color.FromArgb("#f8d7da"), "🔒", Color.FromArgb("#dc3545"));
+        public static readonly StatusType TradedFor = new(Color.FromArgb("#d4edda"), Color.FromArgb("#28a745"), "Recibido en trueque", Color.FromArgb("#155724"), Color.FromArgb("#d4edda"), "✓", Color.FromArgb("#28a745"));
+        public static readonly StatusType Protected = new(Color.FromArgb("#fff3cd"), Color.FromArgb("#ffeaa7"), "Protegido - no se puede añadir", Color.FromArgb("#856404"), Color.FromArgb("#fff3cd"), "🔒", Color.FromArgb("#856404"));
+        public static readonly StatusType Selected = new(Color.FromArgb("#d4edda"), Color.FromArgb("#28a745"), "SELECCIONADO", Color.FromArgb("#155724"), Color.FromArgb("#d4edda"), "✓", Color.FromArgb("#28a745"));
+        public static readonly StatusType Available = new(Colors.White, Color.FromArgb("#dee2e6"), "DISPONIBLE", Colors.Black, Colors.Transparent, string.Empty, Colors.Transparent);
     }
 
     public partial class PlayerModel : ObservableObject
@@ -47,7 +47,7 @@ namespace MobileApp.Models.Team
         public Color StatusBackgroundColor => PlayerStatus.StatusBackgroundColor;
         public string Icon => PlayerStatus.Icon;
         public Color IconColor => PlayerStatus.IconColor;
-        public bool HasStatus => !string.IsNullOrEmpty(StatusText) && StatusText != "AVAILABLE";
+        public bool HasStatus => !string.IsNullOrEmpty(StatusText) && StatusText != "DISPONIBLE";
         public bool HasIcon => !string.IsNullOrEmpty(Icon);
         public bool CanRemove => StatusSelected && !StatusProtected;
 
@@ -128,7 +128,7 @@ namespace MobileApp.Models.Team
         [ObservableProperty] private Color playerBackgroundColor = Color.FromArgb("#dc3545");
         [ObservableProperty] private Color playerBorderColor = Colors.White;
         [ObservableProperty] private Rect layoutBounds;
-        [ObservableProperty] private int playerIndex; // 1-based index for lineup storage
+        [ObservableProperty] private int playerIndex;
 
         public FormationPosition(string id, string name, string position, double x, double y, int index)
         {
@@ -136,9 +136,7 @@ namespace MobileApp.Models.Team
             PositionName = name;
             RequiredPosition = position;
             PlayerIndex = index;
-            // Convert percentage coordinates to layout bounds (0-1 range)
             LayoutBounds = new Rect(x / 100.0, y / 100.0, 60, 60);
-            //LayoutBounds = new Rect(index*0.9, y / 100.0, 60, 60);
             UpdateAppearance();
         }
 
@@ -153,12 +151,12 @@ namespace MobileApp.Models.Team
         {
             if (AssignedPlayer != null)
             {
-                PlayerBackgroundColor = Color.FromArgb("#28a745"); // Green for assigned
+                PlayerBackgroundColor = Color.FromArgb("#28a745");
                 PlayerBorderColor = Colors.White;
             }
             else
             {
-                PlayerBackgroundColor = Color.FromArgb("#dc3545"); // Red for empty
+                PlayerBackgroundColor = Color.FromArgb("#dc3545");
                 PlayerBorderColor = Colors.White;
             }
         }
@@ -187,10 +185,7 @@ namespace MobileApp.Models.Team
             PositionName = position;
             PlayerName = player;
             PlayerBackgroundColor = hasPlayer ? Color.FromArgb("#28a745") : Color.FromArgb("#dc3545");
-            // Mobile-optimized coordinates (scaled for 300px height field)
-            //x = x ? <
             LayoutBounds = new Rect(x / 100.0, y / 100.0, 45, 45);
-            //LayoutBounds = new Rect(0.1, 0.1, 20, 60);
         }
     }
 }

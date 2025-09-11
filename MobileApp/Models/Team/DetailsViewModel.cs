@@ -96,13 +96,13 @@ namespace MobileApp.Models.Team
                 else
                 {
                     HasLoadError = true;
-                    LoadErrorMessage = "Team not found";
+                    LoadErrorMessage = "Equipo no encontrado";
                 }
             }
             catch (Exception ex)
             {
                 HasLoadError = true;
-                LoadErrorMessage = $"Failed to load team: {ex.Message}";
+                LoadErrorMessage = $"Error al cargar el equipo: {ex.Message}";
             }
             finally
             {

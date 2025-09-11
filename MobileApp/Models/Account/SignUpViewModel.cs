@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MobileApp.Models.Shared;
@@ -30,6 +31,23 @@ namespace MobileApp.Models.Account
             if (!IsValidEmail(Email))
             {
                 ErrorMessage = "Por favor, introduzca una dirección de correo válida";
+                return;
+            }
+
+            if (!Regex.Match(Username, @"^(?=.*[a-zA-Z])(?=.*\d).{8,}$").Success)
+            {
+                ErrorMessage = "El nombre de usuario, de mínimo 8, caracteres debe contener: una letra y un dígito.";
+                return;
+            }
+            if (!Regex.Match(Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_?.,-]).{8,}$").Success)
+            {
+                ErrorMessage = "La contraseña, de mínimo 8, caracteres debe contener: una minúscula, una mayúscula, un dígito y un símbolo.";
+                return;
+            }
+
+            if (!Regex.Match(Tlf, @"^(\d{9})?$").Success)
+            {
+                ErrorMessage = "El teléfono debe tener nueve dígitos.";
                 return;
             }
 

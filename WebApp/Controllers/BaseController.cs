@@ -2,6 +2,8 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using METCore.DTOs.Admin;
 using METCore.DTOs.Shared;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
@@ -30,7 +32,17 @@ namespace WebApp.Controllers
 
             HttpRequestMessage request = new(method, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Request.Cookies["jwt"]);
-            return (obj is FileDto fileDto && fileDto.File is not null) ? await SendImportRequest(request, fileDto) : await SendNormalRequest(request, url, obj);
+
+            HttpResponseMessage response = (obj is FileDto fileDto && fileDto.File is not null) ? await SendImportRequest(request, fileDto) : await SendNormalRequest(request, url, obj);
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized && User.Identity?.IsAuthenticated == true)
+            {
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                Response.Cookies.Delete("jwt");
+
+                Response.Redirect($"/Account/LogIn?RedirectUrl={Uri.EscapeDataString(url)}");
+            }
+
+            return response;
         }
 
         private async Task<HttpResponseMessage> SendImportRequest(HttpRequestMessage request, FileDto fileDto)

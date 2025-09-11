@@ -25,8 +25,8 @@ namespace MobileApp.Models.Team
         ];
 
         public decimal AvailableCap => BaseSalaryCap - CurrentSalaryCap;
-        public string SalaryCapText => $"Salary Cap: ${CurrentSalaryCap:F1}M / ${BaseSalaryCap}M";
-        public string AvailableCapText => $"Available: ${AvailableCap:F1}M";
+        public string SalaryCapText => $"Límite salarial: ${CurrentSalaryCap:F1}M / ${BaseSalaryCap}M";
+        public string AvailableCapText => $"Disponible: ${AvailableCap:F1}M";
         public int TotalPlayersCount => AllRosterPlayers.Count;
 
 
@@ -65,7 +65,7 @@ namespace MobileApp.Models.Team
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Failed to load roster: {ex.Message}";
+                ErrorMessage = $"Error al cargar la plantilla: {ex.Message}";
             }
             finally
             {
@@ -129,11 +129,11 @@ namespace MobileApp.Models.Team
                 if (await _teamService.UpdateRosterAsync(teamDto))
                     await BaseService.GoToMyTeamsTabAsync();
                 else
-                    ErrorMessage = "Failed to save roster";
+                    ErrorMessage = "Error al guardar la plantilla";
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Save failed: {ex.Message}";
+                ErrorMessage = $"Error en el guardado: {ex.Message}";
             }
             finally
             {

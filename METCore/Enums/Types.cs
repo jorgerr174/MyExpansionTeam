@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using METCore.DTOs.Player;
 using METCore.Models.Players;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace METCore.Enums
 {
@@ -50,7 +51,6 @@ namespace METCore.Enums
         public enum RoleEnum
         {
             User,
-            Manager,
             Admin
         }
 
@@ -406,19 +406,19 @@ namespace METCore.Enums
             public static int GetPlayerValue(SelectableDto player)
             {
                 PositionEnum position = Enum.TryParse(player.Position, out PositionEnum pos) ? pos : PositionEnum.ATH;
-                int age = int.TryParse(player.Age, out int edad) ? edad : 30;
-                double apy = double.TryParse(player.APY.Replace('.', ','), out double money) ? money : 0;
+                int age = int.TryParse(player.Age.Replace("a", ""), out int edad) ? edad : 30;
+                double apy = double.TryParse(player.PureAPY.Replace('.', ','), out double money) ? money : 0;
+                double aux = ((player.Madden != 0 ? player.Madden : 65) - 50) / 49.0;
 
-                return (int)(player.Madden != 0 ? player.Madden : 70
-                    * GetPositionMultiplier(position)
-                    * CalculateAgeFactor(age)
-                    * CalculateContractValue(position, apy));
+                return (int)Math.Pow(10 +(-2 * Math.Pow(aux, 3) + 3 * Math.Pow(aux, 2))*150,
+                    GetPositionMultiplier(position) * CalculateAgeFactor(age) * CalculateContractValue(position, apy));
             }
 
             public static int GetPlayerValue(Player player)
             {
-                return (int)(player.Madden != 0 ? player.Madden : 70
-                    * GetPositionMultiplier(player.Position)
+                double aux = ((player.Madden != 0 ? player.Madden : 65) - 50) / 49.0;
+                return (int)Math.Pow(10 + (-2 * Math.Pow(aux, 3) + 3 * Math.Pow(aux, 2)) * 150,
+                    GetPositionMultiplier(player.Position)
                     * CalculateAgeFactor(player.BirthDate is null ? 30 : DateTime.Now.Year - player.BirthDate.Value.Year - (DateTime.Now.DayOfYear < player.BirthDate.Value.DayOfYear ? 1 : 0))
                     * CalculateContractValue(player.Position, player.ActiveContract?.APY)
                     * CalculateYearsRemaining(player.ActiveContract == null ? -1 : DateTime.Now.Year - player.ActiveContract.YearSigned));
@@ -426,7 +426,7 @@ namespace METCore.Enums
 
             private static double CalculateContractValue(PositionEnum position, double? apy)
             {
-                if (apy is null || apy == 0) return 0.7;
+                if (apy is null || apy == 0) return 0.8;
 
                 // Get average APY of top 5 players at this position (or top 10% for positions with many players)
                 double topPlayersAvgAPY = GetTopPlayersAverageAPY[(int)position];
@@ -436,15 +436,11 @@ namespace METCore.Enums
 
                 double ratio = (double)apy / topPlayersAvgAPY;
 
-                // Cheaper relative to top players = more valuable
-                if (ratio < 0.3) return 1.8;      // Bargain deal (rookie contracts, etc.)
-                if (ratio < 0.5) return 1.5;      // Very good value
-                if (ratio < 0.7) return 1.3;      // Good value
-                if (ratio < 0.9) return 1.1;      // Fair value
-                if (ratio < 1.1) return 1.0;      // Market rate
-                if (ratio < 1.3) return 0.8;      // Slightly overpaid
-                if (ratio < 1.5) return 0.6;      // Overpaid
-                return 0.4;                       // Severely overpaid
+                if (ratio < 0.5) return 1.15;
+                if (ratio < 0.7) return 1.08;
+                if (ratio < 1.05) return 1.0;
+                if (ratio < 1.2) return 0.95;
+                return 0.9;
             }
 
             private static double[] GetTopPlayersAverageAPY =>
@@ -456,31 +452,29 @@ namespace METCore.Enums
             {
                 return pos switch
                 {
-                    PositionEnum.QB => 2.0,
+                    PositionEnum.QB => 1.25,
                     PositionEnum.RB => 0.9,
-                    PositionEnum.FB => 0.7,
-                    PositionEnum.ED => 1.6,
-                    PositionEnum.OT => 1.5,
-                    PositionEnum.WR => 1.3,
+                    PositionEnum.FB => 0.85,
+                    PositionEnum.OT => 1.1,
+                    PositionEnum.WR => 1.1,
 
-                    PositionEnum.DT => 1.2,
-                    PositionEnum.CB => 1.4,
-                    PositionEnum.OLB => 1.2,
-                    PositionEnum.MLB => 1.1,
+                    PositionEnum.DT => 1.05,
+                    PositionEnum.ED => 1.1,
+                    PositionEnum.OLB => 1.05,
+                    PositionEnum.CB => 1.05,
 
-                    PositionEnum.K => 0.3,
-                    PositionEnum.P => 0.3,
+                    PositionEnum.K => 0.5,
+                    PositionEnum.P => 0.5,
                     _ => 1.0
                 };
             }
 
             private static double CalculateAgeFactor(int age)
             {
-                if (age <= 23) return 0.9;        // Too young/unproven
-                if (age <= 27) return 1.0;         // Prime years
-                if (age <= 30) return 0.8;         // Still good
-                if (age <= 32) return 0.5;         // Declining
-                return 0.2;                        // Veteran minimum
+                if (age <= 25) return 1.15;
+                if (age <= 30) return 1.0;
+                if (age <= 32) return 0.9;
+                return 0.85;
             }
 
             private static double CalculateYearsRemaining(int yearsLeft)

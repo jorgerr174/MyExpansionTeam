@@ -140,7 +140,7 @@ namespace METCore.Mapping
                 .IncludeBase<Player, PlayerBasicDto>()
                 .ForMember(dest => dest.Height, opt => opt.MapFrom(x => (x.Height / 12) + "-" + (x.Height % 12)))
                 .ForMember(dest => dest.Weight, opt => opt.MapFrom(x => x.Weight + "lb"))
-                .ForMember(dest => dest.Age, opt => opt.MapFrom(x => x.Age == null ? string.Empty : x.Age + "yo"))
+                .ForMember(dest => dest.Age, opt => opt.MapFrom(x => x.Age == null ? string.Empty : x.Age + "a"))
                 .ForMember(dest => dest.DefaultProtected, opt => opt.Ignore());
 
             CreateMap<Player, SelectableDto>()

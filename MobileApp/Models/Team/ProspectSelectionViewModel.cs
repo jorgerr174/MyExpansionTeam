@@ -82,7 +82,7 @@ namespace MobileApp.Models.Team
         public string SelectedProspectName => SelectedProspect?.Name ?? "";
         public string SelectedProspectPosition => SelectedProspect?.Position ?? "";
         public string SelectedProspectCollege => SelectedProspect?.College ?? "";
-        public string SelectedProspectRanking => SelectedProspect != null ? $"Consensus Rank: #{SelectedProspect.Consensus}" : "";
+        public string SelectedProspectRanking => SelectedProspect != null ? $"Consenso: #{SelectedProspect.Consensus}" : "";
         public string SelectedProspectCombineStats => ProspectSelectionViewModel.GetCombineStats(SelectedProspect);
 
         // Commands
@@ -166,16 +166,16 @@ namespace MobileApp.Models.Team
             var stats = new List<string>();
 
             if (!string.IsNullOrEmpty(prospect.FortyYardDash))
-                stats.Add($"40-Yard: {prospect.FortyYardDash}");
+                stats.Add($"40-Yardas: {prospect.FortyYardDash}");
 
             if (!string.IsNullOrEmpty(prospect.BenchPress))
-                stats.Add($"Bench: {prospect.BenchPress}");
+                stats.Add($"Press banca: {prospect.BenchPress}");
 
             if (!string.IsNullOrEmpty(prospect.VertJump))
-                stats.Add($"Vert: {prospect.VertJump}");
+                stats.Add($"Salto: {prospect.VertJump}");
 
             if (prospect.AthScore > 0)
-                stats.Add($"Athletic Score: {prospect.AthScore}");
+                stats.Add($"Val. Atlética: {prospect.AthScore}");
 
             return string.Join(" | ", stats);
         }
@@ -184,43 +184,41 @@ namespace MobileApp.Models.Team
         {
             var details = new List<string>
             {
-                $"Position: {prospect.Position}",
-                $"College: {prospect.College}",
-                $"Height: {prospect.Height}\"",
-                $"Weight: {prospect.Weight} lbs",
-                $"Year: {prospect.Year}",
-                $"Consensus Ranking: #{prospect.Consensus}",
-                $"Athletic Score: {prospect.AthScore}"
+                $"Posición: {prospect.Position}",
+                $"Universidad: {prospect.College}",
+                $"Altura: {prospect.Height}\"",
+                $"Peso: {prospect.Weight} lbs",
+                $"Año: {prospect.Year}",
+                $"Consenso: #{prospect.Consensus}",
+                $"val. Atlética: {prospect.AthScore}"
             };
 
-            // Add combine measurements
             if (!string.IsNullOrEmpty(prospect.HandSize))
-                details.Add($"Hand Size: {prospect.HandSize}");
+                details.Add($"Manos: {prospect.HandSize}");
 
             if (!string.IsNullOrEmpty(prospect.ArmLength))
-                details.Add($"Arm Length: {prospect.ArmLength}");
+                details.Add($"Brazos: {prospect.ArmLength}");
 
             if (!string.IsNullOrEmpty(prospect.Wingspan))
-                details.Add($"Wingspan: {prospect.Wingspan}");
+                details.Add($"Envergdura: {prospect.Wingspan}");
 
-            // Add combine performance
             if (!string.IsNullOrEmpty(prospect.FortyYardDash))
-                details.Add($"40-Yard Dash: {prospect.FortyYardDash}");
+                details.Add($"40-Yardas: {prospect.FortyYardDash}");
 
             if (!string.IsNullOrEmpty(prospect.BenchPress))
-                details.Add($"Bench Press: {prospect.BenchPress}");
+                details.Add($"press banca: {prospect.BenchPress}");
 
             if (!string.IsNullOrEmpty(prospect.VertJump))
-                details.Add($"Vertical Jump: {prospect.VertJump}");
+                details.Add($"Salto vertical: {prospect.VertJump}");
 
             if (!string.IsNullOrEmpty(prospect.BroadJump))
-                details.Add($"Broad Jump: {prospect.BroadJump}");
+                details.Add($"Salto horizontal: {prospect.BroadJump}");
 
             if (!string.IsNullOrEmpty(prospect.ThreeConeDrill))
-                details.Add($"3-Cone Drill: {prospect.ThreeConeDrill}");
+                details.Add($"3-Conos: {prospect.ThreeConeDrill}");
 
             if (!string.IsNullOrEmpty(prospect.TwentyYardShuttle))
-                details.Add($"20-Yard Shuttle: {prospect.TwentyYardShuttle}");
+                details.Add($"20-Yardas: {prospect.TwentyYardShuttle}");
 
             return string.Join("\n", details);
         }

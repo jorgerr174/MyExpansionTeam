@@ -29,7 +29,7 @@
 
                         <div class="mb-4">
                             @Html.LabelFor(m => m.Abb, htmlAttributes: new { @class = "form-label fw-bold" })
-                            @Html.TextBoxFor(m => m.Abb, new { @class = "form-control", placeholder = "Enter la abreviatura (p.e., VLL)", minlength = "2", maxlength = "3" })
+                            @Html.TextBoxFor(m => m.Abb, new { @class = "form-control", placeholder = "Introduzca la abreviatura (p.e., VLL)", minlength = "2", maxlength = "3" })
                             @Html.ValidationMessageFor(m => m.Abb, "", new { @class = "text-danger" })
                         </div>
 

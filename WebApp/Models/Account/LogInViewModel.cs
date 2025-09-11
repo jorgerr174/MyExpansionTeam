@@ -13,6 +13,8 @@ namespace WebApp.Models.Account
         [Required]
         [DisplayName("Contraseña")]
         [DataType(DataType.Password)]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_?.,-]).{8,}$",
+            ErrorMessage = "El contraseña, de mínimo 8, caracteres debe contener: una minúscula, una mayúscula, un dígito y un símbolo.")]
         public string Password { get; set; }
 
         [DataType(DataType.Url)]

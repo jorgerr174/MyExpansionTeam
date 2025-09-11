@@ -102,7 +102,6 @@
                                            VerticalOptions="Center">
                                         <Picker.Items>
                                             <x:String>Usuario</x:String>
-                                            <x:String>Manager</x:String>
                                             <x:String>Admin</x:String>
                                         </Picker.Items>
                                     </Picker>

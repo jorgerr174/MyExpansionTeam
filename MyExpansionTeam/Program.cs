@@ -15,25 +15,18 @@ namespace METAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Configure services
             ConfigureServices(builder.Services, builder.Configuration);
 
             var app = builder.Build();
-
-            // Configure middleware pipeline
             ConfigurePipeline(app);
-
             app.Run();
         }
 
         static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            // API Documentation
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
-            // Database
             services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options
@@ -44,17 +37,13 @@ namespace METAPI
                 .UseLazyLoadingProxies();
             });
 
-            // AutoMapper
             services.AddAutoMapper(typeof(METCore.Mapping.MappingProfile));
 
-            // Authentication & Authorization
             ConfigureAuthentication(services, configuration);
             services.AddAuthorization();
 
-            // Controllers
             services.AddControllers();
 
-            // Application Services
             RegisterApplicationServices(services);
         }
 
@@ -89,7 +78,6 @@ namespace METAPI
 
         static void RegisterApplicationServices(IServiceCollection services)
         {
-            // Business Services
             services.AddScoped<AuthService>();
             services.AddScoped<ImportService>();
             services.AddScoped<UserService>();
@@ -97,7 +85,6 @@ namespace METAPI
             services.AddScoped<TeamService>();
             services.AddScoped<PlayerService>();
 
-            // Repositories
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IFranchiseRepository, FranchiseRepository>();
             services.AddScoped<ITeamRepository, TeamRepository>();
@@ -110,7 +97,6 @@ namespace METAPI
 
         static void ConfigurePipeline(WebApplication app)
         {
-            // Development-only middleware
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -121,12 +107,10 @@ namespace METAPI
                 Console.WriteLine("AutoMapper configuration is valid!");
             }
 
-            // Security middleware
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
 
-            // Routing
             app.MapControllers();
         }
     }

@@ -16,15 +16,20 @@ namespace METCore.Models
         [MaxLength(50)]
         public string LastName { get; set; }
 
+        [RegularExpression(@"^(?=.*[a-zA-Z])(?=.*\d).{8,}$",
+            ErrorMessage = "El nombre de usuario, de mínimo 8, caracteres debe contener: una letra y un dígito.")]
         public string Username { get; set; }
 
         [DataType(DataType.Password)]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_?.,-]).{8,}$",
+            ErrorMessage = "La contraseña, de mínimo 8, caracteres debe contener: una minúscula, una mayúscula, un dígito y un símbolo.")]
         public string Password { get; set; }
 
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
         [DataType(DataType.PhoneNumber)]
+        [RegularExpression(@"^(\d{9})?$", ErrorMessage = "El teléfono debe tener nueve dígitos.")]
         public string? Tlf { get; set; }
 
         public bool Active { get; set; }

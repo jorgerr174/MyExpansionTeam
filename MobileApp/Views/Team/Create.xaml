@@ -44,7 +44,7 @@
                                    FontAttributes="Bold" 
                                    TextColor="#333" />
                             <Entry Text="{Binding Location}" 
-                                   Placeholder="Introduzca la ubicación(p.e., Valladolid)"
+                                   Placeholder="Introduzca la ubicación (p.ej., Valladolid)"
                                    FontSize="16"
                                    BackgroundColor="#f8f9fa"
                                    TextColor="#333" />
@@ -61,7 +61,7 @@
                                    FontAttributes="Bold" 
                                    TextColor="#333" />
                             <Entry Text="{Binding Mascot}" 
-                                   Placeholder="Introduzca la mascota(p.e., Pingüinos)"
+                                   Placeholder="Introduzca la mascota (p.ej., Pingüinos)"
                                    FontSize="16"
                                    BackgroundColor="#f8f9fa"
                                    TextColor="#333" />
@@ -78,7 +78,7 @@
                                    FontAttributes="Bold" 
                                    TextColor="#333" />
                             <Entry Text="{Binding Abb}" 
-                                   Placeholder="Introduzca la abreviatura(p.e., VLL)"
+                                   Placeholder="Introduzca la abreviatura (p.ej., VLL)"
                                    MaxLength="3"
                                    FontSize="16"
                                    BackgroundColor="#f8f9fa"

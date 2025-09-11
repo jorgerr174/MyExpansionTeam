@@ -927,15 +927,21 @@
         "additionalProperties": false
       },
       "LogInDto": {
+        "required": [
+          "identifier",
+          "password"
+        ],
         "type": "object",
         "properties": {
           "identifier": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "password": {
+            "minLength": 1,
+            "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[_?.,-]).{8,}$",
             "type": "string",
-            "nullable": true
+            "format": "password"
           }
         },
         "additionalProperties": false
@@ -1080,8 +1086,7 @@
       "RoleEnum": {
         "enum": [
           0,
-          1,
-          2
+          1
         ],
         "type": "integer",
         "format": "int32"

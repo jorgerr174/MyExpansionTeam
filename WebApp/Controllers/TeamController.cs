@@ -178,7 +178,7 @@ namespace WebApp.Controllers
             else if (result.Message.Equals("ProtectedPlayersIds")) 
             {
                 dto.RosterSettingsProtectedPlayersIds = result.Value.RosterSettingsProtectedPlayersIds;
-                ModelState.AddModelError("", "Error al guardar los jugadores protegidos. Pruebe de nuevo.");
+                ModelState.AddModelError("", "Error al guardar los jugadores protegidos.");
             }
             else ModelState.AddModelError("", "No se pudieron guardar los cambios.");
 
@@ -267,6 +267,7 @@ namespace WebApp.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetTradePartialAsString(int TeamId, int FranchiseId, int CurrentPick)
         {
             HttpResponseMessage response = await SendRequest(HttpMethod.Post, "Teams", "GetTradeDto", new TradeDto(TeamId, FranchiseId));
