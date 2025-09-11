@@ -149,6 +149,21 @@ namespace METCore.Services
 
             dto.Prospects = dto.Selections.Count < 1 ? [] : _mapper.Map<IList<ProspectDto>>(await _playerRepository.GetManyTByIds([.. dto.Selections.Values]));
 
+            if (team.Trades is not null && team.Trades.Count > 0)
+                foreach (Trade trade in team.Trades.OrderBy(t => t.Date))
+                {
+                    foreach (int tpi in trade.TeamPicks)
+                    {
+                        dto.Picks[0].Remove(tpi);
+                        dto.Picks[trade.FranchiseId].Add(tpi);
+                    }
+                    foreach (int fpi in trade.FranchisePicks)
+                    {
+                        dto.Picks[0].Add(fpi);
+                        dto.Picks[trade.FranchiseId].Remove(fpi);
+                    }
+                }
+
             return dto;
         }
 
@@ -449,9 +464,7 @@ namespace METCore.Services
             newTeam.User = user;
 
             bool created = await _teamRepository.CreateT(newTeam) > 0;
-            return new(
-                created ? string.Empty : "Error",
-                created ? await GetBasicInfoDtoById(newTeam.Id) : null);
+            return created ? new(string.Empty, await GetBasicInfoDtoById(newTeam.Id)) : new("Error", null);
         }
         #endregion DuplicateTeam
     }

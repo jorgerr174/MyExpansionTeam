@@ -272,7 +272,7 @@ namespace MobileApp.Models.Team
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to load players: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error al cargar jugadores: {ex.Message}", "OK");
             }
         }
 

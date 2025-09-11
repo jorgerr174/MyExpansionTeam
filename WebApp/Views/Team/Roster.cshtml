@@ -45,7 +45,7 @@
                             <div class="progress-bar" id="capProgressBar" style="width: 0%"></div>
                         </div>
                         <small class="text-muted">
-                            $<span id="currentCapUsed">0</span>M of $<span id="maxCapAvailable">0</span>M used 
+                            $<span id="currentCapUsed">0</span>M de $<span id="maxCapAvailable">0</span>M usado 
                             (<span id="capPercentage">0</span>%)
                         </small>
                     </div>
@@ -57,8 +57,14 @@
                 </div>
             </div>
 
+            @if (!ViewData.ModelState?.IsValid ?? false)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+                </div>
+            }
+
             <form asp-action="SaveRoster" method="post" id="teamRosterForm">
-                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 @Html.HiddenFor(m => m.Id)
                 @Html.HiddenFor(m => m.Location)
                 @Html.HiddenFor(m => m.Mascot)
@@ -836,7 +842,7 @@
                 const isMaxed = selectedCount >= maxPerFranchise;
                 const statusClass = isMaxed ? 'list-group-item-success' : hasSelections ? 'list-group-item-warning' : '';
 
-                const franchiseInfo = franchiseNames[franchiseId] || { name: `Franchise ${franchiseId}`, abbreviation: `F${franchiseId}` };
+                const franchiseInfo = franchiseNames[franchiseId] || { name: `Franquicia ${franchiseId}`, abbreviation: `F${franchiseId}` };
 
                 const franchiseItem = document.createElement('a');
                 franchiseItem.href = '#';
@@ -894,13 +900,13 @@
             fetch(`/Team/GetSelectablePlayers?FranchiseId=${franchiseId}`)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        throw new Error(`Error HTTP! status: ${response.status}`);
                     }
                     return response.json();
                 })
                 .then(data => {
                     if (data.error || !Array.isArray(data)) {
-                        throw new Error('Invalid response format');
+                        throw new Error('Formato de respuesta inválida');
                     }
 
                     const franchiseData = createFranchiseDataFromJson(data, franchiseId);
@@ -914,11 +920,11 @@
                     reapplySelectedStates();
                 })
                 .catch(error => {
-                    console.error('Error loading franchise data:', error);
+                    console.error('Error cargando información de la franquicia:', error);
                     container.innerHTML = `
                         <div class="text-center text-danger p-5">
                             <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
-                            <p>Error loading franchise data. Please try again.</p>
+                            <p>Error cargando información de la franquicia. Pruebe de nuevo.</p>
                             <button type="button" class="btn btn-outline-primary btn-sm" onclick="selectFranchise(${franchiseId})">
                                 <i class="fas fa-redo me-1"></i>Retry
                             </button>
@@ -1014,7 +1020,7 @@
                                 <div class="player-header">
                                     <div class="player-info">
                                         <h6 class="player-title">${player.name}</h6>
-                                        <small class="player-details">${player.position} | Age: ${player.age}</small>
+                                        <small class="player-details">${player.position} | Edad: ${player.age}</small>
                                         <br>
                                         <small class="player-details">${player.height} | ${player.weight}</small>
                                     </div>
@@ -1053,7 +1059,6 @@
                             const isCurrentlySelected = rosterPlayersArray.includes(playerId);
 
                             if (isCurrentlySelected) {
-                                // Check if player is in any starting position across all formations
                                 const allStarterConfigs = [
                                     { config: offenseStartersConfiguration, name: 'Offense' },
                                     { config: defenseStartersConfiguration, name: 'Defense' },
@@ -1103,13 +1108,13 @@
                             } else {
                                 const currentFranchiseSelected = getFranchiseSelectedCount(currentFranchiseId);
                                 if (currentFranchiseSelected >= maxPerFranchise) {
-                                    alert(`You can only select ${maxPerFranchise} players from each franchise.`);
+                                    alert(`Solo puede selccionar ${maxPerFranchise} jugadores de cada franquicia.`);
                                     return;
                                 }
 
                                 const currentCapUsed = calculateCurrentCapUsed();
                                 if (currentCapUsed + playerCapValue > maxCapAvailable) {
-                                    alert(`Adding this player would exceed your salary cap. Available: ${(maxCapAvailable - currentCapUsed).toFixed(1)}M`);
+                                    alert(`Añadir a este jugador supondría superar el límite salarial. Disponible: ${(maxCapAvailable - currentCapUsed).toFixed(1)}M`);
                                     return;
                                 }
 
@@ -1132,7 +1137,6 @@
             });
         }
 
-        // Toggle between showing all players vs only available (unselected) players
         document.getElementById('showAllPlayers').addEventListener('click', function () {
             viewMode = 'all';
             document.getElementById('showAllPlayers').classList.add('active');
@@ -1154,9 +1158,6 @@
         });
 
         // ===== TAB 2: REVIEW ROSTER FUNCTIONS =====
-        // Functions for displaying and managing the complete roster
-
-        // Display all selected players organized by position with filtering options
         function refreshRosterDisplay() {
             const container = document.getElementById('currentRosterDisplay');
             
@@ -1164,7 +1165,7 @@
                 container.innerHTML = `
                     <div class="text-center text-muted p-5">
                         <i class="fas fa-users fa-2x mb-3"></i>
-                        <p>No players selected yet. Start by selecting players in the Build Roster tab.</p>
+                        <p>Sin jugadores seleccionados aún. Comience seleccionando jugadores en la pestaña de Edición de Plantilla.</p>
                     </div>
                 `;
                 return;
@@ -1279,7 +1280,7 @@
         });
 
         document.getElementById('clearAllRoster').addEventListener('click', function() {
-            if (confirm('Are you sure you want to clear your entire roster? This action cannot be undone.')) {
+            if (confirm('¿Está seguro de que desea quitar a todos los jugadores de la plantilla? Esto no se podrá deshacer.')) {
                 rosterPlayersArray = [];
                 totalCapUsed = 0;
 
@@ -1300,12 +1301,12 @@
                     displayPlayersForSelection(franchisePlayersCache[currentFranchiseId]);
                 }
 
-                alert('Roster cleared successfully.');
+                alert('Plantilla vaciada con éxito.');
             }
         });
 
         window.removeFromRoster = function(playerId) {
-            if (confirm('Are you sure you want to remove this player from your roster?')) {
+            if (confirm('¿Estás seguro de que quiere quitar a este jugador de su plantilla?')) {
                 rosterPlayersArray = rosterPlayersArray.filter(id => id !== playerId);
 
                 [startersConfiguration, offenseStartersConfiguration, defenseStartersConfiguration, specialStartersConfiguration].forEach(config => {
@@ -1548,7 +1549,7 @@
             const formationTypes = formations[currentFormation];
 
             if (!formationTypes) {
-                fieldDisplay.innerHTML = '<div class="text-center p-5"><p>Formation category not found</p></div>';
+                fieldDisplay.innerHTML = '<div class="text-center p-5"><p>Categoría de alineación no encontrada</p></div>';
                 return;
             }
 
@@ -1559,7 +1560,7 @@
             const formation = formationTypes[currentFormationType];
 
             if (!formation) {
-                fieldDisplay.innerHTML = '<div class="text-center p-5"><p>Formation not found</p></div>';
+                fieldDisplay.innerHTML = '<div class="text-center p-5"><p>Alineación no encontrada</p></div>';
                 return;
             }
 
@@ -1626,7 +1627,7 @@
                 benchContainer.innerHTML = `
                     <div class="text-center text-muted p-4">
                         <i class="fas fa-users-slash fa-2x mb-3"></i>
-                        <p>No players available for this formation</p>
+                        <p>Sin jugadores disponibles para esta alineación</p>
                     </div>
                 `;
                 return;
@@ -1783,7 +1784,7 @@
 
             if (previousFormationType && previousFormationType !== newFormationType) {
                 if (Object.keys(startersConfiguration).length > 0) {
-                    if (confirm('Changing formation will clear current starting lineup. Continue?')) {
+                    if (confirm('Cambiar la alineación desasignará todos los titulares actuales. ¿Desea continuar?')) {
                         startersConfiguration = {};
                         updateStartersHiddenFields();
                         currentFormationType = newFormationType;
@@ -1889,14 +1890,14 @@
                         <div class="text-center text-muted p-5">
                             <i class="fas fa-exchange-alt fa-2x mb-3"></i>
                             <p>No trades completed yet.</p>
-                            <p><small class="text-muted">Use the "New Trade Offer" button to propose your first trade.</small></p>
+                            <p><small class="text-muted">Usar el botón "Nuevo Trueque" para proponer su primer trueque.</small></p>
                         </div>
                     `;
                 } else {
                     tradesDisplay.innerHTML = `
                         <div class="text-center text-muted p-5">
                             <i class="fas fa-exclamation-triangle fa-2x mb-3 text-warning"></i>
-                            <p>Error loading trade history. Please try again.</p>
+                            <p>Error cargando historial de trueques. Pruebe de nuevo.</p>
                         </div>
                     `;
                 }
@@ -1911,7 +1912,7 @@
                     <div class="text-center text-muted p-5">
                         <i class="fas fa-exchange-alt fa-2x mb-3"></i>
                         <p>No trades completed yet.</p>
-                        <p><small class="text-muted">Use the "New Trade Offer" button to propose your first trade.</small></p>
+                        <p><small class="text-muted">Usar el botón "Nuevo Trueque" para proponer su primer trueque.</small></p>
                     </div>
                 `;
                 return;
@@ -1969,7 +1970,7 @@
                     <div class="modal-dialog modal-xl">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title">Select Franchise to Trade With</h5>
+                                <h5 class="modal-title">Seleccione la franquicia con la que realizar el trueque</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
@@ -1994,7 +1995,7 @@
             document.getElementById('tradeModal').querySelector('.modal-body').innerHTML = `
                 <div class="text-center p-4">
                     <div class="spinner-border text-warning mb-3"></div>
-                    <p>Saving current roster...</p>
+                    <p>Guardando plantilla actual...</p>
                 </div>
             `;
 
@@ -2006,13 +2007,13 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Failed to save roster');
+                    throw new Error('Error al guardar la plantilla');
                 }
 
 		        document.getElementById('tradeModal').querySelector('.modal-body').innerHTML = `
 			        <div class="text-center p-4">
 				        <div class="spinner-border text-primary mb-3"></div>
-				        <p>Cargando trade interface with ${franchiseNames[franchiseId].name}...</p>
+				        <p>Cargando interfaz de trueque con ${franchiseNames[franchiseId].name}...</p>
 			        </div>
 		        `;
 
@@ -2020,7 +2021,7 @@
             })
             .then(result => {
                 if (!result.ok) {
-                    throw new Error(`Unable to load the trade interface with ${franchiseNames[franchiseId].name}`);
+                    throw new Error(`Error al cargar la interfaz de trueque con ${franchiseNames[franchiseId].name}`);
                 }
                 else {
                     return result.json();
@@ -2028,7 +2029,7 @@
             })
             .then(json => {
                 if (json.message && json.message != "") {
-                    throw new Error(`Unable to load the trade interface with ${franchiseNames[franchiseId].name}`);
+                    throw new Error(`Error al cargar la interfaz de trueque con ${franchiseNames[franchiseId].name}`);
                 }
                 else {
                     return json.value;
@@ -2049,9 +2050,9 @@
                     </div>
                     <div class="modal-body">
                         <div class="alert alert-danger">
-                            <h6>Network Error</h6>
-                            <p>Failed to load trade interface: ${error.message}</p>
-                            <button class="btn btn-primary btn-sm" onclick="selectFranchiseForTrade(${franchiseId})">Try Again</button>
+                            <h6>Error de conexión</h6>
+                            <p>Error al cargar la interfaz de trueque: ${error.message}</p>
+                            <button class="btn btn-primary btn-sm" onclick="selectFranchiseForTrade(${franchiseId})">Pruebe de nuevo</button>
                         </div>
                     </div>
                 `);
@@ -2097,11 +2098,11 @@
                 updateDraftPicksCount(prospects.length);
             })
             .catch(error => {
-                console.error('Error loading draft results:', error);
+                console.error('Error cargando los resultados del draft:', error);
                 draftDisplay.innerHTML = `
                     <div class="text-center text-muted p-5">
                         <i class="fas fa-exclamation-triangle fa-2x mb-3 text-warning"></i>
-                        <p>Error loading draft results. Please try again.</p>
+                        <p>Error cargando los resultados del draft. Pruebe de nuevo.</p>
                     </div>
                 `;
             });
@@ -2115,7 +2116,7 @@
                     <div class="text-center text-muted p-5">
                         <i class="fas fa-trophy fa-2x mb-3"></i>
                         <p>No draft completed yet.</p>
-                        <p><small class="text-muted">Complete the roster building process and proceed to the draft.</small></p>
+                        <p><small class="text-muted">Completa el proceso de construcción de la plantilla y proceda al draft.</small></p>
                     </div>
                 `;
                 return;
@@ -2143,7 +2144,7 @@
                             <div class="card-body">
                                 <div class="d-flex align-items-center mb-2">
                                     <div class="flex-grow-1">
-                                        <h6 class="mb-1">${prospect.name || prospect.player || 'Unknown Player'}</h6>
+                                        <h6 class="mb-1">${prospect.name || prospect.player || ''}</h6>
                                         <small class="text-muted">${prospect.position || 'N/A'} - ${prospect.college || 'N/A'}</small>
                                     </div>
                                 </div>
@@ -2165,7 +2166,7 @@
                                     <div class="progress" style="height: 6px;">
                                         <div class="progress-bar bg-info" style="width: ${(prospect.athScore || 0)}%"></div>
                                     </div>
-                                    <small class="text-muted">Val. Athética: ${prospect.athScore || 0}</small>
+                                    <small class="text-muted">Val. Atlética: ${prospect.athScore || 0}</small>
                                 </div>
                             </div>
                         </div>

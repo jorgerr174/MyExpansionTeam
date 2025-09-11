@@ -1,3 +1,4 @@
+C:\Users\jorge\workspaces\repos\MyExpansionTeam\MyExpansionTeam\bin\Debug\net9.0\web.config
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\MyExpansionTeam\bin\Debug\net9.0\appsettings.Development.json
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\MyExpansionTeam\bin\Debug\net9.0\appsettings.json
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\MyExpansionTeam\bin\Debug\net9.0\METAPI.staticwebassets.endpoints.json
@@ -180,4 +181,3 @@ C:\Users\jorge\workspaces\repos\MyExpansionTeam\MyExpansionTeam\obj\Debug\net9.0
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\MyExpansionTeam\obj\Debug\net9.0\METAPI.pdb
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\MyExpansionTeam\obj\Debug\net9.0\METAPI.genruntimeconfig.cache
 C:\Users\jorge\workspaces\repos\MyExpansionTeam\MyExpansionTeam\obj\Debug\net9.0\ref\METAPI.dll
-C:\Users\jorge\workspaces\repos\MyExpansionTeam\MyExpansionTeam\bin\Debug\net9.0\web.config

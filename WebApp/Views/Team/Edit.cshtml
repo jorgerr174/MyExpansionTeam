@@ -30,19 +30,19 @@
 
                         <div class="mb-3">
                             @Html.LabelFor(m => m.Location, htmlAttributes: new { @class = "form-label fw-bold" })
-                            @Html.TextBoxFor(m => m.Location, new { @class = "form-control", placeholder = "Enter team location (e.g., New York)" })
+                            @Html.TextBoxFor(m => m.Location, new { @class = "form-control", placeholder = "Introduzca la ubicación (p.ej., New York)" })
                             @Html.ValidationMessageFor(m => m.Location, "", new { @class = "text-danger" })
                         </div>
 
                         <div class="mb-3">
                             @Html.LabelFor(m => m.Mascot, new { @class = "form-label fw-bold" })
-                            @Html.TextBoxFor(m => m.Mascot, new { @class = "form-control", placeholder = "Enter team mascot (e.g., Yankees)" })
+                            @Html.TextBoxFor(m => m.Mascot, new { @class = "form-control", placeholder = "Introduzca la mascota (p.ej., Giants)" })
                             @Html.ValidationMessageFor(m => m.Mascot, "", new { @class = "text-danger" })
                         </div>
 
                         <div class="mb-4">
                             @Html.LabelFor(m => m.Abb, htmlAttributes: new { @class = "form-label fw-bold" })
-                            @Html.TextBoxFor(m => m.Abb, new { @class = "form-control", placeholder = "Enter abbreviation (e.g., NYY)", maxlength = "5" })
+                            @Html.TextBoxFor(m => m.Abb, new { @class = "form-control", placeholder = "Introduzca la abreviatura (e.g., NYG)", maxlength = "5" })
                             @Html.ValidationMessageFor(m => m.Abb, "", new { @class = "text-danger" })
                         </div>
 

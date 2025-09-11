@@ -8,7 +8,7 @@ namespace MobileApp.Models.Team
         public ProtectedPlayerViewModel(ProtectableDto player)
         {
             Player = player;
-            IsProtected = player.DefaultProtected; // Initialize with default protection
+            IsProtected = player.DefaultProtected;
         }
 
         [ObservableProperty] private bool isProtected;

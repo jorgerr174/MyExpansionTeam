@@ -27,27 +27,20 @@ namespace WebApp.Controllers
             {
                 MessageDto result = await GetResult<MessageDto>(response);
 
-                // Store the JWT securely (cookie, session, etc.)
-                // Example: store in cookie
+                JwtSecurityToken jwtToken = new JwtSecurityTokenHandler().ReadJwtToken(result.Message);
+                DateTime jwtExpiration = jwtToken.ValidTo;
+
                 await HttpContext.SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(
-                        new ClaimsIdentity(
-                            new JwtSecurityTokenHandler().ReadJwtToken(result.Message).Claims,
-                            CookieAuthenticationDefaults.AuthenticationScheme
-                        )
-                    ),
-                    new AuthenticationProperties
-                    {
-                        IsPersistent = true,
-                        ExpiresUtc = DateTime.UtcNow.AddHours(2)
-                    });
+                    new ClaimsPrincipal(new ClaimsIdentity(jwtToken.Claims, CookieAuthenticationDefaults.AuthenticationScheme)),
+                    new AuthenticationProperties { IsPersistent = true, ExpiresUtc = jwtExpiration }
+                );
 
-                Response.Cookies.Append("jwt", result.Message, new CookieOptions { HttpOnly = true });
+                Response.Cookies.Append("jwt", result.Message, new CookieOptions { HttpOnly = true, Expires = jwtExpiration });
                 return String.IsNullOrWhiteSpace(model.RedirectUrl) ? RedirectToAction("Index", "Home") : Redirect(model.RedirectUrl);
             }
 
-            ModelState.AddModelError("LogIn", "Credenciales inválidas.");
+            ModelState.AddModelError("", "Credenciales inválidas.");
             return View(model);
         }
         #endregion

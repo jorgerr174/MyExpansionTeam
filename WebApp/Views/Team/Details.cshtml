@@ -243,7 +243,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             const teamId = @Model.Id;
 
-            // Position mapping for filters
             const positionMappings = {
                 'QB': ['QB'],
                 'HB': ['RB', 'FB'],
@@ -259,10 +258,8 @@
             };
             const totalAtRound = @Html.Raw(Json.Serialize(DraftPicks.TotalAtRound));
 
-            // Load data from model - EXACTLY like in Roster view
             const teamRosterData = @Html.Raw(Json.Serialize(Model.Players));
 
-            // EXACTLY like Roster view - load lineups from server data
             const lineupsData = {
                 offense: @Html.Raw(Json.Serialize(Model.OffLineup)),
                 defense: @Html.Raw(Json.Serialize(Model.DefLineup)),
@@ -624,7 +621,7 @@
                     container.innerHTML = `
                         <div class="text-center text-muted p-5">
                             <i class="fas fa-users fa-2x mb-3"></i>
-                            <p>No players selected yet.</p>
+                            <p>Aún no se han seleccionado jugadores.</p>
                         </div>
                     `;
                     return;
@@ -640,14 +637,13 @@
 
                 container.innerHTML = '';
 
-                // Add roster summary - EXACTLY like Roster view
                 const summaryDiv = document.createElement('div');
                 summaryDiv.className = 'alert alert-secondary mb-4';
                 summaryDiv.innerHTML = `
                     <div class="row">
                         <div class="col-md-6">
                             <strong># Jugadores:</strong> ${teamRosterData.length}<br>
-                            <strong>Salario usado total:</strong> ${teamRosterData.reduce((sum, p) => sum + parseFloat(p.pureAPY || 0), 0).toFixed(1)}M
+                            <strong>Salario total usado:</strong> ${teamRosterData.reduce((sum, p) => sum + parseFloat(p.pureAPY || 0), 0).toFixed(1)}M
                         </div>
                         <div class="col-md-6">
                             <strong>Posiciones:</strong> ${Object.keys(playersByPosition).map(pos => `${pos} (${playersByPosition[pos].length})`).join(', ')}
@@ -773,7 +769,6 @@
             function updateBenchPlayers() {
                 const benchContainer = document.getElementById('benchDisplay');
 
-                // Get assigned player IDs
                 let assignedPlayerIds = [];
                 switch(currentFormation) {
                     case 'offense':
@@ -787,7 +782,6 @@
                         break;
                 }
 
-                // Filter players for this formation type
                 let relevantPositions = [];
                 switch(currentFormation) {
                     case 'offense':
@@ -860,14 +854,14 @@
                         tradesDisplay.innerHTML = `
                             <div class="text-center text-muted p-5">
                                 <i class="fas fa-exchange-alt fa-2x mb-3"></i>
-                                <p>No trades completed yet.</p>
+                                <p>Aún no se ha completado ningún trueque.</p>
                             </div>
                         `;
                     } else {
                         tradesDisplay.innerHTML = `
                             <div class="text-center text-muted p-5">
                                 <i class="fas fa-exclamation-triangle fa-2x mb-3 text-warning"></i>
-                                <p>Error loading trade history. Please try again.</p>
+                                <p>Error cargando el historial de trueques.</p>
                             </div>
                         `;
                     }
@@ -881,7 +875,7 @@
                     tradesDisplay.innerHTML = `
                         <div class="text-center text-muted p-5">
                             <i class="fas fa-exchange-alt fa-2x mb-3"></i>
-                            <p>No trades completed yet.</p>
+                            <p>Aún no se ha completado ningún trueque.</p>
                         </div>
                     `;
                     return;
@@ -932,11 +926,11 @@
                     displayDraftResults(draftData.prospects || [], Object.entries(draftData.selections || []));
                 })
                 .catch(error => {
-                    console.error('Error loading draft results:', error);
+                    console.error('Error cargando los resultados del draft:', error);
                     draftDisplay.innerHTML = `
                         <div class="text-center text-muted p-5">
                             <i class="fas fa-exclamation-triangle fa-2x mb-3 text-warning"></i>
-                            <p>Error loading draft results. Please try again.</p>
+                            <p>Error cargando los resultados del draft.</p>
                         </div>
                     `;
                 });
@@ -949,7 +943,7 @@
                     draftDisplay.innerHTML = `
                         <div class="text-center text-muted p-5">
                             <i class="fas fa-trophy fa-2x mb-3"></i>
-                            <p>No draft picks made yet.</p>
+                            <p>Aún no se ha realizado el draft.</p>
                         </div>
                     `;
                     return;
