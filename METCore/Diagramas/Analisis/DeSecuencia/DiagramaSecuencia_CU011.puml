@@ -1,0 +1,66 @@
+@startuml DiagramaSecuencia_CU011
+!theme plain
+
+actor "Actor Usuario" as usuario
+participant "IUSistema" as interfaz
+collections "AjustesDeEquipo" as ajustes
+collections "Franquicias" as franchises
+collections "Jugadores" as players
+
+usuario -> interfaz : 1. modificarJugadoresProtegidos(equipoId)
+
+activate interfaz
+interfaz -> ajustes : 2. A1 := buscarAjustesPorEquipoId(equipoId)
+activate ajustes
+interfaz <-- ajustes : 3. A1
+deactivate ajustes
+
+alt E1 IS NULL OR E1.propietario != usuario
+    interfaz --> usuario : 4. mostrarError("No es propietario del equipo o no existe")
+    activate usuario
+end
+
+usuario <-- interfaz : 5. A1.JugadoresProtegidos
+interfaz -> franchises : 6. franquicias := getAll()
+activate franchises
+franchises --> interfaz : 7. franquicias
+deactivate franchises
+usuario <-- interfaz : 8. franquicias
+
+loop Para cada franquicia que el usuario quiera modificar
+    usuario -> interfaz : 9. jugadores := getJugadoresPorFranquicia(franquiciaId)
+
+    interfaz -> players : 10. jugadores := getJugadoresPorFranquicia(franquiciaId)
+    activate players
+    players --> interfaz : 11. jugadores
+    deactivate players
+    usuario <- interfaz : 12. jugadores
+
+    loop Para cada jugador clicado
+        alt Proteger 
+            usuario -> interfaz : 13. protegerJugador(jugadorId)
+        else Desproteger
+            usuario -> interfaz : 14. desprotegerJugador(jugadorId)
+        end
+        usuario <-- interfaz : 15. ok
+    end
+    
+end
+    
+    usuario -> interfaz : 16. guardarProtecciones()
+    interfaz -> interfaz : 17. validarProtecciones(A1)
+    
+
+alt Número incorrecto de jugadores protegidos
+    usuario <-- interfaz : 18. mostrarError("Número de protegidos incorrecto")
+else Selección válida
+    interfaz -> ajustes : 19. guardarProtecciones(A1)
+    activate ajustes
+    interfaz <-- ajustes : 20. ok
+    deactivate ajustes
+    usuario <-- interfaz : 21. ok
+    deactivate interfaz
+    deactivate usuario
+end
+
+@enduml

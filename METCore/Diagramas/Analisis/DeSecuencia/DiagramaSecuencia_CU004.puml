@@ -1,0 +1,47 @@
+@startuml DiagramaSecuencia_CU004
+!theme plain
+
+actor "Actor Usuario" as usuario
+participant "IUSistema" as interfaz
+collections "Usuarios" as users
+
+usuario -> interfaz : 1. solicitarModificarCredenciales()
+
+activate interfaz
+interfaz -> users : 2. U1 := getUsuario(username)
+activate users
+interfaz <-- users : 3. U1
+deactivate users
+
+loop U2 IS NOT NULL
+    loop Antigua contraseña incorrecta
+        loop Datos inválidos
+            usuario <- interfaz : 4. modificarCredenciales := solicitarDatos()
+            deactivate interfaz
+            activate usuario
+            usuario --> interfaz : 5. modificarCredenciales
+            deactivate usuario
+            activate interfaz
+            
+            interfaz -> interfaz : 6. validarCredenciales(credenciales)
+        end
+    
+        interfaz --> usuario : 7. mostrarError("Contraseña actual incorrecta")
+    end
+
+    interfaz -> users : 8. U2 := getUsuario(nuevoUsername)
+    activate users
+    users --> interfaz : 9. U2
+    deactivate users
+    interfaz --> usuario : 10. mostrarError("El nombre de usuario ya está en uso")
+end
+
+interfaz -> users : 11. actualizarCredenciales(credenciales)
+activate users
+users --> interfaz : 12. ok
+deactivate users
+interfaz -> interfaz : 13. cerrarSesion()
+interfaz --> usuario : 14. redirigirInicioSesion()
+deactivate interfaz
+
+@enduml

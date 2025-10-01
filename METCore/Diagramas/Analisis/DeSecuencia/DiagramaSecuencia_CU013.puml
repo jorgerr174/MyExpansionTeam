@@ -1,0 +1,122 @@
+@startuml DiagramaSecuencia_CU013
+!theme plain
+
+actor "Actor Usuario" as usuario
+participant "IC_Teams" as interfaz
+participant "G_Teams" as gestion
+collections "Teams" as teams
+collections "Franchises" as franchises
+collections "Players" as players
+collections "DraftPicks" as picks
+
+usuario -> interfaz : 1. solicitarRealizarTrueque(equipoId)
+activate interfaz
+
+interfaz -> gestion : 2. E1 := getEquipo(equipoId)
+activate gestion
+gestion -> teams : 3. E1 := buscarPorId(equipoId)
+activate teams
+teams --> gestion : 4. E1
+deactivate teams
+
+alt E1 IS NULL OR E1.propietario != usuario
+    gestion --> interfaz : 5. error
+    interfaz --> usuario : 6. mostrarError("No es propietario del equipo o no existe")
+    deactivate gestion
+    deactivate interfaz
+else Es propietario
+    gestion -> franchises : 5. franquicias := obtenerTodas()
+    activate franchises
+    franchises --> gestion : 6. franquicias
+    deactivate franchises
+    gestion --> interfaz : 7. E1, franquicias
+    deactivate gestion
+    interfaz --> usuario : 8. franquicias
+    activate usuario
+    
+    usuario -> interfaz : 9. franquiciaSeleccionada
+    deactivate usuario
+    activate interfaz
+    
+    loop Trueque rechazado OR usuario quiere continuar
+        note over usuario, interfaz : Selección de ítems del equipo del usuario
+        loop Para cada ítem que el usuario quiera ofrecer
+            interfaz -> gestion : 10. itemsEquipoUsuario := obtenerItemsEquipo(equipoId)
+            activate gestion
+            gestion -> players : 11. jugadoresUsuario := buscarPorEquipo(equipoId)
+            activate players
+            players --> gestion : 12. jugadoresUsuario
+            deactivate players
+            gestion -> picks : 13. eleccionesUsuario := buscarPorEquipo(equipoId)
+            activate picks
+            picks --> gestion : 14. eleccionesUsuario
+            deactivate picks
+            gestion --> interfaz : 15. itemsEquipoUsuario
+            deactivate gestion
+            interfaz --> usuario : 16. itemsEquipoUsuario
+            activate usuario
+            
+            usuario -> interfaz : 17. seleccionarItem(itemId, tipo)
+            deactivate usuario
+            interfaz --> usuario : 18. confirmarSeleccion()
+        end
+        
+        note over usuario, interfaz : Selección de ítems de la franquicia
+        loop Para cada ítem que el usuario quiera recibir
+            interfaz -> gestion : 19. itemsFranquicia := obtenerItemsFranquicia(franquiciaId)
+            activate gestion
+            gestion -> players : 20. jugadoresFranquicia := buscarPorFranquicia(franquiciaId)
+            activate players
+            players --> gestion : 21. jugadoresFranquicia
+            deactivate players
+            gestion -> picks : 22. eleccionesFranquicia := buscarPorFranquicia(franquiciaId)
+            activate picks
+            picks --> gestion : 23. eleccionesFranquicia
+            deactivate picks
+            gestion --> interfaz : 24. itemsFranquicia
+            deactivate gestion
+            interfaz --> usuario : 25. itemsFranquicia
+            activate usuario
+            
+            usuario -> interfaz : 26. seleccionarItem(itemId, tipo)
+            deactivate usuario
+            interfaz --> usuario : 27. confirmarSeleccion()
+        end
+        
+        usuario -> interfaz : 28. procesarTrueque()
+        activate usuario
+        deactivate usuario
+        
+        interfaz -> gestion : 29. evaluarTrueque(itemsOfrecidos, itemsSolicitados)
+        activate gestion
+        gestion -> gestion : 30. calcularValorTotal(itemsOfrecidos, itemsSolicitados)
+        
+        alt Valores no están en rango similar
+            gestion --> interfaz : 31. rechazado
+            interfaz --> usuario : 32. mostrarError("Trueque rechazado - valores no equilibrados")
+            activate usuario
+            
+            alt Usuario quiere intentar nuevo trueque
+                usuario -> interfaz : 33. intentarNuevoTrueque()
+                deactivate usuario
+            else Usuario cancela
+                usuario -> interfaz : 33. cancelarTrueque()
+                deactivate usuario
+                deactivate interfaz
+            end
+        else Valores equilibrados
+            gestion -> teams : 31. ejecutarTrueque(equipoId, franquiciaId, items)
+            activate teams
+            teams --> gestion : 32. confirmacion
+            deactivate teams
+            gestion --> interfaz : 33. truequeAceptado
+            deactivate gestion
+            interfaz --> usuario : 34. confirmarTrueque("Trueque realizado exitosamente")
+            deactivate interfaz
+        end
+    end
+end
+
+note right of usuario : El actor puede cancelar\nel proceso en cualquier momento
+
+@enduml
