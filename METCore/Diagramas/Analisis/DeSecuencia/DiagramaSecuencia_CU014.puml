@@ -1,0 +1,71 @@
+@startuml DiagramaSecuencia_CU014
+!theme plain
+
+actor "Actor Usuario" as usuario
+participant "IUSistema" as interfaz
+collections "Equipos" as teams
+collections "Jugadores" as players
+
+usuario -> interfaz : 1. iniciarDraft(equipoId)
+activate interfaz
+
+interfaz -> teams : 2. E1 := buscarPorId(equipoId)
+activate teams
+teams --> interfaz : 3. E1
+deactivate teams
+
+alt E1 IS NULL OR E1.propietario != usuario OR E1.Draft IS NOT NULL
+    interfaz --> usuario : 4. mostrarError("Equipo no existe, no es propietario o ya tiene draft")
+else Es propietario
+    note over interfaz : Incluye CU016 - Modificación de ajustes del draft
+    interfaz -> interfaz : 5. AD1 := ejecutarCU016_ModificarAjustesDraft(E1)
+    
+    interfaz -> interfaz : 6. D1 := inicializarDraft(E1, AD1)
+    interfaz --> usuario : 7. D1
+    interfaz -> players : 8. prospectos := getProspectos()
+    activate players
+    players --> interfaz : 9. prospectos
+    deactivate players
+    interfaz --> usuario : 10. prospectos
+
+    loop Para cada elección de las rondas seleccionadas
+        alt Es turno del usuario
+
+            loop Prospecto no disponible
+                interfaz --> usuario : 11. mostrarProspectosDisponibles()
+                deactivate interfaz
+                activate usuario
+                usuario -> interfaz : 12. seleccionarProspecto(P1)
+                deactivate usuario
+                activate interfaz
+                
+                interfaz -> interfaz : 13. validarEleccion(P1)
+                
+                alt Prospecto ya seleccionado
+                    interfaz --> usuario : 14. mostrarError("Prospecto ya seleccionado")
+                    activate usuario
+                else Prospecto disponible
+                    interfaz --> usuario : 15. ok
+                end
+            end
+        else No es turno del usuario
+            interfaz -> interfaz : 16. eleccionSimulada := simular()
+            usuario <-- interfaz : 17. eleccionSimulada
+            deactivate usuario
+        end
+        interfaz -> interfaz : 18. siguientePick()
+    end
+    
+    interfaz --> usuario : 19. confirmarDraftCompleto("Draft completado exitosamente")
+    activate usuario
+    usuario -> interfaz : 20. guardarDraft()
+    interfaz -> teams : 21. guardarDraft(E1, D1)
+    activate teams
+    interfaz <-- teams : 22. ok
+    deactivate teams
+    usuario <-- interfaz : 23. ok
+    deactivate interfaz
+    deactivate usuario
+end
+
+@enduml

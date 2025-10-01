@@ -1,0 +1,77 @@
+@startuml DiagramaSecuencia_CU012
+!theme plain
+
+actor "Actor Usuario" as usuario
+participant "IUSistema" as interfaz
+collections "Equipos" as teams
+collections "AjustesDeEquipo" as ajustes
+collections "Franquicias" as franchises
+collections "Jugadores" as players
+
+usuario -> interfaz : 1. modificarJugadoresEquipo(equipoId)
+activate interfaz
+
+interfaz -> teams : 2. E1 := getEquipo(equipoId)
+activate teams
+teams --> interfaz : 3. E1
+deactivate teams
+
+interfaz -> ajustes : 4. A1 := buscarAjustesPorEquipoId(equipoId)
+activate ajustes
+ajustes --> interfaz : 5. A1
+deactivate ajustes
+
+alt E1 IS NULL OR E1.propietario != usuario
+    interfaz --> usuario : 6. mostrarError("No es propietario del equipo o no existe")
+else Es propietario
+    interfaz --> usuario : 7. E1.JugadoresSeleccionados
+    activate usuario
+    
+    interfaz -> franchises : 8. franquicias := getAll()
+    activate franchises
+    franchises --> interfaz : 9. franquicias
+    deactivate franchises
+    interfaz --> usuario : 10. franquicias
+    
+    loop Para cada franquicia que el usuario quiera modificar
+        usuario -> interfaz : 11. jugadores := getJugadoresPorFranquicia(franquiciaId)
+        interfaz -> players : 12. jugadores := getJugadoresPorFranquicia(franquiciaId)
+        activate players
+        players --> interfaz : 13. jugadores
+        deactivate players
+        interfaz --> usuario : 14. jugadores
+        
+        loop Para cada jugador clicado
+            alt Seleccionar jugador
+                usuario -> interfaz : 15. seleccionarJugador(jugadorId)
+                interfaz -> interfaz : 16. validarJugadorSeleccionable(jugadorId, A1.JugadoresProtegidos)
+                
+                alt Jugador protegido
+                    interfaz --> usuario : 17. mostrarError("Jugador protegido - no seleccionable")
+                else Jugador seleccionable
+                    interfaz --> usuario : 18. confirmarSeleccion()
+                end
+            else Deseleccionar jugador
+                usuario -> interfaz : 19. deseleccionarJugador(jugadorId)
+                interfaz --> usuario : 20. confirmarDeseleccion()
+            end
+        end
+    end
+    
+    usuario -> interfaz : 21. guardarSelecciones()
+    interfaz -> interfaz : 22. validarRoster(E1, A1)
+    
+    alt Roster no cumple validaciones
+        interfaz --> usuario : 23. mostrarError("El conjunto de jugadores no cumple con las validaciones del equipo")
+    else Selección válida
+        interfaz -> teams : 24. guardarSelecciones(E1)
+        activate teams
+        teams --> interfaz : 25. ok
+        deactivate teams
+        interfaz --> usuario : 26. confirmarCambios("Jugadores del equipo actualizados")
+        deactivate interfaz
+        deactivate usuario
+    end
+end
+
+@enduml

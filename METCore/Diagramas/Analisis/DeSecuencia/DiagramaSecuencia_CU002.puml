@@ -1,0 +1,37 @@
+@startuml DiagramaSecuencia_CU002
+!theme plain
+
+actor "Actor Anónimo" as anonimo
+participant "IUSistema" as interfaz
+collections "Usuarios" as gestion
+
+anonimo -> interfaz : 1. solicitarInicioSesion()
+activate interfaz
+
+loop usuario no existe
+    loop Credenciales inválidas
+        anonimo <- interfaz : 2. credenciales := solicitarCredenciales()
+        deactivate interfaz
+        activate anonimo
+        anonimo --> interfaz : 3. credenciales
+        deactivate anonimo
+        activate interfaz
+        
+        interfaz -> interfaz : 4. validarDatos(credenciales)
+    end
+    
+    interfaz -> gestion : 5. U1 := autenticarUsuario(credenciales)
+    activate gestion
+
+    gestion --> interfaz : 6. U1
+    deactivate gestion
+    alt U1 IS NULL
+        interfaz --> anonimo : 7. mostrarError("Usuario no registrado")
+    else
+        interfaz --> anonimo : 8. permitirAcceso(usuario)
+        deactivate interfaz
+    end
+
+end
+
+@enduml

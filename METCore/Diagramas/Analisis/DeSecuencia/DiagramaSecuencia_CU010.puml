@@ -1,0 +1,45 @@
+@startuml DiagramaSecuencia_CU010
+!theme plain
+
+actor "Actor Usuario" as usuario
+participant "IUSistema" as interfaz
+collections "Equipos" as teams
+
+alt Invocación de usuario
+    usuario -> interfaz : 1. modificarAjustes(equipoId)
+    
+    activate interfaz
+    interfaz -> teams : 2. E1 := buscarPorId(equipoId)
+    activate teams
+    teams --> interfaz : 3. E1
+    deactivate teams
+    
+    alt equipoActual IS NULL OR equipoActual.propietario != usuario
+        interfaz --> usuario : 4. mostrarError("No es propietario del equipo o no existe")
+    end
+    usuario <-- interfaz : 5. cambios:= mostrarAjustes(E1.ajustes)
+    activate usuario
+
+else Invocación desde creación de equipo (CU006)
+    note over interfaz : Equipo recién creado ya disponible\ndesde CU006
+    usuario <-- interfaz : 6. cambios:= mostrarAjustes(E1.ajustes)
+    deactivate interfaz
+end
+
+loop Modificaciones válidas
+    deactivate interfaz
+    usuario --> interfaz : 7. cambios
+    deactivate usuario
+    activate interfaz
+    
+    interfaz -> interfaz : 8. validarAjustes(cambios)
+end
+    
+interfaz -> teams : 9. guardarAjustes(E1, cambios)
+activate teams
+teams --> interfaz : 10. ok
+deactivate teams
+interfaz --> usuario : 11. ok
+deactivate interfaz
+
+@enduml

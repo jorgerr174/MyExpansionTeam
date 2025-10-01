@@ -13,14 +13,11 @@ namespace METAPI.Controllers
         private readonly UserService _userService = userService;
 
 
-        #region Get
+        #region Profile
         /// <summary>
         /// Obtener un UserDto con los valores del User logeado.
         /// </summary>
-        /// <returns>Opciones:
-        /// Username (vacío o no existe un User con ese username).
-        /// UserDto (Con los valores del User logeado).
-        /// </returns>
+        /// <returns>Información de perfil del usuario autenticado</returns>
         [HttpGet("Profile")]
         [Authorize]
         public async Task<IActionResult> Profile()
@@ -35,19 +32,15 @@ namespace METAPI.Controllers
 
             return Ok(user);
         }
-        #endregion
+        #endregion Profile
 
 
-        #region Update
+        #region UpdateUser
         /// <summary>
         /// Actualizar el User logeado con el userDto recibido.
         /// </summary>
-        /// <param name="dto"></param>
-        /// <returns>Opciones:
-        /// Username (vacío o no existe un User con ese username).
-        /// Error (no se pudieron guardar los cambios).
-        /// Nada (Ejecución correcta).
-        /// </returns>
+        /// <param name="dto">Nuevos datos del usuario (UpdateUserDto)</param>
+        /// <returns>Resultado de la actualización del usuario</returns>
         [HttpPut("UpdateUser")]
         [Authorize]
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto dto)
@@ -62,10 +55,15 @@ namespace METAPI.Controllers
 
             return Ok();
         }
-        #endregion
+        #endregion UpdateUser
 
 
         #region AssignRoles
+        /// <summary>
+        /// Buscar usuarios con filtros (solo Admin).
+        /// </summary>
+        /// <param name="dto">Criterios de búsqueda (SearchDto)</param>
+        /// <returns>Resultados paginados de usuarios encontrados</returns>
         [HttpPost("List")]
         [Authorize(Roles = "Admin")]
         public async Task<SearchResultDto<UserDto>> List(SearchDto dto)

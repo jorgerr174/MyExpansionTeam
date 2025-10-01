@@ -1,0 +1,59 @@
+@startuml DiagramaSecuencia_CU016
+!theme plain
+
+actor "Actor Usuario" as usuario
+participant "IUSistema" as interfaz
+collections "Equipos" as teams
+collections "Jugadores" as players
+
+usuario -> interfaz : 1. solicitarVisualizarEquipos()
+activate interfaz
+
+interfaz -> teams : 2. equipos := getEquiposDeUsuario(username)
+activate teams
+teams --> interfaz : 3. equipos
+deactivate teams
+
+alt equipos IS EMPTY
+    interfaz --> usuario : 4. mostrarMensaje("No tiene equipos creados")
+else Tiene equipos
+    interfaz --> usuario : 5. mostrarListadoEquipos(equipos)
+    deactivate interfaz
+    activate usuario
+    
+    loop Usuario navega entre equipos
+        usuario -> interfaz : 6. seleccionarEquipo(equipoId)
+        deactivate usuario
+        activate interfaz
+        
+        interfaz -> teams : 9. E1 := buscarConJugadores(equipoId)
+        activate teams
+        teams --> interfaz : 10. E1
+        deactivate teams
+        
+        interfaz -> players : 11. Stats := obtenerEstadisticas(E1.jugadores)
+        activate players
+        players --> interfaz : 12. Stats
+        deactivate players
+        
+
+        interfaz --> usuario : 13. mostrarDatos(E1, Stats)
+        deactivate interfaz
+        activate usuario
+        
+        alt Usuario selecciona volver al listado
+            usuario -> interfaz : 14. volverAListado()
+            deactivate usuario
+            activate interfaz
+            interfaz --> usuario : 15. mostrarListadoEquipos(equipos)
+            deactivate interfaz
+            activate usuario
+        else Usuario selecciona otro equipo
+            note over usuario : Continúa el loop con nueva selección
+            deactivate usuario
+        end
+    end
+    
+end
+
+@enduml
