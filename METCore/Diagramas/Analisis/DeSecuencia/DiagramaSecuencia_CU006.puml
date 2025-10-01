@@ -1,0 +1,30 @@
+@startuml DiagramaSecuencia_CU006
+!theme plain
+
+actor "Actor Usuario" as usuario
+participant "IUSistema" as interfaz
+collections "Equipos" as teams
+
+usuario -> interfaz : 1. crearEquipo()
+activate interfaz
+
+loop Datos inválidos o incompletos
+    usuario <- interfaz : 2. equipo := solicitarDatos()
+    deactivate interfaz
+    activate usuario
+    usuario --> interfaz : 3. equipo
+    deactivate usuario
+    activate interfaz
+    
+    interfaz -> interfaz : 4. validarDatos(equipo)
+    usuario <-- interfaz : 5. mostrarError("Datos inválidos o incompletos")
+end
+
+interfaz -> teams : 6. T1 := crearEquipo(datosEquipo)
+activate teams
+teams --> interfaz : 7. T1
+deactivate teams
+interfaz --> usuario : 8. ok
+deactivate interfaz
+
+@enduml

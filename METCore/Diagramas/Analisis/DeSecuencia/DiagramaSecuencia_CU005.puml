@@ -1,0 +1,27 @@
+@startuml DiagramaSecuencia_CU005
+!theme plain
+
+actor "Actor Usuario" as usuario
+participant "IUSistema" as interfaz
+collections "Usuarios" as users
+collections "Equipos" as teams
+
+usuario -> interfaz : 1. bajaUsuario()
+activate interfaz
+
+interfaz -> teams : 2. *eliminarEquiposDeUsuario(username)
+activate teams
+teams --> interfaz : 3. ok
+deactivate teams
+
+interfaz -> users : 4. eliminarUsuario(username)
+activate users
+users --> interfaz : 5. ok
+deactivate users
+
+
+interfaz -> interfaz : 6. cerrarSesion()
+interfaz --> usuario : 7. redirigeAInicio()
+deactivate interfaz
+
+@enduml

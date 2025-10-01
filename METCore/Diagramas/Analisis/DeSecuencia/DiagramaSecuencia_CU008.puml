@@ -1,0 +1,28 @@
+@startuml DiagramaSecuencia_CU008
+!theme plain
+
+actor "Actor Usuario" as usuario
+participant "IUSistema" as interfaz
+collections "Equipos" as teams
+
+usuario -> interfaz : 1. duplicarEquipo(equipoId)
+
+activate interfaz
+interfaz -> teams : 2. E1 := getEquipoPorId(equipoId)
+activate teams
+teams --> interfaz : 3. E1
+deactivate teams
+
+alt E1 IS NULL
+    interfaz --> usuario : 4. mostrarError("El equipo no existe")
+end
+
+interfaz -> interfaz : 5. E2 := duplicarEquipo(E1)
+interfaz -> teams : 6. E2 := crearEquipo(E2)
+activate teams
+teams --> interfaz : 7. E2
+deactivate teams
+interfaz --> usuario : 8. E2
+deactivate interfaz
+
+@enduml

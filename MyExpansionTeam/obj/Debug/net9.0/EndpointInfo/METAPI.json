@@ -333,28 +333,6 @@
         }
       }
     },
-    "/api/Teams/TeamDraft": {
-      "get": {
-        "tags": [
-          "Teams"
-        ],
-        "parameters": [
-          {
-            "name": "TeamId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/Teams/TeamBasicInfo": {
       "get": {
         "tags": [
@@ -557,6 +535,28 @@
       }
     },
     "/api/Teams/GetTeamTrades": {
+      "get": {
+        "tags": [
+          "Teams"
+        ],
+        "parameters": [
+          {
+            "name": "TeamId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Teams/TeamDraft": {
       "get": {
         "tags": [
           "Teams"
