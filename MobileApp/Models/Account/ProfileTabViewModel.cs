@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -80,7 +81,12 @@ namespace MobileApp.Models.Account
         {
             if (string.IsNullOrWhiteSpace(Identifier) || string.IsNullOrWhiteSpace(Password))
             {
-                LoginErrorMessage = "Por favor, introduzca el identificador y contraseña.";
+                ErrorMessage = "Por favor, introduzca el identificador y contraseña.";
+                return;
+            }
+            if (!Regex.Match(Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[_?.,-]).{8,}$").Success)
+            {
+                ErrorMessage = "La contraseña, de mínimo 8, caracteres debe contener: una minúscula, una mayúscula, un dígito y un símbolo.";
                 return;
             }
 
@@ -97,6 +103,7 @@ namespace MobileApp.Models.Account
                 else
                 {
                     LoginErrorMessage = "Credenciales inválidas.";
+                    OnPropertyChanged(nameof(HasLoginError));
                 }
             }
             catch (Exception ex)

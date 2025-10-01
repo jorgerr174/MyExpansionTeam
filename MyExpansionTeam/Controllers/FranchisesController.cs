@@ -13,6 +13,11 @@ namespace METAPI.Controllers
 
 
         #region Get Protectable Players
+        /// <summary>
+        /// Obtener jugadores que pueden ser protegidos por una franquicia.
+        /// </summary>
+        /// <param name="FranchiseId">ID de la franquicia (1-32)</param>
+        /// <returns>Lista de jugadores que pueden ser protegidos por la franquicia</returns>
         [HttpGet("GetProtectablePlayers")]
         public async Task<IActionResult> GetProtectablePlayers(int FranchiseId)
         {
@@ -26,6 +31,11 @@ namespace METAPI.Controllers
 
 
         #region Get Selectable Players
+        /// <summary>
+        /// Obtener jugadores seleccionables de una franquicia.
+        /// </summary>
+        /// <param name="FranchiseId">ID de la franquicia (1-32)</param>
+        /// <returns>Lista de jugadores seleccionables de la franquicia</returns>
         [HttpGet("GetSelectablePlayers")]
         public async Task<IActionResult> GetSelectablePlayers(int FranchiseId)
         {

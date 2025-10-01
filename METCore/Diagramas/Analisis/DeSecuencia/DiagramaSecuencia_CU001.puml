@@ -1,0 +1,35 @@
+@startuml DiagramaSecuencia_CU001
+!theme plain
+
+actor "Actor Anónimo" as anonimo
+participant "IUSistema" as interfaz
+collections "Usuarios" as users
+
+anonimo -> interfaz : 1. solicitarRegistro()
+activate interfaz
+
+loop Datos inválidos OR usuario existe
+    loop Datos inválidos
+        anonimo <- interfaz : 2. nuevoUsuario := solicitarDatos()
+        deactivate interfaz
+        activate anonimo
+        anonimo --> interfaz : 3. nuevoUsuario
+        deactivate anonimo
+        
+        interfaz -> interfaz : 4. validarDatos(nuevoUsuario)
+        activate interfaz
+    end
+    
+    interfaz -> users : 5. U1 := buscarUsuario(nuevoUsuario)
+    activate users
+    users --> interfaz : 8. U1
+    deactivate users
+
+    alt U1 IS NOT NULL
+        interfaz --> anonimo : 9. mostrarError("Usuario ya existe")
+    else
+        interfaz --> anonimo : 10. confirmarRegistro(U1)
+        deactivate interfaz
+    end
+end
+@enduml

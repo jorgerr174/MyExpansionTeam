@@ -18,14 +18,8 @@ namespace METAPI.Controllers
         /// <summary>
         /// Crear un nuevo User.
         /// </summary>
-        /// <param name="dto"></param>
-        /// <returns>Opciones:
-        /// Password (Password vacío).
-        /// Email (Email ya usado por otro usuario).
-        /// Username (Username ya usado por otro usuario).
-        /// Error (no se guardaron los cambios en la BBDD).
-        /// Nada (Ejecución correcta).
-        /// </returns>
+        /// <param name="dto">Datos del nuevo usuario (NewUserDto)</param>
+        /// <returns>Resultado de la operación de registro de usuario</returns>
         [HttpPost("SignUp")]
         public async Task<IActionResult> SignUp([FromBody] NewUserDto dto)
         {
@@ -40,13 +34,10 @@ namespace METAPI.Controllers
 
         #region CU002 LogIn
         /// <summary>
-        /// Actualizar las credenciales de acceso del User logeado.
+        /// Autenticar un usuario y obtener token JWT.
         /// </summary>
-        /// <param name="dto"></param>
-        /// <returns>Opciones:
-        /// Null (credenciales inválidas).
-        /// Token generado.
-        /// </returns>
+        /// <param name="dto">Credenciales de login (LogInDto)</param>
+        /// <returns>Token JWT de acceso</returns>
         [HttpPost("LogIn")]
         public async Task<IActionResult> LogIn([FromBody] LogInDto dto)
         {
@@ -67,16 +58,8 @@ namespace METAPI.Controllers
         /// <summary>
         /// Actualizar las credenciales de acceso del User logeado.
         /// </summary>
-        /// <param name="dto"></param>
-        /// <returns>Opciones:
-        /// Username (vacío o no existe un User con ese username).
-        /// Nothing(tanto NewUsername y NewPassword están vacíos)
-        /// Password (Password actual está vacío).
-        /// Credentials (Username y Password no son una combinación válida).
-        /// NewUsername (nuevo username ya usado por otro User).
-        /// Error (no se guardaron los cambios en la BBDD).
-        /// Nada (Ejecución correcta).
-        /// </returns>
+        /// <param name="dto">Nuevas credenciales (UpdateCredentialsDto)</param>
+        /// <returns>Resultado de la actualización de credenciales</returns>
         [HttpPut("UpdateCredentials")]
         [Authorize]
         public async Task<IActionResult> UpdateCredentials([FromBody] UpdateCredentialsDto dto)
@@ -97,11 +80,7 @@ namespace METAPI.Controllers
         /// <summary>
         /// Borrar el User logeado.
         /// </summary>
-        /// <returns>Opciones:
-        /// Username (vacío o no existe un User con ese username).
-        /// Error (no se guardaron los cambios en la BBDD).
-        /// Nada (Ejecución correcta).
-        /// </returns>
+        /// <returns>Resultado de la operación de eliminación de usuario</returns>
         [HttpDelete("DeleteUser")]
         [Authorize]
         public async Task<IActionResult> DeleteUser()
@@ -119,6 +98,11 @@ namespace METAPI.Controllers
 
 
         #region CU019 AssignRole
+        /// <summary>
+        /// Asignar rol a un usuario (solo Admin).
+        /// </summary>
+        /// <param name="dto">Datos de asignación de rol (AssignRoleDto)</param>
+        /// <returns>Resultado de la asignación de rol</returns>
         [HttpPost("AssignRole")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AssignRole(AssignRoleDto dto)

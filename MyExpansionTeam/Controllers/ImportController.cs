@@ -14,16 +14,12 @@ namespace METAPI.Controllers
         private readonly ImportService _importService = importService;
 
 
-        #region Create
-        /// <summary>Crea un jugador por cada fila con valores válidos en un excel.</summary>
-        /// <param name="dto">Archivo de donde se obtienen los datos.</param>
-        /// <returns>Opciones(números también como string):
-        /// No file uploaded (Archivo nulo).
-        /// File was empty (Archivo vacío).
-        /// NoPlayers (No se obtuvo ningún Player del fichero).
-        /// Error (No se guardó ningún Player en la BBDD).
-        /// Nada (Todo bien, también como string).
-        /// </returns>
+        #region Import
+        /// <summary>
+        /// Crea un jugador por cada fila con valores válidos en un excel.
+        /// </summary>
+        /// <param name="dto">Archivo de donde se obtienen los datos (ImportDto)</param>
+        /// <returns>Resultado del proceso de importación</returns>
         [HttpPost("Import")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Import([FromForm] ImportDto dto)
@@ -45,6 +41,6 @@ namespace METAPI.Controllers
 
             return Ok(new ResultImportDto { Content = result, Type = dto.Type });
         }
-        #endregion Create
+        #endregion Import
     }
 }

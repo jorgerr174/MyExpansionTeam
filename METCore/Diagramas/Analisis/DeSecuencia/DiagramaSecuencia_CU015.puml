@@ -1,0 +1,30 @@
+@startuml DiagramaSecuencia_CU015
+!theme plain
+
+actor "Actor Usuario" as usuario
+participant "IUSistema" as interfaz
+
+note over interfaz : Este caso de uso es invocado desde CU014
+
+interfaz -> interfaz : 1. A1 := generarAjustesDraftDefecto()
+activate interfaz
+
+interfaz --> usuario : 2. mostrarAjustes(A1)
+deactivate interfaz
+activate usuario
+
+loop Ajustes inválidos
+    usuario -> interfaz : 3. guardarAjustes(A2)
+    activate interfaz
+    
+    interfaz -> interfaz : 4. validarAjustesDraft(A2)
+end
+
+interfaz --> usuario : 5. confirmarAjustes("Ajustes de draft correctos")
+deactivate usuario
+
+note over interfaz : Retorna control a CU014 con ajustes configurados
+interfaz --> interfaz : 6. retornarACU014(A2)
+deactivate interfaz
+
+@enduml

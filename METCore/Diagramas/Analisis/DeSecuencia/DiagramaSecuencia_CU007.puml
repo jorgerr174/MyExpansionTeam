@@ -1,0 +1,37 @@
+@startuml DiagramaSecuencia_CU007
+!theme plain
+
+actor "Actor Usuario" as usuario
+participant "IUSistema" as interfaz
+collections "Equipos" as teams
+
+usuario -> interfaz : 1. solicitarModificarEquipo(equipoId)
+
+activate interfaz
+interfaz -> teams : 2. E1 := buscarPorId(equipoId)
+activate teams
+teams --> interfaz : 3. E1
+deactivate teams
+
+alt E1 IS NULL OR E1.propietario != usuario
+    interfaz --> usuario : 4. mostrarError("No es propietario")
+end    
+
+loop Datos incompletos o inválidos
+    usuario <-- interfaz : 5. editarEquipo(E1)
+    deactivate interfaz
+    activate usuario
+    usuario --> interfaz : 6. cambios
+    deactivate usuario
+    activate interfaz
+    interfaz -> interfaz : 7. validarDatos(cambios)
+end
+    
+interfaz -> teams : 8. actualizarEquipo(E1, cambios)
+activate teams
+teams --> interfaz : 9. ok
+deactivate teams
+interfaz --> usuario : 10. ok
+deactivate interfaz
+
+@enduml
