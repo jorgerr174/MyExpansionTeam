@@ -207,7 +207,7 @@ The application was designed as a multi-client system around a central REST API.
                                  ┌─────────────────────────┐
                                  │       SQL Server        │
                                  └─────────────────────────┘
-````
+```
 
 The architecture separates presentation, business logic and data access while allowing multiple clients to consume the same API and underlying business logic.
 
