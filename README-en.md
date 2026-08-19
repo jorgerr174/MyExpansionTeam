@@ -29,7 +29,31 @@ The application provides a complete environment in which users can:
 - Import and manage NFL data
 - Manage user accounts and permissions
 
-All of these features are implemented as functional application features rather than interface prototypes.
+All of these features are fully implemented and functional — not UI mockups.
+
+---
+
+# Getting Started
+
+Local development only — the project is not deployed to a public environment.
+
+**Requirements:** Visual Studio 2022 (.NET MAUI workload for mobile), .NET 9 SDK, SQL Server 2019/2022, SSMS.
+
+```bash
+# REST API
+cd MyExpansionTeam
+dotnet run
+# → https://localhost:7087/swagger
+
+# Web app
+cd WebApp
+dotnet run
+# → https://localhost:7099
+```
+
+For the mobile app, open `METAPI.sln` in Visual Studio, set `MobileApp` as the startup project, and run on an Android emulator.
+
+Full database setup and step-by-step installation instructions: [`TFGMemoria.pdf`](./TFGMemoria.pdf), section 15.1.
 
 ---
 
@@ -119,7 +143,7 @@ It includes data covering areas such as:
 
 The application includes a dedicated data-import system for loading NFL information from CSV files.
 
-The import process does more than simply read CSV files. It:
+The import pipeline:
 
 - Parses the input data
 - Validates records
@@ -153,41 +177,41 @@ The REST API uses **JWT Bearer authentication**, while the web application manag
 The application was designed as a multi-client system around a central REST API.
 
 ```text
-                       ┌─────────────────────────┐
-                       │      Web Application     │
-                       │      ASP.NET Core MVC    │
-                       └────────────┬────────────┘
-                                    │
-                                    │ HTTP
-                                    │
-┌─────────────────────────┐         ▼
-│    Mobile Application  │   ┌─────────────────────┐
-│        .NET MAUI       │──▶│      REST API       │
-│         MVVM           │   │    ASP.NET Core     │
-└─────────────────────────┘   └──────────┬──────────┘
-                                         │
-                                         ▼
-                              ┌─────────────────────┐
-                              │    Business Layer   │
-                              │       METCore       │
-                              └──────────┬──────────┘
-                                         │
-                                         ▼
-                              ┌─────────────────────┐
-                              │   Data Access Layer │
-                              │       METDAL        │
-                              │  EF Core + Repos.   │
-                              └──────────┬──────────┘
-                                         │
-                                         ▼
-                              ┌─────────────────────┐
-                              │     SQL Server      │
-                              └─────────────────────┘
+                                 ┌─────────────────────────┐
+                                 │     Web Application     │
+                                 │     ASP.NET Core MVC    │
+                                 └────────────┬────────────┘
+                                              │
+                                              │ HTTP
+                                              │
+┌─────────────────────────┐                   ▼
+│    Mobile Application   │      ┌─────────────────────────┐
+│        .NET MAUI        │ ──▶ │         REST API        │
+│         MVVM            │      │       ASP.NET Core      │
+└─────────────────────────┘      └────────────┬────────────┘
+                                              │
+                                              ▼
+                                 ┌─────────────────────────┐
+                                 │      Business Layer     │
+                                 │         METCore         │
+                                 └────────────┬────────────┘
+                                              │
+                                              ▼
+                                 ┌─────────────────────────┐
+                                 │     Data Access Layer   │
+                                 │         METDAL          │
+                                 │    EF Core + Repos.     │
+                                 └────────────┬────────────┘
+                                              │
+                                              ▼
+                                 ┌─────────────────────────┐
+                                 │       SQL Server        │
+                                 └─────────────────────────┘
 ````
 
 The architecture separates presentation, business logic and data access while allowing multiple clients to consume the same API and underlying business logic.
 
-This means that the web and mobile applications do not implement their own independent versions of the core functionality. Both communicate with the same backend through HTTP.
+Both clients consume the same backend through HTTP rather than duplicating business logic.
 
 ---
 
@@ -265,8 +289,6 @@ The web application communicates with the REST API through HTTP and provides the
 The mobile client implemented using .NET MAUI.
 
 The application follows the MVVM pattern and communicates with the same REST API used by the web client.
-
-The mobile application provides the core functionality of the system in a mobile-oriented interface.
 
 ---
 
@@ -452,8 +474,6 @@ Testing covered areas including:
 * Role management
 
 The tests included both successful and invalid scenarios, such as incomplete input, invalid credentials, duplicate data, invalid operations and cancellation of processes.
-
-The implemented functionality was verified against the expected results during development.
 
 ---
 
