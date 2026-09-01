@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
     <StartupObject></StartupObject>
+    <UserSecretsId>5e9a772d-41e2-47d2-8bf8-714a8cfe8fb4</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
