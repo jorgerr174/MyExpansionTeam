@@ -53,7 +53,7 @@ dotnet run
 
 Para la aplicación móvil, abre `METAPI.sln` en Visual Studio, establece `MobileApp` como proyecto de inicio y ejecútala sobre un emulador de Android.
 
-Configuración completa de la base de datos e instrucciones de instalación paso a paso: [`TFGMemoria.pdf`](./TFGMemoria.pdf), sección 15.1.
+Configuración completa de la base de datos e instrucciones de instalación paso a paso disponibles bajo petición.
 
 ---
 
@@ -70,7 +70,7 @@ Configuración completa de la base de datos e instrucciones de instalación paso
 
 <img src="docs/screenshots/mobile-home.png" alt="Pantalla de inicio móvil" width="300">
 
-Más pantallas (registro, gestión de cuenta, trueques, importación de datos y el flujo completo de la aplicación móvil) están disponibles en el manual de usuario del TFG — [`TFGMemoria.pdf`](./TFGMemoria.pdf), sección 15.2.
+Más pantallas (registro, gestión de cuenta, trueques, importación de datos y el flujo completo de la aplicación móvil) disponibles bajo petición.
 
 ---
 
@@ -507,9 +507,7 @@ Este proyecto fue desarrollado como mi **Trabajo de Fin de Grado (TFG)** en Inge
 
 La memoria completa documenta los requisitos, el análisis, la arquitectura, el diseño de la base de datos, la implementación, las pruebas, las conclusiones, las posibles líneas futuras de desarrollo y los manuales de instalación y usuario.
 
-La documentación completa está disponible en:
-
-**[`TFGMemoria.pdf`](./TFGMemoria.pdf)**
+La memoria/documentación completa está disponible bajo petición.
 
 La memoria contiene información técnica detallada que deliberadamente no se duplica por completo en este README.
 

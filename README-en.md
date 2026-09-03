@@ -53,7 +53,7 @@ dotnet run
 
 For the mobile app, open `METAPI.sln` in Visual Studio, set `MobileApp` as the startup project, and run on an Android emulator.
 
-Full database setup and step-by-step installation instructions: [`TFGMemoria.pdf`](./TFGMemoria.pdf), section 15.1.
+Full database setup and step-by-step installation instructions available upon request.
 
 ---
 
@@ -70,7 +70,7 @@ Full database setup and step-by-step installation instructions: [`TFGMemoria.pdf
 
 <img src="docs/screenshots/mobile-home.png" alt="Mobile home screen" width="300">
 
-More screens (registration, account management, trades, data import, and the full mobile flow) are available in the thesis's user manual — [`TFGMemoria.pdf`](./TFGMemoria.pdf), section 15.2.
+More screenshots (registration, account management, trades, data import, and the full mobile flow) available upon request.
 
 ---
 
@@ -507,9 +507,7 @@ This project was developed as my **Bachelor's Thesis (Trabajo de Fin de Grado)**
 
 The complete thesis documents the requirements, analysis, architecture, database design, implementation, testing, conclusions, future development possibilities and installation/user manuals.
 
-The full documentation is available in:
-
-**[`TFGMemoria.pdf`](./TFGMemoria.pdf)**
+The full thesis/documentation is available upon request.
 
 The thesis contains detailed technical information that is intentionally not duplicated in full in this README.
 
